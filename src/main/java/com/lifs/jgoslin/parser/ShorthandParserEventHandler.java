@@ -39,15 +39,16 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public void set_content(LipidAdduct l){
         content = l;
     }
+    
+    @Override
+    public LipidAdduct get_content(){
+        return content;
+    }
+    
      
     @Override
     public void enterPl_hg_double(Shorthand2020Parser.Pl_hg_doubleContext ctx) {
         content = new LipidAdduct();
         content.lipid_class = ctx.getText();
-    }
-    
-    @Override
-    public LipidAdduct get_content(){
-        return content;
     }
 }
