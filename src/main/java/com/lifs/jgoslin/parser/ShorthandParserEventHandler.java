@@ -42,7 +42,8 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
      
     @Override
     public void enterPl_hg_double(Shorthand2020Parser.Pl_hg_doubleContext ctx) {
-        System.out.println("Lipid class: "  + ctx.getText());
+        content = new LipidAdduct();
+        content.lipid_class = ctx.getText();
     }
     
     @Override

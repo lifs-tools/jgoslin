@@ -9,5 +9,9 @@ package com.lifs.jgoslin.domain;
  * @author dominik
  */
 public class LipidAdduct {
+    public String lipid_class;
     
+    public LipidAdduct(){
+        lipid_class = "";
+    }
 }
