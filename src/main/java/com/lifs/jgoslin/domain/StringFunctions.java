@@ -42,6 +42,22 @@ public class StringFunctions {
         return ss.toString();
     }
 
+    
+    String strip(String s, char c){
+        if (s.length() > 0) {
+            int st = 0;
+            while (st < s.length() - 1 && s.charAt(st) == c) ++st;
+            s = s.substring(st, s.length() - st);
+        }
+
+        if (s.length() > 0) {
+            int en = 0;
+            while (en < s.length() - 1 && s.charAt(s.length() - 1 - en) == c) ++en;
+            s = s.substring(0, s.length() - en);
+        }
+        return s;
+    }
+    
 
     public static ArrayList<String> split_string(String text){
         return split_string(text, ',', DEFAULT_QUOTE, false);
