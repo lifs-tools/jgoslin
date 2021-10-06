@@ -32,7 +32,7 @@ import com.lifs.jgoslin.domain.LipidException;
  *
  * @author dominik
  */
-public class Parser {
+public class Parser<T> {
     
     public ParseTreeWalker walker;
     public BaseParserEventHandler parser_event_handler;
@@ -43,11 +43,11 @@ public class Parser {
     }
     
     
-    public LipidAdduct parse(String s) throws LipidException {
+    public T parse(String s) {
         return null;
     }
     
-    public LipidAdduct parse(String s, boolean throw_error) throws LipidException {
+    public T parse(String s, boolean throw_error) {
         return null;
     }
 }

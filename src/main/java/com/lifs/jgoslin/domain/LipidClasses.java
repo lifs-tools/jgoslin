@@ -15,6 +15,7 @@
  */
 package com.lifs.jgoslin.domain;
 
+import com.lifs.jgoslin.parser.SumFormulaParser;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -135,10 +136,13 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
         }
         
         // creating the lipid class dictionary
-        for (Entry<String, ArrayList<String>> kv : data.entrySet()){
+        SumFormulaParser sfp = new SumFormulaParser();
+        data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
-            ElementTable e = new ElementTable();
-            // TODO
+            StringFunctions.split_string(kv.getValue().get(5), ',', '"').forEach(scase -> {
+                special_cases.add(scase.strip());
+            });
+            ElementTable e = sfp.parse(kv.getValue().get(6));
             ArrayList<String> synonyms = new ArrayList<>();
             synonyms.add(kv.getValue().get(0)); 
             for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) synonyms.add(kv.getValue().get(ii));
@@ -150,7 +154,7 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
                     special_cases,
                     e,
                     synonyms));
-        }
+        });
     }
             
             

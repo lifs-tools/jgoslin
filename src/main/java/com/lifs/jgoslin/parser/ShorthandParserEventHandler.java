@@ -28,7 +28,7 @@ import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.LipidAdduct;
 
 
-public class ShorthandParserEventHandler extends Shorthand2020BaseListener implements BaseParserEventHandler {
+public class ShorthandParserEventHandler extends Shorthand2020BaseListener implements BaseParserEventHandler<LipidAdduct> {
     LipidAdduct content;
     
     public ShorthandParserEventHandler(){

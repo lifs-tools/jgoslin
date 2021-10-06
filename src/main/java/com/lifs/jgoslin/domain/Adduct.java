@@ -24,6 +24,9 @@ SOFTWARE.
 
 package com.lifs.jgoslin.domain;
 
+import com.lifs.jgoslin.parser.SumFormulaParser;
+import java.util.Map.Entry;
+
 /**
  *
  * @author dominik
@@ -71,13 +74,12 @@ public class Adduct
         try{
 
             String adduct_name = adduct_string.substring(1);
-            /*
-            ElementTable adduct_elements = SumFormulaParser.get_instance().parse(adduct_name);
-            foreach (KeyValuePair<Element, int> kvp in adduct_elements)
-            {
-                elements[kvp.Key] += kvp.Value;
+            
+            ElementTable adduct_elements = (new SumFormulaParser()).parse(adduct_name);
+            for (Entry<Element, Integer> kv : adduct_elements.entrySet()){
+                elements.put(kv.getKey(), elements.get(kv.getKey())  + kv.getValue());
             }
-            */
+            
 
         }
         catch (Exception e)

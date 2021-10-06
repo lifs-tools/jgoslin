@@ -25,8 +25,7 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.Shorthand2020Lexer;
-import com.lifs.jgoslin.antlr.Shorthand2020Parser;
+import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.ElementTable;
 import com.lifs.jgoslin.domain.LipidAdduct;
 import com.lifs.jgoslin.domain.LipidException;
@@ -39,33 +38,33 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author dominik
  */
-public class ShorthandParser extends Parser<LipidAdduct> {
-    public ShorthandParser(){
-        super(new ShorthandParserEventHandler());
+public class SumFormulaParser extends Parser {
+    public SumFormulaParser(){
+        super(new SumFormulaParserEventHandler());
     }
     
     
     
     @Override
-    public LipidAdduct parse(String s) {
+    public ElementTable parse(String s) {
         return parse(s, true);
     }
     
     
     @Override
-    public LipidAdduct parse(String s, boolean throw_exception) {
+    public ElementTable parse(String s, boolean throw_exception) {
         parser_event_handler.set_content(null);
         try {
-            Shorthand2020Lexer lexer = new Shorthand2020Lexer(CharStreams.fromString(s));
+            SumFormulaLexer lexer = new SumFormulaLexer(CharStreams.fromString(s));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            Shorthand2020Parser parser = new Shorthand2020Parser(tokens);
-            ParseTree tree = parser.lipid();
+            com.lifs.jgoslin.antlr.SumFormulaParser parser = new com.lifs.jgoslin.antlr.SumFormulaParser(tokens);
+            ParseTree tree = parser.molecule();
             walker.walk(parser_event_handler, tree);
         }
         catch(Exception e){
             if (throw_exception) throw new LipidParsingException("Lipid '" + s + "' can not be parsed by grammar 'Shorthand2020'");
         }
         
-        return (LipidAdduct)parser_event_handler.get_content();
+        return (ElementTable)parser_event_handler.get_content();
     }
 }

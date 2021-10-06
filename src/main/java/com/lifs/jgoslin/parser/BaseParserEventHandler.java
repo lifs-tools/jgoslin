@@ -24,14 +24,13 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.domain.LipidAdduct;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
  *
  * @author dominik
  */
-public interface BaseParserEventHandler extends ParseTreeListener {
-    public LipidAdduct get_content();
-    public void set_content(LipidAdduct l);
+public interface BaseParserEventHandler<T> extends ParseTreeListener {
+    public T get_content();
+    public void set_content(T l);
 }

@@ -16,7 +16,8 @@ public class Runtest extends TestCase {
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
-        System.out.println(LipidClasses.get_instance());
+        
+        //System.out.println(LipidClasses.get_instance());
 
         
         
