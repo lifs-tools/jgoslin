@@ -27,8 +27,6 @@ package com.lifs.jgoslin.parser;
 
 import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.ElementTable;
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.domain.LipidException;
 import com.lifs.jgoslin.domain.LipidParsingException;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

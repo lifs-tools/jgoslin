@@ -65,40 +65,39 @@
             <artifactId>antlr4-runtime</artifactId>
             <version>4.9.2</version>
         </dependency>
-        
-        <!--
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-maven-plugin</artifactId>
-            <version>4.9.2</version>
-            <type>maven-plugin</type>
-        </dependency>
-        -->
     </dependencies>
     
     
     
     <build>
+        <resources>
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>src/main/antlr4/lipid-list.csv</include>
+                    <include>src/main/antlr4/functional-groups.csv</include>
+                </includes>
+            </resource>
+        </resources>
+        
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <excludeTransitive>false</excludeTransitive>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
             </plugin>
+
             
             <plugin>
                 <groupId>org.antlr</groupId>

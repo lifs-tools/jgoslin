@@ -24,9 +24,7 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.domain.LipidAdduct;
 import org.antlr.v4.runtime.tree.*;
-import com.lifs.jgoslin.domain.LipidException;
 
 /**
  *
