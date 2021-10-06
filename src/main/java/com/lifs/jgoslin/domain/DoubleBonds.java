@@ -56,7 +56,7 @@ public class DoubleBonds{
     }
 
 
-    public int get_num() throws ConstraintViolationException {
+    public int get_num() {
         if (double_bond_positions.size() > 0 && double_bond_positions.size() != num_double_bonds)
         {
             throw new ConstraintViolationException("Number of double bonds '" + Integer.toString(num_double_bonds) + "' does not match to number of double bond positions '" + Integer.toString(double_bond_positions.size()) + "'");

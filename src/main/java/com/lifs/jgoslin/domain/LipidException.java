@@ -19,7 +19,7 @@ package com.lifs.jgoslin.domain;
  *
  * @author dominik
  */
-public class LipidException extends Exception {
+public class LipidException extends RuntimeException {
     public LipidException(String s){
         super(s);
     }

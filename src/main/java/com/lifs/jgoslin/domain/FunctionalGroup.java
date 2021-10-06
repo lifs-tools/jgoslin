@@ -47,6 +47,10 @@ public class FunctionalGroup {
         this(_name, -1, 1, null, false, "", null, null);
     }
     
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements){
+        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null);
+    
+    }
     
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups){
         name = _name;
@@ -98,8 +102,7 @@ public class FunctionalGroup {
     }
 
 
-    public void shift_positions(int shift)
-    {
+    public void shift_positions(int shift){
         position += shift;
         functional_groups.entrySet().forEach(kv -> {
             kv.getValue().forEach(fg -> {
@@ -125,8 +128,7 @@ public class FunctionalGroup {
     }
 
 
-    public void compute_elements()
-    {
+    public void compute_elements() {
         functional_groups.entrySet().forEach(kv -> {
             kv.getValue().forEach(func_group -> {
                 func_group.compute_elements();
@@ -186,9 +188,8 @@ public class FunctionalGroup {
 
 
     public void add(FunctionalGroup fg){
-        for (Enrty<Element, int> kv in fg.elements)
-        {
-            elements[kv.Key] += kv.Value * fg.count;
-        }
+        fg.elements.entrySet().forEach(kv -> {
+            elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue() * fg.count);
+        });
     }
 }
