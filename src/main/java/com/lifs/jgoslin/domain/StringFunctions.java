@@ -46,6 +46,11 @@ public class StringFunctions {
     public static ArrayList<String> split_string(String text){
         return split_string(text, ',', DEFAULT_QUOTE, false);
     }
+
+
+    public static ArrayList<String> split_string(String text, char _sep, char _quote){
+        return split_string(text, _sep, _quote, false);
+    }
     
 
     public static ArrayList<String> split_string(String text, char separator, char _quote, boolean with_empty){

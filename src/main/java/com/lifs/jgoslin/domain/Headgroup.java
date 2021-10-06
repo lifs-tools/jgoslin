@@ -76,9 +76,9 @@ public class Headgroup {
 
     public static LipidCategory get_category(String _headgroup){
         if (StringCategory.isEmpty()){
-            LipidClasses.get_instance().entrySet().forEach(kvp -> {
-                LipidCategory category = kvp.getValue().lipid_category;
-                kvp.getValue().synonyms.forEach(hg -> {
+            LipidClasses.get_instance().forEach(lipid_class -> {
+                LipidCategory category = lipid_class.lipid_category;
+                lipid_class.synonyms.forEach(hg -> {
                     StringCategory.put(hg, category);
                 });
             });
@@ -92,12 +92,13 @@ public class Headgroup {
     public static int get_class(String _headgroup){
         
         if (StringClass.isEmpty()){
-            LipidClasses.get_instance().entrySet().forEach(kvp -> {
-                int l_class = kvp.getKey();
-                kvp.getValue().synonyms.forEach(hg -> {
+            int l_class = 0;
+            for (LipidClassMeta lipid_class : LipidClasses.get_instance()){
+                for (String hg : lipid_class.synonyms){
                     StringClass.put(hg, l_class);
-                });
-            });
+                }
+                l_class += 1;
+            }
         }
 
         return StringClass.containsKey(_headgroup) ? StringClass.get(_headgroup) : LipidClasses.UNDEFINED_CLASS;
@@ -106,9 +107,10 @@ public class Headgroup {
 
     public static String get_class_string(int _lipid_class){
         if (ClassString.isEmpty()){
-            LipidClasses.get_instance().entrySet().forEach(kvp -> {
-                ClassString.put(kvp.getKey(), kvp.getValue().synonyms.get(0));
-            });
+            int l_class = 0;
+            for (LipidClassMeta lipid_class : LipidClasses.get_instance()){
+                ClassString.put(l_class++, lipid_class.synonyms.get(0));
+            }
         }
 
         return ClassString.containsKey(_lipid_class) ? ClassString.get(_lipid_class) : "UNDEFINED";
@@ -170,7 +172,7 @@ public class Headgroup {
 
     public ElementTable get_elements(){
 
-        if (use_headgroup || !LipidClasses.get_instance().containsKey(lipid_class)){
+        if (use_headgroup || LipidClasses.get_instance().size() <= lipid_class){
             throw new RuntimeException("Element table cannot be computed for lipid '" + headgroup + "'");
         }
 
