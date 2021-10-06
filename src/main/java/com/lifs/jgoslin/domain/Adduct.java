@@ -58,7 +58,7 @@ public class Adduct
 
     public ElementTable get_elements()
     {
-        ElementTable elements = ElementTable.create_empty_table();
+        ElementTable elements = new ElementTable();
         try{
 
             String adduct_name = adduct_string.substring(1);
@@ -78,7 +78,7 @@ public class Adduct
 
         if (adduct_string.length() > 0 && adduct_string.charAt(0) == '-')
         {
-            for (Elements.Element e : Elements.element_order)
+            for (Element e : Elements.element_order)
             {
                 elements.replace(e, elements.get(e) * -1);
             }
