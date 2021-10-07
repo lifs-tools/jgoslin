@@ -24,18 +24,40 @@ SOFTWARE.
 
 package com.lifs.jgoslin.domain;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author dominik
  */
-public enum LipidFaBondType {
-    NO_FA,
-    UNDEFINED_FA,
-    ESTER,
-    ETHER_PLASMANYL,
-    ETHER_PLASMENYL,
-    ETHER_UNSPECIFIED,
-    LCB_EXCEPTION,
-    LCB_REGULAR,
-    AMINE
-};
+public class CarbonChain extends FunctionalGroup {
+    public CarbonChain(FattyAcid _fa){
+        this(_fa, -1, 1);
+    }
+    
+    public CarbonChain(FattyAcid _fa, int _position, int _count){
+        super("cc", _position, _count);
+        if (_fa != null)
+        {
+            functional_groups.put("cc", new ArrayList<FunctionalGroup>());
+            functional_groups.get("cc").add(_fa);
+        }
+
+        elements.put(Element.H, 1);
+        elements.put(Element.O, -1);
+    }
+
+
+    @Override
+    public FunctionalGroup copy()
+    {
+        return new CarbonChain((FattyAcid)functional_groups.get("cc").get(0).copy(), position, count);
+    }
+
+
+    @Override
+    public String to_string(LipidLevel level)
+    {
+        return (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(position) : "") + "(" + ((FattyAcid)functional_groups.get("cc").get(0)).to_string(level) + ")";
+    }
+}

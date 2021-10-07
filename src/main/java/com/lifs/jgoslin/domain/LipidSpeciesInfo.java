@@ -1,19 +1,31 @@
 /*
- * Copyright 2021 dominik.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+MIT License
+
+Copyright (c) the authors (listed in global LICENSE file)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package com.lifs.jgoslin.domain;
+
+import java.util.ArrayList;
+import java.util.Map.Entry;
 
 /**
  *
@@ -28,20 +40,18 @@ public class LipidSpeciesInfo extends FattyAcid {
     public static final String[] ether_prefix = {"", "O-", "dO-", "tO-", "eO-"};
     public int lipid_class;
 
-    public LipidSpeciesInfo (LipidClass _lipid_class) : base("info")
-    {
+    public LipidSpeciesInfo (int _lipid_class){
+        super("info");
         lipid_class = _lipid_class;
         level = LipidLevel.NO_LEVEL;
         num_ethers = 0;
         num_specified_fa = 0;
         extended_class = LipidFaBondType.ESTER;
-        ClassMap lipid_classes = LipidClasses.lipid_classes;
-        total_fa = lipid_classes.ContainsKey(lipid_class) ? lipid_classes[lipid_class].max_num_fa : 0;
+        total_fa = (LipidClasses.get_instance().size() > lipid_class) ? LipidClasses.get_instance().get(lipid_class).max_num_fa : 0;
     }
 
 
-    public LipidSpeciesInfo copy()
-    {
+    public LipidSpeciesInfo copy(){
         LipidSpeciesInfo lsi = new LipidSpeciesInfo(lipid_class);
         lsi.level = level;
         lsi.num_ethers = num_ethers;
@@ -53,32 +63,30 @@ public class LipidSpeciesInfo extends FattyAcid {
         lsi.double_bonds = double_bonds.copy();
         lsi.lipid_FA_bond_type = lipid_FA_bond_type;
 
-        foreach (KeyValuePair<string, List<FunctionalGroup>> kv in functional_groups)
-        {
-            lsi.functional_groups.Add(kv.Key, new List<FunctionalGroup>());
-            foreach (FunctionalGroup func_group in kv.Value)
-            {
-                lsi.functional_groups[kv.Key].Add(func_group.copy());
-            }
-        }
+        functional_groups.entrySet().stream().map(kv -> {
+            lsi.functional_groups.put(kv.getKey(), new ArrayList<>());
+            return kv;
+        }).forEachOrdered(kv -> {
+            kv.getValue().forEach(func_group -> {
+                lsi.functional_groups.get(kv.getKey()).add(func_group.copy());
+            });
+        });
         return lsi;
     }
 
 
-    public override ElementTable get_elements()
-    {
-        ElementTable elements = base.get_elements();
-        if (lipid_FA_bond_type != LipidFaBondType.LCB_EXCEPTION) elements[Element.O] -= (num_ethers == 0) ? 1 : 0;
-        elements[Element.H] += num_ethers == 0 ? 1 : -1;
+    @Override
+    public ElementTable get_elements(){
+        ElementTable elements = super.get_elements();
+        if (lipid_FA_bond_type != LipidFaBondType.LCB_EXCEPTION) elements.put(Element.O, elements.get(Element.O) - ((num_ethers == 0) ? 1 : 0));
+        elements.put(Element.H, elements.get(Element.H) + (num_ethers == 0 ? 1 : -1));
 
         return elements;
     }
 
 
-    public void add(FattyAcid _fa)
-    {
-        if (_fa.lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMENYL || _fa.lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMANYL)
-        {
+    public void add(FattyAcid _fa){
+        if (_fa.lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMENYL || _fa.lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMANYL){
             num_ethers += 1;
             lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMANYL;
             extended_class = _fa.lipid_FA_bond_type;
@@ -92,42 +100,36 @@ public class LipidSpeciesInfo extends FattyAcid {
         {
             num_specified_fa += 1;
         }
-        foreach (KeyValuePair<string, List<FunctionalGroup> > kv in  _fa.functional_groups)
-        {
-            if (!functional_groups.ContainsKey(kv.Key)) functional_groups.Add(kv.Key, new List<FunctionalGroup>());
-            foreach (FunctionalGroup func_group in kv.Value)
-            {
-                functional_groups[kv.Key].Add(func_group.copy());
+        for (Entry<String, ArrayList<FunctionalGroup> > kv : _fa.functional_groups.entrySet()){
+            if (!functional_groups.containsKey(kv.getKey())) functional_groups.put(kv.getKey(), new ArrayList<FunctionalGroup>());
+            for (FunctionalGroup func_group : kv.getValue()){
+                functional_groups.get(kv.getKey()).add(func_group.copy());
             }
         }
 
         ElementTable e = _fa.get_elements();
-        num_carbon += e[Element.C];
+        num_carbon += e.get(Element.C);
         double_bonds.num_double_bonds += _fa.get_double_bonds();
 
     }
 
 
-    public string to_string()
-    {
+    public String to_string(){
         StringBuilder info_string = new StringBuilder();
-        info_string.Append(ether_prefix[num_ethers]);
-        info_string.Append(num_carbon).Append(":").Append(double_bonds.get_num());
+        info_string.append(ether_prefix[num_ethers]);
+        info_string.append(num_carbon).append(":").append(double_bonds.get_num());
 
         ElementTable elements = get_functional_group_elements();
-        for (int i = 2; i < Elements.element_order.Count; ++i)
-        {
-            Element e = Elements.element_order[i];
-            if (elements[e] > 0)
-            {
-                info_string.Append(";").Append(Elements.element_shortcut[e]);
-                if (elements[e] > 1)
-                {
-                    info_string.Append(elements[e]);
+        for (int i = 2; i < Elements.element_order.size(); ++i){
+            Element e = Elements.element_order.get(i);
+            if (elements.get(e) > 0){
+                info_string.append(";").append(Elements.element_shortcut.get(e));
+                if (elements.get(e) > 1){
+                    info_string.append(elements.get(e));
                 }
             }
         }
 
-        return info_string.ToString();
+        return info_string.toString();
     }
 }

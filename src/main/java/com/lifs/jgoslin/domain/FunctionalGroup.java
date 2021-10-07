@@ -47,9 +47,12 @@ public class FunctionalGroup {
         this(_name, -1, 1, null, false, "", null, null);
     }
     
+    public FunctionalGroup(String _name, int _position, int _count){
+        this(_name, _position, _count, null, false, "", null, null);
+    }
+    
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements){
         this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null);
-    
     }
     
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups){
