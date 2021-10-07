@@ -38,6 +38,10 @@ public class AcylAlkylGroup extends FunctionalGroup {
         this(_fa, -1, 1, false, false);
     }
 
+    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl){
+        this(_fa, _position, _count, _alkyl, false);
+    }
+
     public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, boolean _N_bond){
         super("O", _position, _count);
         alkyl = _alkyl;

@@ -668,5 +668,85 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
         ((Lst)((Dict)tmp.get(FA_I())).get("cycle_elements")).add(Elements.element_positions.get(element));
     }
+    
+    @Override
+    public void enterFatty_acyl_linkage(Shorthand2020Parser.Fatty_acyl_linkageContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_name", "acyl");
+        current_fas.add(new AcylAlkylGroup((FattyAcid)null));
+        tmp.put(FA_I(), new Dict());
+        ((Dict)tmp.get(FA_I())).put("linkage_pos", -1);
+    }
+
+    @Override
+    public void exitFatty_acyl_linkage(Shorthand2020Parser.Fatty_acyl_linkageContext node){
+        boolean linkage_type = (int)((Dict)tmp.get(FA_I())).get("linkage_type") == 1;
+        int linkage_pos = (int)((Dict)tmp.get(FA_I())).get("linkage_pos");
+
+        tmp.remove(FA_I());
+        AcylAlkylGroup acyl = (AcylAlkylGroup)current_fas.PopBack();
+
+        acyl.position = linkage_pos;
+        acyl.set_N_bond_type(linkage_type);
+        if (linkage_pos == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+
+        if (!current_fas.back().functional_groups.containsKey("acyl")) current_fas.back().functional_groups.put("acyl", new ArrayList<FunctionalGroup>());
+        current_fas.back().functional_groups.get("acyl").add(acyl);
+    }
+
+    @Override
+    public void enterFatty_alkyl_linkage(Shorthand2020Parser.Fatty_alkyl_linkageContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_name", "alkyl");
+        current_fas.add(new AcylAlkylGroup(null, -1, 1, true));
+        tmp.put(FA_I(), new Dict());
+        ((Dict)tmp.get(FA_I())).put("linkage_pos", -1);
+    }
+
+    @Override
+    public void exitFatty_alkyl_linkage(Shorthand2020Parser.Fatty_alkyl_linkageContext node){
+        int linkage_pos = (int)((Dict)tmp.get(FA_I())).get("linkage_pos");
+        tmp.remove(FA_I());
+        AcylAlkylGroup alkyl = (AcylAlkylGroup)current_fas.PopBack();
+
+        alkyl.position = linkage_pos;
+        if (linkage_pos == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+
+        if (!current_fas.back().functional_groups.containsKey("alkyl")) current_fas.back().functional_groups.put("alkyl", new ArrayList<FunctionalGroup>());
+        current_fas.back().functional_groups.get("alkyl").add(alkyl);
+    }
+
+    @Override
+    public void enterFatty_linkage_number(Shorthand2020Parser.Fatty_linkage_numberContext node){
+        ((Dict)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
+    }
+
+    @Override
+    public void enterFatty_acyl_linkage_sign(Shorthand2020Parser.Fatty_acyl_linkage_signContext node){
+        ((Dict)tmp.get(FA_I())).put("linkage_type", node.getText().equals("N") ? 1 : 0);
+    }
+
+    @Override
+    public void enterHydrocarbon_chain(Shorthand2020Parser.Hydrocarbon_chainContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_name", "cc");
+        current_fas.add(new CarbonChain((FattyAcid)null));
+        tmp.put(FA_I(), new Dict());
+        ((Dict)tmp.get(FA_I())).put("linkage_pos", -1);
+    }
+
+    @Override
+    public void exitHydrocarbon_chain(Shorthand2020Parser.Hydrocarbon_chainContext node){
+        int linkage_pos = (int)((Dict)tmp.get(FA_I())).get("linkage_pos");
+        tmp.remove(FA_I());
+        CarbonChain cc = (CarbonChain)current_fas.PopBack();
+        cc.position = linkage_pos;
+        if (linkage_pos == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+
+        if (!current_fas.back().functional_groups.containsKey("cc")) current_fas.back().functional_groups.put("cc", new ArrayList<FunctionalGroup>());
+        current_fas.back().functional_groups.get("cc").add(cc);
+    }
+
+    @Override
+    public void enterHydrocarbon_number(Shorthand2020Parser.Hydrocarbon_numberContext node){
+        ((Dict)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
+    }
 
 }
