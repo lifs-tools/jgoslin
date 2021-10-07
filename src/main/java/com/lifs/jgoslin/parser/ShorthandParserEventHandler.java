@@ -749,4 +749,90 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         ((Dict)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
     }
 
+    @Override
+    public void enterRing_stereo(Shorthand2020Parser.Ring_stereoContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_ring_stereo", node.getText());
+    }
+
+    @Override
+    public void enterPl_hg_fa(Shorthand2020Parser.Pl_hg_faContext node){
+        String fa_i = FA_I();
+        tmp.put(fa_i, new Dict());
+        ((Dict)tmp.get(fa_i)).put("fg_name", "decorator_acyl");
+        current_fas.add(new HeadgroupDecorator("decorator_acyl", -1, 1, null, true));
+        tmp.put(FA_I(), new Dict());
+    }
+
+    @Override
+    public void exitPl_hg_fa(Shorthand2020Parser.Pl_hg_faContext node){
+        tmp.remove(FA_I());
+        headgroup_decorators.add((HeadgroupDecorator)current_fas.PopBack());
+        tmp.remove(FA_I());
+    }
+
+    @Override
+    public void enterPl_hg_alk(Shorthand2020Parser.Pl_hg_alkContext node){
+        tmp.put(FA_I(), new Dict());
+        ((Dict)tmp.get(FA_I())).put("fg_name", "decorator_alkyl");
+        current_fas.add(new HeadgroupDecorator("decorator_alkyl", -1, 1, null, true));
+        tmp.put(FA_I(), new Dict());
+    }
+
+    @Override
+    public void exitPl_hg_alk(Shorthand2020Parser.Pl_hg_alkContext node){
+        tmp.remove(FA_I());
+        headgroup_decorators.add((HeadgroupDecorator)current_fas.PopBack());
+        tmp.remove(FA_I());
+    }
+
+    @Override
+    public void enterPl_hg_species(Shorthand2020Parser.Pl_hg_speciesContext node){
+        set_lipid_level(LipidLevel.SPECIES);
+        HeadgroupDecorator hgd = new HeadgroupDecorator("");
+        hgd.elements.put(Element.O, hgd.elements.get(Element.O) + 1);
+        hgd.elements.put(Element.H, hgd.elements.get(Element.O) - 1);
+        headgroup_decorators.add(hgd);
+    }
+
+    @Override
+    public void enterHg_pip_m(Shorthand2020Parser.Hg_pip_mContext node){
+        headgroup_decorators.add(new HeadgroupDecorator(node.getText(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
+    }
+
+    @Override
+    public void enterHg_pip_d(Shorthand2020Parser.Hg_pip_dContext node){
+        headgroup_decorators.add(new HeadgroupDecorator(node.getText(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
+    }
+
+    @Override
+    public void enterHg_pip_t(Shorthand2020Parser.Hg_pip_tContext node){
+        headgroup_decorators.add(new HeadgroupDecorator(node.getText(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
+    }
+
+    @Override
+    public void enterHg_PE_PS_type(Shorthand2020Parser.Hg_PE_PS_typeContext node){
+        headgroup_decorators.add(new HeadgroupDecorator(node.getText(), -1, 1, null, true, LipidLevel.SPECIES));
+    }
+
+    @Override
+    public void exitAcer_hg(Shorthand2020Parser.Acer_hgContext node){
+        head_group = "ACer";
+        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
+        hgd.functional_groups.put("decorator_acyl", new ArrayList<FunctionalGroup>());
+        hgd.functional_groups.get("decorator_acyl").add(fa_list.get(fa_list.size() - 1));
+        fa_list.remove(fa_list.size() - 1);
+        headgroup_decorators.add(hgd);
+    }
+
+    @Override
+    public void exitAcer_species(Shorthand2020Parser.Acer_speciesContext node){
+        head_group = "ACer";
+        set_lipid_level(LipidLevel.SPECIES);
+        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
+        hgd.functional_groups.put("decorator_acyl", new ArrayList<FunctionalGroup>());
+        hgd.functional_groups.get("decorator_acyl").add(new FattyAcid("FA", 2));
+        headgroup_decorators.add(hgd);
+        acer_species = true;
+    }
+
 }
