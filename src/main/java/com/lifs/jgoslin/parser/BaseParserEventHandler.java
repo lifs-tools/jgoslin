@@ -24,6 +24,7 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
+import com.lifs.jgoslin.domain.LipidLevel;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -33,4 +34,5 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 public interface BaseParserEventHandler<T> extends ParseTreeListener {
     public T get_content();
     public void set_content(T l);
+    public void set_lipid_level(LipidLevel _level);
 }

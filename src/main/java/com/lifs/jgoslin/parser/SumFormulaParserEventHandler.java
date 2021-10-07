@@ -49,6 +49,10 @@ public class SumFormulaParserEventHandler extends SumFormulaBaseListener impleme
     public ElementTable get_content(){
         return content;
     }
+
+
+    @Override
+    public void set_lipid_level(LipidLevel _level){}
     
      
     @Override
