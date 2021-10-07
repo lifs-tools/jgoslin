@@ -92,6 +92,12 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
         }
     }
     
+    
+    public FunctionalGroup get(String s){
+        return super.get(s).copy();
+    }
+    
+    
     public static KnownFunctionalGroups get_instance(){
         if (known_functional_groups == null) known_functional_groups = new KnownFunctionalGroups();
         return known_functional_groups;

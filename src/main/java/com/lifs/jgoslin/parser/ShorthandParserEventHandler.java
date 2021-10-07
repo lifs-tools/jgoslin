@@ -42,7 +42,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public Adduct adduct = null;
     public ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
     public boolean use_head_group = false;
-    public ArrayList<FunctionalGroup> current_fas;
+    public ExtendedList<FunctionalGroup> current_fas;
     public HashMap<String, Object> tmp = new HashMap<>();
     public boolean acer_species = false;
     public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
@@ -152,7 +152,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         adduct = null;
         head_group = "";
         fa_list = new ArrayList<FattyAcid>();
-        current_fas = new ArrayList<FunctionalGroup>();
+        current_fas = new ExtendedList<FunctionalGroup>();
         headgroup_decorators = new ArrayList<HeadgroupDecorator>();
         tmp = new HashMap<String, Object>();
         acer_species = false;
@@ -222,5 +222,186 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         String sign = node.getText();
         if (sign.equals("+")) adduct.set_charge_sign(1);
         else adduct.set_charge_sign(-1);
+    }
+    
+    
+    @Override
+    public void enterMed_species(Shorthand2020Parser.Med_speciesContext node){
+        set_lipid_level(LipidLevel.SPECIES);
+    }
+    
+    @Override
+    public void enterGl_species(Shorthand2020Parser.Gl_speciesContext node){
+        set_lipid_level(LipidLevel.SPECIES);
+    }
+    
+    @Override
+    public void enterGl_molecular_species(Shorthand2020Parser.Gl_molecular_speciesContext node){
+        set_lipid_level(LipidLevel.MOLECULAR_SPECIES);
+    }
+    
+    @Override
+    public void enterPl_species(Shorthand2020Parser.Pl_speciesContext node){
+        set_lipid_level(LipidLevel.SPECIES);
+    }
+    
+    @Override
+    public void enterPl_molecular_species(Shorthand2020Parser.Pl_molecular_speciesContext node){
+        set_lipid_level(LipidLevel.MOLECULAR_SPECIES);
+    }
+    
+    @Override
+    public void enterSl_species(Shorthand2020Parser.Sl_speciesContext node){
+        set_lipid_level(LipidLevel.SPECIES);
+    }
+    
+    @Override
+    public void enterPl_single(Shorthand2020Parser.Pl_singleContext node){
+        set_lipid_level(LipidLevel.MOLECULAR_SPECIES);
+    }
+    
+    @Override
+    public void enterUnsorted_fa_separator(Shorthand2020Parser.Unsorted_fa_separatorContext node){
+        set_lipid_level(LipidLevel.MOLECULAR_SPECIES);
+    }
+    
+    @Override
+    public void enterEther_num(Shorthand2020Parser.Ether_numContext node){
+        int num_ethers = 0;
+        String ether = node.getText();
+        if (ether.equals("d")) num_ethers = 2;
+        else if (ether.equals("t")) num_ethers = 3;
+        else if (ether.equals("e")) num_ethers = 4;
+        tmp.put("num_ethers", num_ethers);
+    }
+    
+    @Override
+    public void enterMed_hg_single(Shorthand2020Parser.Med_hg_singleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterMed_hg_double(Shorthand2020Parser.Med_hg_doubleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterMed_hg_triple(Shorthand2020Parser.Med_hg_tripleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterGl_hg_single(Shorthand2020Parser.Gl_hg_singleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterGl_hg_double(Shorthand2020Parser.Gl_hg_doubleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterGl_hg_true_double(Shorthand2020Parser.Gl_hg_true_doubleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterGl_hg_triple(Shorthand2020Parser.Gl_hg_tripleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterPl_hg_single(Shorthand2020Parser.Pl_hg_singleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterPl_hg_double(Shorthand2020Parser.Pl_hg_doubleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterPl_hg_quadro(Shorthand2020Parser.Pl_hg_quadroContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterSl_hg_single(Shorthand2020Parser.Sl_hg_singleContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterPl_hg_double_fa_hg(Shorthand2020Parser.Pl_hg_double_fa_hgContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterSl_hg_double_name(Shorthand2020Parser.Sl_hg_double_nameContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterSt_hg(Shorthand2020Parser.St_hgContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterSt_hg_ester(Shorthand2020Parser.St_hg_esterContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterHg_pip_pure_m(Shorthand2020Parser.Hg_pip_pure_mContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterHg_pip_pure_d(Shorthand2020Parser.Hg_pip_pure_dContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterHg_pip_pure_t(Shorthand2020Parser.Hg_pip_pure_tContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterHg_PE_PS(Shorthand2020Parser.Hg_PE_PSContext node){
+        if (head_group.length() == 0) head_group = node.getText();
+    }
+    
+    @Override
+    public void enterCarbohydrate(Shorthand2020Parser.CarbohydrateContext node){ // _pre_event", set_carbohydrate);
+        String carbohydrate = node.getText();
+        FunctionalGroup functional_group = null;
+        try
+        {
+            functional_group = KnownFunctionalGroups.get_instance().get(carbohydrate);
+        }
+        catch (Exception e)
+        {
+            throw new LipidParsingException("Carbohydrate '" + carbohydrate + "' unknown");
+        }
+
+        functional_group.elements.put(Element.O, functional_group.elements.get(Element.O) - 1);
+        if (tmp.containsKey("func_group_head") && ((int)tmp.get("func_group_head") == 1)){
+            headgroup_decorators.add((HeadgroupDecorator)functional_group);
+        }
+        else {
+            if (!current_fas.back().functional_groups.containsKey(carbohydrate))
+            {
+                current_fas.back().functional_groups.put(carbohydrate, new ArrayList<FunctionalGroup>());
+            }
+            current_fas.back().functional_groups.get(carbohydrate).add(functional_group);
+        }
+    }
+    
+    @Override
+    public void enterCarbohydrate_structural(Shorthand2020Parser.Carbohydrate_structuralContext node){ //_pre_event", set_carbohydrate_structural);
+    
+    }
+    
+    @Override
+    public void enterCarbohydrate_isomeric(Shorthand2020Parser.Carbohydrate_isomericContext node){ //_pre_event", set_carbohydrate_isomeric);
     }
 }
