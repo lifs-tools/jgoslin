@@ -583,4 +583,90 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public void enterMolecular_func_group_name(Shorthand2020Parser.Molecular_func_group_nameContext node){
         ((Dict)tmp.get(FA_I())).put("fg_name", node.getText());
     }
+    
+    @Override
+    public void enterFunc_group_cycle(Shorthand2020Parser.Func_group_cycleContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_name", "cy");
+        current_fas.add(new Cycle(0));
+
+        String fa_i = FA_I();
+        tmp.put(fa_i, new Dict());
+        ((Dict)tmp.get(fa_i)).put("cycle_elements", new Lst());
+    }
+
+    @Override
+    public void exitFunc_group_cycle(Shorthand2020Parser.Func_group_cycleContext node){
+        String fa_i = FA_I();
+        Lst cycle_elements = (Lst)((Dict)tmp.get(fa_i)).get("cycle_elements");
+        Cycle cycle = (Cycle)current_fas.PopBack();
+        for (int i = 0; i < cycle_elements.size(); ++i){
+            cycle.bridge_chain.add((Element)cycle_elements.get(i));
+        }
+        ((Dict)tmp.get(fa_i)).remove("cycle_elements");
+
+        if (cycle.start > -1 && cycle.end > -1 && cycle.end - cycle.start + 1 + cycle.bridge_chain.size() < cycle.cycle){
+            throw new ConstraintViolationException("Cycle length '" + Integer.toString(cycle.cycle) + "' does not match with cycle description.");
+        }
+        if (!current_fas.back().functional_groups.containsKey("cy")){
+            current_fas.back().functional_groups.put("cy", new ArrayList<FunctionalGroup>());
+        }
+        current_fas.back().functional_groups.get("cy").add(cycle);
+    }
+
+    @Override
+    public void enterCycle_start(Shorthand2020Parser.Cycle_startContext node){
+        ((Cycle)current_fas.back()).start = Integer.valueOf(node.getText());
+    }
+
+    @Override
+    public void enterCycle_end(Shorthand2020Parser.Cycle_endContext node){
+        ((Cycle)current_fas.back()).end = Integer.valueOf(node.getText());
+    }
+
+    @Override
+    public void enterCycle_number(Shorthand2020Parser.Cycle_numberContext node){
+        ((Cycle)current_fas.back()).cycle = Integer.valueOf(node.getText());
+    }
+
+    @Override
+    public void enterCycle_db_cnt(Shorthand2020Parser.Cycle_db_cntContext node){
+        ((Cycle)current_fas.back()).double_bonds.num_double_bonds = Integer.valueOf(node.getText());
+    }
+
+    @Override
+    public void enterCycle_db_positions(Shorthand2020Parser.Cycle_db_positionsContext node){
+        ((Dict)tmp.get(FA_I())).put("cycle_db", ((Cycle)current_fas.back()).double_bonds.get_num());
+    }
+
+    @Override
+    public void exitCycle_db_positions(Shorthand2020Parser.Cycle_db_positionsContext node){
+        if (((Cycle)current_fas.back()).double_bonds.get_num() != (int)((Dict)tmp.get(FA_I())).get("cycle_db")){
+            throw new LipidException("Double bond number in cycle does not correspond to number of double bond positions.");
+        }
+    }
+
+    @Override
+    public void enterCycle_db_position_number(Shorthand2020Parser.Cycle_db_position_numberContext node){
+        int pos = Integer.valueOf(node.getText());
+        ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, "");
+        ((Dict)tmp.get(FA_I())).put("last_db_pos", pos);
+    }
+
+    @Override
+    public void enterCycle_db_position_cis_trans(Shorthand2020Parser.Cycle_db_position_cis_transContext node){
+        int pos = (int)((Dict)tmp.get(FA_I())).get("last_db_pos");
+        ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, node.getText());
+    }
+
+    @Override
+    public void enterCylce_element(Shorthand2020Parser.Cylce_elementContext node){
+        String element = node.getText();
+            
+        if (!Elements.element_positions.containsKey(element)){
+            throw new LipidParsingException("Element '" + element + "' unknown");
+        }
+
+        ((Lst)((Dict)tmp.get(FA_I())).get("cycle_elements")).add(Elements.element_positions.get(element));
+    }
+
 }
