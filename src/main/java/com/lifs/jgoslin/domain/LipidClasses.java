@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 /**
@@ -42,7 +43,15 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
     
     private LipidClasses() {
         List<String> lines;
-        add(null);
+        add(new LipidClassMeta(LipidCategory.NO_CATEGORY,
+            "UNDEFINED",
+            "",
+            0,
+            0,
+            new HashSet<>(),
+            new ElementTable(),
+            new ArrayList<>(Arrays.asList("UNDEFINED"))
+        ));
         
         try {
             lines = Files.readAllLines(Path.of("src/main/antlr4/lipid-list.csv"));
@@ -150,7 +159,7 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
             StringFunctions.split_string(kv.getValue().get(5), ',', '"').forEach(scase -> {
                 special_cases.add(scase.strip());
             });
-            ElementTable e = sfp.parse(kv.getValue().get(6));
+            ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6)) : new ElementTable();
             ArrayList<String> synonyms = new ArrayList<>();
             synonyms.add(kv.getValue().get(0)); 
             for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) synonyms.add(kv.getValue().get(ii));

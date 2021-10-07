@@ -76,12 +76,13 @@ public class Headgroup {
 
     public static LipidCategory get_category(String _headgroup){
         if (StringCategory.isEmpty()){
-            LipidClasses.get_instance().forEach(lipid_class -> {
+            
+            for (LipidClassMeta lipid_class : LipidClasses.get_instance()){
                 LipidCategory category = lipid_class.lipid_category;
                 lipid_class.synonyms.forEach(hg -> {
                     StringCategory.put(hg, category);
                 });
-            });
+            }
         }
 
         return StringCategory.containsKey(_headgroup) ? StringCategory.get(_headgroup) : LipidCategory.UNDEFINED;
