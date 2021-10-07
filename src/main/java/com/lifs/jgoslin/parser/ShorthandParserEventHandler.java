@@ -28,6 +28,7 @@ import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 
@@ -41,7 +42,11 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public Adduct adduct = null;
     public ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
     public boolean use_head_group = false;
-    
+    public ArrayList<FunctionalGroup> current_fas;
+    public HashMap<String, Object> tmp = new HashMap<>();
+    public boolean acer_species = false;
+    public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
+        
     public static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
 
     
@@ -141,7 +146,81 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     
      
     @Override
-    public void enterPl_hg_double(Shorthand2020Parser.Pl_hg_doubleContext ctx) {
-        content = new LipidAdduct();
+    public void enterLipid(Shorthand2020Parser.LipidContext node) {
+        content = null;
+        level = LipidLevel.FULL_STRUCTURE;
+        adduct = null;
+        head_group = "";
+        fa_list = new ArrayList<FattyAcid>();
+        current_fas = new ArrayList<FunctionalGroup>();
+        headgroup_decorators = new ArrayList<HeadgroupDecorator>();
+        tmp = new HashMap<String, Object>();
+        acer_species = false;
+    }
+    
+    @Override
+    public void exitLipid(Shorthand2020Parser.LipidContext node){
+        if (acer_species) fa_list.get(0).num_carbon -= 2;
+        Headgroup headgroup = prepare_headgroup_and_checks();
+
+        // add count numbers for fatty acyl chains
+        int fa_it = (fa_list.size() > 0 && (fa_list.get(0).lipid_FA_bond_type == LipidFaBondType.LCB_EXCEPTION || fa_list.get(0).lipid_FA_bond_type == LipidFaBondType.LCB_REGULAR)) ? 1 : 0;
+        for (int it = fa_it; it < fa_list.size(); ++it){
+            fa_list.get(it).name += Integer.toString(it + 1);
+        }
+
+        LipidAdduct lipid = new LipidAdduct();
+        lipid.adduct = adduct;
+        lipid.lipid = assemble_lipid(headgroup);
+
+        if (tmp.containsKey("num_ethers")) lipid.lipid.info.num_ethers = (int)tmp.get("num_ethers");
+
+        content = lipid;
+    }
+    
+    
+    @Override
+    public void enterSl(Shorthand2020Parser.SlContext node){
+        tmp.put("sl_hydroxyl", 0);
+    }
+    
+    
+    @Override
+    public void exitSl(Shorthand2020Parser.SlContext node){
+        if (((int)tmp.get("sl_hydroxyl")) == 0 && !head_group.equals("Cer") && !head_group.equals("SPB")){
+            set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+        }
+    }
+    
+    
+    @Override
+    public void enterSl_hydroxyl(Shorthand2020Parser.Sl_hydroxylContext node){
+        tmp.put("sl_hydroxyl", 1);
+    }
+    
+            
+    @Override
+    public void enterAdduct_info(Shorthand2020Parser.Adduct_infoContext node){
+        adduct = new Adduct("", "", 0, 0);
+    }
+
+
+    @Override
+    public void enterAdduct(Shorthand2020Parser.AdductContext node){
+        adduct.adduct_string = node.getText();
+    }
+
+
+    @Override
+    public void enterCharge(Shorthand2020Parser.ChargeContext node){
+        adduct.charge = Integer.valueOf(node.getText());
+    }
+
+
+    @Override
+    public void enterCharge_sign(Shorthand2020Parser.Charge_signContext node){
+        String sign = node.getText();
+        if (sign.equals("+")) adduct.set_charge_sign(1);
+        else adduct.set_charge_sign(-1);
     }
 }
