@@ -15,20 +15,12 @@
  */
 package com.lifs.jgoslin.domain;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
  * @author dominik
  */
-public class ExtendedList<T> extends ArrayList<T> {
-    public T back(){
-        return get(size() - 1);
-    }
+public class Dict extends HashMap<String, Object> {
     
-    public T PopBack(){
-        T t = get(size() - 1);
-        remove(size() - 1);
-        return t;
-    }
 }

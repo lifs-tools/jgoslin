@@ -43,7 +43,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
     public boolean use_head_group = false;
     public ExtendedList<FunctionalGroup> current_fas;
-    public HashMap<String, Object> tmp = new HashMap<>();
+    public Dict tmp = new Dict();
     public boolean acer_species = false;
     public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
         
@@ -70,7 +70,9 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         level = level.level < _level.level ? level : _level;
     }
 
-
+    public String FA_I(){
+        return "fa" + Integer.toString(current_fas.size());
+    }
 
     public boolean sp_regular_lcb(){
         return Headgroup.get_category(head_group) == LipidCategory.SP && (current_fa.lipid_FA_bond_type == LipidFaBondType.LCB_REGULAR ||current_fa.lipid_FA_bond_type == LipidFaBondType.LCB_EXCEPTION) && !(SP_EXCEPTION_CLASSES.contains(head_group) && headgroup_decorators.isEmpty());
@@ -154,7 +156,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         fa_list = new ArrayList<FattyAcid>();
         current_fas = new ExtendedList<FunctionalGroup>();
         headgroup_decorators = new ArrayList<HeadgroupDecorator>();
-        tmp = new HashMap<String, Object>();
+        tmp = new Dict();
         acer_species = false;
     }
     
@@ -397,11 +399,188 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     }
     
     @Override
-    public void enterCarbohydrate_structural(Shorthand2020Parser.Carbohydrate_structuralContext node){ //_pre_event", set_carbohydrate_structural);
-    
+    public void enterCarbohydrate_structural(Shorthand2020Parser.Carbohydrate_structuralContext node){
+        set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+        tmp.put("func_group_head", 1);
     }
     
     @Override
-    public void enterCarbohydrate_isomeric(Shorthand2020Parser.Carbohydrate_isomericContext node){ //_pre_event", set_carbohydrate_isomeric);
+    public void enterCarbohydrate_isomeric(Shorthand2020Parser.Carbohydrate_isomericContext node){
+        tmp.put("func_group_head", 1);
+    }
+    
+    @Override
+    public void exitLcb(Shorthand2020Parser.LcbContext node){
+        FattyAcid fa = fa_list.get(fa_list.size() - 1);
+        fa.name = "LCB";
+        fa.set_type(LipidFaBondType.LCB_REGULAR);
+    }
+
+    @Override
+    public void enterFatty_acyl_chain(Shorthand2020Parser.Fatty_acyl_chainContext node){
+        current_fas.add(new FattyAcid("FA"));
+        tmp.put(FA_I(), new Dict());
+    }
+
+    @Override
+    public void exitFatty_acyl_chain(Shorthand2020Parser.Fatty_acyl_chainContext node){
+        String fg_i = "fa" + Integer.toString(current_fas.size() - 2);
+        String special_type = "";
+        if (current_fas.size() >= 2 && tmp.containsKey(fg_i) && ((Dict)tmp.get(fg_i)).containsKey("fg_name")){
+            String fg_name = (String)((Dict)tmp.get(fg_i)).get("fg_name");
+            if (special_types.contains(fg_name)){
+                special_type = fg_name;
+            }
+        }
+
+        String fa_i = FA_I();
+        if (current_fas.back().double_bonds.get_num() != (int)((Dict)tmp.get(fa_i)).get("db_count")){
+            throw new LipidException("Double bond count does not match with number of double bond positions");
+        }
+        else if (current_fas.back().double_bonds.get_num() > 0 && current_fas.back().double_bonds.double_bond_positions.isEmpty()){
+            set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+        }
+        tmp.remove(fa_i);
+
+        FattyAcid fa = (FattyAcid)current_fas.PopBack();
+        if (special_type.length() > 0){
+            fa.name = special_type;
+            if (!current_fas.back().functional_groups.containsKey(special_type)){
+                current_fas.back().functional_groups.put(special_type, new ArrayList<FunctionalGroup>());
+            }
+            current_fas.back().functional_groups.get(special_type).add(fa);
+        }
+        else{
+            fa_list.add(fa);
+        }
+    }
+
+    @Override
+    public void enterCarbon(Shorthand2020Parser.CarbonContext node){
+        ((FattyAcid)current_fas.back()).num_carbon = Integer.valueOf(node.getText());
+    }
+
+    @Override
+    public void enterDb_count(Shorthand2020Parser.Db_countContext node){
+        int db_cnt = Integer.valueOf(node.getText());
+        ((Dict)tmp.get(FA_I())).put("db_count", db_cnt);
+        ((FattyAcid)current_fas.back()).double_bonds.num_double_bonds = db_cnt;
+    }
+
+    @Override
+    public void enterDb_position_number(Shorthand2020Parser.Db_position_numberContext node){
+        ((Dict)tmp.get(FA_I())).put("db_position", Integer.valueOf(node.getText()));
+    }
+
+    @Override
+    public void enterDb_single_position(Shorthand2020Parser.Db_single_positionContext node){
+        String fa_i = FA_I();
+        ((Dict)tmp.get(fa_i)).put("db_position", 0);
+        ((Dict)tmp.get(fa_i)).put("db_cistrans", "");
+    }
+
+    @Override
+    public void exitDb_single_position(Shorthand2020Parser.Db_single_positionContext node){
+        String fa_i = FA_I();
+        Dict d = (Dict)tmp.get(fa_i);
+        int pos = (int)d.get("db_position");
+        String cistrans = (String)d.get("db_cistrans");
+
+        if (cistrans.equals("")){
+            set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+        }
+
+        d.remove("db_position");
+        d.remove("db_cistrans");
+        current_fas.back().double_bonds.double_bond_positions.put(pos, cistrans);
+    }
+
+    @Override
+    public void enterCistrans(Shorthand2020Parser.CistransContext node){
+        ((Dict)tmp.get(FA_I())).put("db_cistrans", node.getText());
+    }
+
+    @Override
+    public void enterEther_type(Shorthand2020Parser.Ether_typeContext node){
+        String ether_type = node.getText();
+        if (ether_type.equals("O-")) ((FattyAcid)current_fas.back()).lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMANYL;
+        else if (ether_type.equals("P-")) ((FattyAcid)current_fas.back()).lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMENYL;
+    }
+    
+    
+
+    @Override
+    public void enterFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
+        String fa_i = FA_I();
+        Dict gd = (Dict)tmp.get(fa_i);
+        gd.put("fg_pos", -1);
+        gd.put("fg_name", "0");
+        gd.put("fg_cnt", 1);
+        gd.put("fg_stereo", "");
+        gd.put("fg_ring_stereo", "");
+    }
+
+    @Override
+    public void exitFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
+        String fa_i = FA_I();
+        Dict gd = (Dict)tmp.get(FA_I());
+        String fg_name = (String)gd.get("fg_name");
+
+        if (special_types.contains(fg_name) || fg_name.equals("cy")) return;
+
+        int fg_pos = (int)gd.get("fg_pos");
+        int fg_cnt = (int)gd.get("fg_cnt");
+        String fg_stereo = (String)gd.get("fg_stereo");
+        String fg_ring_stereo = (String)gd.get("fg_ring_stereo");
+
+        if (fg_pos == -1){
+            set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
+        }
+
+        FunctionalGroup functional_group = null;
+        try {
+            functional_group = KnownFunctionalGroups.get_instance().get(fg_name);
+        }
+        catch (Exception e) {
+            throw new LipidParsingException("'" + fg_name + "' unknown");
+        }
+
+        functional_group.position = fg_pos;
+        functional_group.count = fg_cnt;
+        functional_group.stereochemistry = fg_stereo;
+        functional_group.ring_stereo = fg_ring_stereo;
+
+        gd.remove("fg_pos");
+        gd.remove("fg_name");
+        gd.remove("fg_cnt");
+        gd.remove("fg_stereo");
+
+        if (!current_fas.back().functional_groups.containsKey(fg_name)) current_fas.back().functional_groups.put(fg_name, new ArrayList<FunctionalGroup>());
+        current_fas.back().functional_groups.get(fg_name).add(functional_group);
+    }
+
+    @Override
+    public void enterFunc_group_pos_number(Shorthand2020Parser.Func_group_pos_numberContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_pos", Integer.valueOf(node.getText()));
+    }
+
+    @Override
+    public void enterFunc_group_name(Shorthand2020Parser.Func_group_nameContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_name", node.getText());
+    }
+
+    @Override
+    public void enterFunc_group_count(Shorthand2020Parser.Func_group_countContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_cnt", Integer.valueOf(node.getText()));
+    }
+
+    @Override
+    public void enterStereo_type(Shorthand2020Parser.Stereo_typeContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_stereo", node.getText());
+    }
+
+    @Override
+    public void enterMolecular_func_group_name(Shorthand2020Parser.Molecular_func_group_nameContext node){
+        ((Dict)tmp.get(FA_I())).put("fg_name", node.getText());
     }
 }
