@@ -240,8 +240,7 @@ public class Cycle extends FunctionalGroup {
         }
 
         if (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)){
-            ArrayList<String> fg_names = new ArrayList<>();
-            for (Entry<String, ArrayList<FunctionalGroup> > kv : functional_groups.entrySet()) fg_names.add(kv.getKey());
+            ArrayList<String> fg_names = new ArrayList<>(functional_groups.keySet());
             Collections.sort(fg_names, (String a, String b) -> a.toLowerCase().compareTo(b.toLowerCase()));
 
             for (String fg : fg_names){
@@ -259,24 +258,24 @@ public class Cycle extends FunctionalGroup {
         }
 
         else if (level == LipidLevel.STRUCTURE_DEFINED){
-            ArrayList<String> fg_names = new ArrayList<>();
-            for (Entry<String, ArrayList<FunctionalGroup> > kv : functional_groups.entrySet()) fg_names.add(kv.getKey());
+            ArrayList<String> fg_names = new ArrayList<>(functional_groups.keySet());
             Collections.sort(fg_names, (String a, String b) -> a.toLowerCase().compareTo(b.toLowerCase()));
 
             for (String fg : fg_names){
                 ArrayList<FunctionalGroup> fg_list = functional_groups.get(fg);
-                
-                if (fg_list.size() == 1 && fg_list.get(0).count == 1){
-                    cycle_string.append(";").append(fg_list.get(0).to_string(level));
-                }
-                else if (fg_list.size() > 1) {
-                    int fg_count = 0;
-                    for (FunctionalGroup func_group : fg_list) fg_count += func_group.count;
-                    if (fg_count > 1){
-                        cycle_string.append(";(").append(fg).append(")").append(fg_count);
+                if (fg_list.size() > 0) {
+                    if (fg_list.size() == 1 && fg_list.get(0).count == 1){
+                        cycle_string.append(";").append(fg_list.get(0).to_string(level));
                     }
                     else {
-                        cycle_string.append(";").append(fg);
+                        int fg_count = 0;
+                        for (FunctionalGroup func_group : fg_list) fg_count += func_group.count;
+                        if (fg_count > 1){
+                            cycle_string.append(";(").append(fg).append(")").append(fg_count);
+                        }
+                        else {
+                            cycle_string.append(";").append(fg);
+                        }
                     }
                 }
             }
