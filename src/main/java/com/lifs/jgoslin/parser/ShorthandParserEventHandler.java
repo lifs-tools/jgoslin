@@ -790,7 +790,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         set_lipid_level(LipidLevel.SPECIES);
         HeadgroupDecorator hgd = new HeadgroupDecorator("");
         hgd.elements.put(Element.O, hgd.elements.get(Element.O) + 1);
-        hgd.elements.put(Element.H, hgd.elements.get(Element.O) - 1);
+        hgd.elements.put(Element.H, hgd.elements.get(Element.H) - 1);
         headgroup_decorators.add(hgd);
     }
 

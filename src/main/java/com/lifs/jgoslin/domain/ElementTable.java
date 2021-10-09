@@ -34,6 +34,22 @@ public class ElementTable extends HashMap<Element, Integer> {
     
     public ElementTable(){
         super();
-        for (Element e : Elements.element_masses.keySet()) put(e, 0);
+        Elements.element_masses.keySet().forEach(e -> {
+            put(e, 0);
+        });
+    }
+    
+    public void add(ElementTable elements){
+        elements.entrySet().forEach(kv -> {
+            put(kv.getKey(), get(kv.getKey()) + kv.getValue());
+        });
+    }
+    
+    public ElementTable copy(){
+        ElementTable e = new ElementTable();
+        entrySet().forEach(kv -> {
+            e.put(kv.getKey(), kv.getValue());
+        });
+        return e;
     }
 }

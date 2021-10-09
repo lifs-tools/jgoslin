@@ -25,7 +25,6 @@ package com.lifs.jgoslin.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -50,7 +49,7 @@ public class Cycle extends FunctionalGroup {
         start = _start;
         end = _end;
         elements.put(Element.H, elements.get(Element.H) - 2);
-        bridge_chain = (_bridge_chain == null) ? new ArrayList< Element >() : _bridge_chain;
+        bridge_chain = (_bridge_chain == null) ? new ArrayList<>() : _bridge_chain;
     }
 
     
@@ -66,7 +65,7 @@ public class Cycle extends FunctionalGroup {
                 fg.get(kv.getKey()).add(func_group.copy());
             });
         });
-        ArrayList<Element> bc = new ArrayList<Element>();
+        ArrayList<Element> bc = new ArrayList<>();
         for (Element e : bridge_chain) bc.add(e);
 
         return new Cycle(cycle, start, end, db, fg, bc);
@@ -95,11 +94,11 @@ public class Cycle extends FunctionalGroup {
 
         for (Entry<String, ArrayList<FunctionalGroup> > kv : functional_groups.entrySet()){
             if (!parent.functional_groups.containsKey(kv.getKey())){
-                parent.functional_groups.put(kv.getKey(), new ArrayList<FunctionalGroup>());
+                parent.functional_groups.put(kv.getKey(), new ArrayList<>());
             }
             parent.functional_groups.get(kv.getKey()).addAll(functional_groups.get(kv.getKey()));
         }
-        functional_groups = new HashMap<String, ArrayList<FunctionalGroup> >();
+        functional_groups = new HashMap<>();
 
 
         // shift the cycle
@@ -139,7 +138,7 @@ public class Cycle extends FunctionalGroup {
                 remove_item.remove(remove_item.size() - 1);
                 kv.getValue().remove(pos);
             }
-            if (kv.getValue().size() == 0) remove_list.add(kv.getKey());
+            if (kv.getValue().isEmpty()) remove_list.add(kv.getKey());
         }
 
         for (String fg : remove_list) parent.functional_groups.remove(fg);
@@ -243,23 +242,13 @@ public class Cycle extends FunctionalGroup {
         if (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)){
             ArrayList<String> fg_names = new ArrayList<>();
             for (Entry<String, ArrayList<FunctionalGroup> > kv : functional_groups.entrySet()) fg_names.add(kv.getKey());
-            Collections.sort(fg_names, new Comparator<String>(){
-                @Override
-                public int compare(String a, String b){
-                    return a.toLowerCase().compareTo(b.toLowerCase());
-                }
-            });
+            Collections.sort(fg_names, (String a, String b) -> a.toLowerCase().compareTo(b.toLowerCase()));
 
             for (String fg : fg_names){
                 ArrayList<FunctionalGroup> fg_list = functional_groups.get(fg);
-                if (fg_list.size() == 0) continue;
-                Collections.sort(fg_list, new Comparator<FunctionalGroup>(){
-                    @Override
-                    public int compare(FunctionalGroup a, FunctionalGroup b){
-                        return a.position - b.position;
-                    }
-                });
+                if (fg_list.isEmpty()) continue;
                 
+                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -> a.position - b.position);
                 int i = 0;
                 cycle_string.append(";");
                 for (FunctionalGroup func_group : fg_list){
@@ -272,21 +261,15 @@ public class Cycle extends FunctionalGroup {
         else if (level == LipidLevel.STRUCTURE_DEFINED){
             ArrayList<String> fg_names = new ArrayList<>();
             for (Entry<String, ArrayList<FunctionalGroup> > kv : functional_groups.entrySet()) fg_names.add(kv.getKey());
-            Collections.sort(fg_names, new Comparator<String>(){
-                @Override
-                public int compare(String a, String b){
-                    return a.toLowerCase().compareTo(b.toLowerCase());
-                }
-            });
+            Collections.sort(fg_names, (String a, String b) -> a.toLowerCase().compareTo(b.toLowerCase()));
 
             for (String fg : fg_names){
                 ArrayList<FunctionalGroup> fg_list = functional_groups.get(fg);
-                if (fg_list.size() == 0) continue;
-
-                else if (fg_list.size() == 1 && fg_list.get(0).count == 1){
+                
+                if (fg_list.size() == 1 && fg_list.get(0).count == 1){
                     cycle_string.append(";").append(fg_list.get(0).to_string(level));
                 }
-                else {
+                else if (fg_list.size() > 1) {
                     int fg_count = 0;
                     for (FunctionalGroup func_group : fg_list) fg_count += func_group.count;
                     if (fg_count > 1){

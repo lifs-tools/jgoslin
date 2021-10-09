@@ -16,7 +16,6 @@
 package com.lifs.jgoslin.domain;
 
 import java.util.ArrayList;
-import java.util.Map.Entry;
 
 /**
  *
@@ -30,12 +29,14 @@ public class LipidMolecularSpecies extends LipidSpecies {
     public LipidMolecularSpecies(Headgroup _headgroup, ArrayList<FattyAcid> _fa){
         super(_headgroup, _fa);
         info.level = LipidLevel.MOLECULAR_SPECIES;
-        for(FattyAcid fatty_acid : fa_list){
+        fa_list.stream().map(fatty_acid -> {
             if (fa.containsKey(fatty_acid.name)){
                 throw new ConstraintViolationException("FA names must be unique! FA with name " + fatty_acid.name + " was already added!");
             }
+            return fatty_acid;
+        }).forEachOrdered(fatty_acid -> {
             fa.put(fatty_acid.name, fatty_acid);
-        }
+        });
 
 
         // add 0:0 dummys
@@ -115,16 +116,12 @@ public class LipidMolecularSpecies extends LipidSpecies {
 
     @Override
     public ElementTable get_elements(){
-        ElementTable elements = new ElementTable();
-
-        ElementTable hg_elements = headgroup.get_elements();
-        for (Entry<Element, Integer> kv : hg_elements.entrySet()) elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue());
-
+        ElementTable elements = headgroup.get_elements();
+        
         // add elements from all fatty acyl chains
-        for (FattyAcid fatty_acid : fa_list){
-            ElementTable fa_elements = fatty_acid.get_elements();
-            for (Entry<Element, Integer> kv : fa_elements.entrySet()) elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue());
-        }
+        fa_list.forEach(fatty_acid -> {
+            elements.add(fatty_acid.get_elements());
+        });
 
         return elements;
     }
@@ -152,5 +149,4 @@ public class LipidMolecularSpecies extends LipidSpecies {
                 throw new IllegalArgumentException("LipidMolecularSpecies does not know how to create a lipid string for level " + level.toString());
         }
     }
-
-    }
+}

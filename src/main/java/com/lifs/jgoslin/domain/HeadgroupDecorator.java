@@ -43,7 +43,7 @@ public class HeadgroupDecorator extends FunctionalGroup {
     }
     
     public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix){
-        this(_name, _position, _count, _elements, _suffix);
+        this(_name, _position, _count, _elements, _suffix, LipidLevel.NO_LEVEL);
     }
     
     

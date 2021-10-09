@@ -43,7 +43,7 @@ public class StringFunctions {
     }
 
     
-    String strip(String s, char c){
+    public static String strip(String s, char c){
         if (s.length() > 0) {
             int st = 0;
             while (st < s.length() - 1 && s.charAt(st) == c) ++st;

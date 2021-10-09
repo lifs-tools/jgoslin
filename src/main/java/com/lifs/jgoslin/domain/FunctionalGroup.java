@@ -92,15 +92,8 @@ public class FunctionalGroup {
 
     public ElementTable get_elements(){
         compute_elements();
-        ElementTable _elements = new ElementTable();
-        elements.entrySet().forEach(kv -> {
-            _elements.put(kv.getKey(), kv.getValue());
-        });
-
-        ElementTable fgElements = get_functional_group_elements();
-        fgElements.entrySet().forEach(kv -> {
-            _elements.put(kv.getKey(), _elements.get(kv.getKey()) + kv.getValue());
-        });
+        ElementTable _elements = elements.copy();
+        _elements.add(get_functional_group_elements());
         return _elements;
     }
 
@@ -120,10 +113,7 @@ public class FunctionalGroup {
 
         functional_groups.entrySet().forEach(kv -> {
             kv.getValue().forEach(func_group -> {
-                ElementTable fg_elements = func_group.get_elements();
-                fg_elements.entrySet().forEach(el -> {
-                    _elements.put(el.getKey(), _elements.get(el.getKey()) + el.getValue() * func_group.count);
-                });
+                _elements.add(func_group.get_elements());
             });
         });
 
@@ -191,8 +181,6 @@ public class FunctionalGroup {
 
 
     public void add(FunctionalGroup fg){
-        fg.elements.entrySet().forEach(kv -> {
-            elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue() * fg.count);
-        });
+        elements.add(fg.elements);
     }
 }

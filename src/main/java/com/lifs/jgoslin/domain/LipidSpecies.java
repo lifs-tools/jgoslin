@@ -128,8 +128,7 @@ public class LipidSpecies {
 
     public ElementTable get_elements()
     {
-        ElementTable elements = new ElementTable();
-
+        
         switch(info.level){        
             case COMPLETE_STRUCTURE:
             case FULL_STRUCTURE:
@@ -148,13 +147,10 @@ public class LipidSpecies {
             throw new LipidException("Element table cannot be computed for lipid level " + info.level.toString());
         }
 
-
-        ElementTable hg_elements = headgroup.get_elements();
-        for (Entry<Element, Integer> kv : hg_elements.entrySet()) elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue());
-
-        ElementTable info_elements = info.get_elements();
-        for (Entry<Element, Integer> kv : info_elements.entrySet()) elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue());
-
+        ElementTable elements = headgroup.get_elements();
+        elements.add(info.get_elements());
+        
+        
         // since only one FA info is provided, we have to treat this single information as
         // if we would have the complete information about all possible FAs in that lipid
         LipidClassMeta meta = LipidClasses.get_instance().get(headgroup.lipid_class);
@@ -165,7 +161,7 @@ public class LipidSpecies {
 
         elements.put(Element.O, elements.get(Element.O) - (-additional_fa + info.num_ethers + (headgroup.sp_exception ? 1 : 0) + hydrochain));
         elements.put(Element.H, elements.get(Element.H) + (-additional_fa + remaining_H + 2 * info.num_ethers + 2 * hydrochain));
-
+   
         return elements;
     }
 }

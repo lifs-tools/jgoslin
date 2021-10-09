@@ -173,23 +173,13 @@ public class Headgroup {
 
     public ElementTable get_elements(){
 
-        if (use_headgroup || LipidClasses.get_instance().size() <= lipid_class){
+        if (use_headgroup || LipidClasses.get_instance().size() <= lipid_class)
             throw new RuntimeException("Element table cannot be computed for lipid '" + headgroup + "'");
-        }
 
-        ElementTable elements = new ElementTable();
-
-        for (Entry<Element, Integer> kv : LipidClasses.get_instance().get(lipid_class).elements.entrySet()){
-            elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue());
-        }
-
-
-        for (HeadgroupDecorator hgd : decorators){
-            ElementTable hgd_elements = hgd.get_elements();
-            for (Entry<Element, Integer> kv : hgd_elements.entrySet()){
-                elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue() * hgd.count);
-            }
-        }
+        ElementTable elements = LipidClasses.get_instance().get(lipid_class).elements.copy();
+        decorators.forEach(hgd -> {
+            elements.add(hgd.get_elements());
+        });
 
         return elements;
     }
