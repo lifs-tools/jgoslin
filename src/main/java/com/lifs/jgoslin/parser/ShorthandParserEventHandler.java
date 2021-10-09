@@ -43,7 +43,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
     public boolean use_head_group = false;
     public ExtendedList<FunctionalGroup> current_fas;
-    public Dict tmp = new Dict();
+    public Dictionary tmp = new Dictionary();
     public boolean acer_species = false;
     public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
         
@@ -156,7 +156,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         fa_list = new ArrayList<FattyAcid>();
         current_fas = new ExtendedList<FunctionalGroup>();
         headgroup_decorators = new ArrayList<HeadgroupDecorator>();
-        tmp = new Dict();
+        tmp = new Dictionary();
         acer_species = false;
     }
     
@@ -422,22 +422,22 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     @Override
     public void enterFatty_acyl_chain(Shorthand2020Parser.Fatty_acyl_chainContext node){
         current_fas.add(new FattyAcid("FA"));
-        tmp.put(FA_I(), new Dict());
+        tmp.put(FA_I(), new Dictionary());
     }
 
     @Override
     public void exitFatty_acyl_chain(Shorthand2020Parser.Fatty_acyl_chainContext node){
         String fg_i = "fa" + Integer.toString(current_fas.size() - 2);
         String special_type = "";
-        if (current_fas.size() >= 2 && tmp.containsKey(fg_i) && ((Dict)tmp.get(fg_i)).containsKey("fg_name")){
-            String fg_name = (String)((Dict)tmp.get(fg_i)).get("fg_name");
+        if (current_fas.size() >= 2 && tmp.containsKey(fg_i) && ((Dictionary)tmp.get(fg_i)).containsKey("fg_name")){
+            String fg_name = (String)((Dictionary)tmp.get(fg_i)).get("fg_name");
             if (special_types.contains(fg_name)){
                 special_type = fg_name;
             }
         }
 
         String fa_i = FA_I();
-        if (current_fas.back().double_bonds.get_num() != (int)((Dict)tmp.get(fa_i)).get("db_count")){
+        if (current_fas.back().double_bonds.get_num() != (int)((Dictionary)tmp.get(fa_i)).get("db_count")){
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
         else if (current_fas.back().double_bonds.get_num() > 0 && current_fas.back().double_bonds.double_bond_positions.isEmpty()){
@@ -466,26 +466,26 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     @Override
     public void enterDb_count(Shorthand2020Parser.Db_countContext node){
         int db_cnt = Integer.valueOf(node.getText());
-        ((Dict)tmp.get(FA_I())).put("db_count", db_cnt);
+        ((Dictionary)tmp.get(FA_I())).put("db_count", db_cnt);
         ((FattyAcid)current_fas.back()).double_bonds.num_double_bonds = db_cnt;
     }
 
     @Override
     public void enterDb_position_number(Shorthand2020Parser.Db_position_numberContext node){
-        ((Dict)tmp.get(FA_I())).put("db_position", Integer.valueOf(node.getText()));
+        ((Dictionary)tmp.get(FA_I())).put("db_position", Integer.valueOf(node.getText()));
     }
 
     @Override
     public void enterDb_single_position(Shorthand2020Parser.Db_single_positionContext node){
         String fa_i = FA_I();
-        ((Dict)tmp.get(fa_i)).put("db_position", 0);
-        ((Dict)tmp.get(fa_i)).put("db_cistrans", "");
+        ((Dictionary)tmp.get(fa_i)).put("db_position", 0);
+        ((Dictionary)tmp.get(fa_i)).put("db_cistrans", "");
     }
 
     @Override
     public void exitDb_single_position(Shorthand2020Parser.Db_single_positionContext node){
         String fa_i = FA_I();
-        Dict d = (Dict)tmp.get(fa_i);
+        Dictionary d = (Dictionary)tmp.get(fa_i);
         int pos = (int)d.get("db_position");
         String cistrans = (String)d.get("db_cistrans");
 
@@ -500,7 +500,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterCistrans(Shorthand2020Parser.CistransContext node){
-        ((Dict)tmp.get(FA_I())).put("db_cistrans", node.getText());
+        ((Dictionary)tmp.get(FA_I())).put("db_cistrans", node.getText());
     }
 
     @Override
@@ -515,7 +515,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     @Override
     public void enterFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
         String fa_i = FA_I();
-        Dict gd = (Dict)tmp.get(fa_i);
+        Dictionary gd = (Dictionary)tmp.get(fa_i);
         gd.put("fg_pos", -1);
         gd.put("fg_name", "0");
         gd.put("fg_cnt", 1);
@@ -525,7 +525,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void exitFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
-        Dict gd = (Dict)tmp.get(FA_I());
+        Dictionary gd = (Dictionary)tmp.get(FA_I());
         String fg_name = (String)gd.get("fg_name");
 
         if (special_types.contains(fg_name) || fg_name.equals("cy")) return;
@@ -563,48 +563,48 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterFunc_group_pos_number(Shorthand2020Parser.Func_group_pos_numberContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_pos", Integer.valueOf(node.getText()));
+        ((Dictionary)tmp.get(FA_I())).put("fg_pos", Integer.valueOf(node.getText()));
     }
 
     @Override
     public void enterFunc_group_name(Shorthand2020Parser.Func_group_nameContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_name", node.getText());
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", node.getText());
     }
 
     @Override
     public void enterFunc_group_count(Shorthand2020Parser.Func_group_countContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_cnt", Integer.valueOf(node.getText()));
+        ((Dictionary)tmp.get(FA_I())).put("fg_cnt", Integer.valueOf(node.getText()));
     }
 
     @Override
     public void enterStereo_type(Shorthand2020Parser.Stereo_typeContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_stereo", node.getText());
+        ((Dictionary)tmp.get(FA_I())).put("fg_stereo", node.getText());
     }
 
     @Override
     public void enterMolecular_func_group_name(Shorthand2020Parser.Molecular_func_group_nameContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_name", node.getText());
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", node.getText());
     }
     
     @Override
     public void enterFunc_group_cycle(Shorthand2020Parser.Func_group_cycleContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_name", "cy");
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", "cy");
         current_fas.add(new Cycle(0));
 
         String fa_i = FA_I();
-        tmp.put(fa_i, new Dict());
-        ((Dict)tmp.get(fa_i)).put("cycle_elements", new Lst());
+        tmp.put(fa_i, new Dictionary());
+        ((Dictionary)tmp.get(fa_i)).put("cycle_elements", new GenericList());
     }
 
     @Override
     public void exitFunc_group_cycle(Shorthand2020Parser.Func_group_cycleContext node){
         String fa_i = FA_I();
-        Lst cycle_elements = (Lst)((Dict)tmp.get(fa_i)).get("cycle_elements");
+        GenericList cycle_elements = (GenericList)((Dictionary)tmp.get(fa_i)).get("cycle_elements");
         Cycle cycle = (Cycle)current_fas.PopBack();
         for (int i = 0; i < cycle_elements.size(); ++i){
             cycle.bridge_chain.add((Element)cycle_elements.get(i));
         }
-        ((Dict)tmp.get(fa_i)).remove("cycle_elements");
+        ((Dictionary)tmp.get(fa_i)).remove("cycle_elements");
 
         if (cycle.start > -1 && cycle.end > -1 && cycle.end - cycle.start + 1 + cycle.bridge_chain.size() < cycle.cycle){
             throw new ConstraintViolationException("Cycle length '" + Integer.toString(cycle.cycle) + "' does not match with cycle description.");
@@ -637,12 +637,12 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterCycle_db_positions(Shorthand2020Parser.Cycle_db_positionsContext node){
-        ((Dict)tmp.get(FA_I())).put("cycle_db", ((Cycle)current_fas.back()).double_bonds.get_num());
+        ((Dictionary)tmp.get(FA_I())).put("cycle_db", ((Cycle)current_fas.back()).double_bonds.get_num());
     }
 
     @Override
     public void exitCycle_db_positions(Shorthand2020Parser.Cycle_db_positionsContext node){
-        if (((Cycle)current_fas.back()).double_bonds.get_num() != (int)((Dict)tmp.get(FA_I())).get("cycle_db")){
+        if (((Cycle)current_fas.back()).double_bonds.get_num() != (int)((Dictionary)tmp.get(FA_I())).get("cycle_db")){
             throw new LipidException("Double bond number in cycle does not correspond to number of double bond positions.");
         }
     }
@@ -651,12 +651,12 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public void enterCycle_db_position_number(Shorthand2020Parser.Cycle_db_position_numberContext node){
         int pos = Integer.valueOf(node.getText());
         ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, "");
-        ((Dict)tmp.get(FA_I())).put("last_db_pos", pos);
+        ((Dictionary)tmp.get(FA_I())).put("last_db_pos", pos);
     }
 
     @Override
     public void enterCycle_db_position_cis_trans(Shorthand2020Parser.Cycle_db_position_cis_transContext node){
-        int pos = (int)((Dict)tmp.get(FA_I())).get("last_db_pos");
+        int pos = (int)((Dictionary)tmp.get(FA_I())).get("last_db_pos");
         ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, node.getText());
     }
 
@@ -668,21 +668,21 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
             throw new LipidParsingException("Element '" + element + "' unknown");
         }
 
-        ((Lst)((Dict)tmp.get(FA_I())).get("cycle_elements")).add(Elements.element_positions.get(element));
+        ((GenericList)((Dictionary)tmp.get(FA_I())).get("cycle_elements")).add(Elements.element_positions.get(element));
     }
     
     @Override
     public void enterFatty_acyl_linkage(Shorthand2020Parser.Fatty_acyl_linkageContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_name", "acyl");
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", "acyl");
         current_fas.add(new AcylAlkylGroup((FattyAcid)null));
-        tmp.put(FA_I(), new Dict());
-        ((Dict)tmp.get(FA_I())).put("linkage_pos", -1);
+        tmp.put(FA_I(), new Dictionary());
+        ((Dictionary)tmp.get(FA_I())).put("linkage_pos", -1);
     }
 
     @Override
     public void exitFatty_acyl_linkage(Shorthand2020Parser.Fatty_acyl_linkageContext node){
-        boolean linkage_type = (int)((Dict)tmp.get(FA_I())).get("linkage_type") == 1;
-        int linkage_pos = (int)((Dict)tmp.get(FA_I())).get("linkage_pos");
+        boolean linkage_type = (int)((Dictionary)tmp.get(FA_I())).get("linkage_type") == 1;
+        int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
 
         tmp.remove(FA_I());
         AcylAlkylGroup acyl = (AcylAlkylGroup)current_fas.PopBack();
@@ -697,15 +697,15 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterFatty_alkyl_linkage(Shorthand2020Parser.Fatty_alkyl_linkageContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_name", "alkyl");
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", "alkyl");
         current_fas.add(new AcylAlkylGroup(null, -1, 1, true));
-        tmp.put(FA_I(), new Dict());
-        ((Dict)tmp.get(FA_I())).put("linkage_pos", -1);
+        tmp.put(FA_I(), new Dictionary());
+        ((Dictionary)tmp.get(FA_I())).put("linkage_pos", -1);
     }
 
     @Override
     public void exitFatty_alkyl_linkage(Shorthand2020Parser.Fatty_alkyl_linkageContext node){
-        int linkage_pos = (int)((Dict)tmp.get(FA_I())).get("linkage_pos");
+        int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
         tmp.remove(FA_I());
         AcylAlkylGroup alkyl = (AcylAlkylGroup)current_fas.PopBack();
 
@@ -718,25 +718,25 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterFatty_linkage_number(Shorthand2020Parser.Fatty_linkage_numberContext node){
-        ((Dict)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
+        ((Dictionary)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
     }
 
     @Override
     public void enterFatty_acyl_linkage_sign(Shorthand2020Parser.Fatty_acyl_linkage_signContext node){
-        ((Dict)tmp.get(FA_I())).put("linkage_type", node.getText().equals("N") ? 1 : 0);
+        ((Dictionary)tmp.get(FA_I())).put("linkage_type", node.getText().equals("N") ? 1 : 0);
     }
 
     @Override
     public void enterHydrocarbon_chain(Shorthand2020Parser.Hydrocarbon_chainContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_name", "cc");
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", "cc");
         current_fas.add(new CarbonChain((FattyAcid)null));
-        tmp.put(FA_I(), new Dict());
-        ((Dict)tmp.get(FA_I())).put("linkage_pos", -1);
+        tmp.put(FA_I(), new Dictionary());
+        ((Dictionary)tmp.get(FA_I())).put("linkage_pos", -1);
     }
 
     @Override
     public void exitHydrocarbon_chain(Shorthand2020Parser.Hydrocarbon_chainContext node){
-        int linkage_pos = (int)((Dict)tmp.get(FA_I())).get("linkage_pos");
+        int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
         tmp.remove(FA_I());
         CarbonChain cc = (CarbonChain)current_fas.PopBack();
         cc.position = linkage_pos;
@@ -748,21 +748,21 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterHydrocarbon_number(Shorthand2020Parser.Hydrocarbon_numberContext node){
-        ((Dict)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
+        ((Dictionary)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.getText()));
     }
 
     @Override
     public void enterRing_stereo(Shorthand2020Parser.Ring_stereoContext node){
-        ((Dict)tmp.get(FA_I())).put("fg_ring_stereo", node.getText());
+        ((Dictionary)tmp.get(FA_I())).put("fg_ring_stereo", node.getText());
     }
 
     @Override
     public void enterPl_hg_fa(Shorthand2020Parser.Pl_hg_faContext node){
         String fa_i = FA_I();
-        tmp.put(fa_i, new Dict());
-        ((Dict)tmp.get(fa_i)).put("fg_name", "decorator_acyl");
+        tmp.put(fa_i, new Dictionary());
+        ((Dictionary)tmp.get(fa_i)).put("fg_name", "decorator_acyl");
         current_fas.add(new HeadgroupDecorator("decorator_acyl", -1, 1, null, true));
-        tmp.put(FA_I(), new Dict());
+        tmp.put(FA_I(), new Dictionary());
     }
 
     @Override
@@ -774,10 +774,10 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void enterPl_hg_alk(Shorthand2020Parser.Pl_hg_alkContext node){
-        tmp.put(FA_I(), new Dict());
-        ((Dict)tmp.get(FA_I())).put("fg_name", "decorator_alkyl");
+        tmp.put(FA_I(), new Dictionary());
+        ((Dictionary)tmp.get(FA_I())).put("fg_name", "decorator_alkyl");
         current_fas.add(new HeadgroupDecorator("decorator_alkyl", -1, 1, null, true));
-        tmp.put(FA_I(), new Dict());
+        tmp.put(FA_I(), new Dictionary());
     }
 
     @Override

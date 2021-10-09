@@ -21,22 +21,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package com.lifs.jgoslin.domain;
+package com.lifs.jgoslin.parser;
 
+import com.lifs.jgoslin.domain.LipidAdduct;
+import com.lifs.jgoslin.domain.LipidException;
 import java.util.ArrayList;
 
 /**
  *
  * @author dominik
  */
-public class ExtendedList<T> extends ArrayList<T> {
-    public T back(){
-        return get(size() - 1);
+public class LipidParser{
+    public ArrayList< Parser<LipidAdduct> > parser_list = new ArrayList<>();
+    public Parser<LipidAdduct> lastSuccessfulParser = null;
+
+    public LipidParser(){
+        parser_list.add(new ShorthandParser());
+        /*
+        parser_list.Add(new GoslinParser());
+        parser_list.Add(new FattyAcidParser());
+        parser_list.Add(new LipidMapsParser());
+        parser_list.Add(new SwissLipidsParser());
+        parser_list.Add(new HmdbParser());
+        */
+
+        lastSuccessfulParser = null;
     }
-    
-    public T PopBack(){
-        T t = get(size() - 1);
-        remove(size() - 1);
-        return t;
+
+
+    public LipidAdduct parse(String lipid_name)
+    {
+        lastSuccessfulParser = null;
+
+        for (Parser<LipidAdduct> parser : parser_list){
+            LipidAdduct lipid = parser.parse(lipid_name, false);
+            if (lipid != null){
+                lastSuccessfulParser = parser;
+                return lipid;
+            }
+        }
+        throw new LipidException("Lipid not found");
     }
 }
