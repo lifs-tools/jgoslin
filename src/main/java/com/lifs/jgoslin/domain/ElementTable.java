@@ -45,6 +45,12 @@ public class ElementTable extends HashMap<Element, Integer> {
         });
     }
     
+    public void add(ElementTable elements, int count){
+        elements.entrySet().forEach(kv -> {
+            put(kv.getKey(), get(kv.getKey()) + kv.getValue() * count);
+        });
+    }
+    
     public ElementTable copy(){
         ElementTable e = new ElementTable();
         entrySet().forEach(kv -> {

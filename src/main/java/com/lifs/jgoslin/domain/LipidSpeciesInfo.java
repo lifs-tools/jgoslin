@@ -119,13 +119,13 @@ public class LipidSpeciesInfo extends FattyAcid {
         info_string.append(ether_prefix[num_ethers]);
         info_string.append(num_carbon).append(":").append(double_bonds.get_num());
 
-        ElementTable elements = get_functional_group_elements();
+        ElementTable fg_elements = get_functional_group_elements();
         for (int i = 2; i < Elements.element_order.size(); ++i){
             Element e = Elements.element_order.get(i);
-            if (elements.get(e) > 0){
+            if (fg_elements.get(e) > 0){
                 info_string.append(";").append(Elements.element_shortcut.get(e));
-                if (elements.get(e) > 1){
-                    info_string.append(elements.get(e));
+                if (fg_elements.get(e) > 1){
+                    info_string.append(fg_elements.get(e));
                 }
             }
         }

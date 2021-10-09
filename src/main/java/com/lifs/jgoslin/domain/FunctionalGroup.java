@@ -110,10 +110,10 @@ public class FunctionalGroup {
 
     public ElementTable get_functional_group_elements(){
         ElementTable _elements = new ElementTable();
-
+        
         functional_groups.entrySet().forEach(kv -> {
             kv.getValue().forEach(func_group -> {
-                _elements.add(func_group.get_elements());
+                _elements.add(func_group.get_elements(), func_group.count);
             });
         });
 

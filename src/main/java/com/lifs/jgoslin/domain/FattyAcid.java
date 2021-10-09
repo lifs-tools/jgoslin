@@ -243,6 +243,8 @@ public class FattyAcid extends FunctionalGroup {
                 }
             } 
         }
+        
+        
         return fa_string.toString();
     }
 

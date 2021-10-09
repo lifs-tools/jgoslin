@@ -17,9 +17,9 @@ public class Runtest extends TestCase {
     public void testFindPeak() {
         ShorthandParser parser = new ShorthandParser();
         
-        LipidAdduct lipid = parser.parse("PE-N(FA) 56:5");
-        System.out.println(lipid.get_lipid_string());
-        System.out.println(lipid.get_sum_formula());
+        LipidAdduct lipid = parser.parse("Cer 18:1(8);(OH)2/24:0");
+        System.out.println(lipid.get_lipid_string(LipidLevel.SN_POSITION));
+        //System.out.println(lipid.get_sum_formula());
         //System.out.println(lipid.get_mass());
         
     }

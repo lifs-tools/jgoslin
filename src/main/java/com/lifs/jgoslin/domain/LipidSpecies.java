@@ -26,7 +26,6 @@ package com.lifs.jgoslin.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 /**
  *
@@ -59,8 +58,7 @@ public class LipidSpecies {
     }
 
 
-    public LipidLevel get_lipid_level()
-    {
+    public LipidLevel get_lipid_level(){
         return LipidLevel.SPECIES;
     }
 
@@ -103,8 +101,7 @@ public class LipidSpecies {
 
 
 
-    public String get_extended_class()
-    {
+    public String get_extended_class(){
         boolean special_case = (info.num_carbon > 0) ? (headgroup.lipid_category == LipidCategory.GP) : false;
         String class_name = headgroup.get_class_name();
         if (special_case && (info.extended_class == LipidFaBondType.ETHER_PLASMANYL || info.extended_class == LipidFaBondType.ETHER_UNSPECIFIED)){
@@ -119,15 +116,13 @@ public class LipidSpecies {
     }
 
 
-    public ArrayList<FattyAcid> get_fa_list()
-    {
+    public ArrayList<FattyAcid> get_fa_list(){
         return fa_list;
     }
 
 
 
-    public ElementTable get_elements()
-    {
+    public ElementTable get_elements(){
         
         switch(info.level){        
             case COMPLETE_STRUCTURE:

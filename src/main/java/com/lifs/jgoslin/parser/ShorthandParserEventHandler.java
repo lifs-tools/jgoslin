@@ -51,7 +51,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     
     public ShorthandParserEventHandler(){
-        set_content(null);
+        content = null;
     }
     
     @Override
@@ -271,9 +271,12 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
     public void enterEther_num(Shorthand2020Parser.Ether_numContext node){
         int num_ethers = 0;
         String ether = node.getText();
-        if (ether.equals("d")) num_ethers = 2;
-        else if (ether.equals("t")) num_ethers = 3;
-        else if (ether.equals("e")) num_ethers = 4;
+        switch (ether) {
+            case "d": num_ethers = 2; break;
+            case "t": num_ethers = 3; break;
+            case "e": num_ethers = 4; break;
+            default: break;
+        }
         tmp.put("num_ethers", num_ethers);
     }
     
@@ -392,7 +395,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         else {
             if (!current_fas.back().functional_groups.containsKey(carbohydrate))
             {
-                current_fas.back().functional_groups.put(carbohydrate, new ArrayList<FunctionalGroup>());
+                current_fas.back().functional_groups.put(carbohydrate, new ArrayList<>());
             }
             current_fas.back().functional_groups.get(carbohydrate).add(functional_group);
         }
@@ -446,7 +449,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         if (special_type.length() > 0){
             fa.name = special_type;
             if (!current_fas.back().functional_groups.containsKey(special_type)){
-                current_fas.back().functional_groups.put(special_type, new ArrayList<FunctionalGroup>());
+                current_fas.back().functional_groups.put(special_type, new ArrayList<>());
             }
             current_fas.back().functional_groups.get(special_type).add(fa);
         }
@@ -522,7 +525,6 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
 
     @Override
     public void exitFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
-        String fa_i = FA_I();
         Dict gd = (Dict)tmp.get(FA_I());
         String fg_name = (String)gd.get("fg_name");
 
@@ -555,7 +557,7 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         gd.remove("fg_cnt");
         gd.remove("fg_stereo");
 
-        if (!current_fas.back().functional_groups.containsKey(fg_name)) current_fas.back().functional_groups.put(fg_name, new ArrayList<FunctionalGroup>());
+        if (!current_fas.back().functional_groups.containsKey(fg_name)) current_fas.back().functional_groups.put(fg_name, new ArrayList<>());
         current_fas.back().functional_groups.get(fg_name).add(functional_group);
     }
 
