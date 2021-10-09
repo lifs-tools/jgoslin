@@ -22,13 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.Shorthand2020Lexer;
-import com.lifs.jgoslin.antlr.Shorthand2020Parser;
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.domain.LipidParsingException;
+import com.lifs.jgoslin.antlr.*;
+import com.lifs.jgoslin.domain.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -37,9 +34,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  * @author dominik
  */
-public class ShorthandParser extends Parser<LipidAdduct> {
-    public ShorthandParser(){
-        super(new ShorthandParserEventHandler());
+public class FattyAcidParser extends Parser<LipidAdduct> {
+    public FattyAcidParser(){
+        super(new FattyAcidParserEventHandler());
     }
     
     
@@ -55,9 +52,9 @@ public class ShorthandParser extends Parser<LipidAdduct> {
         ParseTree tree = null;
         parser_event_handler.set_content(null);
         try {
-            Shorthand2020Lexer lexer = new Shorthand2020Lexer(CharStreams.fromString(s));
+            FattyAcidsLexer lexer = new FattyAcidsLexer(CharStreams.fromString(s));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            Shorthand2020Parser parser = new Shorthand2020Parser(tokens);
+            com.lifs.jgoslin.antlr.FattyAcidsParser parser = new com.lifs.jgoslin.antlr.FattyAcidsParser(tokens);
             tree = parser.lipid();
         }
         catch(Exception e){

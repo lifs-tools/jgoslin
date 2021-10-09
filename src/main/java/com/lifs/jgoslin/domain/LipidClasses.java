@@ -56,7 +56,6 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
             new ElementTable(),
             new ArrayList<>(Arrays.asList("UNDEFINED"))
         ));
-        
         try {
             InputStream is = getClass().getResourceAsStream("/src/main/antlr4/lipid-list.csv");
             InputStreamReader isr = new InputStreamReader(is);
