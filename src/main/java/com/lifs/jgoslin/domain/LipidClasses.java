@@ -25,6 +25,10 @@ SOFTWARE.
 package com.lifs.jgoslin.domain;
 
 import com.lifs.jgoslin.parser.SumFormulaParser;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -42,7 +46,7 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
     public static final int UNDEFINED_CLASS = 0;
     
     private LipidClasses() {
-        List<String> lines;
+        ArrayList<String> lines = new ArrayList<>();
         add(new LipidClassMeta(LipidCategory.NO_CATEGORY,
             "UNDEFINED",
             "",
@@ -54,9 +58,18 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
         ));
         
         try {
-            lines = Files.readAllLines(Path.of("src/main/antlr4/lipid-list.csv"));
+            InputStream is = getClass().getResourceAsStream("/src/main/antlr4/lipid-list.csv");
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            while ((line = br.readLine()) != null) {
+              lines.add(line);
+            }
+            br.close();
+            isr.close();
+            is.close();
         }
-        catch(Exception e){
+        catch(IOException e){
             throw new RuntimeException("File lipid-list.csv cannot be read.");
         }
         int lineCounter = 0;
@@ -65,7 +78,6 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
 
         HashMap<String, ArrayList<String> > data = new HashMap<>();
         HashSet<String> keys = new HashSet<>();
-        ArrayList<String> list_keys = new ArrayList<>();
         HashMap<String, Integer> enum_names = new HashMap<String, Integer>(){{
             put("GL", 1);
             put("GP", 1);
@@ -149,7 +161,6 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
             }
 
             data.put(enum_name, tokens);
-            list_keys.add(enum_name);
         }
         
         // creating the lipid class dictionary
