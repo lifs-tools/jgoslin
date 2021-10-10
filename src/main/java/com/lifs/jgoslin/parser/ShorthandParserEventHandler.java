@@ -395,6 +395,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void set_cistrans(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("db_cistrans", node.get_text());
     }
+    
 
     
     public void set_ether_type(TreeNode node){
