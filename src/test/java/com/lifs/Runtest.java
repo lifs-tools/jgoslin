@@ -23,9 +23,14 @@ SOFTWARE.
 */
 package com.lifs;
 
+import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.*;
 import com.lifs.jgoslin.parser.*;
 import junit.framework.TestCase;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * This class tests the spectrum annotation.
@@ -38,10 +43,22 @@ public class Runtest extends TestCase {
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
-        ShorthandParser parser = new ShorthandParser();
         
-        LipidAdduct lipid = parser.parse("HexCer(1) 18:1(5Z);3OH/14:0");
-        System.out.println(lipid.get_lipid_string());
+        ParseTree tree = null;
+        
+            Alexer lexer = new Alexer("PA 12:0/12:0");
+            
+            
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            Shorthand2020Parser parser = new Shorthand2020Parser(tokens);
+            tree = parser.lipid();
+        
+        
+        
+        //FattyAcidParser parser = new FattyAcidParser();
+        
+        //LipidAdduct lipid = parser.parse("17-methyl-6Z-octadecenoic acid");
+        //System.out.println(lipid.get_lipid_string());
         //System.out.println(lipid.get_sum_formula());
         //System.out.println(lipid.get_mass());
         

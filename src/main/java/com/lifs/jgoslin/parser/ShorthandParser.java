@@ -25,10 +25,8 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.Shorthand2020Lexer;
-import com.lifs.jgoslin.antlr.Shorthand2020Parser;
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.domain.LipidParsingException;
+import com.lifs.jgoslin.antlr.*;
+import com.lifs.jgoslin.domain.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
