@@ -25,11 +25,7 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.*;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  *
@@ -37,38 +33,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
  */
 public class ShorthandParser extends Parser<LipidAdduct> {
     public ShorthandParser(){
-        super(new ShorthandParserEventHandler());
-    }
-    
-    
-    
-    @Override
-    public LipidAdduct parse(String s) {
-        return parse(s, true);
-    }
-    
-    
-    @Override
-    public LipidAdduct parse(String s, boolean throw_exception) {
-        ParseTree tree = null;
-        parser_event_handler.set_content(null);
-        try {
-            Shorthand2020Lexer lexer = new Shorthand2020Lexer(CharStreams.fromString(s));
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            Shorthand2020Parser parser = new Shorthand2020Parser(tokens);
-            tree = parser.lipid();
-        }
-        catch(Exception e){
-            if (throw_exception) throw new LipidParsingException("Lipid '" + s + "' can not be parsed by grammar 'Shorthand2020'");
-        }
-        try {
-            walker.walk(parser_event_handler, tree);
-        }
-        catch(Exception e){
-            if (throw_exception) throw e;
-        }
-        
-        
-        return (LipidAdduct)parser_event_handler.get_content();
+        super(new ShorthandParserEventHandler(), "/src/main/antlr4/Shorthand2020.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

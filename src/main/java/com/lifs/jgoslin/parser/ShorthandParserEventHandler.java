@@ -24,15 +24,33 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 
-public class ShorthandParserEventHandler extends Shorthand2020BaseListener implements BaseParserEventHandler<LipidAdduct> {
+public class ShorthandParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
+    
+    public ShorthandParserEventHandler() {
+        try {
+            registered_events.put("lipid_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
+            registered_events.put("lipid_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("end_parser", TreeNode.class));
+        }
+        catch(Exception e){
+            throw new RuntimeException("Cannot initialize ShorthandParserEventHandler.");
+        }
+    }   
+        
+    public void reset_parser(TreeNode node){
+        System.out.println("haha");
+        System.out.println("start " + node.get_text());
+    }
+    
+    public void end_parser(TreeNode node){
+        System.out.println("end " + node.get_text());
+    }
+    /*
     public LipidAdduct content;
     public LipidLevel level = LipidLevel.FULL_STRUCTURE;
     public String head_group = "";
@@ -836,5 +854,5 @@ public class ShorthandParserEventHandler extends Shorthand2020BaseListener imple
         headgroup_decorators.add(hgd);
         acer_species = true;
     }
-
+    */
 }

@@ -23,14 +23,12 @@ SOFTWARE.
 */
 package com.lifs;
 
-import com.lifs.jgoslin.antlr.*;
-import com.lifs.jgoslin.domain.*;
-import com.lifs.jgoslin.parser.*;
+import com.lifs.jgoslin.domain.ElementTable;
+import com.lifs.jgoslin.domain.LipidAdduct;
+import com.lifs.jgoslin.domain.StringFunctions;
+import com.lifs.jgoslin.parser.ShorthandParser;
+import com.lifs.jgoslin.parser.SumFormulaParser;
 import junit.framework.TestCase;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * This class tests the spectrum annotation.
@@ -38,23 +36,22 @@ import org.antlr.v4.runtime.tree.ParseTree;
  * @author Marc Vaudel
  */
 public class Runtest extends TestCase {
-
+    
+    
     /**
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
         
-        ParseTree tree = null;
-        
-            Alexer lexer = new Alexer("PA 12:0/12:0");
-            
-            
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            Shorthand2020Parser parser = new Shorthand2020Parser(tokens);
-            tree = parser.lipid();
+        SumFormulaParser parser = SumFormulaParser.get_instance();
+        ElementTable e = parser.parse("C12H22O3PN2");
+        System.out.println(parser.parser_event_handler.content != null);
         
         
-        
+        //ShorthandParser parser = new ShorthandParser();
+        //LipidAdduct lipid = parser.parse("PA 12:0/12:1");
+        //System.out.println(lipid.get_lipid_string());
+       
         //FattyAcidParser parser = new FattyAcidParser();
         
         //LipidAdduct lipid = parser.parse("17-methyl-6Z-octadecenoic acid");

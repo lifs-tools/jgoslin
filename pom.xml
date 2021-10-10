@@ -54,17 +54,6 @@
             <type>jar</type>
         </dependency>
         
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
-            <version>4.9.2</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.9.2</version>
-        </dependency>
     </dependencies>
     
     
@@ -76,6 +65,7 @@
                 <includes>
                     <include>src/main/antlr4/lipid-list.csv</include>
                     <include>src/main/antlr4/functional-groups.csv</include>
+                    <include>src/main/antlr4/*.g4</include>
                 </includes>
             </resource>
         </resources>
@@ -98,27 +88,6 @@
                 </configuration>
             </plugin>
 
-            
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.9.2</version>
-                <configuration>
-                    <excludes>Systematic.g4</excludes>
-                    <arguments>
-                        <argument>-package</argument>
-                        <argument>com.lifs.jgoslin.antlr</argument>
-                     </arguments>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>antlr</id>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>

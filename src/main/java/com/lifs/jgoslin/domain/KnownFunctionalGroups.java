@@ -75,7 +75,7 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
             functional_data_set.add(fd_name);
         }
         
-        SumFormulaParser sfp = new SumFormulaParser();
+        SumFormulaParser sfp = SumFormulaParser.get_instance();
         for (ArrayList<String> row : functional_data){
             row.add(row.get(1));
             for (int i = 6; i < row.size(); ++i){

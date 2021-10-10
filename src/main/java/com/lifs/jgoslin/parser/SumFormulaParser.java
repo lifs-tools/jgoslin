@@ -25,44 +25,21 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.*;
-import com.lifs.jgoslin.domain.ElementTable;
-import com.lifs.jgoslin.domain.LipidParsingException;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
+import com.lifs.jgoslin.domain.*;
 
 /**
  *
  * @author dominik
  */
-public class SumFormulaParser extends Parser {
-    public SumFormulaParser(){
-        super(new SumFormulaParserEventHandler());
-    }
-    
-    
-    
-    @Override
-    public ElementTable parse(String s) {
-        return parse(s, true);
-    }
-    
-    
-    @Override
-    public ElementTable parse(String s, boolean throw_exception) {
-        parser_event_handler.set_content(null);
-        try {
-            SumFormulaLexer lexer = new SumFormulaLexer(CharStreams.fromString(s));
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            com.lifs.jgoslin.antlr.SumFormulaParser parser = new com.lifs.jgoslin.antlr.SumFormulaParser(tokens);
-            ParseTree tree = parser.molecule();
-            walker.walk(parser_event_handler, tree);
-        }
-        catch(Exception e){
-            if (throw_exception) throw new LipidParsingException("Lipid '" + s + "' can not be parsed by grammar 'Shorthand2020'");
-        }
+public class SumFormulaParser extends Parser<ElementTable> {
+    private static SumFormulaParser sum_formula_parser = null;
         
-        return (ElementTable)parser_event_handler.get_content();
+    private SumFormulaParser(){
+        super(new SumFormulaParserEventHandler(), "/src/main/antlr4/SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
+    }
+    
+    public static SumFormulaParser get_instance(){
+        if (sum_formula_parser == null) sum_formula_parser = new SumFormulaParser();
+        return sum_formula_parser;
     }
 }

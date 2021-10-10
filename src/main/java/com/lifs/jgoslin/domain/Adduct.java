@@ -75,7 +75,7 @@ public class Adduct
 
             String adduct_name = adduct_string.substring(1);
             
-            ElementTable adduct_elements = (new SumFormulaParser()).parse(adduct_name);
+            ElementTable adduct_elements = (SumFormulaParser.get_instance()).parse(adduct_name);
             for (Entry<Element, Integer> kv : adduct_elements.entrySet()){
                 elements.put(kv.getKey(), elements.get(kv.getKey())  + kv.getValue());
             }

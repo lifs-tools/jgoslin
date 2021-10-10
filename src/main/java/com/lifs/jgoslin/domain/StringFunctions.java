@@ -47,7 +47,7 @@ public class StringFunctions {
         if (s.length() > 0) {
             int st = 0;
             while (st < s.length() - 1 && s.charAt(st) == c) ++st;
-            s = s.substring(st, s.length() - st);
+            s = s.substring(st, s.length());
         }
 
         if (s.length() > 0) {

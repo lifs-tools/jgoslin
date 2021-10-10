@@ -24,15 +24,61 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.domain.LipidLevel;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.function.Function;
 
 /**
  *
  * @author dominik
  */
-public interface BaseParserEventHandler<T> extends ParseTreeListener {
-    public T get_content();
-    public void set_content(T l);
-    public void set_lipid_level(LipidLevel _level);
-}
+public abstract class BaseParserEventHandler<T> {
+    public HashMap<String, Method> registered_events = new HashMap<>();
+    public HashSet<String> rule_names = new HashSet<>();
+    public Parser<T> parser = null;
+    public String debug = "";
+    public T content = null;
+
+    public BaseParserEventHandler()
+    {
+        registered_events = new HashMap<>();
+        rule_names = new HashSet<>();
+    }
+
+
+    // checking if all registered events are reasonable and orrur as rules in the grammar
+    public void sanity_check()
+    {
+        for (String event_name : registered_events.keySet()) {
+            if (!event_name.endsWith("_pre_event") && !event_name.endsWith("_post_event")){
+                throw new RuntimeException("Parser event handler error: event '" + event_name + "' does not contain the suffix '_pre_event' or '_post_event'");
+            }
+            String rule_name = event_name.replace("_pre_event", "").replace("_post_event", "");
+            if (!rule_names.contains(rule_name)){
+                throw new RuntimeException("Parser event handler error: rule '" + rule_name + "' in event '" + event_name + "' is not present in the grammar" + (parser != null ? " '" + parser.grammar_name + "'" : ""));
+            }
+        }
+    }
+
+
+    public void handle_event(String event_name, TreeNode node)
+    {
+        if (debug.equals("full")){
+            String reg_event = registered_events.containsKey(event_name) ? "*" : "";
+            System.out.println(event_name + reg_event + ": \"" + node.get_text() + "\"");
+        }
+
+        if (registered_events.containsKey(event_name)){
+            if (!debug.equals("") && !debug.equals("full")){
+                System.out.println(event_name + ": \"" + node.get_text() + "\"");
+            }
+            try {
+                registered_events.get(event_name).invoke(this, node);
+            }
+            catch (Exception e){
+                throw new RuntimeException("Parser rule '" + event_name + "' has unknown method.");
+            }
+        }
+    }
+}   

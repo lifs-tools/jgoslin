@@ -24,53 +24,46 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.*;
 
 /**
  *
  * @author dominik
  */
-public class SumFormulaParserEventHandler extends SumFormulaBaseListener implements BaseParserEventHandler<ElementTable> {
+public class SumFormulaParserEventHandler extends BaseParserEventHandler<ElementTable> {
     public ElementTable content;
     public Element element;
     public int count;
     
     public SumFormulaParserEventHandler(){
-        set_content(null);
+        try {
+            registered_events.put("molecule_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
+            registered_events.put("element_group_post_event", SumFormulaParserEventHandler.class.getDeclaredMethod("element_group_post_event", TreeNode.class));
+            registered_events.put("element_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("element_pre_event", TreeNode.class));
+            registered_events.put("single_element_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("single_element_group_pre_event", TreeNode.class));
+            registered_events.put("count_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("count_pre_event", TreeNode.class));
+        }
+        catch(Exception e){
+            throw new RuntimeException("Cannot initialize ShorthandParserEventHandler.");
+        }
     }
-    
-    @Override
-    public void set_content(ElementTable l){
-        content = l;
-    }
-    
-    @Override
-    public ElementTable get_content(){
-        return content;
-    }
-
-
-    @Override
-    public void set_lipid_level(LipidLevel _level){}
-    
      
-    @Override
-    public void enterMolecule(com.lifs.jgoslin.antlr.SumFormulaParser.MoleculeContext ctx) {
+    
+    public void reset_parser(TreeNode node){
         content = new ElementTable();
         element = Element.H;
         count = 0;
     }
     
-    @Override
-    public void exitElement_group(com.lifs.jgoslin.antlr.SumFormulaParser.Element_groupContext ctx){
+    
+    public void element_group_post_event(TreeNode node){
          content.put(element, content.get(element) + count);
     }
     
-    @Override
-    public void enterElement(com.lifs.jgoslin.antlr.SumFormulaParser.ElementContext ctx){
+    
+    public void element_pre_event(TreeNode node){
         
-        String parsed_element = ctx.getText();
+        String parsed_element = node.get_text();
 
         if (Elements.element_positions.containsKey(parsed_element))
         {
@@ -82,9 +75,9 @@ public class SumFormulaParserEventHandler extends SumFormulaBaseListener impleme
         }
     }
     
-    @Override
-    public void enterSingle_element(com.lifs.jgoslin.antlr.SumFormulaParser.Single_elementContext ctx){
-        String parsed_element = ctx.getText();
+    
+    public void single_element_group_pre_event(TreeNode node){
+        String parsed_element = node.get_text();
         if (Elements.element_positions.containsKey(parsed_element))
         {
             element = Elements.element_positions.get(parsed_element);
@@ -96,8 +89,8 @@ public class SumFormulaParserEventHandler extends SumFormulaBaseListener impleme
         }
     }
     
-    @Override
-    public void enterCount(com.lifs.jgoslin.antlr.SumFormulaParser.CountContext ctx){
-        count = Integer.valueOf(ctx.getText());
+    
+    public void count_pre_event(TreeNode node){
+        count = Integer.valueOf(node.get_text());
     }
 }

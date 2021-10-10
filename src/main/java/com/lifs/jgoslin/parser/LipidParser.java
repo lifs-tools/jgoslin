@@ -37,7 +37,7 @@ public class LipidParser{
 
     public LipidParser(){
         parser_list.add(new ShorthandParser());
-        parser_list.add(new FattyAcidParser());
+        //parser_list.add(new FattyAcidParser());
         /*
         parser_list.add(new GoslinParser());
         parser_list.add(new LipidMapsParser());
