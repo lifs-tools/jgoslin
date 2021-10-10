@@ -28,8 +28,8 @@ import com.lifs.jgoslin.antlr.*;
 import com.lifs.jgoslin.domain.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 
 public class ShorthandParserEventHandler extends Shorthand2020BaseListener implements BaseParserEventHandler<LipidAdduct> {

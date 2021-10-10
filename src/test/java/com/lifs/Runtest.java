@@ -38,11 +38,10 @@ public class Runtest extends TestCase {
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
-        System.out.println(KnownFunctionalGroups.get_instance().size());
-        //ShorthandParser parser = new ShorthandParser();
+        ShorthandParser parser = new ShorthandParser();
         
-        //LipidAdduct lipid = parser.parse("HexCer(1) 18:1(5Z);3OH/14:0");
-        //System.out.println(lipid.get_lipid_string());
+        LipidAdduct lipid = parser.parse("HexCer(1) 18:1(5Z);3OH/14:0");
+        System.out.println(lipid.get_lipid_string());
         //System.out.println(lipid.get_sum_formula());
         //System.out.println(lipid.get_mass());
         

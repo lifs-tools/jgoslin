@@ -35,6 +35,11 @@ public class CarbonChain extends FunctionalGroup {
         this(_fa, -1, 1);
     }
     
+    
+    public CarbonChain(FattyAcid _fa, int _position){
+        this(_fa, _position, 1);
+    }
+    
     public CarbonChain(FattyAcid _fa, int _position, int _count){
         super("cc", _position, _count);
         if (_fa != null)
