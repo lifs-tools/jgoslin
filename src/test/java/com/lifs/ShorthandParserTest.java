@@ -18,7 +18,6 @@ import org.junit.Assert;
  */
 public class ShorthandParserTest extends TestCase {
     public void testShorthandParserTest() {
-    /*
         ShorthandParser parser = new ShorthandParser();
         LipidAdduct l = parser.parse("PE 18:1(8Z);1OH,3OH/24:0");
         Assert.assertEquals("PE 18:1(8Z);1OH,3OH/24:0", l.get_lipid_string());
@@ -208,6 +207,5 @@ public class ShorthandParserTest extends TestCase {
         }
 
         System.out.println("Shorthand Test: All tests passed without any problem");
-        */
     }
 }

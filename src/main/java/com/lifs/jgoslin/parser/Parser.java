@@ -94,7 +94,6 @@ public class Parser<T>
 
         quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
         parser_event_handler = _parserEventHandler;
-        System.out.println(parser_event_handler.content != null);
 
          
         try {

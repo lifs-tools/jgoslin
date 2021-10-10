@@ -407,7 +407,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
 
     
-    public void enterFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
+    public void set_functional_group(TreeNode node){
         String fa_i = FA_I();
         Dictionary gd = (Dictionary)tmp.get(fa_i);
         gd.put("fg_pos", -1);
@@ -418,7 +418,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitFunc_group_data(Shorthand2020Parser.Func_group_dataContext node){
+    public void add_functional_group(TreeNode node){
         Dictionary gd = (Dictionary)tmp.get(FA_I());
         String fg_name = (String)gd.get("fg_name");
 
@@ -456,32 +456,32 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void enterFunc_group_pos_number(Shorthand2020Parser.Func_group_pos_numberContext node){
+    public void set_functional_group_position(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_pos", Integer.valueOf(node.get_text()));
     }
 
     
-    public void enterFunc_group_name(Shorthand2020Parser.Func_group_nameContext node){
+    public void set_functional_group_name(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", node.get_text());
     }
 
     
-    public void enterFunc_group_count(Shorthand2020Parser.Func_group_countContext node){
+    public void set_functional_group_count(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_cnt", Integer.valueOf(node.get_text()));
     }
 
     
-    public void enterStereo_type(Shorthand2020Parser.Stereo_typeContext node){
+    public void set_functional_group_stereo(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_stereo", node.get_text());
     }
 
     
-    public void enterMolecular_func_group_name(Shorthand2020Parser.Molecular_func_group_nameContext node){
+    public void set_molecular_func_group(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", node.get_text());
     }
     
     
-    public void enterFunc_group_cycle(Shorthand2020Parser.Func_group_cycleContext node){
+    public void set_cycle(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "cy");
         current_fas.add(new Cycle(0));
 
@@ -491,7 +491,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitFunc_group_cycle(Shorthand2020Parser.Func_group_cycleContext node){
+    public void add_cycle(TreeNode node){
         String fa_i = FA_I();
         GenericList cycle_elements = (GenericList)((Dictionary)tmp.get(fa_i)).get("cycle_elements");
         Cycle cycle = (Cycle)current_fas.PopBack();
@@ -510,52 +510,52 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void enterCycle_start(Shorthand2020Parser.Cycle_startContext node){
+    public void set_cycle_start(TreeNode node){
         ((Cycle)current_fas.back()).start = Integer.valueOf(node.get_text());
     }
 
     
-    public void enterCycle_end(Shorthand2020Parser.Cycle_endContext node){
+    public void set_cycle_end(TreeNode node){
         ((Cycle)current_fas.back()).end = Integer.valueOf(node.get_text());
     }
 
     
-    public void enterCycle_number(Shorthand2020Parser.Cycle_numberContext node){
+    public void set_cycle_number(TreeNode node){
         ((Cycle)current_fas.back()).cycle = Integer.valueOf(node.get_text());
     }
 
     
-    public void enterCycle_db_cnt(Shorthand2020Parser.Cycle_db_cntContext node){
+    public void set_cycle_db_count(TreeNode node){
         ((Cycle)current_fas.back()).double_bonds.num_double_bonds = Integer.valueOf(node.get_text());
     }
 
     
-    public void enterCycle_db_positions(Shorthand2020Parser.Cycle_db_positionsContext node){
+    public void set_cycle_db_positions(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("cycle_db", ((Cycle)current_fas.back()).double_bonds.get_num());
     }
 
     
-    public void exitCycle_db_positions(Shorthand2020Parser.Cycle_db_positionsContext node){
+    public void check_cycle_db_positions(TreeNode node){
         if (((Cycle)current_fas.back()).double_bonds.get_num() != (int)((Dictionary)tmp.get(FA_I())).get("cycle_db")){
             throw new LipidException("Double bond number in cycle does not correspond to number of double bond positions.");
         }
     }
 
     
-    public void enterCycle_db_position_number(Shorthand2020Parser.Cycle_db_position_numberContext node){
+    public void set_cycle_db_position(TreeNode node){
         int pos = Integer.valueOf(node.get_text());
         ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, "");
         ((Dictionary)tmp.get(FA_I())).put("last_db_pos", pos);
     }
 
     
-    public void enterCycle_db_position_cis_trans(Shorthand2020Parser.Cycle_db_position_cis_transContext node){
+    public void set_cycle_db_position_cistrans(TreeNode node){
         int pos = (int)((Dictionary)tmp.get(FA_I())).get("last_db_pos");
         ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, node.get_text());
     }
 
     
-    public void enterCylce_element(Shorthand2020Parser.Cylce_elementContext node){
+    public void add_cycle_element(TreeNode node){
         String element = node.get_text();
             
         if (!Elements.element_positions.containsKey(element)){
@@ -566,7 +566,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
     
     
-    public void enterFatty_acyl_linkage(Shorthand2020Parser.Fatty_acyl_linkageContext node){
+    public void set_acyl_linkage(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "acyl");
         current_fas.add(new AcylAlkylGroup((FattyAcid)null));
         tmp.put(FA_I(), new Dictionary());
@@ -574,7 +574,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitFatty_acyl_linkage(Shorthand2020Parser.Fatty_acyl_linkageContext node){
+    public void add_acyl_linkage(TreeNode node){
         boolean linkage_type = (int)((Dictionary)tmp.get(FA_I())).get("linkage_type") == 1;
         int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
 
@@ -590,7 +590,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void enterFatty_alkyl_linkage(Shorthand2020Parser.Fatty_alkyl_linkageContext node){
+    public void set_alkyl_linkage(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "alkyl");
         current_fas.add(new AcylAlkylGroup(null, -1, 1, true));
         tmp.put(FA_I(), new Dictionary());
@@ -598,7 +598,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitFatty_alkyl_linkage(Shorthand2020Parser.Fatty_alkyl_linkageContext node){
+    public void add_alkyl_linkage(TreeNode node){
         int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
         tmp.remove(FA_I());
         AcylAlkylGroup alkyl = (AcylAlkylGroup)current_fas.PopBack();
@@ -611,17 +611,17 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void enterFatty_linkage_number(Shorthand2020Parser.Fatty_linkage_numberContext node){
+    public void set_fatty_linkage_number(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.get_text()));
     }
 
     
-    public void enterFatty_acyl_linkage_sign(Shorthand2020Parser.Fatty_acyl_linkage_signContext node){
+    public void set_linkage_type(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("linkage_type", node.get_text().equals("N") ? 1 : 0);
     }
 
     
-    public void enterHydrocarbon_chain(Shorthand2020Parser.Hydrocarbon_chainContext node){
+    public void set_hydrocarbon_chain(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "cc");
         current_fas.add(new CarbonChain((FattyAcid)null));
         tmp.put(FA_I(), new Dictionary());
@@ -629,7 +629,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitHydrocarbon_chain(Shorthand2020Parser.Hydrocarbon_chainContext node){
+    public void add_hydrocarbon_chain(TreeNode node){
         int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
         tmp.remove(FA_I());
         CarbonChain cc = (CarbonChain)current_fas.PopBack();
@@ -641,17 +641,12 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void enterHydrocarbon_number(Shorthand2020Parser.Hydrocarbon_numberContext node){
-        ((Dictionary)tmp.get(FA_I())).put("linkage_pos", Integer.valueOf(node.get_text()));
-    }
-
-    
-    public void enterRing_stereo(Shorthand2020Parser.Ring_stereoContext node){
+    public void set_ring_stereo(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_ring_stereo", node.get_text());
     }
 
     
-    public void enterPl_hg_fa(Shorthand2020Parser.Pl_hg_faContext node){
+    public void set_hg_acyl(TreeNode node){
         String fa_i = FA_I();
         tmp.put(fa_i, new Dictionary());
         ((Dictionary)tmp.get(fa_i)).put("fg_name", "decorator_acyl");
@@ -660,14 +655,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitPl_hg_fa(Shorthand2020Parser.Pl_hg_faContext node){
+    public void add_hg_acyl(TreeNode node){
         tmp.remove(FA_I());
         headgroup_decorators.add((HeadgroupDecorator)current_fas.PopBack());
         tmp.remove(FA_I());
     }
 
     
-    public void enterPl_hg_alk(Shorthand2020Parser.Pl_hg_alkContext node){
+    public void set_hg_alkyl(TreeNode node){
         tmp.put(FA_I(), new Dictionary());
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "decorator_alkyl");
         current_fas.add(new HeadgroupDecorator("decorator_alkyl", -1, 1, null, true));
@@ -675,14 +670,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitPl_hg_alk(Shorthand2020Parser.Pl_hg_alkContext node){
+    public void add_hg_alkyl(TreeNode node){
         tmp.remove(FA_I());
         headgroup_decorators.add((HeadgroupDecorator)current_fas.PopBack());
         tmp.remove(FA_I());
     }
 
     
-    public void enterPl_hg_species(Shorthand2020Parser.Pl_hg_speciesContext node){
+    public void add_pl_species_data(TreeNode node){
         set_lipid_level(LipidLevel.SPECIES);
         HeadgroupDecorator hgd = new HeadgroupDecorator("");
         hgd.elements.put(Element.O, hgd.elements.get(Element.O) + 1);
@@ -691,27 +686,17 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void enterHg_pip_m(Shorthand2020Parser.Hg_pip_mContext node){
+    public void suffix_decorator_molecular(TreeNode node){
         headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
     }
 
     
-    public void enterHg_pip_d(Shorthand2020Parser.Hg_pip_dContext node){
-        headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
-    }
-
-    
-    public void enterHg_pip_t(Shorthand2020Parser.Hg_pip_tContext node){
-        headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
-    }
-
-    
-    public void enterHg_PE_PS_type(Shorthand2020Parser.Hg_PE_PS_typeContext node){
+    public void suffix_decorator_species(TreeNode node){
         headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.SPECIES));
     }
 
     
-    public void exitAcer_hg(Shorthand2020Parser.Acer_hgContext node){
+    public void set_acer(TreeNode node){
         head_group = "ACer";
         HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
         hgd.functional_groups.put("decorator_acyl", new ArrayList<FunctionalGroup>());
@@ -721,7 +706,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     
-    public void exitAcer_species(Shorthand2020Parser.Acer_speciesContext node){
+    public void set_acer_species(TreeNode node){
         head_group = "ACer";
         set_lipid_level(LipidLevel.SPECIES);
         HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
