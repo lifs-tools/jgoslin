@@ -595,13 +595,32 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitWax_ester(FattyAcidsParser.Wax_esterContext node) { }
+    @Override public void exitWax_ester(FattyAcidsParser.Wax_esterContext node) {
+        FattyAcid fa = fatty_acyl_stack.PopBack();
+        fa.name += "1";
+        fa.lipid_FA_bond_type = LipidFaBondType.AMINE;
+        fatty_acyl_stack.back().name += "2";
+        fatty_acyl_stack.add(0, fa);
+    }
     /**
      * {@inheritDoc}
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void enterMethyl(FattyAcidsParser.MethylContext node) { }
+    @Override public void enterMethyl(FattyAcidsParser.MethylContext node) {
+        tmp.put("fg_type", "methylene");
+        GenericList gl = (GenericList)tmp.get("fg_pos");
+        if (gl.size() > 1){
+            if ((int)((GenericList)gl.get(0)).get(0) < (int)((GenericList)gl.get(1)).get(0)){
+                ((GenericList)gl.get(1)).set(0, (int)((GenericList)gl.get(1)).get(0) + 1);
+            }
+            else if ((int)((GenericList)gl.get(0)).get(0) > (int)((GenericList)gl.get(1)).get(0)){
+                ((GenericList)gl.get(0)).set(0, (int)((GenericList)gl.get(0)).get(0) + 1);
+            }
+            fatty_acyl_stack.back().num_carbon += 1;
+            tmp.put("add_methylene", 1);
+        }
+    }
     /**
      * {@inheritDoc}
      *
@@ -613,13 +632,18 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void enterCar(FattyAcidsParser.CarContext node) { }
+    @Override public void enterCar(FattyAcidsParser.CarContext node) {
+        tmp.put("fg_pos", new GenericList());
+        tmp.put("fg_type", "");
+    }
     /**
      * {@inheritDoc}
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitCar(FattyAcidsParser.CarContext node) { }
+    @Override public void exitCar(FattyAcidsParser.CarContext node) {
+        headgroup = "CAR";
+    }
     /**
      * {@inheritDoc}
      *
@@ -679,7 +703,9 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitEthanolamine(FattyAcidsParser.EthanolamineContext node) { }
+    @Override public void exitEthanolamine(FattyAcidsParser.EthanolamineContext node) {
+        headgroup = "NAE";
+    }
     /**
      * {@inheritDoc}
      *
@@ -691,7 +717,9 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitAmine(FattyAcidsParser.AmineContext node) { }
+    @Override public void exitAmine(FattyAcidsParser.AmineContext node) {
+        headgroup = "NA";
+    }
     /**
      * {@inheritDoc}
      *
@@ -717,7 +745,13 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitAmine_n(FattyAcidsParser.Amine_nContext node) { }
+    @Override public void exitAmine_n(FattyAcidsParser.Amine_nContext node) {
+        FattyAcid fa = fatty_acyl_stack.PopBack();
+        fa.name += "1";
+        fatty_acyl_stack.back().name += "2";
+        fa.lipid_FA_bond_type = LipidFaBondType.AMINE;
+        fatty_acyl_stack.add(0, fa);
+    }
     /**
      * {@inheritDoc}
      *
@@ -729,7 +763,10 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitAcetic_acid(FattyAcidsParser.Acetic_acidContext node) { }
+    @Override public void exitAcetic_acid(FattyAcidsParser.Acetic_acidContext node) {
+        fatty_acyl_stack.back().num_carbon += 2;
+        headgroup = "FA";
+    }
     /**
      * {@inheritDoc}
      *
@@ -930,7 +967,18 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitIsoprop(FattyAcidsParser.IsopropContext node) { }
+    @Override public void exitIsoprop(FattyAcidsParser.IsopropContext node) {
+        set_iso(node);
+    }
+    
+    public void set_iso(ParserRuleContext node){
+        FattyAcid curr_fa = fatty_acyl_stack.back();
+        curr_fa.num_carbon -= 1;
+        FunctionalGroup fg = KnownFunctionalGroups.get_instance().get("Me");
+        fg.position = 2;
+        if (!curr_fa.functional_groups.containsKey("Me")) curr_fa.functional_groups.put("Me", new ArrayList<>());
+        curr_fa.functional_groups.get("Me").add(fg);
+    }
     /**
      * {@inheritDoc}
      *
@@ -971,7 +1019,11 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void enterTetrahydrofuran(FattyAcidsParser.TetrahydrofuranContext node) { }
+    @Override public void enterTetrahydrofuran(FattyAcidsParser.TetrahydrofuranContext node) {
+        tmp.put("furan", 1);
+        tmp.put("tetrahydrofuran", 1);
+        set_cycle(node);
+    }
     /**
      * {@inheritDoc}
      *
@@ -983,7 +1035,10 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void enterFuran(FattyAcidsParser.FuranContext node) { }
+    @Override public void enterFuran(FattyAcidsParser.FuranContext node) {
+        tmp.put("furan", 1);
+        set_cycle(node);
+    }
     /**
      * {@inheritDoc}
      *
@@ -1052,7 +1107,9 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitCoa(FattyAcidsParser.CoaContext node) { }
+    @Override public void exitCoa(FattyAcidsParser.CoaContext node) {
+        headgroup = "CoA";
+    }
     /**
      * {@inheritDoc}
      *
@@ -1309,7 +1366,10 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitAte(FattyAcidsParser.AteContext node) { }
+    @Override public void exitAte(FattyAcidsParser.AteContext node) {
+        fatty_acyl_stack.back().num_carbon += ate.get(node.getText());
+        headgroup = "WE";
+    }
     /**
      * {@inheritDoc}
      *
@@ -1321,7 +1381,9 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitIsobut(FattyAcidsParser.IsobutContext node) { }
+    @Override public void exitIsobut(FattyAcidsParser.IsobutContext node) {
+        set_iso(node);
+    }
     /**
      * {@inheritDoc}
      *
@@ -1600,7 +1662,16 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void exitFg_pos_summary(FattyAcidsParser.Fg_pos_summaryContext node) { }
+    @Override public void exitFg_pos_summary(FattyAcidsParser.Fg_pos_summaryContext node) {
+        String fa_i = FA_I();
+        ((Dictionary)tmp.get(fa_i)).put("fg_pos_summary", new Dictionary());
+        for (Object o : (GenericList)tmp.get("fg_pos")){
+            GenericList lst = (GenericList)o;
+            String k = Integer.toString((int)lst.get(0));
+            String v = ((String)lst.get(1)).toUpperCase();
+            ((Dictionary)((Dictionary)tmp.get(fa_i)).get("fg_pos_summary")).put(k, v);
+        }
+    }
     /**
      * {@inheritDoc}
      *
@@ -1802,7 +1873,10 @@ public class FattyAcidParserEventHandler extends FattyAcidsBaseListener implemen
      *
      * <p>The default implementation does nothing.</p>
      */
-    @Override public void enterFunc_stereo(FattyAcidsParser.Func_stereoContext node) { }
+    @Override public void enterFunc_stereo(FattyAcidsParser.Func_stereoContext node) {
+        int l = ((GenericList)tmp.get("fg_pos")).size();
+        ((GenericList)((GenericList)tmp.get("fg_pos")).get(l - 1)).set(1, node.getText());
+    }
     /**
      * {@inheritDoc}
      *
