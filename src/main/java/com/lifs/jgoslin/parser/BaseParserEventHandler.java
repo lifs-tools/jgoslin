@@ -27,7 +27,6 @@ package com.lifs.jgoslin.parser;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.function.Function;
 
 /**
  *

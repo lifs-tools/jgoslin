@@ -700,8 +700,6 @@ public class Parser<T>
         parser_event_handler.content = null;
 
         parse_regular(text_to_parse);
-        //System.out.println(parser_event_handler != null);
-        //System.out.println(parser_event_handler.content != null);
         if (throw_error && !word_in_grammar){
             throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammar_name + "'");
         }

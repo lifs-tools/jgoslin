@@ -35,7 +35,6 @@ public class SumFormulaParserEventHandler extends BaseParserEventHandler<Element
     public int count;
     
     public SumFormulaParserEventHandler(){
-        reset_parser(null);
         try {
             registered_events.put("molecule_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("element_group_post_event", SumFormulaParserEventHandler.class.getDeclaredMethod("element_group_post_event", TreeNode.class));
