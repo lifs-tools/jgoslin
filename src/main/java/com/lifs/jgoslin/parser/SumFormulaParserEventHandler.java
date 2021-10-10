@@ -31,11 +31,11 @@ import com.lifs.jgoslin.domain.*;
  * @author dominik
  */
 public class SumFormulaParserEventHandler extends BaseParserEventHandler<ElementTable> {
-    public ElementTable content;
     public Element element;
     public int count;
     
     public SumFormulaParserEventHandler(){
+        reset_parser(null);
         try {
             registered_events.put("molecule_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("element_group_post_event", SumFormulaParserEventHandler.class.getDeclaredMethod("element_group_post_event", TreeNode.class));

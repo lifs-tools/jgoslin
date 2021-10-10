@@ -28,11 +28,9 @@ import com.lifs.jgoslin.domain.ExtendedList;
 import com.lifs.jgoslin.domain.LipidParsingException;
 import com.lifs.jgoslin.domain.StringFunctions;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,6 +94,7 @@ public class Parser<T>
 
         quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
         parser_event_handler = _parserEventHandler;
+        System.out.println(parser_event_handler.content != null);
 
          
         try {
@@ -568,7 +567,7 @@ public class Parser<T>
 
     // expanding singleton rules, e.g. S . A, A . B, B . C
     public ArrayList<Long> collect_one_backwards(Long rule_index){
-        ArrayList<Long> collection = new ArrayList<Long>();
+        ArrayList<Long> collection = new ArrayList<>();
         collection.add(rule_index);
         int i = 0;
         while (i < collection.size()){
@@ -690,16 +689,7 @@ public class Parser<T>
 
     
     public T parse(String text_to_parse){
-       String old_text = text_to_parse;
-        if (used_eof) text_to_parse += EOF_SIGN;
-        parser_event_handler.content = null;
-
-        parse_regular(text_to_parse);
-        if (!word_in_grammar) {
-            throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammar_name + "'");
-        }
-
-        return parser_event_handler.content;
+        return parse(text_to_parse, true);
     }
 
 
@@ -710,11 +700,13 @@ public class Parser<T>
         parser_event_handler.content = null;
 
         parse_regular(text_to_parse);
+        //System.out.println(parser_event_handler != null);
+        //System.out.println(parser_event_handler.content != null);
         if (throw_error && !word_in_grammar){
             throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammar_name + "'");
         }
-
-        return parser_event_handler.content;
+        T t = this.parser_event_handler.content;
+        return t;
     }
 
 
@@ -736,7 +728,7 @@ public class Parser<T>
         for (int i = 0; i < n; ++i){
             ArrayList< HashMap<Long, DPNode> > list = new ArrayList<>();
             for (int j = 0; j < n - i; ++j){
-                list.add(new HashMap<Long, DPNode>());
+                list.add(new HashMap<>());
             }
             DP.add(list);
             Ks[i] = new Bitfield(n);

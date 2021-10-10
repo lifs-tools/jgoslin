@@ -28,6 +28,7 @@ import com.lifs.jgoslin.domain.LipidAdduct;
 import com.lifs.jgoslin.domain.StringFunctions;
 import com.lifs.jgoslin.parser.ShorthandParser;
 import com.lifs.jgoslin.parser.SumFormulaParser;
+import com.lifs.jgoslin.parser.SumFormulaParserEventHandler;
 import junit.framework.TestCase;
 
 /**
@@ -42,10 +43,9 @@ public class Runtest extends TestCase {
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
-        
         SumFormulaParser parser = SumFormulaParser.get_instance();
         ElementTable e = parser.parse("C12H22O3PN2");
-        System.out.println(parser.parser_event_handler.content != null);
+        System.out.println(e);
         
         
         //ShorthandParser parser = new ShorthandParser();
