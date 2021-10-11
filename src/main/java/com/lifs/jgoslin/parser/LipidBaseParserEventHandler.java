@@ -67,7 +67,7 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
 
         // make lyso
         boolean can_be_lyso = (LipidClasses.get_instance().size() > Headgroup.get_class("L" + head_group)) ? LipidClasses.get_instance().get(Headgroup.get_class("L" + head_group)).special_cases.contains("Lyso") : false;
-
+        LipidClassMeta l = LipidClasses.get_instance().get(Headgroup.get_class("LCL"));
         if (true_fa + 1 == poss_fa && level != LipidLevel.SPECIES && headgroup.lipid_category == LipidCategory.GP && can_be_lyso){
             head_group = "L" + head_group;
             headgroup = new Headgroup(head_group, headgroup_decorators, use_head_group);

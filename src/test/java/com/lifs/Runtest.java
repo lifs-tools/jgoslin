@@ -24,7 +24,7 @@ SOFTWARE.
 package com.lifs;
 
 import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.parser.FattyAcidParser;
+import com.lifs.jgoslin.parser.LipidMapsParser;
 import junit.framework.TestCase;
 
 /**
@@ -40,8 +40,8 @@ public class Runtest extends TestCase {
      */
     public void testFindPeak() {
         
-        FattyAcidParser parser = new FattyAcidParser();
-        LipidAdduct lipid = parser.parse("N-(1,3-dihydroxypropan-2-yl)-9S,15S-dihydroxy-11-oxo-5Z,13E-prostadienoyl amine");
+        LipidMapsParser parser = new LipidMapsParser();
+        LipidAdduct lipid = parser.parse("CL(1'-[18:2(9Z,12Z)/18:2(9Z,12Z)],3'-[18:2(9Z,12Z)/0:0])");
         System.out.println(lipid.get_lipid_string());
         //System.out.println(lipid.get_sum_formula());
         //System.out.println(lipid.get_mass());

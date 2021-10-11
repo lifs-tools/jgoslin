@@ -76,7 +76,7 @@ public abstract class BaseParserEventHandler<T> {
                 registered_events.get(event_name).invoke(this, node);
             }
             catch (Exception e){
-                throw new RuntimeException("Parser rule '" + event_name + "' has unknown method.");
+                throw new RuntimeException(e.getMessage());
             }
         }
     }

@@ -163,7 +163,7 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
         SumFormulaParser sfp = SumFormulaParser.get_instance();
         data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
-            StringFunctions.split_string(kv.getValue().get(5), ',', '"').forEach(scase -> {
+            StringFunctions.split_string(kv.getValue().get(5), ';', '"').forEach(scase -> {
                 special_cases.add(scase.strip());
             });
             ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6)) : new ElementTable();
