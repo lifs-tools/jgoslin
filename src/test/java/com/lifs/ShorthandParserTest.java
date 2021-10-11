@@ -168,7 +168,7 @@ public class ShorthandParserTest extends TestCase {
         
         List<String> lines;
         try {
-            lines = Files.readAllLines(Path.of("src/main/antlr4/testfiles/shorthand-test.csv"));
+            lines = Files.readAllLines(Path.of("src/main/goslin/testfiles/shorthand-test.csv"));
         }
         catch(IOException e){
             throw new RuntimeException("File shorthand-test.csv cannot be read.");

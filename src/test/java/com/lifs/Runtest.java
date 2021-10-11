@@ -24,11 +24,7 @@ SOFTWARE.
 package com.lifs;
 
 import com.lifs.jgoslin.domain.ElementTable;
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.domain.StringFunctions;
-import com.lifs.jgoslin.parser.ShorthandParser;
 import com.lifs.jgoslin.parser.SumFormulaParser;
-import com.lifs.jgoslin.parser.SumFormulaParserEventHandler;
 import junit.framework.TestCase;
 
 /**

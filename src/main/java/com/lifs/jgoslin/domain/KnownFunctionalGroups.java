@@ -44,7 +44,7 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
         ArrayList<String> lines = new ArrayList<>();
         
         try {
-            InputStream is = getClass().getResourceAsStream("/src/main/antlr4/functional-groups.csv");
+            InputStream is = getClass().getResourceAsStream("/src/main/goslin/functional-groups.csv");
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             String line;

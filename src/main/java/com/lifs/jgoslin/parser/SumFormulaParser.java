@@ -35,7 +35,7 @@ public class SumFormulaParser extends Parser<ElementTable> {
     private static SumFormulaParser sum_formula_parser = null;
         
     private SumFormulaParser(){
-        super(new SumFormulaParserEventHandler(), "/src/main/antlr4/SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new SumFormulaParserEventHandler(), "/src/main/goslin/SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
     }
     
     public static SumFormulaParser get_instance(){

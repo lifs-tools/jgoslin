@@ -29,10 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -57,7 +54,7 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
             new ArrayList<>(Arrays.asList("UNDEFINED"))
         ));
         try {
-            InputStream is = getClass().getResourceAsStream("/src/main/antlr4/lipid-list.csv");
+            InputStream is = getClass().getResourceAsStream("/src/main/goslin/lipid-list.csv");
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             String line;

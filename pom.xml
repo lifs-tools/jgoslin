@@ -63,9 +63,9 @@
             <resource>
                 <directory>.</directory>
                 <includes>
-                    <include>src/main/antlr4/lipid-list.csv</include>
-                    <include>src/main/antlr4/functional-groups.csv</include>
-                    <include>src/main/antlr4/*.g4</include>
+                    <include>src/main/goslin/lipid-list.csv</include>
+                    <include>src/main/goslin/functional-groups.csv</include>
+                    <include>src/main/goslin/*.g4</include>
                 </includes>
             </resource>
         </resources>
