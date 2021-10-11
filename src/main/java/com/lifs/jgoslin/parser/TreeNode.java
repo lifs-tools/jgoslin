@@ -53,4 +53,8 @@ public class TreeNode{
         }
         return String.valueOf(terminal);
     }
+    
+    public int get_int(){
+        return Integer.valueOf(get_text());
+    }
 }
