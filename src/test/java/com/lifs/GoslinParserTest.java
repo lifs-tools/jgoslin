@@ -22,35 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package com.lifs.jgoslin.parser;
+package com.lifs;
+
+import junit.framework.TestCase;
 
 /**
  *
  * @author dominik
  */
-public class TreeNode{
-    public long rule_index;
-    public TreeNode left;
-    public TreeNode right;
-    public char terminal;
-    public boolean fire_event;
-    public static final char EOF_SIGN = '\0';
-    public static final String one_str = "\0";
-
-    public TreeNode(long _rule, boolean _fire_event){
-        rule_index = _rule;
-        left = null;
-        right = null;
-        terminal = '\0';
-        fire_event = _fire_event;
-    }
-
-    public String get_text(){
-        if (terminal == '\0'){
-            String left_str = left.get_text();
-            String right_str = right != null ? right.get_text() : "";
-            return (!left_str.equals(one_str) ? left_str : "") + (!right_str.equals(one_str) ? right_str : "");
-        }
-        return String.valueOf(terminal);
-    }
+public class GoslinParserTest extends TestCase {
+    
 }
