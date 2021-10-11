@@ -84,8 +84,7 @@ public class Cycle extends FunctionalGroup {
     }
 
 
-    public void rearrange_functional_groups(FunctionalGroup parent, int shift)
-    {
+    public void rearrange_functional_groups(FunctionalGroup parent, int shift){
         // put everything back into parent
         for (Entry<Integer, String> kv : double_bonds.double_bond_positions.entrySet()) {
             parent.double_bonds.double_bond_positions.put(kv.getKey(), kv.getValue());
@@ -209,6 +208,7 @@ public class Cycle extends FunctionalGroup {
             elements.put(Element.H, elements.get(Element.H) + 2 * n);
         }
     }
+    
 
     @Override
     public String to_string(LipidLevel level){
@@ -226,14 +226,16 @@ public class Cycle extends FunctionalGroup {
         cycle_string.append(":").append(double_bonds.get_num());
 
         if (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)){
-            if (double_bonds.double_bond_positions.size() > 0)
-            {
+            if (double_bonds.double_bond_positions.size() > 0){
                 int i = 0;
                 cycle_string.append("(");
-                for (Entry<Integer, String> kv : double_bonds.double_bond_positions.entrySet()){
+                ArrayList<Integer> sorted = new ArrayList<>(double_bonds.double_bond_positions.keySet());
+                Collections.sort(sorted, (a, b) -> (int)a - (int)b);
+                for (int key : sorted){
+                    String value = double_bonds.double_bond_positions.get(key);
                     if (i++ > 0) cycle_string.append(",");
-                    if (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) cycle_string.append(kv.getKey()).append(kv.getValue());
-                    else cycle_string.append(kv.getKey());
+                    if (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) cycle_string.append(key).append(value);
+                    else cycle_string.append(key);
                 }
                 cycle_string.append(")");
             }

@@ -302,6 +302,18 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
     
+    
+    public void add_amine(TreeNode node){
+        FattyAcid fa = fatty_acyl_stack.PopBack();
+
+        fa.name += "1";
+        fatty_acyl_stack.back().name += "2";
+        fa.lipid_FA_bond_type = LipidFaBondType.AMINE;
+        fatty_acyl_stack.add(0, fa);
+    }
+    
+    
+    
     public void set_fatty_acid(TreeNode node){
         FattyAcid curr_fa = fatty_acyl_stack.back();
         if (tmp.containsKey("length_pattern")) {
@@ -595,7 +607,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                 ++i;
             }
             for (int ii = remove_item.size() - 1; ii >= 0; --ii){
-                curr_fa.functional_groups.get("noyloxy").remove(remove_item.get(ii));
+                curr_fa.functional_groups.get("noyloxy").remove((int)remove_item.get(ii));
             }
             if (curr_fa.functional_groups.get("noyloxy").isEmpty()) remove_list.add("noyloxy");
         }
@@ -612,7 +624,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                 ++i;    
             }
             for (int ii = remove_item.size() - 1; ii >= 0; --ii){
-                kv.getValue().remove(remove_item.get(ii));
+                kv.getValue().remove((int)remove_item.get(ii));
             }
             if (kv.getValue().isEmpty()) remove_list.add(kv.getKey());
         }
@@ -642,6 +654,13 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     public void set_methyl(TreeNode node){
         fatty_acyl_stack.back().num_carbon += 1;
     }
+    
+    
+    public void set_acetic_acid(TreeNode node)
+        {
+            fatty_acyl_stack.back().num_carbon += 2;
+            headgroup = "FA";
+        }
     
     
     public void set_methylene(TreeNode node){
@@ -824,7 +843,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             FattyAcid fa = new FattyAcid("FA", l);
             // shift functional groups
             for (Entry<String, ArrayList<FunctionalGroup> > kv : curr_fa.functional_groups.entrySet()){
-                ArrayList<Integer> remove_item = new ArrayList<Integer>();
+                ArrayList<Integer> remove_item = new ArrayList<>();
                 int i = 0;
                 for (FunctionalGroup func_group : kv.getValue()){
                     if (func_group.position <= l){
@@ -835,7 +854,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                     }
                 }
                 for (int ii = remove_item.size() - 1; ii >= 0; --ii){
-                    curr_fa.functional_groups.get(kv.getKey()).remove(remove_item.get(ii));
+                    curr_fa.functional_groups.get(kv.getKey()).remove((int)remove_item.get(ii));
                 }
             }
             HashMap<String, ArrayList<FunctionalGroup> > func_dict = curr_fa.functional_groups;

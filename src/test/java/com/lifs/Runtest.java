@@ -23,8 +23,8 @@ SOFTWARE.
 */
 package com.lifs;
 
-import com.lifs.jgoslin.domain.ElementTable;
-import com.lifs.jgoslin.parser.SumFormulaParser;
+import com.lifs.jgoslin.domain.LipidAdduct;
+import com.lifs.jgoslin.parser.FattyAcidParser;
 import junit.framework.TestCase;
 
 /**
@@ -39,19 +39,11 @@ public class Runtest extends TestCase {
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
-        SumFormulaParser parser = SumFormulaParser.get_instance();
-        ElementTable e = parser.parse("C12H22O3PN2");
-        System.out.println(e);
         
-        
-        //ShorthandParser parser = new ShorthandParser();
-        //LipidAdduct lipid = parser.parse("PA 12:0/12:1");
-        //System.out.println(lipid.get_lipid_string());
-       
-        //FattyAcidParser parser = new FattyAcidParser();
-        
-        //LipidAdduct lipid = parser.parse("17-methyl-6Z-octadecenoic acid");
-        //System.out.println(lipid.get_lipid_string());
+        FattyAcidParser parser = new FattyAcidParser();
+        parser.parser_event_handler.debug = "a";
+        LipidAdduct lipid = parser.parse("N-(1,3-dihydroxypropan-2-yl)-9S,15S-dihydroxy-11-oxo-5Z,13E-prostadienoyl amine");
+        System.out.println(lipid.get_lipid_string());
         //System.out.println(lipid.get_sum_formula());
         //System.out.println(lipid.get_mass());
         

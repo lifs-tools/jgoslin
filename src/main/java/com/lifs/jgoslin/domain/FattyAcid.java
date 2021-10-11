@@ -159,11 +159,8 @@ public class FattyAcid extends FunctionalGroup {
             fa_string.append("(");
 
             int i = 0;
-            ArrayList<Integer> sorted_db = new ArrayList<>();
-            double_bonds.double_bond_positions.entrySet().forEach(kv -> {
-                sorted_db.add(kv.getKey());
-            });
-            Collections.sort(sorted_db);
+            ArrayList<Integer> sorted_db = new ArrayList<>(double_bonds.double_bond_positions.keySet());
+            Collections.sort(sorted_db, (a, b) -> (int)a - (int)b);
             for (int db_pos : sorted_db){
                 if (i++ > 0) fa_string.append(",");
                 fa_string.append(db_pos);

@@ -31,10 +31,9 @@ import org.junit.Assert;
  */
 public class FattyAcidParserTest extends TestCase {
     public void testFattyAcidParserTest(){
-    /*
         List<String> lipid_data;
         try {
-            lipid_data = Files.readAllLines(Path.of("src/main/antlr4/testfiles/fatty-acids-test.csv"));
+            lipid_data = Files.readAllLines(Path.of("src/main/goslin/testfiles/fatty-acids-test.csv"));
         }
         catch(IOException e){
             throw new RuntimeException("File fatty-acids-test.csv cannot be read.");
@@ -47,7 +46,7 @@ public class FattyAcidParserTest extends TestCase {
         // Test for correctness
         ////////////////////////////////////////////////////////////////////////////
 
-        com.lifs.jgoslin.parser.SumFormulaParser sfp = new com.lifs.jgoslin.parser.SumFormulaParser();
+        SumFormulaParser sfp = SumFormulaParser.get_instance();
         for (String lipid_row : lipid_data) {
             ArrayList<String> data = StringFunctions.split_string(lipid_row, ',', '"', true);
             String lmid = StringFunctions.strip(data.get(0), '"');
@@ -85,6 +84,5 @@ public class FattyAcidParserTest extends TestCase {
         }
 
         System.out.println("Fatty Acids Test: All tests passed without any problem");
-    */
     }
 }
