@@ -21,30 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package com.lifs;
 
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.parser.FattyAcidParser;
-import junit.framework.TestCase;
+
+package com.lifs.jgoslin.parser;
+
+import com.lifs.jgoslin.domain.*;
 
 /**
- * This class tests the spectrum annotation.
  *
- * @author Marc Vaudel
+ * @author dominik
  */
-public class Runtest extends TestCase {
-    
-    
-    /**
-     * This test evaluates the SpectrumIndex.
-     */
-    public void testFindPeak() {
-        
-        FattyAcidParser parser = new FattyAcidParser();
-        LipidAdduct lipid = parser.parse("N-(1,3-dihydroxypropan-2-yl)-9S,15S-dihydroxy-11-oxo-5Z,13E-prostadienoyl amine");
-        System.out.println(lipid.get_lipid_string());
-        //System.out.println(lipid.get_sum_formula());
-        //System.out.println(lipid.get_mass());
-        
+public class GoslinParser extends Parser<LipidAdduct> {
+    public GoslinParser(){
+        super(new GoslinParserEventHandler(), "/src/main/goslin/Goslin.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

@@ -21,30 +21,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package com.lifs;
 
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.parser.FattyAcidParser;
-import junit.framework.TestCase;
+package com.lifs.jgoslin.parser;
 
-/**
- * This class tests the spectrum annotation.
- *
- * @author Marc Vaudel
- */
-public class Runtest extends TestCase {
-    
-    
-    /**
-     * This test evaluates the SpectrumIndex.
-     */
-    public void testFindPeak() {
+import com.lifs.jgoslin.domain.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+
+
+public class GoslinParserEventHandler extends LipidBaseParserEventHandler {    
+    public ExtendedList<FunctionalGroup> current_fas;
+    public Dictionary tmp = new Dictionary();
+    public boolean acer_species = false;
+    public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
         
-        FattyAcidParser parser = new FattyAcidParser();
-        LipidAdduct lipid = parser.parse("N-(1,3-dihydroxypropan-2-yl)-9S,15S-dihydroxy-11-oxo-5Z,13E-prostadienoyl amine");
-        System.out.println(lipid.get_lipid_string());
-        //System.out.println(lipid.get_sum_formula());
-        //System.out.println(lipid.get_mass());
+    
+    public GoslinParserEventHandler() {
+        try {
+            
+            
+        }
+        catch(Exception e){
+            throw new RuntimeException("Cannot initialize ShorthandParserEventHandler.");
+        }
+    }   
+        
+    public void reset_parser(TreeNode node){
+        
+    }    
+
+    
+    
+    
+    public void build_lipid(TreeNode node){
         
     }
+    
 }

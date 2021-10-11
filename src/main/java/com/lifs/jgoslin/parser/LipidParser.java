@@ -31,13 +31,13 @@ import java.util.ArrayList;
  *
  * @author dominik
  */
-public class LipidParser{
+public class LipidParser {
     public ArrayList< Parser<LipidAdduct> > parser_list = new ArrayList<>();
     public Parser<LipidAdduct> lastSuccessfulParser = null;
 
     public LipidParser(){
         parser_list.add(new ShorthandParser());
-        //parser_list.add(new FattyAcidParser());
+        parser_list.add(new FattyAcidParser());
         /*
         parser_list.add(new GoslinParser());
         parser_list.add(new LipidMapsParser());
