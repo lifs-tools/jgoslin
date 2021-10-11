@@ -32,6 +32,16 @@ import com.lifs.jgoslin.domain.*;
  */
 public class FattyAcidParser extends Parser<LipidAdduct> {
     public FattyAcidParser(){
-        super(new FattyAcidParserEventHandler(), "src/main/antlr4/FattyAcids.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new FattyAcidParserEventHandler(), "/src/main/goslin/FattyAcids.g4", StringFunctions.DEFAULT_QUOTE);
+    }
+    
+    @Override
+    public LipidAdduct parse(String text){
+        return super.parse(text.toLowerCase(), true);
+    }
+    
+    @Override
+    public LipidAdduct parse(String text, boolean with_exception){
+        return super.parse(text.toLowerCase(), with_exception);
     }
 }
