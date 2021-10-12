@@ -69,7 +69,7 @@ public class SwissLipidsParserTest extends TestCase {
         Assert.assertEquals("EPC 16:2;O2/22:1;O", l.get_lipid_string(LipidLevel.SN_POSITION));
         Assert.assertEquals("EPC 16:2;O2/22:1;O", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
         Assert.assertEquals("EPC 38:3;O3", l.get_lipid_string(LipidLevel.SPECIES));
-        Assert.assertEquals(l.get_sum_formula(), "C40H77N2O7P");
+        Assert.assertEquals("C40H77N2O7P", l.get_sum_formula());
 
         List<String> lipid_data = null;
         try {
