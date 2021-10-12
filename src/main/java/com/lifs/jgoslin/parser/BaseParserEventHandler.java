@@ -24,6 +24,7 @@ SOFTWARE.
 
 package com.lifs.jgoslin.parser;
 
+import com.lifs.jgoslin.domain.LipidParsingException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +77,7 @@ public abstract class BaseParserEventHandler<T> {
                 registered_events.get(event_name).invoke(this, node);
             }
             catch (Exception e){
-                throw new RuntimeException(e.getMessage());
+                throw new LipidParsingException(e.getMessage());
             }
         }
     }
