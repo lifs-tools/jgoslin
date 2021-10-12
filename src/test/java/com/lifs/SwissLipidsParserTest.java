@@ -86,7 +86,6 @@ public class SwissLipidsParserTest extends TestCase {
         for (String lipid_row : lipid_data){
 
             String lipid_name = StringFunctions.strip(lipid_row, '"');
-            System.out.println(lipid_name);
             LipidAdduct lipid = parser.parse(lipid_name);
 
             Assert.assertTrue(lipid != null);
