@@ -43,7 +43,7 @@ public class SumFormulaParserEventHandler extends BaseParserEventHandler<Element
             registered_events.put("count_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("count_pre_event", TreeNode.class));
         }
         catch(Exception e){
-            throw new RuntimeException("Cannot initialize ShorthandParserEventHandler.");
+            throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");
         }
     }
      

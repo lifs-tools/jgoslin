@@ -152,7 +152,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
             
         }
         catch(Exception e){
-            throw new RuntimeException("Cannot initialize ShorthandParserEventHandler.");
+            throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");
         }
     }   
         

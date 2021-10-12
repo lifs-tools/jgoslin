@@ -104,7 +104,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             
         }
         catch(Exception e){
-            throw new RuntimeException("Cannot initialize GoslinParserEventHandler");
+            throw new LipidParsingException("Cannot initialize GoslinParserEventHandler");
         }
     }   
         

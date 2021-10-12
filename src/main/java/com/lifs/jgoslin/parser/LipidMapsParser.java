@@ -21,44 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.domain.LipidAdduct;
-import com.lifs.jgoslin.domain.LipidException;
-import java.util.ArrayList;
+import com.lifs.jgoslin.domain.*;
 
 /**
  *
  * @author dominik
  */
-public class LipidParser {
-    public ArrayList< Parser<LipidAdduct> > parser_list = new ArrayList<>();
-    public Parser<LipidAdduct> lastSuccessfulParser = null;
-
-    public LipidParser(){
-        parser_list.add(new ShorthandParser());
-        parser_list.add(new FattyAcidParser());
-        parser_list.add(new GoslinParser());
-        parser_list.add(new LipidMapsParser());
-        /*
-        parser_list.add(new SwissLipidsParser());
-        parser_list.add(new HmdbParser());
-        */
-
-        lastSuccessfulParser = null;
-    }
-
-
-    public LipidAdduct parse(String lipid_name){
-        lastSuccessfulParser = null;
-
-        for (Parser<LipidAdduct> parser : parser_list){
-            LipidAdduct lipid = parser.parse(lipid_name, false);
-            if (lipid != null){
-                lastSuccessfulParser = parser;
-                return lipid;
-            }
-        }
-        throw new LipidException("Lipid not found");
+public class LipidMapsParser extends Parser<LipidAdduct> {
+    public LipidMapsParser(){
+        super(new LipidMapsParserEventHandler(), "/src/main/goslin/LipidMaps.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }
