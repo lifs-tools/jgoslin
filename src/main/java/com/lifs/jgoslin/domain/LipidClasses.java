@@ -164,12 +164,16 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
         data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
             StringFunctions.split_string(kv.getValue().get(5), ';', '"').forEach(scase -> {
-                special_cases.add(scase.strip());
+                special_cases.add(StringFunctions.strip(scase, '"'));
             });
             ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6)) : new ElementTable();
             ArrayList<String> synonyms = new ArrayList<>();
             synonyms.add(kv.getValue().get(0)); 
-            for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) synonyms.add(kv.getValue().get(ii));
+            for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) {
+                if (kv.getValue().get(ii).length() > 0){
+                    synonyms.add(StringFunctions.strip(kv.getValue().get(ii), '"'));
+                }
+            }
             add(new LipidClassMeta(names_to_category.get(kv.getValue().get(1)),
                     kv.getValue().get(0),
                     kv.getValue().get(2),

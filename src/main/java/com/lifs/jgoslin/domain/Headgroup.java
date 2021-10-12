@@ -26,11 +26,9 @@ package com.lifs.jgoslin.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
 
 /**
  *
@@ -102,7 +100,7 @@ public class Headgroup {
             }
         }
 
-        return StringClass.containsKey(_headgroup) ? StringClass.get(_headgroup) : LipidClasses.UNDEFINED_CLASS;
+        return StringClass.containsKey(_headgroup) ? (int)StringClass.get(_headgroup) : LipidClasses.UNDEFINED_CLASS;
     }
 
 

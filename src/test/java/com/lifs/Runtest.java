@@ -23,8 +23,13 @@ SOFTWARE.
 */
 package com.lifs;
 
+import com.lifs.jgoslin.domain.Headgroup;
 import com.lifs.jgoslin.domain.LipidAdduct;
+import com.lifs.jgoslin.domain.LipidClassMeta;
+import com.lifs.jgoslin.domain.LipidClasses;
 import com.lifs.jgoslin.parser.LipidMapsParser;
+import com.lifs.jgoslin.parser.SwissLipidsParser;
+import java.util.Map.Entry;
 import junit.framework.TestCase;
 
 /**
@@ -39,9 +44,16 @@ public class Runtest extends TestCase {
      * This test evaluates the SpectrumIndex.
      */
     public void testFindPeak() {
+        for (Entry<String, Integer> kv : Headgroup.StringClass.entrySet())
+            System.out.println(kv);
+        int aa = Headgroup.get_class("PIP3[3,4,5]");
         
-        LipidMapsParser parser = new LipidMapsParser();
-        LipidAdduct lipid = parser.parse("CL(1'-[18:2(9Z,12Z)/18:2(9Z,12Z)],3'-[18:2(9Z,12Z)/0:0])");
+        
+        LipidClassMeta a = LipidClasses.get_instance().get(Headgroup.get_class("PIP3[3,4,5]"));
+        
+        SwissLipidsParser parser = new SwissLipidsParser();
+        parser.parser_event_handler.debug = "a";
+        LipidAdduct lipid = parser.parse("PIP3[3,4,5](20:3(11Z,14Z,17Z)/17:0)");
         System.out.println(lipid.get_lipid_string());
         //System.out.println(lipid.get_sum_formula());
         //System.out.println(lipid.get_mass());
