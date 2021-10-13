@@ -183,4 +183,8 @@ public class FunctionalGroup {
     public void add(FunctionalGroup fg){
         elements.add(fg.elements);
     }
+    
+    public void add_functional_group(FunctionalGroup fg){
+        
+    }
 }

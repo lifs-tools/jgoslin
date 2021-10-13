@@ -24,13 +24,15 @@ SOFTWARE.
 
 package com.lifs.jgoslin.domain;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
  *
  * @author dominik
  */
-public class DoubleBonds{
+public class DoubleBonds {
     
     public int num_double_bonds;
     public HashMap<Integer, String> double_bond_positions;
