@@ -15,6 +15,7 @@
  */
 package com.lifs.jgoslin.parser;
 
+import com.lifs.jgoslin.domain.Adduct;
 import com.lifs.jgoslin.domain.Cycle;
 import com.lifs.jgoslin.domain.Dictionary;
 import com.lifs.jgoslin.domain.DoubleBonds;
@@ -45,6 +46,12 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         try {
             registered_events.put("lipid_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", HmdbParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
+            // set adduct events
+            registered_events.put("adduct_info_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("new_adduct", TreeNode.class));
+            registered_events.put("adduct_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("add_adduct", TreeNode.class));
+            registered_events.put("charge_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("add_charge", TreeNode.class));
+            registered_events.put("charge_sign_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("add_charge_sign", TreeNode.class));
+
             registered_events.put("fa_hg_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
             registered_events.put("gl_hg_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
             registered_events.put("gl_molecular_hg_pre_event", HmdbParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
@@ -97,6 +104,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         level = LipidLevel.FULL_STRUCTURE;
         head_group = "";
         lcb = null;
+        adduct = null;
         fa_list = new ArrayList<>();
         current_fa = null;
         use_head_group = false;
@@ -208,6 +216,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
         LipidAdduct lipid = new LipidAdduct();
         lipid.lipid = assemble_lipid(headgroup);
+        lipid.adduct = adduct;
         content = lipid;
     }
 
@@ -343,4 +352,30 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     public void lipid_suffix(TreeNode node){
         //throw new UnsupportedLipidException("Lipids with suffix '" + node.get_text() + "' are currently not supported");
     } 
+
+
+
+    public void new_adduct(TreeNode node){
+        adduct = new Adduct("", "");
+    }
+
+
+
+    public void add_adduct(TreeNode node){
+        adduct.adduct_string = node.get_text();
+    }
+
+
+
+    public void add_charge(TreeNode node){
+        adduct.charge = Integer.valueOf(node.get_text());
+    }
+
+
+
+    public void add_charge_sign(TreeNode node){
+        String sign = node.get_text();
+        if (sign.equals("+")) adduct.set_charge_sign(1);
+        else if (sign.equals("-")) adduct.set_charge_sign(-1);
+    }
 }

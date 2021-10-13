@@ -64,6 +64,12 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             registered_events.put("lipid_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
 
+            // set adduct events
+            registered_events.put("adduct_info_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("new_adduct", TreeNode.class));
+            registered_events.put("adduct_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_adduct", TreeNode.class));
+            registered_events.put("charge_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_charge", TreeNode.class));
+            registered_events.put("charge_sign_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_charge_sign", TreeNode.class));
+
             registered_events.put("mediator_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("mediator_event", TreeNode.class));
 
             registered_events.put("sgl_species_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
@@ -138,6 +144,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         level = LipidLevel.FULL_STRUCTURE;
         head_group = "";
         lcb = null;
+        adduct = null;
         fa_list = new ArrayList<>();
         current_fa = null;
         use_head_group = false;
@@ -408,6 +415,33 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
         LipidAdduct lipid = new LipidAdduct();
         lipid.lipid = assemble_lipid(headgroup);
+        lipid.adduct = adduct;
         content = lipid;
+    }
+
+
+
+    public void new_adduct(TreeNode node){
+        adduct = new Adduct("", "");
+    }
+
+
+
+    public void add_adduct(TreeNode node){
+        adduct.adduct_string = node.get_text();
+    }
+
+
+
+    public void add_charge(TreeNode node){
+        adduct.charge = Integer.valueOf(node.get_text());
+    }
+
+
+
+    public void add_charge_sign(TreeNode node){
+        String sign = node.get_text();
+        if (sign.equals("+")) adduct.set_charge_sign(1);
+        else if (sign.equals("-")) adduct.set_charge_sign(-1);
     }
 }

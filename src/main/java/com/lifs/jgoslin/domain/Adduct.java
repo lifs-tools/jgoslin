@@ -25,6 +25,7 @@ SOFTWARE.
 package com.lifs.jgoslin.domain;
 
 import com.lifs.jgoslin.parser.SumFormulaParser;
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
@@ -37,6 +38,37 @@ public class Adduct
     public String adduct_string;
     public int charge;
     public int charge_sign;
+    
+    public static final HashMap<String, ElementTable> adducts = new HashMap<>(){{
+        put("+H", new ElementTable(){{put(Element.H, 1);}});
+        put("+2H", new ElementTable(){{put(Element.H, 2);}});
+        put("+3H", new ElementTable(){{put(Element.H, 3);}});
+        put("+4H", new ElementTable(){{put(Element.H, 4);}});
+        put("-H", new ElementTable(){{put(Element.H, -1);}});
+        put("-2H", new ElementTable(){{put(Element.H, -2);}});
+        put("-3H", new ElementTable(){{put(Element.H, -3);}});
+        put("-4H", new ElementTable(){{put(Element.H, -4);}});
+        
+        put("+H-H2O", new ElementTable(){{put(Element.H, -1); put(Element.O, -1);}});
+        put("+NH4", new ElementTable(){{put(Element.N, 1); put(Element.H, 4);}});
+        put("+Cl", new ElementTable(){{put(Element.Cl, 1);}});
+        put("+HCOO", new ElementTable(){{put(Element.H, 1); put(Element.C, 1); put(Element.O, 2);}});
+        put("+CH3COO", new ElementTable(){{put(Element.H, 3); put(Element.C, 2); put(Element.O, 2);}});
+    }};
+    
+    
+    public static final HashMap<String, Integer> adduct_charges = new HashMap<>(){{
+        put("+H", 1); put("+2H", 2); put("+3H", 3); put("+4H", 4);
+        put("-H", -1); put("-2H", -2); put("-3H", -3); put("-4H", -4);
+        put("+H-H2O", 1); put("+NH4", 1); put("+Cl", -1);
+        put("+HCOO", -1); put("+CH3COO", -1);
+    }};
+    
+
+    public Adduct(String _sum_formula, String _adduct_string){
+        this(_sum_formula, _adduct_string, 1, 1);
+
+    }
 
     public Adduct(String _sum_formula, String _adduct_string, int _charge, int _sign){
         sum_formula = _sum_formula;
@@ -53,13 +85,12 @@ public class Adduct
         }
 
         else {
-            throw new IllegalArgumentException("Sign can only be -1, 0, or 1");
+            throw new ConstraintViolationException("Sign can only be -1, 0, or 1");
         }
     }
 
     public String get_lipid_string(){
-        if (charge == 0)
-        {
+        if (charge == 0){
             return "[M]";
         }
         StringBuilder sb = new StringBuilder();
@@ -68,31 +99,18 @@ public class Adduct
         return sb.toString();
     }
 
-    public ElementTable get_elements()
-    {
+    public ElementTable get_elements(){
         ElementTable elements = new ElementTable();
-        try{
+        String adduct_name = adduct_string.substring(1);
 
-            String adduct_name = adduct_string.substring(1);
-            
-            ElementTable adduct_elements = (SumFormulaParser.get_instance()).parse(adduct_name);
-            for (Entry<Element, Integer> kv : adduct_elements.entrySet()){
-                elements.put(kv.getKey(), elements.get(kv.getKey())  + kv.getValue());
-            }
-            
-
+        if (adducts.containsKey(adduct_string)){
+            if (adduct_charges.get(adduct_string) != get_charge()){
+                throw new ConstraintViolationException("Provided charge '" + get_charge() + "' in contradiction to adduct '" + adduct_string + "' charge '" + adduct_charges.get(adduct_string) + "'.");
+            }    
+            elements.add(adducts.get(adduct_string));
         }
-        catch (Exception e)
-        {
-            return elements;
-        }
-
-        if (adduct_string.length() > 0 && adduct_string.charAt(0) == '-')
-        {
-            for (Element e : Elements.element_order)
-            {
-                elements.replace(e, elements.get(e) * -1);
-            }
+        else {
+            throw new ConstraintViolationException("Adduct '" + adduct_string + "' is unknown.");
         }
 
         return elements;
@@ -100,8 +118,7 @@ public class Adduct
 
 
 
-    public int get_charge()
-    {
+    public int get_charge(){
         return charge * charge_sign;
     }
 }

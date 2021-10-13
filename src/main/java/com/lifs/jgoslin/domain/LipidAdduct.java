@@ -145,10 +145,15 @@ public class LipidAdduct {
         }
         return elements;
     }
+    
+    
+    @Override
+    public String toString(){
+        return get_lipid_string();
+    }
 
     
-    public String get_sum_formula()
-    {
+    public String get_sum_formula(){
         return StringFunctions.compute_sum_formula(get_elements());
     }
 }

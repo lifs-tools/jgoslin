@@ -23,9 +23,8 @@ SOFTWARE.
 */
 package com.lifs.jgoslin.parser;
 
-import com.lifs.jgoslin.domain.Dictionary;
+import com.lifs.jgoslin.domain.Adduct;
 import com.lifs.jgoslin.domain.FattyAcid;
-import com.lifs.jgoslin.domain.ExtendedList;
 import com.lifs.jgoslin.domain.FunctionalGroup;
 import com.lifs.jgoslin.domain.Headgroup;
 import com.lifs.jgoslin.domain.HeadgroupDecorator;
@@ -36,9 +35,6 @@ import com.lifs.jgoslin.domain.LipidFaBondType;
 import com.lifs.jgoslin.domain.LipidLevel;
 import com.lifs.jgoslin.domain.LipidParsingException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  *
@@ -53,6 +49,12 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
         try {
             registered_events.put("lipid_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
+            // set adduct events
+            registered_events.put("adduct_info_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("new_adduct", TreeNode.class));
+            registered_events.put("adduct_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("add_adduct", TreeNode.class));
+            registered_events.put("charge_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("add_charge", TreeNode.class));
+            registered_events.put("charge_sign_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("add_charge_sign", TreeNode.class));
+
             registered_events.put("fa_hg_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
             registered_events.put("gl_hg_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
             registered_events.put("gl_molecular_hg_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
@@ -98,6 +100,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     public void reset_parser(TreeNode node){
         content = null;
         level = LipidLevel.FULL_STRUCTURE;
+        adduct = null;
         head_group = "";
         lcb = null;
         fa_list = new ArrayList<>();
@@ -218,13 +221,16 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     public void build_lipid(TreeNode node){
         if (lcb != null)
         {
-            for (FattyAcid fa : fa_list) fa.position += 1;
+            fa_list.forEach(fa -> {
+                fa.position += 1;
+            });
             fa_list.add(0, lcb);
         }
 
         Headgroup headgroup = prepare_headgroup_and_checks();
         content = new LipidAdduct();
         content.lipid = assemble_lipid(headgroup);
+        content.adduct = adduct;
     }
 
 
@@ -306,5 +312,31 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
         head_group += " 27:1";
         fa_list.get(fa_list.size() - 1).num_carbon -= 27;
         fa_list.get(fa_list.size() - 1).double_bonds.num_double_bonds -= 1;
+    }
+
+
+
+    public void new_adduct(TreeNode node){
+        adduct = new Adduct("", "");
+    }
+
+
+
+    public void add_adduct(TreeNode node){
+        adduct.adduct_string = node.get_text();
+    }
+
+
+
+    public void add_charge(TreeNode node){
+        adduct.charge = Integer.valueOf(node.get_text());
+    }
+
+
+
+    public void add_charge_sign(TreeNode node){
+        String sign = node.get_text();
+        if (sign.equals("+")) adduct.set_charge_sign(1);
+        else if (sign.equals("-")) adduct.set_charge_sign(-1);
     }
 }

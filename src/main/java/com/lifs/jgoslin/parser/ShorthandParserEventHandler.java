@@ -187,6 +187,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         LipidAdduct lipid = new LipidAdduct();
         lipid.adduct = adduct;
         lipid.lipid = assemble_lipid(headgroup);
+        lipid.adduct = adduct;
 
         if (tmp.containsKey("num_ethers")) lipid.lipid.info.num_ethers = (int)tmp.get("num_ethers");
 
