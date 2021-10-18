@@ -1,0 +1,209 @@
+= jgoslin Parser, Validator and Normalized for Shorthand Lipid Nomenclatures
+Nils Hoffmann <nils.hoffmann@isas.de>
+:toc: macro
+
+image::https://api.bintray.com/packages/lifs/maven/jgoslin-cli/images/download.svg[link="https://bintray.com/lifs/maven/jgoslin-cli/_latestVersion"] 
+image:https://img.shields.io/github/release/lifs-tools/jgoslin.svg["Latest Release", link="https://github.com/lifs-tools/jgoslin/releases/latest"] 
+image:https://zenodo.org/badge/DOI/10.5281/zenodo.3826474.svg["DOI", link="https://doi.org/10.5281/zenodo.3826474"]
+image:https://travis-ci.org/lifs-tools/jgoslin.svg?branch=master["Build Status", link="https://travis-ci.org/lifs-tools/jgoslin"]
+image:https://sonarcloud.io/api/project_badges/measure?branch=master&project=lifs-tools_jgoslin&metric=alert_status["Quality Gate", link=https://sonarcloud.io/dashboard?id=lifs-tools_jgoslin]
+
+//NOTE: If you use the jGoslin library or the web application, please cite the following paper: +
+//https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[N. Hoffmann et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
+
+
+This project is a parser, validator and normalizer implementation for shorthand lipid nomenclatures, base on the https://github.com/lifs-tools/goslin[Grammar of Succinct Lipid Nomenclatures project].
+
+Goslin defines multiple grammers compatible with https://www.antlr.org/[ANTLRv4] for different sources of shorthand lipid nomenclature. This allows to generate parsers based on the defined grammars,
+which provide immediate feedback whether a processed lipid shorthand notation string is compliant with a particular grammar, or not.
+
+jGoslin uses the Goslin grammars and the generated parser to support the following general tasks:
+
+. Facilitate the parsing of shorthand lipid names dialects.
+. Provide a structural representation of the shorthand lipid after parsing.
+. Use the structural representation to generate normalized names.
+
+The Maven site with JavaDoc is available https://lifs-tools.github.io/jgoslin/index.html[here].
+
+The web-based application is available https://github.com/lifs-tools/goslin-webapp[here].
+
+== Related Projects
+
+- https://github.com/lifs-tools/jgoslin[This project]
+- http://github.com/lifs-tools/goslin[Goslin grammars and test files]
+- https://github.com/lifs-tools/cppgoslin[C++ implementation]
+- https://github.com/lifs-tools/pygoslin[Python implementation]
+- https://github.com/lifs-tools/rgoslin[R implementation]
+- https://github.com/lifs-tools/goslin-webapp[Webapplication and REST API]
+
+== Table of contents
+toc::[]
+
+== Building the project and generating client code from the command-line
+
+In order to build the client code and run the unit tests, execute the following command from a terminal:
+
+	./mvnw install
+
+This generates the necessary domain specific code for Java. 
+
+== Running a validation with the command-line interface
+The `cli` sub-project provides a command line interface for parsing of lipid names either from the command line or from a file with one lipid name per line.
+
+After building the project as mentioned above with `./mvnw install`, the `cli/target` folder will contain the `jgoslin-cli-<version>-bin.zip` file. Alternatively, you can download the latest
+cli zip file from Bintray: https://bintray.com/lifs/maven/jgoslin-cli[Search for latest jgoslin-cli-<VERSION>-bin.zip artefact] and click to download.
+
+In order to run the validator, unzip that file, change into the unzipped folder and run
+
+  java -jar jgoslin-cli-<VERSION>.jar
+
+to see the available options.
+
+To parse a single lipid name from the command line, run
+
+  java -jar jgoslin-cli-<VERSION>.jar -n "Cer(d31:1/20:1)"
+
+To parse multiple lipid names from a file via the commmand line, run
+
+  java -jar jgoslin-cli-<VERSION>.jar -f examples/lipidnames.txt
+
+To use a specific grammar, instead of trying all, run
+
+  java -jar jgoslin-cli-<VERSION>.jar -f examples/lipidNames.txt -g GOSLIN
+
+To write output to the tab-separated output file 'goslin-out.tsv', run
+
+
+
+== Running the Web Application for Validation
+
+The goslin web application is available at: https://apps.lifs.isas.de/goslin
+
+== Building the Docker Image
+
+In order to build a Docker image of the command line interface application, run 
+
+  ./mvnw -Pdocker install
+
+from your commandline (mvnw.bat on Windows).
+This will build and tag a Docker image lifs/jgoslin-cli with a corresponding version and make it available to your local Docker installation.
+To show the coordinates of the image, call
+
+  docker image ls | grep "jgoslin-cli"
+
+== Running the Docker Image
+
+If you have not done so, please build the Docker image of the validator cli or pull it from the docker hub (see previous sections).
+Then, run the following command, replacing `<VERSION>` with the current version, e.g. `1.0.0`) and `<DATA_DIR>` with the **local** directory containing your lipid name files:
+
+  docker run -v <YOUR_DATA_DIR>:/home/data:rw lifs/jgoslin-cli:<VERSION>
+
+This will only invoke the default entrypoint of the container, which is a shell script wrapper calling the jgoslin-cli Jar. It passes all arguments to the validator, so that all
+arguments that you would pass normally will work in the same way (please replace `<YOUR_FILE>` with the actual file's name in `<YOUR_DATA_DIR>`:
+
+  docker run -v <YOUR_DATA_DIR>:/home/data:rw lifs/jgoslin-cli:<VERSION> -f <YOUR_FILE>
+
+You can also run the docker container without the `-f <YOUR_FILE>` argument to see a list of possible arguments.
+
+== Using the project code releases via Bintray
+
+The library release artifacts are available from Bintray.
+If you want to use them, add the following lines to your own Maven pom file :
+
+  <profile>
+    <id>lifs-repos</id>
+    <repositories>
+     <repository>
+         <snapshots>
+             <enabled>false</enabled>
+         </snapshots>
+         <id>bintray-lifs</id>
+         <name>bintray-lifs</name>
+         <url>https://dl.bintray.com/lifs/maven</url>
+     </repository>
+    </repositories>
+  </profile>
+
+To compile jgoslin against the LIFS Bintray repository, please add the following entry to you ~/.m2/settings.xml file:
+
+  <activeProfiles>
+    <activeProfile>lifs-repos</activeProfile>
+  </activeProfiles>
+
+or use the `-Plifs-repos` command line switch when running Maven to enable the LIFS Bintray maven repositories for parent pom and artifact resolution.
+
+To use the parser libraries (reading and validation) in your own Maven projects, use the following dependency:
+
+  <dependency>
+    <groupId>de.isas.lipidomics</groupId>
+    <artifactId>jgoslin-parsers</artifactId>
+    <version>${jgoslin.version}</version>
+  </dependency>
+
+where `jgoslin.version` is the version of jgoslin you wish to use, e.g. for a release version:
+
+  <properties>
+    <jgoslin.version>1.0.0</jgoslin.version>
+  </properties>
+
+as defined in the properties section of your pom file.
+
+== Using the API programmatically
+
+=== Reading a Shorthand Lipid Name with a given Parser
+
+The following snippet shows how to parse a shorthand lipid name with the different parsers:
+
+	import de.isas.lipidomics.domain.*; // contains Domain objects like LipidAdduct, LipidSpecies ...
+	import de.isas.lipidomics.palinom.*; // contains the parser implementations
+	...
+
+	String ref = "Cer(d18:1/20:2)";
+	try {
+		// use the SwissLipids parser
+		SwissLipidsVisitorParser slParser = new SwissLipidsVisitorParser();
+		LipidAdduct sllipid = slParser.parse(ref);
+		System.out.println(sllipid.getLipidString()); // to print the lipid name to the console
+	} catch (ParsingException pe) {
+	// catch this for any syntactical issues with the name during parsing with a particular parser
+		pe.printStackTrace();
+	} catch (ParseTreeVisitorException ptve) {
+	// catch this for any structural issues with the name during parsing with a particular parser
+		ptve.printStackTrace();
+	}	
+
+	//alternatively, use the other parsers. Don't forget to place try catch blocks around the following lines, as for the SwissLipids parser example
+	// use the LipidMAPS parser
+	LipidMapsVisitorParser lmParser = new LipidMapsVisitorParser();
+	LipidAdduct lmlipid = lmParser.parse(ref);
+	// use the shorthand notation parser GOSLIN
+	GoslinVisitorParser goslinParser = new GoslinVisitorParser();
+	LipidAdduct golipid = goslinParser.parse(ref);
+	// use the shorthand notation parser with support for fragments GOSLIN_FRAGMENTS
+	GoslinFragmentsVisitorParser goslinFragmentsParser = new GoslinFragmentsVisitorParser();
+	LipidAdduct gflipid = goslinFragmentsParser.parse(ref);
+
+To retrieve a parsed lipid name on a higher hierarchy of lipid level, simply define the
+level when requesting the lipid name:
+
+	System.out.println(sllipid.getLipidString(LipidLevel.CATEGORY));
+	System.out.println(sllipid.getLipidString(LipidLevel.CLASS));
+	System.out.println(sllipid.getLipidString(LipidLevel.SPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES)); // will throw a ConstraintViolationException since this lipid is only on structural subspecies level
+
+This functionality allows easy computation of aggregate statistics of lipids
+on lipid class, category or arbitrary levels. Requesting a lipid name on a lower level than the
+provided will raise an exception.
+
+For more examples how the API works, please consult the tests, especially in the `parsers` module.
+
+== References
+
+//This project is the Java implementation for Goslin.
+
+//  * **https://pubs.acs.org/doi/10.1021/acs.analchem.8b04310[N. Hoffmann et al., Analytical Chemistry 2019; Jan;91(5):3302-3310.] https://pubs.acs.org/doi/pdf/10.1021/acs.analchem.8b04310[PDF File.] https://www.ncbi.nlm.nih.gov/pubmed/30688441[PubMed record].**
+
+* https://doi.org/10.1101/2020.04.17.046656[D. Kopczynski et al., Biorxiv, April 20th, 2020]
+
