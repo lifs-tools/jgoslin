@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 dominik.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lifstools.jgoslin.domain;
-
 /**
- *
- * @author dominik
+ * This package contains the command line interface for jgoslin.
  */
-public class UnsupportedLipidException extends LipidException {
-
-    protected UnsupportedLipidException() {
-        super();
-    }
-
-    public UnsupportedLipidException(String message){
-        super(message);
-    }
-
-    public UnsupportedLipidException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public UnsupportedLipidException(Throwable cause) {
-        super(cause);
-    }
-}
+package org.lifstools.jgoslin.cli;

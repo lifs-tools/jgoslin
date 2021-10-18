@@ -35,9 +35,9 @@ import java.util.List;
     
 public class Elements
 {
-    public static double ELECTRON_REST_MASS = 0.00054857990946;
+    public static final double ELECTRON_REST_MASS = 0.00054857990946;
 
-    public static HashMap<String, Element> element_positions = new HashMap<String, Element>(){{
+    public static final HashMap<String, Element> element_positions = new HashMap<String, Element>(){{
         put("C", Element.C);
         put("H", Element.H);
         put("N", Element.N);
@@ -76,7 +76,7 @@ public class Elements
     }};
 
 
-    public static HashMap<Element, Double> element_masses = new HashMap<Element, Double>(){{
+    public static final HashMap<Element, Double> element_masses = new HashMap<Element, Double>(){{
         put(Element.C, 12.0);
         put(Element.H, 1.007825035);
         put(Element.N, 14.0030740);
@@ -100,7 +100,7 @@ public class Elements
 
 
 
-    public static  HashMap<Element, String> element_shortcut = new HashMap<Element, String>(){{
+    public static final HashMap<Element, String> element_shortcut = new HashMap<Element, String>(){{
         put(Element.C, "C");
         put(Element.H, "H");
         put(Element.N, "N");
@@ -122,5 +122,5 @@ public class Elements
         put(Element.S34, "S''");
     }};
 
-    public static ArrayList<Element> element_order = new ArrayList<Element>(List.of(Element.C, Element.H, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));
+    public static final ArrayList<Element> element_order = new ArrayList<Element>(List.of(Element.C, Element.H, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));
 }

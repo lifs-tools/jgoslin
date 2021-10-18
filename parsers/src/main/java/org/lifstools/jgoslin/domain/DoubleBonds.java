@@ -24,8 +24,6 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.domain;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -35,7 +33,7 @@ import java.util.HashMap;
 public class DoubleBonds {
     
     public int num_double_bonds;
-    public HashMap<Integer, String> double_bond_positions;
+    public final HashMap<Integer, String> double_bond_positions;
 
     
     public DoubleBonds(){

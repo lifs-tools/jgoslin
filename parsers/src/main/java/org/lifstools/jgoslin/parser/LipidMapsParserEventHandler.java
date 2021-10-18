@@ -69,9 +69,13 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         put("1-O-lignoceroyl-omega-linoleoyloxy", 24);
         put("1-O-stearoyl-omega-linoleoyloxy", 18);
     }};
-
-
+    
     public LipidMapsParserEventHandler() {
+        this(new KnownFunctionalGroups());
+    }
+
+    public LipidMapsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+        this.knownFunctionalGroups = knownFunctionalGroups;
         try {
             registered_events.put("lipid_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
@@ -182,10 +186,10 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             throw new LipidException("ACer head group '" + head + "' unknown");
         }
 
-        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
+        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);
         int acer_num = acer_heads.get(head);
         hgd.functional_groups.put("decorator_acyl", new ArrayList<>());
-        hgd.functional_groups.get("decorator_acyl").add(new FattyAcid("FA", acer_num));
+        hgd.functional_groups.get("decorator_acyl").add(new FattyAcid("FA", acer_num, knownFunctionalGroups));
         headgroup_decorators.add(hgd);
 
         if (head.equals("1-O-lignoceroyl-omega-linoleoyloxy") || head.equals("1-O-stearoyl-omega-linoleoyloxy")){
@@ -237,7 +241,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         String glyco_name = node.get_text();
         HeadgroupDecorator functional_group = null;
         try {
-            functional_group = (HeadgroupDecorator)KnownFunctionalGroups.get_instance().get(glyco_name);
+            functional_group = (HeadgroupDecorator)knownFunctionalGroups.get(glyco_name);
         }
         catch (Exception e) {
             throw new LipidParsingException("Carbohydrate '" + glyco_name + "' unknown");
@@ -298,7 +302,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     public void add_functional_group(TreeNode node) {
         if (!mod_text.equals("Cp")){
-            FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get(mod_text);
+            FunctionalGroup functional_group = knownFunctionalGroups.get(mod_text);
             functional_group.position = mod_pos;
             functional_group.count = mod_num;
             String fg_name = functional_group.name;
@@ -307,7 +311,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
         else {
             current_fa.num_carbon += 1;
-            Cycle cycle = new Cycle(3, mod_pos, mod_pos + 2);
+            Cycle cycle = new Cycle(3, mod_pos, mod_pos + 2, knownFunctionalGroups);
             if (!current_fa.functional_groups.containsKey("cy")) current_fa.functional_groups.put("cy", new ArrayList<>());
             current_fa.functional_groups.get("cy").add(cycle);
         }
@@ -316,13 +320,13 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     public void new_fa(TreeNode node){
         db_numbers = -1;
-        current_fa = new FattyAcid("FA" + (fa_list.size() + 1));
+        current_fa = new FattyAcid("FA" + (fa_list.size() + 1), knownFunctionalGroups);
     }
 
 
 
     public void new_lcb(TreeNode node){
-        lcb = new FattyAcid("LCB");
+        lcb = new FattyAcid("LCB", knownFunctionalGroups);
         lcb.set_type(LipidFaBondType.LCB_REGULAR);
         set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
         current_fa = lcb;
@@ -377,7 +381,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
         if (sp_regular_lcb()) num_h -= 1;
 
-        FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get("OH");
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.count = num_h;
         if (!current_fa.functional_groups.containsKey("OH")) current_fa.functional_groups.put("OH", new ArrayList<>());
         current_fa.functional_groups.get("OH").add(functional_group);
@@ -394,7 +398,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
         if (sp_regular_lcb()) num_h -= 1;
 
-        FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get("OH");
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.count = num_h;
         if (!current_fa.functional_groups.containsKey("OH")) current_fa.functional_groups.put("OH", new ArrayList<>());
         current_fa.functional_groups.get("OH").add(functional_group);

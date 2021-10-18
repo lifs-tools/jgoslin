@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.parser;
 
+import java.lang.reflect.InvocationTargetException;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 /**
  *
  * @author dominik
+ * @param <T>
  */
 public abstract class BaseParserEventHandler<T> {
     public HashMap<String, Method> registered_events = new HashMap<>();
@@ -76,8 +78,8 @@ public abstract class BaseParserEventHandler<T> {
             try {
                 registered_events.get(event_name).invoke(this, node);
             }
-            catch (Exception e){
-                throw new LipidParsingException(e.toString());
+            catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+                throw new LipidParsingException(e.toString(), e);
             }
         }
     }

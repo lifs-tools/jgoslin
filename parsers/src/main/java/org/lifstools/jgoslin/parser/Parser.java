@@ -24,13 +24,12 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.parser;
 
-import org.lifstools.jgoslin.domain.ExtendedList;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -91,30 +90,21 @@ public class Parser<T>
     
 
     public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammar_filename, char _quote){
-
-        quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
-        parser_event_handler = _parserEventHandler;
+        this.quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
+        this.parser_event_handler = _parserEventHandler;
 
          
-        try {
-            StringBuilder sb = new StringBuilder();
-            InputStream is = getClass().getResourceAsStream(grammar_filename);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            String line;
-            
-            while ((line = br.readLine()) != null) {
-              sb.append(line).append("\n");
-            }
-            br.close();
-            isr.close();
-            is.close();
-            read_grammar(sb.toString());
+        StringBuilder sb = new StringBuilder();
+        // read resource from classpath and current thread's context class loader
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(grammar_filename)));) {
+            br.lines().forEach(line -> {
+                sb.append(line).append("\n");
+            });
+        } catch(IOException e) {
+            //always pass on the original exception
+            throw new RuntimeException("Error: file '" + grammar_filename + "' does not exist.", e);
         }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Error: file '" + grammar_filename + "' does not exist.");
-        }
+        read_grammar(sb.toString());
     }
     
 
@@ -127,7 +117,7 @@ public class Parser<T>
     }
 
 
-    public void read_grammar(String grammar)
+    public final void read_grammar(String grammar)
     {
         next_free_rule_index = START_RULE;
         word_in_grammar = false;
@@ -182,7 +172,7 @@ public class Parser<T>
 
             for (String product : products){
                 ArrayList<String> non_terminals = new ArrayList<>();
-                ExtendedList<Long> non_terminal_rules = new ExtendedList<>();
+                ArrayDeque<Long> non_terminal_rules = new ArrayDeque<>();
                 ArrayList<String> product_rules = StringFunctions.split_string(product, ' ', quote);
                 for (String NT : product_rules){
                     String stripedNT = StringFunctions.strip(NT, ' ');
@@ -225,8 +215,8 @@ public class Parser<T>
 
                 // more than two rules, insert intermediate rule indexes
                 while (non_terminal_rules.size() > 2){
-                    long rule_index_2 = non_terminal_rules.PopBack();
-                    long rule_index_1 = non_terminal_rules.PopBack();
+                    long rule_index_2 = non_terminal_rules.pollLast();
+                    long rule_index_1 = non_terminal_rules.pollLast();
 
                     long key = compute_rule_key(rule_index_1, rule_index_2);
                     long next_index = get_next_free_rule_index();
@@ -237,8 +227,8 @@ public class Parser<T>
 
                 // two product rules
                 if (non_terminal_rules.size() == 2){
-                    long rule_index_2 = non_terminal_rules.get(1);
-                    long rule_index_1 = non_terminal_rules.get(0);
+                    long rule_index_2 = non_terminal_rules.pollLast();
+                    long rule_index_1 = non_terminal_rules.pollLast();
                     long key = compute_rule_key(rule_index_1, rule_index_2);
                     if (!NTtoNT.containsKey(key)) NTtoNT.put(key, new HashSet<>());
                     NTtoNT.get(key).add(new_rule_index);
@@ -246,7 +236,7 @@ public class Parser<T>
 
                 // only one product rule
                 else if (non_terminal_rules.size() == 1){
-                    long rule_index_1 = non_terminal_rules.get(0);
+                    long rule_index_1 = non_terminal_rules.pollLast();
                     if (rule_index_1 == new_rule_index){
                         throw new RuntimeException("Error: corrupted token in grammar: rule '" + rule + "' is not allowed to refer soleley to itself.");
                     }
@@ -515,7 +505,7 @@ public class Parser<T>
     // splitting the whole terminal in a tree structure where characters of terminal are the leafs and the inner nodes are added non terminal rules
     public long add_terminal(String text)
     {
-        ExtendedList<Long> terminal_rules = new ExtendedList<>();
+        ArrayDeque<Long> terminal_rules = new ArrayDeque<>();
         for (int i = 1; i < text.length() - 1; ++i){
             char c = text.charAt(i);
             long tRule = 0;
@@ -531,8 +521,8 @@ public class Parser<T>
         }
 
         while (terminal_rules.size() > 1){
-            long rule_index_2 = terminal_rules.PopBack();
-            long rule_index_1 = terminal_rules.PopBack();
+            long rule_index_2 = terminal_rules.pollLast();
+            long rule_index_1 = terminal_rules.pollLast();
             long next_index = get_next_free_rule_index();
 
             long key = compute_rule_key(rule_index_1, rule_index_2);
@@ -540,7 +530,7 @@ public class Parser<T>
             NTtoNT.get(key).add(next_index);
             terminal_rules.add(next_index);
         }
-        return terminal_rules.get(0);
+        return terminal_rules.pollLast();
     }
 
 

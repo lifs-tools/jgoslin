@@ -33,7 +33,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class FattyAcidParser extends Parser<LipidAdduct> {
     public FattyAcidParser(){
-        super(new FattyAcidParserEventHandler(), "/src/main/goslin/FattyAcids.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new FattyAcidParserEventHandler(), "FattyAcids.g4", StringFunctions.DEFAULT_QUOTE);
     }
     
     @Override

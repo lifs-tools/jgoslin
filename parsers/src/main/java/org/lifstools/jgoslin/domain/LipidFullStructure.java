@@ -23,19 +23,19 @@ SOFTWARE.
 */
 package org.lifstools.jgoslin.domain;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
  * @author dominik
  */
 public class LipidFullStructure extends LipidStructureDefined {
-    public LipidFullStructure(Headgroup _headgroup){
-        this(_headgroup, null);
+    public LipidFullStructure(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+        this(_headgroup, null, knownFunctionalGroups);
     }
     
-    public LipidFullStructure(Headgroup _headgroup, ArrayList<FattyAcid> _fa){
-        super(_headgroup, _fa);
+    public LipidFullStructure(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
+        super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.FULL_STRUCTURE;
     }
 

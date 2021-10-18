@@ -23,19 +23,19 @@ SOFTWARE.
 */
 package org.lifstools.jgoslin.domain;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
  * @author dominik
  */
 public class LipidMolecularSpecies extends LipidSpecies {
-    public LipidMolecularSpecies(Headgroup _headgroup){
-        this(_headgroup, null);
+    public LipidMolecularSpecies(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+        this(_headgroup, null, knownFunctionalGroups);
     }
 
-    public LipidMolecularSpecies(Headgroup _headgroup, ArrayList<FattyAcid> _fa){
-        super(_headgroup, _fa);
+    public LipidMolecularSpecies(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
+        super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.MOLECULAR_SPECIES;
         fa_list.stream().map(fatty_acid -> {
             if (fa.containsKey(fatty_acid.name)){
@@ -50,7 +50,7 @@ public class LipidMolecularSpecies extends LipidSpecies {
         // add 0:0 dummys
         for (int i = _fa.size(); i < info.total_fa; ++i)
         {
-            FattyAcid fatty_acid = new FattyAcid("FA" + Integer.toString(i + _fa.size() + 1));
+            FattyAcid fatty_acid = new FattyAcid("FA" + Integer.toString(i + _fa.size() + 1), knownFunctionalGroups);
             info.add(fatty_acid);
             fa.put(fatty_acid.name, fatty_acid);
             fa_list.add(fatty_acid);

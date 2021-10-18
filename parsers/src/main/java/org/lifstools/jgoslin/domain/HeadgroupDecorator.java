@@ -34,21 +34,21 @@ public class HeadgroupDecorator extends FunctionalGroup {
     public boolean suffix;
     public LipidLevel lowest_visible_level;
     
-    public HeadgroupDecorator(String _name){
-        this(_name, -1, 1, null, false, LipidLevel.NO_LEVEL);
+    public HeadgroupDecorator(String _name, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, -1, 1, null, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);
     }
 
-    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements){
-        this(_name, _position, _count, _elements, false, LipidLevel.NO_LEVEL);
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, _position, _count, _elements, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);
     }
     
-    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix){
-        this(_name, _position, _count, _elements, _suffix, LipidLevel.NO_LEVEL);
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, _position, _count, _elements, _suffix, LipidLevel.NO_LEVEL, knownFunctionalGroups);
     }
     
     
-    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, LipidLevel _level){
-        super(_name, _position, _count, null, false, "", _elements);
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, LipidLevel _level, KnownFunctionalGroups knownFunctionalGroups){
+        super(_name, _position, _count, null, false, "", _elements, knownFunctionalGroups);
         suffix = _suffix;
         lowest_visible_level = _level;
     }
@@ -59,7 +59,7 @@ public class HeadgroupDecorator extends FunctionalGroup {
         for (Entry<Element, Integer> kv : elements.entrySet()){
             e.put(kv.getKey(), e.get(kv.getKey()) + kv.getValue());
         }
-        return new HeadgroupDecorator(name, position, count, e, suffix, lowest_visible_level);
+        return new HeadgroupDecorator(name, position, count, e, suffix, lowest_visible_level, knownFunctionalGroups);
     }
 
 

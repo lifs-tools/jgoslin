@@ -44,6 +44,7 @@ import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 
 /**
  *
@@ -58,6 +59,7 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
     public Adduct adduct = null;
     public ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
     public boolean use_head_group = false;
+    protected KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups();
     
     public static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
 
@@ -127,12 +129,12 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
     public LipidSpecies assemble_lipid(Headgroup headgroup){
         LipidSpecies ls = null;
         switch (level){
-            case COMPLETE_STRUCTURE: ls = new LipidCompleteStructure(headgroup, fa_list); break;
-            case FULL_STRUCTURE: ls = new LipidFullStructure(headgroup, fa_list); break;
-            case STRUCTURE_DEFINED: ls = new LipidStructureDefined(headgroup, fa_list); break;
-            case SN_POSITION: ls = new LipidSnPosition(headgroup, fa_list); break;
-            case MOLECULAR_SPECIES: ls = new LipidMolecularSpecies(headgroup, fa_list); break;
-            case SPECIES: ls = new LipidSpecies(headgroup, fa_list); break;
+            case COMPLETE_STRUCTURE: ls = new LipidCompleteStructure(headgroup, fa_list, knownFunctionalGroups); break;
+            case FULL_STRUCTURE: ls = new LipidFullStructure(headgroup, fa_list, knownFunctionalGroups); break;
+            case STRUCTURE_DEFINED: ls = new LipidStructureDefined(headgroup, fa_list, knownFunctionalGroups); break;
+            case SN_POSITION: ls = new LipidSnPosition(headgroup, fa_list, knownFunctionalGroups); break;
+            case MOLECULAR_SPECIES: ls = new LipidMolecularSpecies(headgroup, fa_list, knownFunctionalGroups); break;
+            case SPECIES: ls = new LipidSpecies(headgroup, fa_list, knownFunctionalGroups); break;
             default: break;
         }
         return ls;

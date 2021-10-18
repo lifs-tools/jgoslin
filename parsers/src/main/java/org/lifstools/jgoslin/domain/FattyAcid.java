@@ -40,28 +40,28 @@ public class FattyAcid extends FunctionalGroup {
     public LipidFaBondType lipid_FA_bond_type;
     public HashSet<String> fg_exceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
     
-    public FattyAcid(String _name){
-        this(_name, 0, null, null, LipidFaBondType.ESTER, 0);
+    public FattyAcid(String _name, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
     }
     
-    public FattyAcid(String _name, int _num_carbon){
-        this(_name, _num_carbon, null, null, LipidFaBondType.ESTER, 0);
+    public FattyAcid(String _name, int _num_carbon, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, _num_carbon, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
     }
     
-    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups, LipidFaBondType _lipid_FA_bond_type) {
-        this(_name, _num_carbon, _double_bonds, _functional_groups, _lipid_FA_bond_type, 0);
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups, LipidFaBondType _lipid_FA_bond_type, KnownFunctionalGroups knownFunctionalGroups) {
+        this(_name, _num_carbon, _double_bonds, _functional_groups, _lipid_FA_bond_type, 0, knownFunctionalGroups);
     }
     
 
-    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups, LipidFaBondType _lipid_FA_bond_type, int _position) {
-        super(_name, _position, 1, _double_bonds, false, "", null, _functional_groups);
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups, LipidFaBondType _lipid_FA_bond_type, int _position, KnownFunctionalGroups knownFunctionalGroups) {
+        super(_name, _position, 1, _double_bonds, false, "", null, _functional_groups, knownFunctionalGroups);
         num_carbon = _num_carbon;
         lipid_FA_bond_type = _lipid_FA_bond_type;
 
         if (lipid_FA_bond_type == LipidFaBondType.LCB_REGULAR)
         {
             functional_groups.put("[X]", new ArrayList<>());
-            functional_groups.get("[X]").add(KnownFunctionalGroups.get_instance().get("X"));
+            functional_groups.get("[X]").add(knownFunctionalGroups.get("X"));
         }
 
         if (num_carbon < 0 || num_carbon == 1)
@@ -93,7 +93,7 @@ public class FattyAcid extends FunctionalGroup {
             }
         }
 
-        return new FattyAcid(name, num_carbon, db, fg, lipid_FA_bond_type, position);
+        return new FattyAcid(name, num_carbon, db, fg, lipid_FA_bond_type, position, knownFunctionalGroups);
     }
 
 
@@ -104,7 +104,7 @@ public class FattyAcid extends FunctionalGroup {
         if (lipid_FA_bond_type == LipidFaBondType.LCB_REGULAR && !functional_groups.containsKey("[X]"))
         {
             functional_groups.put("[X]", new ArrayList<FunctionalGroup>());
-            functional_groups.get("[X]").add(KnownFunctionalGroups.get_instance().get("X"));
+            functional_groups.get("[X]").add(knownFunctionalGroups.get("X"));
         }
 
         else if (functional_groups.containsKey("[X]"))

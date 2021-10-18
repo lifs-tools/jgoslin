@@ -28,7 +28,20 @@ package org.lifstools.jgoslin.domain;
  * @author dominik
  */
 public class LipidException extends RuntimeException {
-    public LipidException(String s){
-        super(s);
+
+    protected LipidException() {
+        super();
+    }
+
+    public LipidException(String message){
+        super(message);
+    }
+
+    public LipidException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public LipidException(Throwable cause) {
+        super(cause);
     }
 }

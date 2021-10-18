@@ -23,19 +23,19 @@ SOFTWARE.
 */
 package org.lifstools.jgoslin.domain;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
  * @author dominik
  */
 public class LipidStructureDefined extends LipidSnPosition {
-    public LipidStructureDefined(Headgroup _headgroup){
-        this(_headgroup, null);
+    public LipidStructureDefined(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+        this(_headgroup, null, knownFunctionalGroups);
     }
     
-    public LipidStructureDefined(Headgroup _headgroup, ArrayList<FattyAcid> _fa){
-        super(_headgroup, _fa);
+    public LipidStructureDefined(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
+        super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.STRUCTURE_DEFINED;
     }
 

@@ -35,6 +35,7 @@ import org.lifstools.jgoslin.domain.ElementTable;
  * @author dominik
  */
 public class SumFormulaParserEventHandler extends BaseParserEventHandler<ElementTable> {
+    
     public Element element;
     public int count;
     

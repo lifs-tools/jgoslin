@@ -24,6 +24,6 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  */
 public class HmdbParser extends Parser<LipidAdduct> {
     public HmdbParser(){
-        super(new HmdbParserEventHandler(), "/src/main/goslin/HMDB.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new HmdbParserEventHandler(), "HMDB.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

@@ -42,20 +42,21 @@ public class FunctionalGroup {
     public boolean is_atomic;
     public ElementTable elements;
     public HashMap<String, ArrayList<FunctionalGroup> > functional_groups;
+    protected KnownFunctionalGroups knownFunctionalGroups;
 
-    public FunctionalGroup(String _name){
-        this(_name, -1, 1, null, false, "", null, null);
+    public FunctionalGroup(String _name, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, -1, 1, null, false, "", null, null, knownFunctionalGroups);
     }
     
-    public FunctionalGroup(String _name, int _position, int _count){
-        this(_name, _position, _count, null, false, "", null, null);
+    public FunctionalGroup(String _name, int _position, int _count, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, _position, _count, null, false, "", null, null, knownFunctionalGroups);
     }
     
-    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements){
-        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null);
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups){
+        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null, knownFunctionalGroups);
     }
     
-    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups){
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup> > _functional_groups, KnownFunctionalGroups knownFunctionalGroups){
         name = _name;
         position = _position;
         count = _count;
@@ -65,6 +66,7 @@ public class FunctionalGroup {
         is_atomic = _is_atomic;
         elements = (_elements != null) ? _elements : new ElementTable();
         functional_groups = (_functional_groups != null) ? _functional_groups : (new HashMap< >());
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
 
@@ -84,7 +86,7 @@ public class FunctionalGroup {
             e.put(kv.getKey(), kv.getValue());
         });
 
-        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, is_atomic, stereochemistry, e, fg);
+        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, is_atomic, stereochemistry, e, fg, knownFunctionalGroups);
         func_group_new.ring_stereo = ring_stereo;
         return func_group_new;
     }

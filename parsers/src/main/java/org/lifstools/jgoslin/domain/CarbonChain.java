@@ -41,10 +41,10 @@ public class CarbonChain extends FunctionalGroup {
     }
     
     public CarbonChain(FattyAcid _fa, int _position, int _count){
-        super("cc", _position, _count);
+        super("cc", _position, _count, _fa.knownFunctionalGroups);
         if (_fa != null)
         {
-            functional_groups.put("cc", new ArrayList<FunctionalGroup>());
+            functional_groups.put("cc", new ArrayList<>());
             functional_groups.get("cc").add(_fa);
         }
 

@@ -11,9 +11,8 @@
         </encoder>
     </appender>
 
-    <logger name="de.isas.lipidomics" level="info"/>
-    <logger name="de.isas.lipidomics.palinom" level="warn"/>
-    <logger name="de.isas.lipidomics.palinom.cli" level="info"/>
+    <logger name="org.lifstools.jgoslin" level="info"/>
+    <logger name="org.lifstools.jgoslin.cli" level="info"/>
 
     <root level="${root-level:-INFO}">
         <appender-ref ref="console"/>

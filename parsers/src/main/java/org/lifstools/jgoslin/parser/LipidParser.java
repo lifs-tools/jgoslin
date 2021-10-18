@@ -20,45 +20,70 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidAdduct;
-import org.lifstools.jgoslin.domain.LipidException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import org.lifstools.jgoslin.domain.LipidParsingException;
 
 /**
  *
  * @author dominik
  */
 public class LipidParser {
-    public ArrayList< Parser<LipidAdduct> > parser_list = new ArrayList<>();
-    public Parser<LipidAdduct> lastSuccessfulParser = null;
 
-    public LipidParser(){
-        parser_list.add(new ShorthandParser());
-        parser_list.add(new FattyAcidParser());
-        parser_list.add(new GoslinParser());
-        parser_list.add(new LipidMapsParser());
-        /*
-        parser_list.add(new SwissLipidsParser());
-        parser_list.add(new HmdbParser());
-        */
+    private final ArrayList< Parser<LipidAdduct>> parser_list = new ArrayList<>();
+    private Parser<LipidAdduct> lastSuccessfulParser = null;
 
-        lastSuccessfulParser = null;
+    public LipidParser(Parser<LipidAdduct>... parsers) {
+        parser_list.addAll(Arrays.asList(parsers));
     }
 
+    public LipidParser() {
+        this(
+                new ShorthandParser(),
+                new FattyAcidParser(),
+                new GoslinParser(),
+                new LipidMapsParser()
+        //new SwissLipidsParser(),
+        //new HmdbParser()
+        );
+    }
 
-    public LipidAdduct parse(String lipid_name){
+    /**
+     * This method tries multiple parsers in a defined order to parse the
+     * provided lipid name. If no parser is able to parse the name successfully,
+     * an exception is thrown.
+     *
+     * @param lipid_name the lipid name to parse.
+     * @return the {@link LipidAdduct} if parsing with at least one parser
+     * succeeded.
+     * @throws LipidParsingException if now parser was able to parse the
+     * provided lipid name.
+     */
+    public LipidAdduct parse(String lipid_name) {
         lastSuccessfulParser = null;
-
-        for (Parser<LipidAdduct> parser : parser_list){
+        for (Parser<LipidAdduct> parser : parser_list) {
             LipidAdduct lipid = parser.parse(lipid_name, false);
-            if (lipid != null){
+            if (lipid != null) {
                 lastSuccessfulParser = parser;
                 return lipid;
             }
         }
-        throw new LipidException("Lipid not found");
+        throw new LipidParsingException("Could not parse lipid '" + lipid_name + "'with any parser!");
     }
+
+    /**
+     * Returns the last successful parser instance. May be null, if either no
+     * parser has been applied yet, or no parser has been successfully applied
+     * for parsing the last lipid name.
+     *
+     * @return the last successful parser instance.
+     */
+    public Parser<LipidAdduct> getLastSuccessfulParser() {
+        return lastSuccessfulParser;
+    }
+
 }

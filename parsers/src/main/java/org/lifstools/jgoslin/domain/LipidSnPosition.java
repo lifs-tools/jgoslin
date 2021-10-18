@@ -23,19 +23,19 @@ SOFTWARE.
 */
 package org.lifstools.jgoslin.domain;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
  * @author dominik
  */
 public class LipidSnPosition extends LipidMolecularSpecies {
-    public LipidSnPosition(Headgroup _headgroup){
-        this(_headgroup, null);
+    public LipidSnPosition(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+        this(_headgroup, null, knownFunctionalGroups);
     }
     
-    public LipidSnPosition(Headgroup _headgroup, ArrayList<FattyAcid> _fa){
-        super(_headgroup, _fa);
+    public LipidSnPosition(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
+        super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.SN_POSITION;
     }
 

@@ -25,6 +25,7 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -38,14 +39,14 @@ public class LipidSpecies {
     public HashMap<String, FattyAcid> fa = new HashMap<>();
     public ArrayList<FattyAcid> fa_list = new ArrayList<>();
 
-    public LipidSpecies(Headgroup _headgroup){
-        this(_headgroup, null);
+    public LipidSpecies(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+        this(_headgroup, null, knownFunctionalGroups);
     }
     
-    public LipidSpecies(Headgroup _headgroup, ArrayList<FattyAcid> _fa){
+    public LipidSpecies(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
         headgroup = _headgroup;
 
-        info = new LipidSpeciesInfo(headgroup.lipid_class);
+        info = new LipidSpeciesInfo(headgroup.lipid_class, knownFunctionalGroups);
         info.level = LipidLevel.SPECIES;
 
         // add fatty acids

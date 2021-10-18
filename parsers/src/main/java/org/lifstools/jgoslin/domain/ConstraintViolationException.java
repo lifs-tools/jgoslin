@@ -29,7 +29,20 @@ package org.lifstools.jgoslin.domain;
  * @author dominik
  */
 public class ConstraintViolationException extends LipidException {
-    public ConstraintViolationException(String s){
-        super(s);
+
+    protected ConstraintViolationException() {
+        super();
+    }
+
+    public ConstraintViolationException(String message){
+        super(message);
+    }
+
+    public ConstraintViolationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ConstraintViolationException(Throwable cause) {
+        super(cause);
     }
 }

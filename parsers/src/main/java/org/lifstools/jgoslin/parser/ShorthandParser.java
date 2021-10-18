@@ -34,6 +34,6 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class ShorthandParser extends Parser<LipidAdduct> {
     public ShorthandParser(){
-        super(new ShorthandParserEventHandler(), "/src/main/goslin/Shorthand2020.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new ShorthandParserEventHandler(), "Shorthand2020.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

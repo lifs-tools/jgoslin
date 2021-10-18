@@ -28,7 +28,20 @@ package org.lifstools.jgoslin.domain;
  * @author dominik
  */
 public class LipidParsingException extends LipidException {
+
+    protected LipidParsingException() {
+        super();
+    }
+
     public LipidParsingException(String s){
         super(s);
+    }
+
+    public LipidParsingException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public LipidParsingException(Throwable cause) {
+        super(cause);
     }
 }

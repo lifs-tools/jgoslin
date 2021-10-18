@@ -24,18 +24,53 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.domain;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  *
  * @author dominik
+ * @autho Nils Hoffmann
  */
 public enum LipidCategory {
-    NO_CATEGORY,
-    UNDEFINED,
-    GL, // SLM:000117142 Glycerolipids
-    GP, // SLM:000001193 Glycerophospholipids
-    SP, // SLM:000000525 Sphingolipids
-    ST, // SLM:000500463 Steroids and derivatives
-    FA, // SLM:000390054 Fatty acyls and derivatives
-    PK, // polyketides
-    SL // Saccharo lipids
+
+    NO_CATEGORY("Unknown lipid category"),
+    UNDEFINED("Undefined lipid category"),
+    /* SLM:000117142 Glycerolipids */
+    GL("Glycerolipids"),
+    /* SLM:000001193 Glycerophospholipids */
+    GP("Glycerophospholipids"),
+    /* SLM:000000525 Sphingolipids */
+    SP("Sphingolipids"),
+    /* SLM:000500463 Steroids and derivatives */
+    ST("Sterollipids"),
+    /* SLM:000390054 Fatty acyls and derivatives */
+    FA("Fattyacyls"),
+    /* LipidMAPS [PK]*/
+    PK("Polyketides"),
+    /* LipidMAPS [SL]*/
+    SL("Saccharolipids");
+
+    private final String fullName;
+
+    private LipidCategory(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFullName() {
+        return this.fullName;
+    }
+
+    public static LipidCategory forFullName(String fullName) {
+        List<LipidCategory> matches = Arrays.asList(LipidCategory.values()).stream().filter((t) -> {
+            return t.getFullName().equalsIgnoreCase(fullName);
+        }).collect(Collectors.toList());
+        if (matches.isEmpty()) {
+            return LipidCategory.UNDEFINED;
+        } else if (matches.size() > 1) {
+            throw new ConstraintViolationException("Query string " + fullName + " found more than once in enum values! Please check enum definition: fullName is compared case insensitive!");
+        }
+        return matches.get(0);
+    }
 }

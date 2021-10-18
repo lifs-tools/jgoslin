@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.parser;
 
+import java.util.ArrayDeque;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 import org.lifstools.jgoslin.domain.GenericList;
 import org.lifstools.jgoslin.domain.LipidFaBondType;
@@ -37,7 +38,6 @@ import org.lifstools.jgoslin.domain.AcylAlkylGroup;
 import org.lifstools.jgoslin.domain.Adduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidParsingException;
-import org.lifstools.jgoslin.domain.ExtendedList;
 import org.lifstools.jgoslin.domain.CarbonChain;
 import org.lifstools.jgoslin.domain.Elements;
 import org.lifstools.jgoslin.domain.Cycle;
@@ -49,14 +49,19 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 
-public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {    
-    public ExtendedList<FunctionalGroup> current_fas;
+public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
+    
+    public ArrayDeque<FunctionalGroup> current_fas;
     public Dictionary tmp = new Dictionary();
     public boolean acer_species = false;
     public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
         
-    
     public ShorthandParserEventHandler() {
+        this(new KnownFunctionalGroups());
+    }
+    
+    public ShorthandParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+        this.knownFunctionalGroups = knownFunctionalGroups;
         try {
             registered_events.put("lipid_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
@@ -180,9 +185,9 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         level = LipidLevel.FULL_STRUCTURE;
         adduct = null;
         head_group = "";
-        fa_list = new ExtendedList<>();
-        current_fas = new ExtendedList<>();
-        headgroup_decorators = new ExtendedList<>();
+        fa_list = new ArrayList<>();
+        current_fas = new ArrayDeque<>();
+        headgroup_decorators = new ArrayList<>();
         tmp = new Dictionary();
         acer_species = false;
     }    
@@ -294,7 +299,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         FunctionalGroup functional_group = null;
         try
         {
-            functional_group = KnownFunctionalGroups.get_instance().get(carbohydrate);
+            functional_group = knownFunctionalGroups.get(carbohydrate);
         }
         catch (Exception e)
         {
@@ -306,11 +311,11 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
             headgroup_decorators.add((HeadgroupDecorator)functional_group);
         }
         else {
-            if (!current_fas.back().functional_groups.containsKey(carbohydrate))
+            if (!current_fas.peekLast().functional_groups.containsKey(carbohydrate))
             {
-                current_fas.back().functional_groups.put(carbohydrate, new ArrayList<>());
+                current_fas.peekLast().functional_groups.put(carbohydrate, new ArrayList<>());
             }
-            current_fas.back().functional_groups.get(carbohydrate).add(functional_group);
+            current_fas.peekLast().functional_groups.get(carbohydrate).add(functional_group);
         }
     }
     
@@ -334,7 +339,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     
     public void new_fatty_acyl_chain(TreeNode node){
-        current_fas.add(new FattyAcid("FA"));
+        current_fas.add(new FattyAcid("FA", knownFunctionalGroups));
         tmp.put(FA_I(), new Dictionary());
     }
 
@@ -350,21 +355,21 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         String fa_i = FA_I();
-        if (current_fas.back().double_bonds.get_num() != (int)((Dictionary)tmp.get(fa_i)).get("db_count")){
+        if (current_fas.peekLast().double_bonds.get_num() != (int)((Dictionary)tmp.get(fa_i)).get("db_count")){
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
-        else if (current_fas.back().double_bonds.get_num() > 0 && current_fas.back().double_bonds.double_bond_positions.isEmpty()){
+        else if (current_fas.peekLast().double_bonds.get_num() > 0 && current_fas.peekLast().double_bonds.double_bond_positions.isEmpty()){
             set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
         }
         tmp.remove(fa_i);
 
-        FattyAcid fa = (FattyAcid)current_fas.PopBack();
+        FattyAcid fa = (FattyAcid)current_fas.pollLast();
         if (special_type.length() > 0){
             fa.name = special_type;
-            if (!current_fas.back().functional_groups.containsKey(special_type)){
-                current_fas.back().functional_groups.put(special_type, new ArrayList<>());
+            if (!current_fas.peekLast().functional_groups.containsKey(special_type)){
+                current_fas.peekLast().functional_groups.put(special_type, new ArrayList<>());
             }
-            current_fas.back().functional_groups.get(special_type).add(fa);
+            current_fas.peekLast().functional_groups.get(special_type).add(fa);
         }
         else{
             fa_list.add(fa);
@@ -373,14 +378,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     
     public void set_carbon(TreeNode node){
-        ((FattyAcid)current_fas.back()).num_carbon = Integer.valueOf(node.get_text());
+        ((FattyAcid)current_fas.peekLast()).num_carbon = Integer.valueOf(node.get_text());
     }
 
     
     public void set_double_bond_count(TreeNode node){
         int db_cnt = Integer.valueOf(node.get_text());
         ((Dictionary)tmp.get(FA_I())).put("db_count", db_cnt);
-        ((FattyAcid)current_fas.back()).double_bonds.num_double_bonds = db_cnt;
+        ((FattyAcid)current_fas.peekLast()).double_bonds.num_double_bonds = db_cnt;
     }
 
     
@@ -408,7 +413,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
         d.remove("db_position");
         d.remove("db_cistrans");
-        current_fas.back().double_bonds.double_bond_positions.put(pos, cistrans);
+        current_fas.peekLast().double_bonds.double_bond_positions.put(pos, cistrans);
     }
 
     
@@ -420,8 +425,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     public void set_ether_type(TreeNode node){
         String ether_type = node.get_text();
-        if (ether_type.equals("O-")) ((FattyAcid)current_fas.back()).lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMANYL;
-        else if (ether_type.equals("P-")) ((FattyAcid)current_fas.back()).lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMENYL;
+        if (ether_type.equals("O-")) ((FattyAcid)current_fas.peekLast()).lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMANYL;
+        else if (ether_type.equals("P-")) ((FattyAcid)current_fas.peekLast()).lipid_FA_bond_type = LipidFaBondType.ETHER_PLASMENYL;
     }
     
     
@@ -455,7 +460,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
         FunctionalGroup functional_group = null;
         try {
-            functional_group = KnownFunctionalGroups.get_instance().get(fg_name);
+            // FIXME please do not use static singletons, this usually does not pay off in Java and introduces memory leaks
+            functional_group = knownFunctionalGroups.get(fg_name);
         }
         catch (Exception e) {
             throw new LipidParsingException("'" + fg_name + "' unknown");
@@ -471,8 +477,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         gd.remove("fg_cnt");
         gd.remove("fg_stereo");
 
-        if (!current_fas.back().functional_groups.containsKey(fg_name)) current_fas.back().functional_groups.put(fg_name, new ArrayList<>());
-        current_fas.back().functional_groups.get(fg_name).add(functional_group);
+        if (!current_fas.peekLast().functional_groups.containsKey(fg_name)) current_fas.peekLast().functional_groups.put(fg_name, new ArrayList<>());
+        current_fas.peekLast().functional_groups.get(fg_name).add(functional_group);
     }
 
     
@@ -503,7 +509,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     public void set_cycle(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "cy");
-        current_fas.add(new Cycle(0));
+        current_fas.add(new Cycle(0, knownFunctionalGroups));
 
         String fa_i = FA_I();
         tmp.put(fa_i, new Dictionary());
@@ -514,7 +520,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void add_cycle(TreeNode node){
         String fa_i = FA_I();
         GenericList cycle_elements = (GenericList)((Dictionary)tmp.get(fa_i)).get("cycle_elements");
-        Cycle cycle = (Cycle)current_fas.PopBack();
+        Cycle cycle = (Cycle)current_fas.pollLast();
         for (int i = 0; i < cycle_elements.size(); ++i){
             cycle.bridge_chain.add((Element)cycle_elements.get(i));
         }
@@ -523,40 +529,40 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         if (cycle.start > -1 && cycle.end > -1 && cycle.end - cycle.start + 1 + cycle.bridge_chain.size() < cycle.cycle){
             throw new ConstraintViolationException("Cycle length '" + Integer.toString(cycle.cycle) + "' does not match with cycle description.");
         }
-        if (!current_fas.back().functional_groups.containsKey("cy")){
-            current_fas.back().functional_groups.put("cy", new ArrayList<FunctionalGroup>());
+        if (!current_fas.peekLast().functional_groups.containsKey("cy")){
+            current_fas.peekLast().functional_groups.put("cy", new ArrayList<FunctionalGroup>());
         }
-        current_fas.back().functional_groups.get("cy").add(cycle);
+        current_fas.peekLast().functional_groups.get("cy").add(cycle);
     }
 
     
     public void set_cycle_start(TreeNode node){
-        ((Cycle)current_fas.back()).start = Integer.valueOf(node.get_text());
+        ((Cycle)current_fas.peekLast()).start = Integer.valueOf(node.get_text());
     }
 
     
     public void set_cycle_end(TreeNode node){
-        ((Cycle)current_fas.back()).end = Integer.valueOf(node.get_text());
+        ((Cycle)current_fas.peekLast()).end = Integer.valueOf(node.get_text());
     }
 
     
     public void set_cycle_number(TreeNode node){
-        ((Cycle)current_fas.back()).cycle = Integer.valueOf(node.get_text());
+        ((Cycle)current_fas.peekLast()).cycle = Integer.valueOf(node.get_text());
     }
 
     
     public void set_cycle_db_count(TreeNode node){
-        ((Cycle)current_fas.back()).double_bonds.num_double_bonds = Integer.valueOf(node.get_text());
+        ((Cycle)current_fas.peekLast()).double_bonds.num_double_bonds = Integer.valueOf(node.get_text());
     }
 
     
     public void set_cycle_db_positions(TreeNode node){
-        ((Dictionary)tmp.get(FA_I())).put("cycle_db", ((Cycle)current_fas.back()).double_bonds.get_num());
+        ((Dictionary)tmp.get(FA_I())).put("cycle_db", ((Cycle)current_fas.peekLast()).double_bonds.get_num());
     }
 
     
     public void check_cycle_db_positions(TreeNode node){
-        if (((Cycle)current_fas.back()).double_bonds.get_num() != (int)((Dictionary)tmp.get(FA_I())).get("cycle_db")){
+        if (((Cycle)current_fas.peekLast()).double_bonds.get_num() != (int)((Dictionary)tmp.get(FA_I())).get("cycle_db")){
             throw new LipidException("Double bond number in cycle does not correspond to number of double bond positions.");
         }
     }
@@ -564,14 +570,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     public void set_cycle_db_position(TreeNode node){
         int pos = Integer.valueOf(node.get_text());
-        ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, "");
+        ((Cycle)current_fas.peekLast()).double_bonds.double_bond_positions.put(pos, "");
         ((Dictionary)tmp.get(FA_I())).put("last_db_pos", pos);
     }
 
     
     public void set_cycle_db_position_cistrans(TreeNode node){
         int pos = (int)((Dictionary)tmp.get(FA_I())).get("last_db_pos");
-        ((Cycle)current_fas.back()).double_bonds.double_bond_positions.put(pos, node.get_text());
+        ((Cycle)current_fas.peekLast()).double_bonds.double_bond_positions.put(pos, node.get_text());
     }
 
     
@@ -588,7 +594,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     public void set_acyl_linkage(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "acyl");
-        current_fas.add(new AcylAlkylGroup((FattyAcid)null));
+        current_fas.add(new AcylAlkylGroup((FattyAcid)null, knownFunctionalGroups));
         tmp.put(FA_I(), new Dictionary());
         ((Dictionary)tmp.get(FA_I())).put("linkage_pos", -1);
     }
@@ -599,20 +605,20 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
 
         tmp.remove(FA_I());
-        AcylAlkylGroup acyl = (AcylAlkylGroup)current_fas.PopBack();
+        AcylAlkylGroup acyl = (AcylAlkylGroup)current_fas.pollLast();
 
         acyl.position = linkage_pos;
         acyl.set_N_bond_type(linkage_type);
         if (linkage_pos == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
 
-        if (!current_fas.back().functional_groups.containsKey("acyl")) current_fas.back().functional_groups.put("acyl", new ArrayList<FunctionalGroup>());
-        current_fas.back().functional_groups.get("acyl").add(acyl);
+        if (!current_fas.peekLast().functional_groups.containsKey("acyl")) current_fas.peekLast().functional_groups.put("acyl", new ArrayList<FunctionalGroup>());
+        current_fas.peekLast().functional_groups.get("acyl").add(acyl);
     }
 
     
     public void set_alkyl_linkage(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "alkyl");
-        current_fas.add(new AcylAlkylGroup(null, -1, 1, true));
+        current_fas.add(new AcylAlkylGroup(null, -1, 1, true, knownFunctionalGroups));
         tmp.put(FA_I(), new Dictionary());
         ((Dictionary)tmp.get(FA_I())).put("linkage_pos", -1);
     }
@@ -621,13 +627,13 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void add_alkyl_linkage(TreeNode node){
         int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
         tmp.remove(FA_I());
-        AcylAlkylGroup alkyl = (AcylAlkylGroup)current_fas.PopBack();
+        AcylAlkylGroup alkyl = (AcylAlkylGroup)current_fas.pollLast();
 
         alkyl.position = linkage_pos;
         if (linkage_pos == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
 
-        if (!current_fas.back().functional_groups.containsKey("alkyl")) current_fas.back().functional_groups.put("alkyl", new ArrayList<FunctionalGroup>());
-        current_fas.back().functional_groups.get("alkyl").add(alkyl);
+        if (!current_fas.peekLast().functional_groups.containsKey("alkyl")) current_fas.peekLast().functional_groups.put("alkyl", new ArrayList<FunctionalGroup>());
+        current_fas.peekLast().functional_groups.get("alkyl").add(alkyl);
     }
 
     
@@ -652,12 +658,12 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void add_hydrocarbon_chain(TreeNode node){
         int linkage_pos = (int)((Dictionary)tmp.get(FA_I())).get("linkage_pos");
         tmp.remove(FA_I());
-        CarbonChain cc = (CarbonChain)current_fas.PopBack();
+        CarbonChain cc = (CarbonChain)current_fas.pollLast();
         cc.position = linkage_pos;
         if (linkage_pos == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
 
-        if (!current_fas.back().functional_groups.containsKey("cc")) current_fas.back().functional_groups.put("cc", new ArrayList<FunctionalGroup>());
-        current_fas.back().functional_groups.get("cc").add(cc);
+        if (!current_fas.peekLast().functional_groups.containsKey("cc")) current_fas.peekLast().functional_groups.put("cc", new ArrayList<FunctionalGroup>());
+        current_fas.peekLast().functional_groups.get("cc").add(cc);
     }
 
     
@@ -670,14 +676,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         String fa_i = FA_I();
         tmp.put(fa_i, new Dictionary());
         ((Dictionary)tmp.get(fa_i)).put("fg_name", "decorator_acyl");
-        current_fas.add(new HeadgroupDecorator("decorator_acyl", -1, 1, null, true));
+        current_fas.add(new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups));
         tmp.put(FA_I(), new Dictionary());
     }
 
     
     public void add_hg_acyl(TreeNode node){
         tmp.remove(FA_I());
-        headgroup_decorators.add((HeadgroupDecorator)current_fas.PopBack());
+        headgroup_decorators.add((HeadgroupDecorator)current_fas.pollLast());
         tmp.remove(FA_I());
     }
 
@@ -685,21 +691,21 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void set_hg_alkyl(TreeNode node){
         tmp.put(FA_I(), new Dictionary());
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "decorator_alkyl");
-        current_fas.add(new HeadgroupDecorator("decorator_alkyl", -1, 1, null, true));
+        current_fas.add(new HeadgroupDecorator("decorator_alkyl", -1, 1, null, true, knownFunctionalGroups));
         tmp.put(FA_I(), new Dictionary());
     }
 
     
     public void add_hg_alkyl(TreeNode node){
         tmp.remove(FA_I());
-        headgroup_decorators.add((HeadgroupDecorator)current_fas.PopBack());
+        headgroup_decorators.add((HeadgroupDecorator)current_fas.pollLast());
         tmp.remove(FA_I());
     }
 
     
     public void add_pl_species_data(TreeNode node){
         set_lipid_level(LipidLevel.SPECIES);
-        HeadgroupDecorator hgd = new HeadgroupDecorator("");
+        HeadgroupDecorator hgd = new HeadgroupDecorator("", knownFunctionalGroups);
         hgd.elements.put(Element.O, hgd.elements.get(Element.O) + 1);
         hgd.elements.put(Element.H, hgd.elements.get(Element.H) - 1);
         headgroup_decorators.add(hgd);
@@ -707,19 +713,19 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     
     public void suffix_decorator_molecular(TreeNode node){
-        headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES));
+        headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES, knownFunctionalGroups));
     }
 
     
     public void suffix_decorator_species(TreeNode node){
-        headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.SPECIES));
+        headgroup_decorators.add(new HeadgroupDecorator(node.get_text(), -1, 1, null, true, LipidLevel.SPECIES, knownFunctionalGroups));
     }
 
     
     public void set_acer(TreeNode node){
         head_group = "ACer";
-        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
-        hgd.functional_groups.put("decorator_acyl", new ArrayList<FunctionalGroup>());
+        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);
+        hgd.functional_groups.put("decorator_acyl", new ArrayList<>());
         hgd.functional_groups.get("decorator_acyl").add(fa_list.get(fa_list.size() - 1));
         fa_list.remove(fa_list.size() - 1);
         headgroup_decorators.add(hgd);
@@ -729,9 +735,9 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void set_acer_species(TreeNode node){
         head_group = "ACer";
         set_lipid_level(LipidLevel.SPECIES);
-        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
-        hgd.functional_groups.put("decorator_acyl", new ArrayList<FunctionalGroup>());
-        hgd.functional_groups.get("decorator_acyl").add(new FattyAcid("FA", 2));
+        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);
+        hgd.functional_groups.put("decorator_acyl", new ArrayList<>());
+        hgd.functional_groups.get("decorator_acyl").add(new FattyAcid("FA", 2, knownFunctionalGroups));
         headgroup_decorators.add(hgd);
         acer_species = true;
     }

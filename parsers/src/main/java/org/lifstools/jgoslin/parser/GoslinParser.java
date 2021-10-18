@@ -25,6 +25,7 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 
@@ -34,6 +35,6 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class GoslinParser extends Parser<LipidAdduct> {
     public GoslinParser(){
-        super(new GoslinParserEventHandler(), "/src/main/goslin/Goslin.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new GoslinParserEventHandler(new KnownFunctionalGroups()), "Goslin.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

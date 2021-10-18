@@ -27,37 +27,30 @@ package org.lifstools.jgoslin.domain;
 import org.lifstools.jgoslin.parser.SumFormulaParser;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author dominik
  */
 public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
-    private static KnownFunctionalGroups known_functional_groups = null;
+//    private static KnownFunctionalGroups known_functional_groups = null;
     
-    private KnownFunctionalGroups(){
+    public KnownFunctionalGroups(String resourceName, SumFormulaParser sumFormulaParser) {
         ArrayList<String> lines = new ArrayList<>();
         
-        try {
-            InputStream is = getClass().getResourceAsStream("/src/main/goslin/functional-groups.csv");
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            String line;
-            while ((line = br.readLine()) != null) {
-              lines.add(line);
-            }
-            br.close();
-            isr.close();
-            is.close();
+        // read resource from classpath and current thread's context class loader
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)));) {
+            lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
+        } catch(IOException e) {
+            //always pass on the original exception
+            throw new RuntimeException("Error: Resource "+ resourceName + " cannot be read.", e);
         }
-        catch(IOException e){
-            throw new RuntimeException("File functional-groups.csv cannot be read.");
-        }
+        
         int lineCounter = 0;
         ArrayList< ArrayList<String> > functional_data = new ArrayList<>();
         HashSet<String> functional_data_set = new HashSet<>();
@@ -75,7 +68,7 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
             functional_data_set.add(fd_name);
         }
         
-        SumFormulaParser sfp = SumFormulaParser.get_instance();
+        SumFormulaParser sfp = sumFormulaParser;
         for (ArrayList<String> row : functional_data){
             row.add(row.get(1));
             for (int i = 6; i < row.size(); ++i){
@@ -88,7 +81,8 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
                         new DoubleBonds(Integer.valueOf(row.get(3))),
                         (row.get(4).equals("1") ? true : false),
                         "",
-                        et
+                        et,
+                        this
                     ));
                 }
                 else {
@@ -96,11 +90,16 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
                         row.get(1),
                         -1,
                         1,
-                        et
+                        et,
+                        this
                     ));
                 }
             }
         }
+    }
+    
+    public KnownFunctionalGroups(){
+        this("functional-groups.csv", new SumFormulaParser());
     }
     
     
@@ -109,8 +108,8 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
     }
     
     
-    public static KnownFunctionalGroups get_instance(){
-        if (known_functional_groups == null) known_functional_groups = new KnownFunctionalGroups();
-        return known_functional_groups;
-    }
+//    public static KnownFunctionalGroups get_instance(){
+//        if (known_functional_groups == null) known_functional_groups = new KnownFunctionalGroups();
+//        return known_functional_groups;
+//    }
 }

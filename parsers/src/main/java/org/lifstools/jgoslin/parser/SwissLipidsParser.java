@@ -32,6 +32,6 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  */
 public class SwissLipidsParser extends Parser<LipidAdduct> {
     public SwissLipidsParser(){
-        super(new SwissLipidsParserEventHandler(), "/src/main/goslin/SwissLipids.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new SwissLipidsParserEventHandler(), "SwissLipids.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

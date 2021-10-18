@@ -20,9 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.StringFunctions;
@@ -33,14 +31,7 @@ import org.lifstools.jgoslin.domain.ElementTable;
  * @author dominik
  */
 public class SumFormulaParser extends Parser<ElementTable> {
-    private static SumFormulaParser sum_formula_parser = null;
-        
-    private SumFormulaParser(){
-        super(new SumFormulaParserEventHandler(), "/src/main/goslin/SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
-    }
-    
-    public static SumFormulaParser get_instance(){
-        if (sum_formula_parser == null) sum_formula_parser = new SumFormulaParser();
-        return sum_formula_parser;
+    public SumFormulaParser() {
+        super(new SumFormulaParserEventHandler(), "SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

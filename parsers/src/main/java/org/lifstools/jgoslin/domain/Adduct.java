@@ -24,15 +24,13 @@ SOFTWARE.
 
 package org.lifstools.jgoslin.domain;
 
-import org.lifstools.jgoslin.parser.SumFormulaParser;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 /**
  *
  * @author dominik
  */
-public class Adduct
+public final class Adduct
 {
     public String sum_formula;
     public String adduct_string;

@@ -41,11 +41,17 @@ import java.util.ArrayList;
  * @author dominik
  */
 public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
+    
     public int db_position;
     public String db_cistrans;
     public int suffix_number;
-        
+    
     public SwissLipidsParserEventHandler() {
+        this(new KnownFunctionalGroups());
+    }
+        
+    public SwissLipidsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+        this.knownFunctionalGroups = knownFunctionalGroups;
         try {
             registered_events.put("lipid_pre_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", SwissLipidsParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
@@ -129,7 +135,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
     public void set_nape(TreeNode node){
         head_group = "PE-N";
-        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true);
+        HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);
         headgroup_decorators.add(hgd);
         hgd.functional_groups.put("decorator_acyl", new ArrayList<>());
         hgd.functional_groups.get("decorator_acyl").add(fa_list.get(fa_list.size() - 1));
@@ -176,13 +182,13 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
 
     public void new_fa(TreeNode node){
-        current_fa = new FattyAcid("FA" + (fa_list.size() + 1));
+        current_fa = new FattyAcid("FA" + (fa_list.size() + 1), knownFunctionalGroups);
     }
 
 
 
     public void new_lcb(TreeNode node){
-        lcb = new FattyAcid("LCB");
+        lcb = new FattyAcid("LCB", knownFunctionalGroups);
         lcb.set_type(LipidFaBondType.LCB_REGULAR);
         current_fa = lcb;
         set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
@@ -252,7 +258,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
 
         if (sp_regular_lcb()) num_h -= 1;
-        FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get("OH");
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.count = num_h;
         if (!current_fa.functional_groups.containsKey("OH")) current_fa.functional_groups.put("OH", new ArrayList<>());
         current_fa.functional_groups.get("OH").add(functional_group);
@@ -264,7 +270,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
             current_fa.functional_groups.get("OH").get(0).count += 1;
         }
         else {
-            FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get("OH");
+            FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
             if (!current_fa.functional_groups.containsKey("OH")) current_fa.functional_groups.put("OH", new ArrayList<>());
             current_fa.functional_groups.get("OH").add(functional_group);
         }
@@ -285,7 +291,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
             current_fa.num_carbon -= 1;
         }
 
-        FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get(suffix_type);
+        FunctionalGroup functional_group = knownFunctionalGroups.get(suffix_type);
         functional_group.position = suffix_number;
         if (functional_group.position == -1) set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
         if (!current_fa.functional_groups.containsKey(suffix_type)) current_fa.functional_groups.put(suffix_type, new ArrayList<>());

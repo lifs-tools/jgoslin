@@ -35,17 +35,20 @@ import org.lifstools.jgoslin.domain.Headgroup;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 
 
-public class GoslinParserEventHandler extends LipidBaseParserEventHandler {    
+public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
+
     public int db_position;
     public String db_cistrans;
     public boolean unspecified_ether;
     
-    
     public GoslinParserEventHandler() {
+        this(new KnownFunctionalGroups());
+    }
+    
+    public GoslinParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+        this.knownFunctionalGroups = knownFunctionalGroups;
         try {
             registered_events.put("lipid_pre_event", GoslinParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
             registered_events.put("lipid_post_event", GoslinParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
@@ -186,13 +189,13 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             unspecified_ether = false;
             lipid_FA_bond_type = LipidFaBondType.ETHER_UNSPECIFIED;
         }
-        current_fa = new FattyAcid("FA" + (fa_list.size() + 1), 2, null, null, lipid_FA_bond_type);
+        current_fa = new FattyAcid("FA" + (fa_list.size() + 1), 2, null, null, lipid_FA_bond_type, knownFunctionalGroups);
     }
 
 
 
     public void new_lcb(TreeNode node){
-        lcb = new FattyAcid("LCB");
+        lcb = new FattyAcid("LCB", knownFunctionalGroups);
         lcb.set_type(LipidFaBondType.LCB_REGULAR);
         current_fa = lcb;
         set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
@@ -271,7 +274,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
         if (sp_regular_lcb()) num_h -= 1;
 
-        FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get("OH");
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.count = num_h;
         if (!current_fa.functional_groups.containsKey("OH")) current_fa.functional_groups.put("OH", new ArrayList<>());
         current_fa.functional_groups.get("OH").add(functional_group);
@@ -296,7 +299,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
         if (sp_regular_lcb()) num_h -= 1;
 
-        FunctionalGroup functional_group = KnownFunctionalGroups.get_instance().get("OH");
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.count = num_h;
         if (!current_fa.functional_groups.containsKey("OH")) current_fa.functional_groups.put("OH", new ArrayList<>());
         current_fa.functional_groups.get("OH").add(functional_group);

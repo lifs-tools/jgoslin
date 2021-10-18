@@ -34,6 +34,6 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class LipidMapsParser extends Parser<LipidAdduct> {
     public LipidMapsParser(){
-        super(new LipidMapsParserEventHandler(), "/src/main/goslin/LipidMaps.g4", StringFunctions.DEFAULT_QUOTE);
+        super(new LipidMapsParserEventHandler(), "LipidMaps.g4", StringFunctions.DEFAULT_QUOTE);
     }
 }

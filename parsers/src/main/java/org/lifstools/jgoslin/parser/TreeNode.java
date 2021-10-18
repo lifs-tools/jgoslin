@@ -35,7 +35,7 @@ public class TreeNode{
     public char terminal;
     public boolean fire_event;
     public static final char EOF_SIGN = '\0';
-    public static final String one_str = "\0";
+    public static final String ONE_STR = "\0";
 
     public TreeNode(long _rule, boolean _fire_event){
         rule_index = _rule;
@@ -49,7 +49,7 @@ public class TreeNode{
         if (terminal == '\0'){
             String left_str = left.get_text();
             String right_str = right != null ? right.get_text() : "";
-            return (!left_str.equals(one_str) ? left_str : "") + (!right_str.equals(one_str) ? right_str : "");
+            return (!left_str.equals(ONE_STR) ? left_str : "") + (!right_str.equals(ONE_STR) ? right_str : "");
         }
         return String.valueOf(terminal);
     }

@@ -38,6 +38,7 @@
                                     <directory>src/main/goslin</directory>
                                     <includes>
                                         <include>lipid-list.csv</include>
+                                        <include>functional-groups.csv</include>
                                         <include>**/*.g4</include>
                                     </includes>
                                 </resource>

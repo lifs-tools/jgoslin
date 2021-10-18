@@ -2,3 +2,4 @@
 /integration-tests/target/
 /acceptance-tests/target/
 /cli/target/
+/parsers/target/

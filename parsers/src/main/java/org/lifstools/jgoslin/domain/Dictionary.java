@@ -29,6 +29,6 @@ import java.util.HashMap;
  *
  * @author dominik
  */
-public class Dictionary extends HashMap<String, Object> {
+public final class Dictionary extends HashMap<String, Object> {
     
 }

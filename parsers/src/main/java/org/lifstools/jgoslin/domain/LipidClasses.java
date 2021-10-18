@@ -27,12 +27,12 @@ package org.lifstools.jgoslin.domain;
 import org.lifstools.jgoslin.parser.SumFormulaParser;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -43,7 +43,10 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
     public static final int UNDEFINED_CLASS = 0;
     
     private LipidClasses() {
-        ArrayList<String> lines = new ArrayList<>();
+        this("lipid-list.csv");
+    }
+    
+    private LipidClasses(String resourceName) {
         add(new LipidClassMeta(LipidCategory.NO_CATEGORY,
             "UNDEFINED",
             "",
@@ -53,24 +56,19 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
             new ElementTable(),
             new ArrayList<>(Arrays.asList("UNDEFINED"))
         ));
-        try {
-            InputStream is = getClass().getResourceAsStream("/src/main/goslin/lipid-list.csv");
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            String line;
-            while ((line = br.readLine()) != null) {
-              lines.add(line);
-            }
-            br.close();
-            isr.close();
-            is.close();
+        
+        ArrayList<String> lines = new ArrayList<>();
+        
+        // read resource from classpath and current thread's context class loader
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)));) {
+            lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
+        } catch(IOException e) {
+            //always pass on the original exception
+            throw new RuntimeException("Error: Resource "+ resourceName + " cannot be read.", e);
         }
-        catch(IOException e){
-            throw new RuntimeException("File lipid-list.csv cannot be read.");
-        }
+        
         int lineCounter = 0;
         int SYNONYM_START_INDEX = 7;
-
 
         HashMap<String, ArrayList<String> > data = new HashMap<>();
         HashSet<String> keys = new HashSet<>();
@@ -160,7 +158,7 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
         }
         
         // creating the lipid class dictionary
-        SumFormulaParser sfp = SumFormulaParser.get_instance();
+        SumFormulaParser sfp = new SumFormulaParser();
         data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
             StringFunctions.split_string(kv.getValue().get(5), ';', '"').forEach(scase -> {

@@ -40,8 +40,8 @@ public class LipidSpeciesInfo extends FattyAcid {
     public static final String[] ether_prefix = {"", "O-", "dO-", "tO-", "eO-"};
     public int lipid_class;
 
-    public LipidSpeciesInfo (int _lipid_class){
-        super("info");
+    public LipidSpeciesInfo (int _lipid_class, KnownFunctionalGroups knownFunctionalGroups){
+        super("info", knownFunctionalGroups);
         lipid_class = _lipid_class;
         level = LipidLevel.NO_LEVEL;
         num_ethers = 0;
@@ -52,7 +52,7 @@ public class LipidSpeciesInfo extends FattyAcid {
 
 
     public LipidSpeciesInfo copy(){
-        LipidSpeciesInfo lsi = new LipidSpeciesInfo(lipid_class);
+        LipidSpeciesInfo lsi = new LipidSpeciesInfo(lipid_class, knownFunctionalGroups);
         lsi.level = level;
         lsi.num_ethers = num_ethers;
         lsi.num_specified_fa = num_specified_fa;
