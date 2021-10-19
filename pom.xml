@@ -44,6 +44,16 @@
             <name>JGoslin Website</name>
             <url>https://lifs-tools.github.io/jgoslin/${project.version}</url>
         </site>
+        <repository>
+            <id>lifstools-jfrog</id>
+            <name>lifstools-release</name>
+            <url>https://lifstools.jfrog.io/artifactory/lifs-libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>lifstools-jfrog</id>
+            <name>lifstools-snapshot</name>
+            <url>https://lifstools.jfrog.io/artifactory/lifs-libs-snapshot-local</url>
+        </snapshotRepository>
     </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
