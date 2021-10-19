@@ -81,6 +81,7 @@ public class Parser<T>
     public String grammar_name = "";
     public boolean used_eof = false;
     public static final char DEFAULT_QUOTE = '\'';
+    public String error_message = "";
     
     
 
@@ -675,15 +676,26 @@ public class Parser<T>
             node.terminal = (char)dp_node.rule_index_1;
         }
     }
+    
+    
+    
+    String get_error_message(){
+        return error_message;
+    }
+    
 
     
     public T parse(String text_to_parse){
         return parse(text_to_parse, true);
     }
+    
+    
+    
 
 
     // re-implementation of Cocke-Younger-Kasami algorithm
     public T parse(String text_to_parse, boolean throw_error){
+        error_message = "";
         String old_text = text_to_parse;
         if (used_eof) text_to_parse += EOF_SIGN;
         parser_event_handler.content = null;
@@ -699,8 +711,7 @@ public class Parser<T>
 
 
 
-    public void parse_regular(String text_to_parse)
-    {
+    public void parse_regular(String text_to_parse){
         word_in_grammar = false;
 
         int n = text_to_parse.length();
@@ -786,6 +797,18 @@ public class Parser<T>
                 }
             }
 
+            if (!word_in_grammar){
+                for (int i = n - 1; i > 0; --i){
+                    if (DP.get(0).get(i).size() > 0){
+                        long first_rule = DP.get(0).get(i).keySet().iterator().next();
+                        
+                        TreeNode parse_tree = new TreeNode(first_rule, NTtoRule.containsKey(first_rule));
+                        fill_tree(parse_tree, DP.get(0).get(i).get(first_rule));
+                        error_message = parse_tree.get_text();
+                        break;
+                    }
+                }
+            }
         }
     }
 }

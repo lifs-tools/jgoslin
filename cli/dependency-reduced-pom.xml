@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>jgoslin</artifactId>
-    <groupId>de.isas.lipidomics</groupId>
-    <version>1.1.3-SNAPSHOT</version>
+    <groupId>org.lifstools</groupId>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>jgoslin-cli</artifactId>
@@ -48,7 +48,7 @@
         <configuration>
           <transformers>
             <transformer>
-              <mainClass>de.isas.lipidomics.palinom.cli.CmdLineParser</mainClass>
+              <mainClass>org.lifstools.jgoslin.cli.CmdLineParser</mainClass>
             </transformer>
           </transformers>
         </configuration>
@@ -85,7 +85,7 @@
         </plugins>
       </build>
       <properties>
-        <docker.image.prefix>do1-aps-feris.isas.de:5000/lifs</docker.image.prefix>
+        <docker.image.prefix>docker.lifs-tools.org/lifs</docker.image.prefix>
       </properties>
     </profile>
   </profiles>
