@@ -48,4 +48,13 @@ jobs:
       if: always()
       with:
         files: "**/*-reports/*.xml"
+    - name: Publish Jar
+      env:
+        ARTIFACTORY_USERNAME_REF: github-deployer 
+        ARTIFACTORY_TOKEN_REF: ${{ secrets.ARTIFACTORY_TOKEN }}
+        BUILD_ENV: 'github-actions'
+        DEFAULT_BRANCH: master
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: ./mvnw -B deploy --file pom.xml
+    
 
