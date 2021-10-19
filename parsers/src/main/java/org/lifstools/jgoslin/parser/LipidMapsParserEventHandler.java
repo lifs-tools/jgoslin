@@ -77,76 +77,76 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     public LipidMapsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;
         try {
-            registered_events.put("lipid_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
-            registered_events.put("lipid_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
+            registered_events.put("lipid_pre_event", this::reset_parser);
+            registered_events.put("lipid_post_event", this::build_lipid);
 
             // set adduct events
-            registered_events.put("adduct_info_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("new_adduct", TreeNode.class));
-            registered_events.put("adduct_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_adduct", TreeNode.class));
-            registered_events.put("charge_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_charge", TreeNode.class));
-            registered_events.put("charge_sign_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_charge_sign", TreeNode.class));
+            registered_events.put("adduct_info_pre_event", this::new_adduct);
+            registered_events.put("adduct_pre_event", this::add_adduct);
+            registered_events.put("charge_pre_event", this::add_charge);
+            registered_events.put("charge_sign_pre_event", this::add_charge_sign);
 
-            registered_events.put("mediator_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("mediator_event", TreeNode.class));
+            registered_events.put("mediator_pre_event", this::mediator_event);
 
-            registered_events.put("sgl_species_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("species_fa_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("tgl_species_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("dpl_species_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("cl_species_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("dsl_species_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("fa2_unsorted_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_molecular_subspecies_level", TreeNode.class));
-            registered_events.put("fa3_unsorted_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_molecular_subspecies_level", TreeNode.class));
-            registered_events.put("fa4_unsorted_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_molecular_subspecies_level", TreeNode.class));
-            registered_events.put("hg_dg_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_molecular_subspecies_level", TreeNode.class));
-            registered_events.put("fa_lpl_molecular_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_molecular_subspecies_level", TreeNode.class));
-            registered_events.put("hg_lbpa_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_molecular_subspecies_level", TreeNode.class));
+            registered_events.put("sgl_species_pre_event", this::set_species_level);
+            registered_events.put("species_fa_pre_event", this::set_species_level);
+            registered_events.put("tgl_species_pre_event", this::set_species_level);
+            registered_events.put("dpl_species_pre_event", this::set_species_level);
+            registered_events.put("cl_species_pre_event", this::set_species_level);
+            registered_events.put("dsl_species_pre_event", this::set_species_level);
+            registered_events.put("fa2_unsorted_pre_event", this::set_molecular_subspecies_level);
+            registered_events.put("fa3_unsorted_pre_event", this::set_molecular_subspecies_level);
+            registered_events.put("fa4_unsorted_pre_event", this::set_molecular_subspecies_level);
+            registered_events.put("hg_dg_pre_event", this::set_molecular_subspecies_level);
+            registered_events.put("fa_lpl_molecular_pre_event", this::set_molecular_subspecies_level);
+            registered_events.put("hg_lbpa_pre_event", this::set_molecular_subspecies_level);
 
-            registered_events.put("fa_no_hg_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("pure_fa", TreeNode.class));
+            registered_events.put("fa_no_hg_pre_event", this::pure_fa);
 
-            registered_events.put("hg_sgl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_gl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_cl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_dpl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_lpl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_threepl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_fourpl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_dsl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_cpa_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("ch_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_che_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("mediator_const_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("pk_hg_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_fa_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("hg_lsl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("special_cer_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("special_cer_hg_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_head_group_name", TreeNode.class));
-            registered_events.put("omega_linoleoyloxy_Cer_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_omega_head_group_name", TreeNode.class));
+            registered_events.put("hg_sgl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_gl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_cl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_dpl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_lpl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_threepl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_fourpl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_dsl_pre_event", this::set_head_group_name);
+            registered_events.put("hg_cpa_pre_event", this::set_head_group_name);
+            registered_events.put("ch_pre_event", this::set_head_group_name);
+            registered_events.put("hg_che_pre_event", this::set_head_group_name);
+            registered_events.put("mediator_const_pre_event", this::set_head_group_name);
+            registered_events.put("pk_hg_pre_event", this::set_head_group_name);
+            registered_events.put("hg_fa_pre_event", this::set_head_group_name);
+            registered_events.put("hg_lsl_pre_event", this::set_head_group_name);
+            registered_events.put("special_cer_pre_event", this::set_head_group_name);
+            registered_events.put("special_cer_hg_pre_event", this::set_head_group_name);
+            registered_events.put("omega_linoleoyloxy_Cer_pre_event", this::set_omega_head_group_name);
 
-            registered_events.put("lcb_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("new_lcb", TreeNode.class));
-            registered_events.put("lcb_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("clean_lcb", TreeNode.class));
-            registered_events.put("fa_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("new_fa", TreeNode.class));
-            registered_events.put("fa_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("append_fa", TreeNode.class));
+            registered_events.put("lcb_pre_event", this::new_lcb);
+            registered_events.put("lcb_post_event", this::clean_lcb);
+            registered_events.put("fa_pre_event", this::new_fa);
+            registered_events.put("fa_post_event", this::append_fa);
 
-            registered_events.put("glyco_struct_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_glyco", TreeNode.class));
+            registered_events.put("glyco_struct_pre_event", this::add_glyco);
 
-            registered_events.put("db_single_position_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_isomeric_level", TreeNode.class));
-            registered_events.put("db_single_position_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_db_position", TreeNode.class));
-            registered_events.put("db_position_number_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_db_position_number", TreeNode.class));
-            registered_events.put("cistrans_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_cistrans", TreeNode.class));
+            registered_events.put("db_single_position_pre_event", this::set_isomeric_level);
+            registered_events.put("db_single_position_post_event", this::add_db_position);
+            registered_events.put("db_position_number_pre_event", this::add_db_position_number);
+            registered_events.put("cistrans_pre_event", this::add_cistrans);
 
-            registered_events.put("ether_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_ether", TreeNode.class));
-            registered_events.put("hydroxyl_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_hydroxyl", TreeNode.class));
-            registered_events.put("hydroxyl_lcb_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_hydroxyl_lcb", TreeNode.class));
-            registered_events.put("db_count_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_double_bonds", TreeNode.class));
-            registered_events.put("carbon_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_carbon", TreeNode.class));
+            registered_events.put("ether_pre_event", this::add_ether);
+            registered_events.put("hydroxyl_pre_event", this::add_hydroxyl);
+            registered_events.put("hydroxyl_lcb_pre_event", this::add_hydroxyl_lcb);
+            registered_events.put("db_count_pre_event", this::add_double_bonds);
+            registered_events.put("carbon_pre_event", this::add_carbon);
 
-            registered_events.put("structural_mod_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_structural_subspecies_level", TreeNode.class));
-            registered_events.put("single_mod_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_mod", TreeNode.class));
-            registered_events.put("mod_text_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_mod_text", TreeNode.class));
-            registered_events.put("mod_pos_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_mod_pos", TreeNode.class));
-            registered_events.put("mod_num_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("set_mod_num", TreeNode.class));
-            registered_events.put("single_mod_post_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_functional_group", TreeNode.class));
-            registered_events.put("special_cer_prefix_pre_event", LipidMapsParserEventHandler.class.getDeclaredMethod("add_ACer", TreeNode.class));
+            registered_events.put("structural_mod_pre_event", this::set_structural_subspecies_level);
+            registered_events.put("single_mod_pre_event", this::set_mod);
+            registered_events.put("mod_text_pre_event", this::set_mod_text);
+            registered_events.put("mod_pos_pre_event", this::set_mod_pos);
+            registered_events.put("mod_num_pre_event", this::set_mod_num);
+            registered_events.put("single_mod_post_event", this::add_functional_group);
+            registered_events.put("special_cer_prefix_pre_event", this::add_ACer);
             
         }
         catch(Exception e){

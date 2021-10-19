@@ -63,115 +63,115 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public ShorthandParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;
         try {
-            registered_events.put("lipid_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
-            registered_events.put("lipid_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
+            registered_events.put("lipid_pre_event", this::reset_parser);
+            registered_events.put("lipid_post_event", this::build_lipid);
 
             // set categories
-            registered_events.put("sl_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("pre_sphingolipid", TreeNode.class));
-            registered_events.put("sl_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("post_sphingolipid", TreeNode.class));
-            registered_events.put("sl_hydroxyl_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_hydroxyl", TreeNode.class));
+            registered_events.put("sl_pre_event", this::pre_sphingolipid);
+            registered_events.put("sl_post_event", this::post_sphingolipid);
+            registered_events.put("sl_hydroxyl_pre_event", this::set_hydroxyl);
 
             // set adduct events
-            registered_events.put("adduct_info_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("new_adduct", TreeNode.class));
-            registered_events.put("adduct_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_adduct", TreeNode.class));
-            registered_events.put("charge_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_charge", TreeNode.class));
-            registered_events.put("charge_sign_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_charge_sign", TreeNode.class));
+            registered_events.put("adduct_info_pre_event", this::new_adduct);
+            registered_events.put("adduct_pre_event", this::add_adduct);
+            registered_events.put("charge_pre_event", this::add_charge);
+            registered_events.put("charge_sign_pre_event", this::add_charge_sign);
 
             // set species events
-            registered_events.put("med_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("gl_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("gl_molecular_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_molecular_level", TreeNode.class));
-            registered_events.put("pl_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("pl_molecular_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_molecular_level", TreeNode.class));
-            registered_events.put("sl_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_species_level", TreeNode.class));
-            registered_events.put("pl_single_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_molecular_level", TreeNode.class));
-            registered_events.put("unsorted_fa_separator_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_molecular_level", TreeNode.class));
-            registered_events.put("ether_num_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_ether_num", TreeNode.class));
+            registered_events.put("med_species_pre_event", this::set_species_level);
+            registered_events.put("gl_species_pre_event", this::set_species_level);
+            registered_events.put("gl_molecular_species_pre_event", this::set_molecular_level);
+            registered_events.put("pl_species_pre_event", this::set_species_level);
+            registered_events.put("pl_molecular_species_pre_event", this::set_molecular_level);
+            registered_events.put("sl_species_pre_event", this::set_species_level);
+            registered_events.put("pl_single_pre_event", this::set_molecular_level);
+            registered_events.put("unsorted_fa_separator_pre_event", this::set_molecular_level);
+            registered_events.put("ether_num_pre_event", this::set_ether_num);
 
             // set head groups events
-            registered_events.put("med_hg_single_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("med_hg_double_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("med_hg_triple_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("gl_hg_single_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("gl_hg_double_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("gl_hg_true_double_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("gl_hg_triple_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("pl_hg_single_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("pl_hg_double_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("pl_hg_quadro_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("sl_hg_single_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("pl_hg_double_fa_hg_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("sl_hg_double_name_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("st_hg_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("st_hg_ester_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("hg_pip_pure_m_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("hg_pip_pure_d_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("hg_pip_pure_t_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
-            registered_events.put("hg_PE_PS_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_headgroup_name", TreeNode.class));
+            registered_events.put("med_hg_single_pre_event", this::set_headgroup_name);
+            registered_events.put("med_hg_double_pre_event", this::set_headgroup_name);
+            registered_events.put("med_hg_triple_pre_event", this::set_headgroup_name);
+            registered_events.put("gl_hg_single_pre_event", this::set_headgroup_name);
+            registered_events.put("gl_hg_double_pre_event", this::set_headgroup_name);
+            registered_events.put("gl_hg_true_double_pre_event", this::set_headgroup_name);
+            registered_events.put("gl_hg_triple_pre_event", this::set_headgroup_name);
+            registered_events.put("pl_hg_single_pre_event", this::set_headgroup_name);
+            registered_events.put("pl_hg_double_pre_event", this::set_headgroup_name);
+            registered_events.put("pl_hg_quadro_pre_event", this::set_headgroup_name);
+            registered_events.put("sl_hg_single_pre_event", this::set_headgroup_name);
+            registered_events.put("pl_hg_double_fa_hg_pre_event", this::set_headgroup_name);
+            registered_events.put("sl_hg_double_name_pre_event", this::set_headgroup_name);
+            registered_events.put("st_hg_pre_event", this::set_headgroup_name);
+            registered_events.put("st_hg_ester_pre_event", this::set_headgroup_name);
+            registered_events.put("hg_pip_pure_m_pre_event", this::set_headgroup_name);
+            registered_events.put("hg_pip_pure_d_pre_event", this::set_headgroup_name);
+            registered_events.put("hg_pip_pure_t_pre_event", this::set_headgroup_name);
+            registered_events.put("hg_PE_PS_pre_event", this::set_headgroup_name);
 
             // set head group headgroup_decorators
-            registered_events.put("carbohydrate_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_carbohydrate", TreeNode.class));
-            registered_events.put("carbohydrate_structural_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_carbohydrate_structural", TreeNode.class));
-            registered_events.put("carbohydrate_isomeric_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_carbohydrate_isomeric", TreeNode.class));
+            registered_events.put("carbohydrate_pre_event", this::set_carbohydrate);
+            registered_events.put("carbohydrate_structural_pre_event", this::set_carbohydrate_structural);
+            registered_events.put("carbohydrate_isomeric_pre_event", this::set_carbohydrate_isomeric);
 
             // fatty acyl events
-            registered_events.put("lcb_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_lcb", TreeNode.class));
-            registered_events.put("fatty_acyl_chain_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("new_fatty_acyl_chain", TreeNode.class));
-            registered_events.put("fatty_acyl_chain_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_fatty_acyl_chain", TreeNode.class));
-            registered_events.put("carbon_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_carbon", TreeNode.class));
-            registered_events.put("db_count_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_double_bond_count", TreeNode.class));
-            registered_events.put("db_position_number_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_double_bond_position", TreeNode.class));
-            registered_events.put("db_single_position_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_double_bond_information", TreeNode.class));
-            registered_events.put("db_single_position_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_double_bond_information", TreeNode.class));
-            registered_events.put("cistrans_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cistrans", TreeNode.class));
-            registered_events.put("ether_type_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_ether_type", TreeNode.class));
+            registered_events.put("lcb_post_event", this::set_lcb);
+            registered_events.put("fatty_acyl_chain_pre_event", this::new_fatty_acyl_chain);
+            registered_events.put("fatty_acyl_chain_post_event", this::add_fatty_acyl_chain);
+            registered_events.put("carbon_pre_event", this::set_carbon);
+            registered_events.put("db_count_pre_event", this::set_double_bond_count);
+            registered_events.put("db_position_number_pre_event", this::set_double_bond_position);
+            registered_events.put("db_single_position_pre_event", this::set_double_bond_information);
+            registered_events.put("db_single_position_post_event", this::add_double_bond_information);
+            registered_events.put("cistrans_pre_event", this::set_cistrans);
+            registered_events.put("ether_type_pre_event", this::set_ether_type);
 
             // set functional group events
-            registered_events.put("func_group_data_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("func_group_data_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_functional_group", TreeNode.class));
-            registered_events.put("func_group_pos_number_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_functional_group_position", TreeNode.class));
-            registered_events.put("func_group_name_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_functional_group_name", TreeNode.class));
-            registered_events.put("func_group_count_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_functional_group_count", TreeNode.class));
-            registered_events.put("stereo_type_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_functional_group_stereo", TreeNode.class));
-            registered_events.put("molecular_func_group_name_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_molecular_func_group", TreeNode.class));
+            registered_events.put("func_group_data_pre_event", this::set_functional_group);
+            registered_events.put("func_group_data_post_event", this::add_functional_group);
+            registered_events.put("func_group_pos_number_pre_event", this::set_functional_group_position);
+            registered_events.put("func_group_name_pre_event", this::set_functional_group_name);
+            registered_events.put("func_group_count_pre_event", this::set_functional_group_count);
+            registered_events.put("stereo_type_pre_event", this::set_functional_group_stereo);
+            registered_events.put("molecular_func_group_name_pre_event", this::set_molecular_func_group);
 
             // set cycle events
-            registered_events.put("func_group_cycle_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle", TreeNode.class));
-            registered_events.put("func_group_cycle_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_cycle", TreeNode.class));
-            registered_events.put("cycle_start_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_start", TreeNode.class));
-            registered_events.put("cycle_end_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_end", TreeNode.class));
-            registered_events.put("cycle_number_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_number", TreeNode.class));
-            registered_events.put("cycle_db_cnt_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_db_count", TreeNode.class));
-            registered_events.put("cycle_db_positions_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_db_positions", TreeNode.class));
-            registered_events.put("cycle_db_positions_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("check_cycle_db_positions", TreeNode.class));
-            registered_events.put("cycle_db_position_number_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_db_position", TreeNode.class));
-            registered_events.put("cycle_db_position_cis_trans_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_cycle_db_position_cistrans", TreeNode.class));
-            registered_events.put("cylce_element_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_cycle_element", TreeNode.class));
+            registered_events.put("func_group_cycle_pre_event", this::set_cycle);
+            registered_events.put("func_group_cycle_post_event", this::add_cycle);
+            registered_events.put("cycle_start_pre_event", this::set_cycle_start);
+            registered_events.put("cycle_end_pre_event", this::set_cycle_end);
+            registered_events.put("cycle_number_pre_event", this::set_cycle_number);
+            registered_events.put("cycle_db_cnt_pre_event", this::set_cycle_db_count);
+            registered_events.put("cycle_db_positions_pre_event", this::set_cycle_db_positions);
+            registered_events.put("cycle_db_positions_post_event", this::check_cycle_db_positions);
+            registered_events.put("cycle_db_position_number_pre_event", this::set_cycle_db_position);
+            registered_events.put("cycle_db_position_cis_trans_pre_event", this::set_cycle_db_position_cistrans);
+            registered_events.put("cylce_element_pre_event", this::add_cycle_element);
 
             // set linkage events
-            registered_events.put("fatty_acyl_linkage_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_acyl_linkage", TreeNode.class));
-            registered_events.put("fatty_acyl_linkage_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_acyl_linkage", TreeNode.class));
-            registered_events.put("fatty_alkyl_linkage_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_alkyl_linkage", TreeNode.class));
-            registered_events.put("fatty_alkyl_linkage_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_alkyl_linkage", TreeNode.class));
-            registered_events.put("fatty_linkage_number_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_fatty_linkage_number", TreeNode.class));
-            registered_events.put("fatty_acyl_linkage_sign_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_linkage_type", TreeNode.class));
-            registered_events.put("hydrocarbon_chain_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_hydrocarbon_chain", TreeNode.class));
-            registered_events.put("hydrocarbon_chain_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_hydrocarbon_chain", TreeNode.class));
-            registered_events.put("hydrocarbon_number_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_fatty_linkage_number", TreeNode.class));
+            registered_events.put("fatty_acyl_linkage_pre_event", this::set_acyl_linkage);
+            registered_events.put("fatty_acyl_linkage_post_event", this::add_acyl_linkage);
+            registered_events.put("fatty_alkyl_linkage_pre_event", this::set_alkyl_linkage);
+            registered_events.put("fatty_alkyl_linkage_post_event", this::add_alkyl_linkage);
+            registered_events.put("fatty_linkage_number_pre_event", this::set_fatty_linkage_number);
+            registered_events.put("fatty_acyl_linkage_sign_pre_event", this::set_linkage_type);
+            registered_events.put("hydrocarbon_chain_pre_event", this::set_hydrocarbon_chain);
+            registered_events.put("hydrocarbon_chain_post_event", this::add_hydrocarbon_chain);
+            registered_events.put("hydrocarbon_number_pre_event", this::set_fatty_linkage_number);
 
             // set remaining events
-            registered_events.put("ring_stereo_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_ring_stereo", TreeNode.class));
-            registered_events.put("pl_hg_fa_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_hg_acyl", TreeNode.class));
-            registered_events.put("pl_hg_fa_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_hg_acyl", TreeNode.class));
-            registered_events.put("pl_hg_alk_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_hg_alkyl", TreeNode.class));
-            registered_events.put("pl_hg_alk_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_hg_alkyl", TreeNode.class));
-            registered_events.put("pl_hg_species_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("add_pl_species_data", TreeNode.class));
-            registered_events.put("hg_pip_m_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("suffix_decorator_molecular", TreeNode.class));
-            registered_events.put("hg_pip_d_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("suffix_decorator_molecular", TreeNode.class));
-            registered_events.put("hg_pip_t_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("suffix_decorator_molecular", TreeNode.class));
-            registered_events.put("hg_PE_PS_type_pre_event", ShorthandParserEventHandler.class.getDeclaredMethod("suffix_decorator_species", TreeNode.class));
-            registered_events.put("acer_hg_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_acer", TreeNode.class));
-            registered_events.put("acer_species_post_event", ShorthandParserEventHandler.class.getDeclaredMethod("set_acer_species", TreeNode.class));
+            registered_events.put("ring_stereo_pre_event", this::set_ring_stereo);
+            registered_events.put("pl_hg_fa_pre_event", this::set_hg_acyl);
+            registered_events.put("pl_hg_fa_post_event", this::add_hg_acyl);
+            registered_events.put("pl_hg_alk_pre_event", this::set_hg_alkyl);
+            registered_events.put("pl_hg_alk_post_event", this::add_hg_alkyl);
+            registered_events.put("pl_hg_species_pre_event", this::add_pl_species_data);
+            registered_events.put("hg_pip_m_pre_event", this::suffix_decorator_molecular);
+            registered_events.put("hg_pip_d_pre_event", this::suffix_decorator_molecular);
+            registered_events.put("hg_pip_t_pre_event", this::suffix_decorator_molecular);
+            registered_events.put("hg_PE_PS_type_pre_event", this::suffix_decorator_species);
+            registered_events.put("acer_hg_post_event", this::set_acer);
+            registered_events.put("acer_species_post_event", this::set_acer_species);
             
             
         }

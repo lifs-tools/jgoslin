@@ -123,105 +123,105 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     public FattyAcidParserEventHandler(KnownFunctionalGroups knownFunctionalGroups){
         this.knownFunctionalGroups = knownFunctionalGroups;
         try {
-            registered_events.put("lipid_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
-            registered_events.put("lipid_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("build_lipid", TreeNode.class));
-            registered_events.put("fatty_acid_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_fatty_acid", TreeNode.class));
-            registered_events.put("fatty_acid_recursion_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_fatty_acid", TreeNode.class));
+            registered_events.put("lipid_pre_event", this::reset_parser);
+            registered_events.put("lipid_post_event", this::build_lipid);
+            registered_events.put("fatty_acid_post_event", this::set_fatty_acid);
+            registered_events.put("fatty_acid_recursion_post_event", this::set_fatty_acid);
 
-            registered_events.put("acid_single_type_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_fatty_acyl_type", TreeNode.class));
-            registered_events.put("ol_ending_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_fatty_acyl_type", TreeNode.class));
-            registered_events.put("double_bond_position_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_double_bond_information", TreeNode.class));
-            registered_events.put("double_bond_position_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_double_bond_information", TreeNode.class));
-            registered_events.put("db_number_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_double_bond_position", TreeNode.class)); 
-            registered_events.put("cistrans_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_cistrans", TreeNode.class));
-            registered_events.put("acid_type_double_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("check_db", TreeNode.class));
-            registered_events.put("db_length_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("open_db_length", TreeNode.class));
-            registered_events.put("db_length_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("close_db_length", TreeNode.class));
+            registered_events.put("acid_single_type_pre_event", this::set_fatty_acyl_type);
+            registered_events.put("ol_ending_pre_event", this::set_fatty_acyl_type);
+            registered_events.put("double_bond_position_pre_event", this::set_double_bond_information);
+            registered_events.put("double_bond_position_post_event", this::add_double_bond_information);
+            registered_events.put("db_number_post_event", this::set_double_bond_position); 
+            registered_events.put("cistrans_post_event", this::set_cistrans);
+            registered_events.put("acid_type_double_post_event", this::check_db);
+            registered_events.put("db_length_pre_event", this::open_db_length);
+            registered_events.put("db_length_post_event", this::close_db_length);
 
             // lengths
-            registered_events.put("functional_length_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("reset_length", TreeNode.class));
-            registered_events.put("fatty_length_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("reset_length", TreeNode.class));
-            registered_events.put("functional_length_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_length", TreeNode.class));
-            registered_events.put("fatty_length_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_fatty_length", TreeNode.class));
+            registered_events.put("functional_length_pre_event", this::reset_length);
+            registered_events.put("fatty_length_pre_event", this::reset_length);
+            registered_events.put("functional_length_post_event", this::set_functional_length);
+            registered_events.put("fatty_length_post_event", this::set_fatty_length);
 
             // numbers
-            registered_events.put("notation_specials_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("special_number", TreeNode.class));
-            registered_events.put("notation_last_digit_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("last_number", TreeNode.class));
-            registered_events.put("notation_second_digit_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("second_number", TreeNode.class));
+            registered_events.put("notation_specials_pre_event", this::special_number);
+            registered_events.put("notation_last_digit_pre_event", this::last_number);
+            registered_events.put("notation_second_digit_pre_event", this::second_number);
 
             // functional groups
-            registered_events.put("functional_group_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("functional_group_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_functional_group", TreeNode.class));
-            registered_events.put("functional_pos_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_pos", TreeNode.class));
-            registered_events.put("functional_position_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_position", TreeNode.class));
-            registered_events.put("functional_group_type_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_type", TreeNode.class));
+            registered_events.put("functional_group_pre_event", this::set_functional_group);
+            registered_events.put("functional_group_post_event", this::add_functional_group);
+            registered_events.put("functional_pos_pre_event", this::set_functional_pos);
+            registered_events.put("functional_position_pre_event", this::set_functional_position);
+            registered_events.put("functional_group_type_pre_event", this::set_functional_type);
 
             // cyclo / epoxy
-            registered_events.put("cyclo_position_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("cyclo_position_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("rearrange_cycle", TreeNode.class));
-            registered_events.put("epoxy_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("epoxy_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_epoxy", TreeNode.class));
-            registered_events.put("cycle_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_cycle", TreeNode.class));
-            registered_events.put("methylene_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_methylene", TreeNode.class));
+            registered_events.put("cyclo_position_pre_event", this::set_functional_group);
+            registered_events.put("cyclo_position_post_event", this::rearrange_cycle);
+            registered_events.put("epoxy_pre_event", this::set_functional_group);
+            registered_events.put("epoxy_post_event", this::add_epoxy);
+            registered_events.put("cycle_pre_event", this::set_cycle);
+            registered_events.put("methylene_post_event", this::set_methylene);
 
             // dioic
-            registered_events.put("dioic_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("dioic_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_dioic", TreeNode.class));
-            registered_events.put("dioic_acid_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_fatty_acyl_type", TreeNode.class));
-            registered_events.put("dial_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_dial", TreeNode.class));
+            registered_events.put("dioic_pre_event", this::set_functional_group);
+            registered_events.put("dioic_post_event", this::set_dioic);
+            registered_events.put("dioic_acid_pre_event", this::set_fatty_acyl_type);
+            registered_events.put("dial_post_event", this::set_dial);
 
 
             // prosta
-            registered_events.put("prosta_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_prosta", TreeNode.class));
-            registered_events.put("prosta_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_cyclo", TreeNode.class));
-            registered_events.put("reduction_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("reduction_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("reduction", TreeNode.class));
-            registered_events.put("homo_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("homo", TreeNode.class));
+            registered_events.put("prosta_pre_event", this::set_prosta);
+            registered_events.put("prosta_post_event", this::add_cyclo);
+            registered_events.put("reduction_pre_event", this::set_functional_group);
+            registered_events.put("reduction_post_event", this::reduction);
+            registered_events.put("homo_post_event", this::homo);
 
 
             // recursion
-            registered_events.put("recursion_description_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_recursion", TreeNode.class));
-            registered_events.put("recursion_description_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_recursion", TreeNode.class));
-            registered_events.put("recursion_pos_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_recursion_pos", TreeNode.class));
-            registered_events.put("yl_ending_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_yl_ending", TreeNode.class));
-            registered_events.put("acetic_acid_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_acetic_acid", TreeNode.class));
-            registered_events.put("acetic_recursion_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_recursion", TreeNode.class));
-            registered_events.put("acetic_recursion_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_recursion", TreeNode.class));
-            registered_events.put("hydroxyl_number_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_hydroxyl", TreeNode.class));
-            registered_events.put("ol_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("setup_hydroxyl", TreeNode.class));
-            registered_events.put("ol_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_hydroxyls", TreeNode.class));
-            registered_events.put("ol_pos_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_yl_ending", TreeNode.class));
+            registered_events.put("recursion_description_pre_event", this::set_recursion);
+            registered_events.put("recursion_description_post_event", this::add_recursion);
+            registered_events.put("recursion_pos_pre_event", this::set_recursion_pos);
+            registered_events.put("yl_ending_pre_event", this::set_yl_ending);
+            registered_events.put("acetic_acid_post_event", this::set_acetic_acid);
+            registered_events.put("acetic_recursion_pre_event", this::set_recursion);
+            registered_events.put("acetic_recursion_post_event", this::add_recursion);
+            registered_events.put("hydroxyl_number_pre_event", this::add_hydroxyl);
+            registered_events.put("ol_pre_event", this::setup_hydroxyl);
+            registered_events.put("ol_post_event", this::add_hydroxyls);
+            registered_events.put("ol_pos_post_event", this::set_yl_ending);
 
 
             // wax esters
-            registered_events.put("wax_ester_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_recursion", TreeNode.class));
-            registered_events.put("wax_ester_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_wax_ester", TreeNode.class));
-            registered_events.put("ate_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_ate", TreeNode.class));
-            registered_events.put("isoprop_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_iso", TreeNode.class));
-            registered_events.put("isobut_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_iso", TreeNode.class));
+            registered_events.put("wax_ester_pre_event", this::set_recursion);
+            registered_events.put("wax_ester_post_event", this::add_wax_ester);
+            registered_events.put("ate_post_event", this::set_ate);
+            registered_events.put("isoprop_post_event", this::set_iso);
+            registered_events.put("isobut_post_event", this::set_iso);
 
             // CoA
-            registered_events.put("coa_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_coa", TreeNode.class));
-            registered_events.put("methyl_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_methyl", TreeNode.class));
+            registered_events.put("coa_post_event", this::set_coa);
+            registered_events.put("methyl_pre_event", this::set_methyl);
 
             // CAR
-            registered_events.put("car_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_car", TreeNode.class));
-            registered_events.put("car_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_car", TreeNode.class));
+            registered_events.put("car_pre_event", this::set_car);
+            registered_events.put("car_post_event", this::add_car);
 
             // furan
-            registered_events.put("tetrahydrofuran_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_tetrahydrofuran", TreeNode.class));
-            registered_events.put("furan_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_furan", TreeNode.class));
+            registered_events.put("tetrahydrofuran_pre_event", this::set_tetrahydrofuran);
+            registered_events.put("furan_pre_event", this::set_furan);
 
             // amine
-            registered_events.put("ethanolamine_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_ethanolamine", TreeNode.class));
-            registered_events.put("amine_n_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_recursion", TreeNode.class));
-            registered_events.put("amine_n_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_amine", TreeNode.class));
-            registered_events.put("amine_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_amine_name", TreeNode.class));
+            registered_events.put("ethanolamine_post_event", this::add_ethanolamine);
+            registered_events.put("amine_n_pre_event", this::set_recursion);
+            registered_events.put("amine_n_post_event", this::add_amine);
+            registered_events.put("amine_post_event", this::add_amine_name);
 
             // functional group position summary
-            registered_events.put("fg_pos_summary_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("set_functional_group", TreeNode.class));
-            registered_events.put("fg_pos_summary_post_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_summary", TreeNode.class));
-            registered_events.put("func_stereo_pre_event", FattyAcidParserEventHandler.class.getDeclaredMethod("add_func_stereo", TreeNode.class));
+            registered_events.put("fg_pos_summary_pre_event", this::set_functional_group);
+            registered_events.put("fg_pos_summary_post_event", this::add_summary);
+            registered_events.put("func_stereo_pre_event", this::add_func_stereo);
         }
         catch(Exception e){
             throw new RuntimeException("Cannot initialize FattyAcidParserEventHandler.", e);

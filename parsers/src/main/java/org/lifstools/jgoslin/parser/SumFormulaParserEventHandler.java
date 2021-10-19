@@ -41,11 +41,11 @@ public class SumFormulaParserEventHandler extends BaseParserEventHandler<Element
     
     public SumFormulaParserEventHandler(){
         try {
-            registered_events.put("molecule_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("reset_parser", TreeNode.class));
-            registered_events.put("element_group_post_event", SumFormulaParserEventHandler.class.getDeclaredMethod("element_group_post_event", TreeNode.class));
-            registered_events.put("element_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("element_pre_event", TreeNode.class));
-            registered_events.put("single_element_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("single_element_group_pre_event", TreeNode.class));
-            registered_events.put("count_pre_event", SumFormulaParserEventHandler.class.getDeclaredMethod("count_pre_event", TreeNode.class));
+            registered_events.put("molecule_pre_event", this::reset_parser);
+            registered_events.put("element_group_post_event", this::element_group_post_event);
+            registered_events.put("element_pre_event", this::element_pre_event);
+            registered_events.put("single_element_pre_event", this::single_element_group_pre_event);
+            registered_events.put("count_pre_event", this::count_pre_event);
         }
         catch(Exception e){
             throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");
