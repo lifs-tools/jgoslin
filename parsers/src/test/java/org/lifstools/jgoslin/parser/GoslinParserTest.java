@@ -23,17 +23,8 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
-import java.io.BufferedReader;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidAdduct;
-import org.lifstools.jgoslin.parser.GoslinParser;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -23,7 +23,6 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
-import org.lifstools.jgoslin.parser.ShorthandParser;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.ArrayList;

@@ -17,7 +17,6 @@ package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
-import org.lifstools.jgoslin.parser.LipidMapsParser;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

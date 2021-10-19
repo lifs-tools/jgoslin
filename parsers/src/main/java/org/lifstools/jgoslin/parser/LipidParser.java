@@ -24,8 +24,8 @@ SOFTWARE.
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidAdduct;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 
 /**
@@ -34,11 +34,11 @@ import org.lifstools.jgoslin.domain.LipidParsingException;
  */
 public class LipidParser {
 
-    private final ArrayList< Parser<LipidAdduct>> parser_list = new ArrayList<>();
+    private final List< Parser<LipidAdduct>> parser_list;
     private Parser<LipidAdduct> lastSuccessfulParser = null;
 
     public LipidParser(Parser<LipidAdduct>... parsers) {
-        parser_list.addAll(Arrays.asList(parsers));
+        parser_list = Arrays.asList(parsers);
     }
 
     public LipidParser() {

@@ -50,7 +50,7 @@ public class LipidSpeciesInfo extends FattyAcid {
         total_fa = (LipidClasses.get_instance().size() > lipid_class) ? LipidClasses.get_instance().get(lipid_class).max_num_fa : 0;
     }
 
-
+    @Override
     public LipidSpeciesInfo copy(){
         LipidSpeciesInfo lsi = new LipidSpeciesInfo(lipid_class, knownFunctionalGroups);
         lsi.level = level;

@@ -501,7 +501,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                                 }
                             }
                             if (fg_name.length() == 0){
-                                CarbonChain cc = new CarbonChain(fa, fa.position);
+                                CarbonChain cc = new CarbonChain(fa, fa.position, knownFunctionalGroups);
                                 if (!curr_fa.functional_groups.containsKey("cc")) curr_fa.functional_groups.put("cc", new ArrayList<>());
                                 curr_fa.functional_groups.get("cc").add(cc);
                             }
@@ -625,7 +625,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             int i = 0;
             for (FunctionalGroup func_group : curr_fa.functional_groups.get("noyloxy")){
                 if (start <= func_group.position && func_group.position <= end){
-                    CarbonChain cc = new CarbonChain((FattyAcid)func_group, func_group.position);
+                    CarbonChain cc = new CarbonChain((FattyAcid)func_group, func_group.position, knownFunctionalGroups);
 
                     if (!curr_fa.functional_groups.containsKey("cc")) curr_fa.functional_groups.put("cc", new ArrayList<>());
                     curr_fa.functional_groups.get("cc").add(cc);
@@ -902,7 +902,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                 }
             }
             fname = "cc";
-            fg = new CarbonChain(fa);
+            fg = new CarbonChain(fa, knownFunctionalGroups);
         }
         curr_fa.num_carbon -= l;
         fg.position = l;

@@ -23,14 +23,12 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
-import org.lifstools.jgoslin.parser.FattyAcidParser;
-import org.lifstools.jgoslin.parser.SumFormulaParser;
-import org.lifstools.jgoslin.parser.ShorthandParser;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
@@ -50,6 +48,18 @@ public class FattyAcidParserTest {
         fatty_acid_parser = new FattyAcidParser();
         shorthand_parser = new ShorthandParser();
     }
+    
+    @Test
+    public void testSumFormulaFailures(){
+        //"molecular LMFA01100037 '4-amino-4-cyano-butanoic acid': C5H8N2O2 != C5H12N2O2 (computed) ==> expected: <C5H8N2O2> but was: <C5H12N2O2>"
+        String computed_formula = StringFunctions.compute_sum_formula(sfp.parse("C5H8N2O2"));
+        LipidAdduct lipid = fatty_acid_parser.parse("4-amino-4-cyano-butanoic acid");
+        String lipid_formula = lipid.get_sum_formula();
+        assertEquals(computed_formula, lipid_formula);
+        LipidAdduct lipid2 = shorthand_parser.parse(lipid.get_lipid_string());
+        String lipid_formula2 = lipid2.get_sum_formula();
+        assertEquals(computed_formula, lipid_formula2);
+    }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/testfiles/fatty-acids-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
@@ -64,7 +74,7 @@ public class FattyAcidParserTest {
         assertEquals(expected_lipid_name, lipid.get_lipid_string(), lmid + " '" + lipid_name + "': " + expected_lipid_name + " != " + lipid.get_lipid_string() + " (computed)");
         assertEquals(computed_formula, lipid_formula, "formula " + lmid + " '" + lipid_name + "': " + computed_formula + " != " + lipid_formula + " (computed)");
 
-        if (lipid_name.toLowerCase().contains("cyano")) {
+        if (!lipid_name.toLowerCase().contains("cyano")) {
             LipidAdduct lipid2 = shorthand_parser.parse(lipid.get_lipid_string());
             lipid_formula = lipid2.get_sum_formula();
 

@@ -31,17 +31,17 @@ import java.util.ArrayList;
  * @author dominik
  */
 public class CarbonChain extends FunctionalGroup {
-    public CarbonChain(FattyAcid _fa){
-        this(_fa, -1, 1);
+    public CarbonChain(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups){
+        this(_fa, -1, 1, knownFunctionalGroups);
     }
     
     
-    public CarbonChain(FattyAcid _fa, int _position){
-        this(_fa, _position, 1);
+    public CarbonChain(FattyAcid _fa, int _position, KnownFunctionalGroups knownFunctionalGroups){
+        this(_fa, _position, 1, knownFunctionalGroups);
     }
     
-    public CarbonChain(FattyAcid _fa, int _position, int _count){
-        super("cc", _position, _count, _fa.knownFunctionalGroups);
+    public CarbonChain(FattyAcid _fa, int _position, int _count, KnownFunctionalGroups knownFunctionalGroups){
+        super("cc", _position, _count, knownFunctionalGroups);
         if (_fa != null)
         {
             functional_groups.put("cc", new ArrayList<>());
@@ -56,7 +56,7 @@ public class CarbonChain extends FunctionalGroup {
     @Override
     public FunctionalGroup copy()
     {
-        return new CarbonChain((FattyAcid)functional_groups.get("cc").get(0).copy(), position, count);
+        return new CarbonChain((FattyAcid)functional_groups.get("cc").get(0).copy(), position, count, knownFunctionalGroups);
     }
 
 

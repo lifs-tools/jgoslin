@@ -103,7 +103,7 @@ public class FattyAcid extends FunctionalGroup {
         lipid_FA_bond_type = _lipid_FA_bond_type;
         if (lipid_FA_bond_type == LipidFaBondType.LCB_REGULAR && !functional_groups.containsKey("[X]"))
         {
-            functional_groups.put("[X]", new ArrayList<FunctionalGroup>());
+            functional_groups.put("[X]", new ArrayList<>());
             functional_groups.get("[X]").add(knownFunctionalGroups.get("X"));
         }
 

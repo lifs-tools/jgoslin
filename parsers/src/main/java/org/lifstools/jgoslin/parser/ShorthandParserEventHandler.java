@@ -649,7 +649,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     public void set_hydrocarbon_chain(TreeNode node){
         ((Dictionary)tmp.get(FA_I())).put("fg_name", "cc");
-        current_fas.add(new CarbonChain((FattyAcid)null));
+        current_fas.add(new CarbonChain((FattyAcid)null, knownFunctionalGroups));
         tmp.put(FA_I(), new Dictionary());
         ((Dictionary)tmp.get(FA_I())).put("linkage_pos", -1);
     }
