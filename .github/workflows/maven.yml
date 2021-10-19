@@ -55,6 +55,6 @@ jobs:
         BUILD_ENV: 'github-actions'
         DEFAULT_BRANCH: master
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./mvnw -B deploy --file pom.xml
+      run: ./mvnw -B deploy -DskipTests --file pom.xml
     
 
