@@ -51,10 +51,10 @@ import java.util.HashSet;
 
 public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
-    public ArrayDeque<FunctionalGroup> current_fas;
-    public Dictionary tmp = new Dictionary();
-    public boolean acer_species = false;
-    public static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
+    private ArrayDeque<FunctionalGroup> current_fas = new ArrayDeque<>();
+    private Dictionary tmp = new Dictionary();
+    private boolean acer_species = false;
+    private static final HashSet<String> special_types = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
         
     public ShorthandParserEventHandler() {
         this(new KnownFunctionalGroups());
@@ -185,8 +185,9 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         level = LipidLevel.FULL_STRUCTURE;
         adduct = null;
         head_group = "";
-        fa_list = new ArrayList<>();
-        current_fas = new ArrayDeque<>();
+        fa_list.clear();
+        current_fas.clear();
+        // FIXME
         headgroup_decorators = new ArrayList<>();
         tmp = new Dictionary();
         acer_species = false;
@@ -213,7 +214,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         lipid.lipid = assemble_lipid(headgroup);
         lipid.adduct = adduct;
 
-        if (tmp.containsKey("num_ethers")) lipid.lipid.info.num_ethers = (int)tmp.get("num_ethers");
+        if (tmp.containsKey("num_ethers")) lipid.lipid.getInfo().num_ethers = (int)tmp.get("num_ethers");
 
         content = lipid;
     }

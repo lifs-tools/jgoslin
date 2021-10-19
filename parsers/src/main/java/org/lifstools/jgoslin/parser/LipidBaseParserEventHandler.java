@@ -44,6 +44,8 @@ import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 
 /**
@@ -51,17 +53,17 @@ import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
  * @author dominik
  */
 public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
-    public LipidLevel level = LipidLevel.FULL_STRUCTURE;
-    public String head_group = "";
-    public FattyAcid lcb = null;
-    public ArrayList<FattyAcid> fa_list = new ArrayList<>();
-    public FattyAcid current_fa = null;
-    public Adduct adduct = null;
-    public ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
-    public boolean use_head_group = false;
+    protected LipidLevel level = LipidLevel.FULL_STRUCTURE;
+    protected String head_group = "";
+    protected FattyAcid lcb = null;
+    protected List<FattyAcid> fa_list = new LinkedList<>();
+    protected FattyAcid current_fa = null;
+    protected Adduct adduct = null;
+    protected ArrayList<HeadgroupDecorator> headgroup_decorators = new ArrayList<>();
+    protected boolean use_head_group = false;
     protected KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups();
     
-    public static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
+    protected static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
 
     
     public void set_lipid_level(LipidLevel _level){

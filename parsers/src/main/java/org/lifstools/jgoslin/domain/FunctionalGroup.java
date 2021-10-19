@@ -34,7 +34,7 @@ import java.util.Map.Entry;
  */
 public class FunctionalGroup {
     public String name;
-    public int position;
+    public int position = -1;
     public int count;
     public String stereochemistry;
     public String ring_stereo;

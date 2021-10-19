@@ -679,7 +679,7 @@ public class Parser<T>
     
     
     
-    String get_error_message(){
+    public String get_error_message(){
         return error_message;
     }
     

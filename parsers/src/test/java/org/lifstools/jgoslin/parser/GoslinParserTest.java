@@ -48,13 +48,16 @@ public class GoslinParserTest {
     
     @Test
     public void testGoslinParserTest() {
-//        GoslinParser parser = new GoslinParser();
         LipidAdduct l = parser.parse("Cer 18:1(8Z);2/24:0");
         assertEquals("Cer 18:1(8);(OH)2/24:0", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.SN_POSITION));
         assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("Cer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
         assertEquals("C42H83NO3", l.get_sum_formula());
+        assertEquals("LCB", l.lipid.get_fa_list().get(0).name);
+        assertEquals(0, l.lipid.get_fa_list().get(0).position);
+        assertEquals("FA1", l.lipid.get_fa_list().get(1).name);
+        assertEquals(2, l.lipid.get_fa_list().get(1).position);
 
         l = parser.parse("HexCer 18:1(5Z);2/24:0");
         assertEquals("HexCer 18:1(5);OH/24:0", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
@@ -97,6 +100,14 @@ public class GoslinParserTest {
         assertEquals("EPC 16:2;O2/22:1;O", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("EPC 38:3;O3", l.get_lipid_string(LipidLevel.SPECIES));
         assertEquals("C40H77N2O7P", l.get_sum_formula());
+        
+        l = parser.parse("BMP 18:1-18:1");
+        assertEquals("C42H79O10P", l.get_sum_formula());
+        assertEquals(4, l.lipid.get_fa_list().size());
+        assertEquals("FA1", l.lipid.get_fa_list().get(0).name);
+        assertEquals(0, l.lipid.get_fa_list().get(0).position);
+        assertEquals("FA2", l.lipid.get_fa_list().get(1).name);
+        assertEquals(0, l.lipid.get_fa_list().get(1).position);
     }
 
     @ParameterizedTest

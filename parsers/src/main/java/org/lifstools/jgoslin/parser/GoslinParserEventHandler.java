@@ -39,9 +39,9 @@ import java.util.ArrayList;
 
 public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
-    public int db_position;
-    public String db_cistrans;
-    public boolean unspecified_ether;
+    private int db_position;
+    private String db_cistrans;
+    private boolean unspecified_ether;
     
     public GoslinParserEventHandler() {
         this(new KnownFunctionalGroups());
@@ -125,7 +125,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         level = LipidLevel.FULL_STRUCTURE;
         head_group = "";
         lcb = null;
-        fa_list = new ArrayList<>();
+        fa_list.clear();
         current_fa = null;
         adduct = null;
         db_position = 0;
@@ -241,6 +241,8 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         if (lcb != null){
             for (FattyAcid fa : fa_list) fa.position += 1;
             fa_list.add(0, lcb);
+            lcb = null;
+            current_fa = null;
         }
 
         Headgroup headgroup = prepare_headgroup_and_checks();

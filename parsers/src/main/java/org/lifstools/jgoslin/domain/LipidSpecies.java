@@ -27,17 +27,19 @@ package org.lifstools.jgoslin.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import lombok.Data;
 
 /**
  *
  * @author dominik
  */
+@Data
 public class LipidSpecies {
-    public Headgroup headgroup;
-    public LipidSpeciesInfo info;
+    protected Headgroup headgroup;
+    protected LipidSpeciesInfo info;
 
-    public HashMap<String, FattyAcid> fa = new HashMap<>();
-    public ArrayList<FattyAcid> fa_list = new ArrayList<>();
+    protected HashMap<String, FattyAcid> fa = new HashMap<>();
+    protected ArrayList<FattyAcid> fa_list = new ArrayList<>();
 
     public LipidSpecies(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
         this(_headgroup, null, knownFunctionalGroups);

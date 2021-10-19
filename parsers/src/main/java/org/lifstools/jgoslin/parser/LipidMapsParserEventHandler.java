@@ -45,17 +45,17 @@ import java.util.HashSet;
 
 public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
    
-    public boolean omit_fa;
-    public int db_numbers;
-    public int db_position;
-    public String db_cistrans;
-    public String mod_text;
-    public int mod_pos;
-    public int mod_num;
-    public boolean add_omega_linoleoyloxy_Cer;
+    private boolean omit_fa;
+    private int db_numbers;
+    private int db_position;
+    private String db_cistrans;
+    private String mod_text;
+    private int mod_pos;
+    private int mod_num;
+    private boolean add_omega_linoleoyloxy_Cer;
 
-    public static final HashSet<String> head_group_exceptions = new HashSet<>(Arrays.asList("PA", "PC", "PE", "PG", "PI", "PS"));
-    public static final HashMap<String, Integer> acer_heads = new HashMap<>(){{
+    private static final HashSet<String> head_group_exceptions = new HashSet<>(Arrays.asList("PA", "PC", "PE", "PG", "PI", "PS"));
+    private static final HashMap<String, Integer> acer_heads = new HashMap<>(){{
         put("1-O-myristoyl", 14);
         put("1-O-palmitoyl", 16);
         put("1-O-stearoyl", 18);
@@ -161,7 +161,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         head_group = "";
         lcb = null;
         adduct = null;
-        fa_list = new ArrayList<>();
+        fa_list.clear();
         current_fa = null;
         use_head_group = false;
         omit_fa = false;
@@ -171,7 +171,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         mod_pos = -1;
         mod_num = 1;
         mod_text = "";
-        headgroup_decorators = new ArrayList<>();
+        headgroup_decorators.clear();
         add_omega_linoleoyloxy_Cer = false;
     }
 

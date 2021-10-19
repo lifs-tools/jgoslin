@@ -109,12 +109,12 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
         adduct = null;
         head_group = "";
         lcb = null;
-        fa_list = new ArrayList<>();
+        fa_list.clear();
         current_fa = null;
         use_head_group = false;
         db_position = 0;
         db_cistrans = "";
-        headgroup_decorators = new ArrayList<>();
+        headgroup_decorators.clear();
         suffix_number = -1;
     }
 

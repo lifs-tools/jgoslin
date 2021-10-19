@@ -49,8 +49,8 @@ import org.lifstools.jgoslin.domain.Dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
@@ -60,12 +60,12 @@ import java.util.Map.Entry;
 public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
     
     private final KnownFunctionalGroups knownFunctionalGroups;
-    public LipidLevel level;
-    public String headgroup;
-    public ArrayDeque<FattyAcid> fatty_acyl_stack;
-    public Dictionary tmp;
+    private LipidLevel level;
+    private String headgroup;
+    private ArrayDeque<FattyAcid> fatty_acyl_stack;
+    private Dictionary tmp;
 
-    public static final HashMap<String, Integer> last_numbers = new HashMap<>(){{
+    private static final HashMap<String, Integer> last_numbers = new HashMap<>(){{
         put("un", 1); put("hen", 1);
         put("do", 2); put("di", 2);
         put("tri", 3);
@@ -77,7 +77,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         put("nona", 9); put("non", 9);
     }};
 
-    public static final HashMap<String, Integer> second_numbers = new HashMap<>(){{
+    private static final HashMap<String, Integer> second_numbers = new HashMap<>(){{
         put("deca", 10); put("dec", 10); put("eicosa", 20); put("eicos", 20);
         put("cosa", 20); put("cos", 20); put("triaconta", 30); put("triacont", 30);
         put("tetraconta", 40); put("tetracont", 40); put("pentaconta", 50);
@@ -86,7 +86,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         put("octacont", 80); put("nonaconta", 90); put("nonacont", 90);
     }};
 
-    public static final HashMap<String, String> func_groups = new HashMap<>(){{
+    private static final HashMap<String, String> func_groups = new HashMap<>(){{
         put("keto", "oxo"); put("ethyl", "Et"); put("hydroxy", "OH"); put("phospho", "Ph");
         put("oxo", "oxo"); put("bromo", "Br"); put("methyl", "Me"); put("hydroperoxy", "OOH");
         put("homo", ""); put("Epoxy", "Ep"); put("fluro", "F"); put("fluoro", "F");
@@ -100,21 +100,21 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         put("imino", "NH"); put("s-cysteinylglycinyl", "SCG");
     }};
 
-    public static final HashMap<String, Integer> ate = new HashMap<>(){{
+    private static final HashMap<String, Integer> ate = new HashMap<>(){{
         put("formate", 1); put("acetate", 2); put("butyrate", 4); put("propionate", 3);
         put("valerate", 5); put("isobutyrate", 4);
     }};
 
-    public static final HashMap<String, Integer> special_numbers = new HashMap<>(){{
+    private static final HashMap<String, Integer> special_numbers = new HashMap<>(){{
         put("meth", 1); put("etha", 2); put("eth", 2); put("propa", 3); put("isoprop", 3);
         put("prop", 3); put("propi", 3); put("propio", 3); put("buta", 4); put("but", 4);
         put("butr", 4); put("furan", 5); put("valer", 5); put("eicosa", 20); put("eicos", 20);
         put("icosa", 20); put("icos", 20); put("prosta", 20); put("prost", 20); put("prostan", 20);
     }};
 
-    public static final HashSet<String> noic_set = new HashSet<>(Arrays.asList("noic acid", "nic acid", "dioic_acid"));
-    public static final HashSet<String> nal_set = new HashSet<>(Arrays.asList("nal", "dial"));
-    public static final HashSet<String> acetate_set = new HashSet<>(Arrays.asList("acetate", "noate", "nate"));
+    private static final HashSet<String> noic_set = new HashSet<>(Arrays.asList("noic acid", "nic acid", "dioic_acid"));
+    private static final HashSet<String> nal_set = new HashSet<>(Arrays.asList("nal", "dial"));
+    private static final HashSet<String> acetate_set = new HashSet<>(Arrays.asList("acetate", "noate", "nate"));
     
     public FattyAcidParserEventHandler(){ 
         this(new KnownFunctionalGroups());

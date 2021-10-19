@@ -39,9 +39,9 @@ import java.util.HashMap;
  */
 public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     
-    public int db_position;
-    public String db_cistrans;
-    public Dictionary furan = null;
+    private int db_position;
+    private String db_cistrans;
+    private Dictionary furan = null;
     
     public HmdbParserEventHandler() {
         this(new KnownFunctionalGroups());
@@ -111,7 +111,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         head_group = "";
         lcb = null;
         adduct = null;
-        fa_list = new ArrayList<>();
+        fa_list.clear();
         current_fa = null;
         use_head_group = false;
         db_position = 0;
