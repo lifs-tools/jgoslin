@@ -35,7 +35,7 @@ public class LipidMapsParserTest {
     
     @BeforeAll
     public static void setupParser() {
-        parser = new LipidMapsParser();
+        parser = LipidMapsParser.newInstance();
     }
     
     @Test

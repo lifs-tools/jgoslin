@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.StringFunctions;
@@ -32,17 +31,29 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  * @author dominik
  */
 public class FattyAcidParser extends Parser<LipidAdduct> {
-    public FattyAcidParser(){
-        super(new FattyAcidParserEventHandler(), "FattyAcids.g4", StringFunctions.DEFAULT_QUOTE);
+
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("FattyAcids.g4");
+
+    private FattyAcidParser(String grammarContent, char quote) {
+        super(new FattyAcidParserEventHandler(), grammarContent, quote);
     }
-    
+
+    public static FattyAcidParser newInstance(String grammarResourcePath, char quote) {
+        return new FattyAcidParser(readGrammarContent(grammarResourcePath), quote);
+    }
+
+    public static FattyAcidParser newInstance() {
+        return new FattyAcidParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
     @Override
-    public LipidAdduct parse(String text){
+    public LipidAdduct parse(String text) {
         return super.parse(text.toLowerCase(), true);
     }
-    
+
     @Override
-    public LipidAdduct parse(String text, boolean with_exception){
+    public LipidAdduct parse(String text, boolean with_exception) {
         return super.parse(text.toLowerCase(), with_exception);
     }
+
 }

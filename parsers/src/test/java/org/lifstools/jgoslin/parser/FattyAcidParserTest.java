@@ -44,9 +44,9 @@ public class FattyAcidParserTest {
 
     @BeforeAll
     public static void setupParsers() {
-        sfp = new SumFormulaParser();
-        fatty_acid_parser = new FattyAcidParser();
-        shorthand_parser = new ShorthandParser();
+        sfp = SumFormulaParser.newInstance();
+        fatty_acid_parser = FattyAcidParser.newInstance();
+        shorthand_parser = ShorthandParser.newInstance();
     }
     
     @Test

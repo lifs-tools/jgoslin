@@ -36,9 +36,9 @@ public class SumFormulaTest {
 
     @BeforeAll
     public static void setupParsers() {
-        lipid_maps_parser = new LipidMapsParser();
-        swiss_lipids_parser = new SwissLipidsParser();
-        goslin_parser = new GoslinParser();
+        lipid_maps_parser = LipidMapsParser.newInstance();
+        swiss_lipids_parser = SwissLipidsParser.newInstance();
+        goslin_parser = GoslinParser.newInstance();
     }
 
     @ParameterizedTest

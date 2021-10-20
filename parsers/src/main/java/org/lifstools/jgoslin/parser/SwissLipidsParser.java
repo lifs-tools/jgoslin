@@ -31,7 +31,19 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  * @author dominik
  */
 public class SwissLipidsParser extends Parser<LipidAdduct> {
-    public SwissLipidsParser(){
-        super(new SwissLipidsParserEventHandler(), "SwissLipids.g4", StringFunctions.DEFAULT_QUOTE);
+       
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SwissLipids.g4");
+
+    private SwissLipidsParser(String grammarContent, char quote) {
+        super(new SwissLipidsParserEventHandler(), grammarContent, quote);
     }
+
+    public static SwissLipidsParser newInstance(String grammarResourcePath, char quote) {
+        return new SwissLipidsParser(readGrammarContent(grammarResourcePath), quote);
+    }
+
+    public static SwissLipidsParser newInstance() {
+        return new SwissLipidsParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
 }

@@ -85,27 +85,15 @@ public class Parser<T>
     
     
 
-    public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammar_filename){
-        this(_parserEventHandler, grammar_filename, (char)'\0');
+    public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammarContent){
+        this(_parserEventHandler, grammarContent, (char)'\0');
     }
     
 
-    public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammar_filename, char _quote){
+    public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammarContent, char _quote){
         this.quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
         this.parser_event_handler = _parserEventHandler;
-
-         
-        StringBuilder sb = new StringBuilder();
-        // read resource from classpath and current thread's context class loader
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(grammar_filename)));) {
-            br.lines().forEach(line -> {
-                sb.append(line).append("\n");
-            });
-        } catch(IOException e) {
-            //always pass on the original exception
-            throw new RuntimeException("Error: file '" + grammar_filename + "' does not exist.", e);
-        }
-        read_grammar(sb.toString());
+        read_grammar(grammarContent);
     }
     
 
@@ -809,6 +797,20 @@ public class Parser<T>
                     }
                 }
             }
+        }
+    }
+    
+    protected static String readGrammarContent(String grammarResourcePath) {
+        StringBuilder sb = new StringBuilder();
+        // read resource from classpath and current thread's context class loader
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(grammarResourcePath)));) {
+            br.lines().forEach(line -> {
+                sb.append(line).append("\n");
+            });
+            return sb.toString();
+        } catch (IOException e) {
+            //always pass on the original exception
+            throw new RuntimeException("Error: resource '" + grammarResourcePath + "' does not exist.", e);
         }
     }
 }

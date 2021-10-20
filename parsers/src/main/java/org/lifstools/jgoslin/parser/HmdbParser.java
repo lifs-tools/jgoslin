@@ -23,7 +23,19 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  * @author dominik
  */
 public class HmdbParser extends Parser<LipidAdduct> {
-    public HmdbParser(){
-        super(new HmdbParserEventHandler(), "HMDB.g4", StringFunctions.DEFAULT_QUOTE);
+
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("HMDB.g4");
+
+    private HmdbParser(String grammarContent, char quote) {
+        super(new HmdbParserEventHandler(), grammarContent, quote);
     }
+
+    public static HmdbParser newInstance(String grammarResourcePath, char quote) {
+        return new HmdbParser(readGrammarContent(grammarResourcePath), quote);
+    }
+
+    public static HmdbParser newInstance() {
+        return new HmdbParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
 }

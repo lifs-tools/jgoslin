@@ -20,9 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.StringFunctions;
@@ -33,7 +31,19 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  * @author dominik
  */
 public class GoslinParser extends Parser<LipidAdduct> {
-    public GoslinParser(){
-        super(new GoslinParserEventHandler(), "Goslin.g4", StringFunctions.DEFAULT_QUOTE);
+
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Goslin.g4");
+
+    private GoslinParser(String grammarContent, char quote) {
+        super(new GoslinParserEventHandler(), grammarContent, quote);
     }
+
+    public static GoslinParser newInstance(String grammarResourcePath, char quote) {
+        return new GoslinParser(readGrammarContent(grammarResourcePath), quote);
+    }
+
+    public static GoslinParser newInstance() {
+        return new GoslinParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+    
 }

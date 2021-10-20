@@ -20,9 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.StringFunctions;
@@ -33,7 +31,19 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  * @author dominik
  */
 public class LipidMapsParser extends Parser<LipidAdduct> {
-    public LipidMapsParser(){
-        super(new LipidMapsParserEventHandler(), "LipidMaps.g4", StringFunctions.DEFAULT_QUOTE);
+
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("LipidMaps.g4");
+
+    private LipidMapsParser(String grammarContent, char quote) {
+        super(new LipidMapsParserEventHandler(), grammarContent, quote);
     }
+
+    public static LipidMapsParser newInstance(String grammarResourcePath, char quote) {
+        return new LipidMapsParser(readGrammarContent(grammarResourcePath), quote);
+    }
+
+    public static LipidMapsParser newInstance() {
+        return new LipidMapsParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
 }

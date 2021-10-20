@@ -43,12 +43,12 @@ public class LipidParser {
 
     public LipidParser() {
         this(
-                new ShorthandParser(),
-                new FattyAcidParser(),
-                new GoslinParser(),
-                new LipidMapsParser()
-        //new SwissLipidsParser(),
-        //new HmdbParser()
+                ShorthandParser.newInstance(),
+                FattyAcidParser.newInstance(),
+                GoslinParser.newInstance(),
+                LipidMapsParser.newInstance(),
+                SwissLipidsParser.newInstance(),
+                HmdbParser.newInstance()
         );
     }
 

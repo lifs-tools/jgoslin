@@ -464,22 +464,22 @@ public class CmdLineParser {
             for (ValidationResult.Grammar grammar : ValidationResult.Grammar.values()) {
                 switch (grammar) {
                     case FATTY_ACID:
-                        parsers.put(grammar, new FattyAcidParser());
+                        parsers.put(grammar, FattyAcidParser.newInstance());
                         break;
                     case GOSLIN:
-                        parsers.put(grammar, new GoslinParser());
+                        parsers.put(grammar, GoslinParser.newInstance());
                         break;
                     case HMDB:
-                        parsers.put(grammar, new HmdbParser());
+                        parsers.put(grammar, HmdbParser.newInstance());
                         break;
                     case LIPIDMAPS:
-                        parsers.put(grammar, new LipidMapsParser());
+                        parsers.put(grammar, LipidMapsParser.newInstance());
                         break;
                     case SHORTHAND:
-                        parsers.put(grammar, new ShorthandParser());
+                        parsers.put(grammar, ShorthandParser.newInstance());
                         break;
                     case SWISSLIPIDS:
-                        parsers.put(grammar, new SwissLipidsParser());
+                        parsers.put(grammar, SwissLipidsParser.newInstance());
                         break;
                     case GOSLIN_FRAGMENTS:
                         //FIXME skipping for now

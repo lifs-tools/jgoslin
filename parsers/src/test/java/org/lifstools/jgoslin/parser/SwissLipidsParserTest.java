@@ -35,7 +35,7 @@ public class SwissLipidsParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = new SwissLipidsParser();
+        parser = SwissLipidsParser.newInstance();
     }
 
     @Test

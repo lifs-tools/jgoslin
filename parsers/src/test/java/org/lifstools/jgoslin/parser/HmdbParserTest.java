@@ -35,7 +35,7 @@ public class HmdbParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = new HmdbParser();
+        parser = HmdbParser.newInstance();
     }
 
     @Test

@@ -20,9 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.StringFunctions;
@@ -33,7 +31,19 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  * @author dominik
  */
 public class ShorthandParser extends Parser<LipidAdduct> {
-    public ShorthandParser(){
-        super(new ShorthandParserEventHandler(), "Shorthand2020.g4", StringFunctions.DEFAULT_QUOTE);
+
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Shorthand2020.g4");
+
+    private ShorthandParser(String grammarContent, char quote) {
+        super(new ShorthandParserEventHandler(), grammarContent, quote);
     }
+
+    public static ShorthandParser newInstance(String grammarResourcePath, char quote) {
+        return new ShorthandParser(readGrammarContent(grammarResourcePath), quote);
+    }
+
+    public static ShorthandParser newInstance() {
+        return new ShorthandParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
 }

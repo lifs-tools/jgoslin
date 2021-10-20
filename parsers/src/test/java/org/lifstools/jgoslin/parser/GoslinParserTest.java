@@ -43,7 +43,7 @@ public class GoslinParserTest {
     
     @BeforeAll
     public static void setupParser() {
-        parser = new GoslinParser();
+        parser = GoslinParser.newInstance();
     }
     
     @Test
