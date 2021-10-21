@@ -31,7 +31,7 @@ jobs:
     - name: Setup Maven settings.xml
       uses: whelk-io/maven-settings-xml-action@v14
       with:
-        servers: '[{ "id": "lifstools-jfrog", "username": "${env.ARTIFACTORY_USERNAME_REF}", "password": "${env.ARTIFACTORY_TOKEN_REF}" }]'
+        servers: '[{ "id": "lifstools-jfrog", "username": "github-deployer", "password": "${secrets.ARTIFACTORY_TOKEN}" }]'
     - name: Set Release version env variable
       env:
         USERNAME: ${{ github.actor }}
