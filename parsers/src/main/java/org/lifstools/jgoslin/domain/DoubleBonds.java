@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.HashMap;
@@ -31,36 +30,32 @@ import java.util.HashMap;
  * @author dominik
  */
 public class DoubleBonds {
-    
-    public int num_double_bonds;
-    public final HashMap<Integer, String> double_bond_positions;
 
-    
-    public DoubleBonds(){
-        num_double_bonds = 0;
-        double_bond_positions = new HashMap<>();
+    public int numDoubleBonds;
+    public final HashMap<Integer, String> doubleBondPositions;
+
+    public DoubleBonds() {
+        numDoubleBonds = 0;
+        doubleBondPositions = new HashMap<>();
     }
-    
+
     public DoubleBonds(int num) {
-        num_double_bonds = num;
-        double_bond_positions = new HashMap<>();
+        numDoubleBonds = num;
+        doubleBondPositions = new HashMap<>();
     }
 
-
-    public DoubleBonds copy(){
-        DoubleBonds db = new DoubleBonds(num_double_bonds);
-        double_bond_positions.entrySet().forEach(kv -> {
-            db.double_bond_positions.put(kv.getKey(), kv.getValue());
+    public DoubleBonds copy() {
+        DoubleBonds db = new DoubleBonds(numDoubleBonds);
+        doubleBondPositions.entrySet().forEach(kv -> {
+            db.doubleBondPositions.put(kv.getKey(), kv.getValue());
         });
         return db;
     }
 
-
-    public int get_num() {
-        if (double_bond_positions.size() > 0 && double_bond_positions.size() != num_double_bonds)
-        {
-            throw new ConstraintViolationException("Number of double bonds '" + Integer.toString(num_double_bonds) + "' does not match to number of double bond positions '" + Integer.toString(double_bond_positions.size()) + "'");
+    public int getNum() {
+        if (doubleBondPositions.size() > 0 && doubleBondPositions.size() != numDoubleBonds) {
+            throw new ConstraintViolationException("Number of double bonds '" + Integer.toString(numDoubleBonds) + "' does not match to number of double bond positions '" + Integer.toString(doubleBondPositions.size()) + "'");
         }
-        return num_double_bonds;
+        return numDoubleBonds;
     }
 }

@@ -25,7 +25,7 @@ public class UnsupportedLipidException extends LipidException {
         super();
     }
 
-    public UnsupportedLipidException(String message){
+    public UnsupportedLipidException(String message) {
         super(message);
     }
 

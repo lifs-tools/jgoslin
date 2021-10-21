@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.Collection;
@@ -30,32 +30,32 @@ import java.util.Collection;
  * @author dominik
  */
 public class LipidFullStructure extends LipidStructureDefined {
-    public LipidFullStructure(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+
+    public LipidFullStructure(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
         this(_headgroup, null, knownFunctionalGroups);
     }
-    
-    public LipidFullStructure(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
+
+    public LipidFullStructure(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.FULL_STRUCTURE;
     }
 
-
     @Override
-    public LipidLevel get_lipid_level(){
+    public LipidLevel getLipidLevel() {
         return LipidLevel.FULL_STRUCTURE;
     }
 
     @Override
-    public String get_lipid_string(){
-        return get_lipid_string(LipidLevel.NO_LEVEL);
+    public String getLipidString() {
+        return getLipidString(LipidLevel.NO_LEVEL);
     }
 
     @Override
-    public String get_lipid_string(LipidLevel level){
-        switch(level){
+    public String getLipidString(LipidLevel level) {
+        switch (level) {
             case NO_LEVEL:
             case FULL_STRUCTURE:
-                return super.build_lipid_subspecies_name(LipidLevel.FULL_STRUCTURE);
+                return super.buildLipidSubspeciesName(LipidLevel.FULL_STRUCTURE);
 
             case STRUCTURE_DEFINED:
             case SN_POSITION:
@@ -63,7 +63,7 @@ public class LipidFullStructure extends LipidStructureDefined {
             case SPECIES:
             case CATEGORY:
             case CLASS:
-                return super.get_lipid_string(level);
+                return super.getLipidString(level);
 
             default:
                 throw new IllegalArgumentException("LipidFullStructure does not know how to create a lipid string for level " + level.toString());

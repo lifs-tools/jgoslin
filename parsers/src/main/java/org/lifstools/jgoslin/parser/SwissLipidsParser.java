@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidAdduct;
@@ -31,7 +31,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  * @author dominik
  */
 public class SwissLipidsParser extends Parser<LipidAdduct> {
-       
+
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SwissLipids.g4");
 
     private SwissLipidsParser(String grammarContent, char quote) {

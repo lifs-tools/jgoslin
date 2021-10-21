@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.Map.Entry;
@@ -31,63 +30,59 @@ import java.util.Map.Entry;
  * @author dominik
  */
 public class HeadgroupDecorator extends FunctionalGroup {
+
     public boolean suffix;
-    public LipidLevel lowest_visible_level;
-    
-    public HeadgroupDecorator(String _name, KnownFunctionalGroups knownFunctionalGroups){
+    public LipidLevel lowestVisibleLevel;
+
+    public HeadgroupDecorator(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, -1, 1, null, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);
     }
 
-    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups){
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, _position, _count, _elements, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);
     }
-    
-    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, KnownFunctionalGroups knownFunctionalGroups){
+
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, _position, _count, _elements, _suffix, LipidLevel.NO_LEVEL, knownFunctionalGroups);
     }
-    
-    
-    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, LipidLevel _level, KnownFunctionalGroups knownFunctionalGroups){
+
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, LipidLevel _level, KnownFunctionalGroups knownFunctionalGroups) {
         super(_name, _position, _count, null, false, "", _elements, knownFunctionalGroups);
         suffix = _suffix;
-        lowest_visible_level = _level;
+        lowestVisibleLevel = _level;
     }
 
     @Override
-    public FunctionalGroup copy(){
+    public FunctionalGroup copy() {
         ElementTable e = new ElementTable();
-        for (Entry<Element, Integer> kv : elements.entrySet()){
+        for (Entry<Element, Integer> kv : elements.entrySet()) {
             e.put(kv.getKey(), e.get(kv.getKey()) + kv.getValue());
         }
-        return new HeadgroupDecorator(name, position, count, e, suffix, lowest_visible_level, knownFunctionalGroups);
+        return new HeadgroupDecorator(name, position, count, e, suffix, lowestVisibleLevel, knownFunctionalGroups);
     }
 
-
     @Override
-    public String to_string(LipidLevel level){
-        if (!suffix) return name;
+    public String toString(LipidLevel level) {
+        if (!suffix) {
+            return name;
+        }
         String decorator_string = "";
-        if ((lowest_visible_level == LipidLevel.NO_LEVEL) || (lowest_visible_level.level <= level.level)){
+        if ((lowestVisibleLevel == LipidLevel.NO_LEVEL) || (lowestVisibleLevel.level <= level.level)) {
 
-            if (functional_groups.containsKey("decorator_alkyl")){
-                if (functional_groups.get("decorator_alkyl").size() > 0){
-                    decorator_string = (level.level > LipidLevel.SPECIES.level) ? functional_groups.get("decorator_alkyl").get(0).to_string(level) : "Alk";
-                }
-                else {
+            if (functionalGroups.containsKey("decorator_alkyl")) {
+                if (functionalGroups.get("decorator_alkyl").size() > 0) {
+                    decorator_string = (level.level > LipidLevel.SPECIES.level) ? functionalGroups.get("decorator_alkyl").get(0).toString(level) : "Alk";
+                } else {
                     decorator_string = "Alk";
                 }
-            }
-            else if (functional_groups.containsKey("decorator_acyl")) {
-                if (functional_groups.get("decorator_acyl").size() > 0){
-                    decorator_string = (level.level > LipidLevel.SPECIES.level) ? ("FA " + functional_groups.get("decorator_acyl").get(0).to_string(level)) :
-                    "FA";
-                }
-                else {
+            } else if (functionalGroups.containsKey("decorator_acyl")) {
+                if (functionalGroups.get("decorator_acyl").size() > 0) {
+                    decorator_string = (level.level > LipidLevel.SPECIES.level) ? ("FA " + functionalGroups.get("decorator_acyl").get(0).toString(level))
+                            : "FA";
+                } else {
                     decorator_string = "FA";
                 }
-            }
-            else
-            {
+            } else {
                 decorator_string = name;
             }
             decorator_string = "(" + decorator_string + ")";
@@ -95,7 +90,5 @@ public class HeadgroupDecorator extends FunctionalGroup {
 
         return decorator_string;
     }
-
-
 
 }

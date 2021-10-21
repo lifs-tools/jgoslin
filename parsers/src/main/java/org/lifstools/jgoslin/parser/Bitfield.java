@@ -20,10 +20,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.parser;
-
 
 /**
  *
@@ -31,74 +29,74 @@ package org.lifstools.jgoslin.parser;
  */
 // this class is dedicated to have an efficient sorted set class storing
 // values within 0..n-1 and fast sequencial iterator
-public class Bitfield {
-    public long[] field;
-    public int length;
-    public int field_len;
-    public int num_size;
-    public int iter = 0;
-    public int pos = 0;
+final class Bitfield {
 
-    public Bitfield(int _length){
+    private final long[] field;
+    private final int length;
+    private final int field_len;
+    private int num_size;
+    private int iter = 0;
+    private int pos = 0;
+
+    Bitfield(int _length) {
         length = _length;
         field_len = 1 + ((length + 1) >>> 6);
         field = new long[field_len];
         num_size = 0;
-        for (int i = 0; i < field_len; ++i) field[i] = 0L;
+        for (int i = 0; i < field_len; ++i) {
+            field[i] = 0L;
+        }
     }
 
-    public void add(int pos)
-    {
-        if (!find(pos)){
-            field[pos >>> 6] |= (long)(1L << (pos & 63));
+    void add(int pos) {
+        if (!find(pos)) {
+            field[pos >>> 6] |= (long) (1L << (pos & 63));
             ++num_size;
         }
     }
 
-
-    public boolean find(int pos)
-    {
+    boolean find(int pos) {
         return ((field[pos >>> 6] >>> (pos & 63)) & 1L) == 1L;
     }
 
-
-    public boolean isNotSet(int pos)
-    {
+    boolean isNotSet(int pos) {
         return ((field[pos >>> 6] >>> (pos & 63)) & 1L) == 0L;
     }
-    
-    public static void print_bitfield(long l){
-        for (int i = 63; i >= 0; --i){
+
+    static void printBitfield(long l) {
+        for (int i = 63; i >= 0; --i) {
             System.out.print(((l >>> i) & 1L));
-        } System.out.println();
+        }
+        System.out.println();
     }
-    
-    
-    public void reset_iterator(){
+
+    void resetIterator() {
         iter = 0;
         pos = -1;
     }
-    
-    
-    public boolean has_next(){
+
+    boolean hasNext() {
         return iter < num_size;
     }
 
-
-    public int next(){
+    int next() {
         pos += 1;
-        if (pos >= length) throw new RuntimeException("Bitfield out of range");
+        if (pos >= length) {
+            throw new RuntimeException("Bitfield out of range");
+        }
 
         int field_pos = pos >>> 6;
-        long field_bits = field[field_pos] & (long)(~((1L << (long)(pos & 63)) - 1L));
+        long field_bits = field[field_pos] & (long) (~((1L << (long) (pos & 63)) - 1L));
 
         do {
-            if (field_bits != 0){
-                pos = (field_pos << 6) + (int)java.lang.Long.numberOfTrailingZeros(field_bits & (-field_bits));
+            if (field_bits != 0) {
+                pos = (field_pos << 6) + (int) java.lang.Long.numberOfTrailingZeros(field_bits & (-field_bits));
                 iter += 1;
                 return pos;
             }
-            if (++field_pos < field_len) field_bits = field[field_pos];
+            if (++field_pos < field_len) {
+                field_bits = field[field_pos];
+            }
         } while (field_pos < field_len);
 
         throw new RuntimeException("Bitfield out of range");

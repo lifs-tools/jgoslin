@@ -34,11 +34,11 @@ import org.lifstools.jgoslin.domain.LipidParsingException;
  */
 public class LipidParser {
 
-    private final List<Parser<LipidAdduct>> parser_list;
+    private final List<Parser<LipidAdduct>> parserList;
     private Parser<LipidAdduct> lastSuccessfulParser = null;
 
     public LipidParser(Parser<LipidAdduct>... parsers) {
-        parser_list = Arrays.asList(parsers);
+        parserList = Arrays.asList(parsers);
     }
 
     public LipidParser() {
@@ -66,7 +66,7 @@ public class LipidParser {
     public LipidAdduct parse(String lipid_name) {
         lastSuccessfulParser = null;
         Parser<LipidAdduct> lastParser = null;
-        for (Parser<LipidAdduct> parser : parser_list) {
+        for (Parser<LipidAdduct> parser : parserList) {
             lastParser = parser;
             LipidAdduct lipid = parser.parse(lipid_name, false);
             if (lipid != null) {
@@ -74,7 +74,7 @@ public class LipidParser {
                 return lipid;
             }
         }
-        throw new LipidParsingException("Could not parse lipid '" + lipid_name + "'with any parser!" + ((lastParser != null) ? " Last message was: " + lastParser.error_message : ""));
+        throw new LipidParsingException("Could not parse lipid '" + lipid_name + "'with any parser!" + ((lastParser != null) ? " Last message was: " + lastParser.errorMessage : ""));
     }
 
     /**

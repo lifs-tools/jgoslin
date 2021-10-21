@@ -20,16 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 /**
  *
  * @author dominik
  */
-public enum LipidLevel
-{
+public enum LipidLevel {
     NO_LEVEL(1),
     UNDEFINED_LEVEL(2),
     CATEGORY(4), // Mediators, Glycerolipids, Glycerophospholipids, Sphingolipids, Steroids, Prenols
@@ -42,13 +40,12 @@ public enum LipidLevel
     COMPLETE_STRUCTURE(512); // e.g. PI 18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z);5OH[R]
 
     public int level;
-    LipidLevel(int l){
+
+    LipidLevel(int l) {
         level = l;
     }
 
-
-    public static boolean is_level(LipidLevel l, int pattern)
-    {
+    public static boolean isLevel(LipidLevel l, int pattern) {
         return (l.level & pattern) != 0;
     }
 }

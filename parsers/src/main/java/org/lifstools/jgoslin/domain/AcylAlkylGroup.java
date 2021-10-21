@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
@@ -31,63 +30,62 @@ import java.util.ArrayList;
  * @author dominik
  */
 public final class AcylAlkylGroup extends FunctionalGroup {
-    public boolean alkyl;
-    public boolean N_bond;
 
-    public AcylAlkylGroup(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups){
+    protected boolean alkyl;
+    protected boolean nitrogenBond;
+
+    public AcylAlkylGroup(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups) {
         this(_fa, -1, 1, false, false, knownFunctionalGroups);
     }
 
-    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, KnownFunctionalGroups knownFunctionalGroups){
+    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, KnownFunctionalGroups knownFunctionalGroups) {
         this(_fa, _position, _count, _alkyl, false, knownFunctionalGroups);
     }
 
-    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, boolean _N_bond, KnownFunctionalGroups knownFunctionalGroups){
+    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, boolean _N_bond, KnownFunctionalGroups knownFunctionalGroups) {
         super("O", _position, _count, knownFunctionalGroups);
         alkyl = _alkyl;
-        if (_fa != null){
+        if (_fa != null) {
             String key = (alkyl ? "alkyl" : "acyl");
-            functional_groups.put(key, new ArrayList<>());
-            functional_groups.get(key).add(_fa);
+            functionalGroups.put(key, new ArrayList<>());
+            functionalGroups.get(key).add(_fa);
         }
-        double_bonds.num_double_bonds = alkyl ? 0 : 1;
-        set_N_bond_type(_N_bond);
+        doubleBonds.numDoubleBonds = alkyl ? 0 : 1;
+        setNbondType(_N_bond);
 
     }
-
 
     @Override
-    public FunctionalGroup copy()
-    {
+    public FunctionalGroup copy() {
         String key = alkyl ? "alkyl" : "acyl";
-        return new AcylAlkylGroup((FattyAcid)functional_groups.get(key).get(0).copy(), position, count, alkyl, N_bond, knownFunctionalGroups);
+        return new AcylAlkylGroup((FattyAcid) functionalGroups.get(key).get(0).copy(), position, count, alkyl, nitrogenBond, knownFunctionalGroups);
     }
 
+    public void setNbondType(boolean _N_bond) {
+        nitrogenBond = _N_bond;
 
-    public void set_N_bond_type(boolean _N_bond)
-    {
-        N_bond = _N_bond;
-
-        if (N_bond){
+        if (nitrogenBond) {
             elements.put(Element.H, (alkyl ? 2 : 0));
             elements.put(Element.O, (alkyl ? -1 : 0));
             elements.put(Element.N, 1);
-        }
-        else {
+        } else {
             elements.put(Element.H, (alkyl ? 1 : -1));
             elements.put(Element.O, (alkyl ? 0 : 1));
         }
     }
 
-
     @Override
-    public String to_string(LipidLevel level){
+    public String toString(LipidLevel level) {
         StringBuilder acyl_alkyl_string = new StringBuilder();
-        if (level == LipidLevel.FULL_STRUCTURE) { acyl_alkyl_string.append(position); }
-        acyl_alkyl_string.append(N_bond ? "N" : "O").append("(");
-        if (!alkyl) { acyl_alkyl_string.append("FA "); }
-        String key = alkyl ? "alkyl" :"acyl";
-        acyl_alkyl_string.append(((FattyAcid)functional_groups.get(key).get(0)).to_string(level)).append(")");
+        if (level == LipidLevel.FULL_STRUCTURE) {
+            acyl_alkyl_string.append(position);
+        }
+        acyl_alkyl_string.append(nitrogenBond ? "N" : "O").append("(");
+        if (!alkyl) {
+            acyl_alkyl_string.append("FA ");
+        }
+        String key = alkyl ? "alkyl" : "acyl";
+        acyl_alkyl_string.append(((FattyAcid) functionalGroups.get(key).get(0)).toString(level)).append(")");
 
         return acyl_alkyl_string.toString();
     }

@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.Collection;
@@ -30,42 +30,38 @@ import java.util.Collection;
  * @author dominik
  */
 public class LipidSnPosition extends LipidMolecularSpecies {
-    public LipidSnPosition(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups){
+
+    public LipidSnPosition(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
         this(_headgroup, null, knownFunctionalGroups);
     }
-    
-    public LipidSnPosition(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups){
+
+    public LipidSnPosition(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.SN_POSITION;
     }
 
-
-
     @Override
-    public LipidLevel get_lipid_level()
-    {
+    public LipidLevel getLipidLevel() {
         return LipidLevel.SN_POSITION;
     }
 
-
     @Override
-    public String get_lipid_string(){
-        return get_lipid_string(LipidLevel.NO_LEVEL);
+    public String getLipidString() {
+        return getLipidString(LipidLevel.NO_LEVEL);
     }
 
-
     @Override
-    public String get_lipid_string(LipidLevel level){
-        switch(level){
+    public String getLipidString(LipidLevel level) {
+        switch (level) {
             case NO_LEVEL:
             case SN_POSITION:
-                return build_lipid_subspecies_name(LipidLevel.SN_POSITION);
+                return buildLipidSubspeciesName(LipidLevel.SN_POSITION);
 
             case MOLECULAR_SPECIES:
             case CATEGORY:
             case CLASS:
             case SPECIES:
-                return super.get_lipid_string(level);
+                return super.getLipidString(level);
 
             default:
                 throw new RuntimeException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());

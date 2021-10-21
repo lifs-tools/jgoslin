@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
@@ -31,38 +30,33 @@ import java.util.ArrayList;
  * @author dominik
  */
 public class CarbonChain extends FunctionalGroup {
-    public CarbonChain(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups){
+
+    public CarbonChain(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups) {
         this(_fa, -1, 1, knownFunctionalGroups);
     }
-    
-    
-    public CarbonChain(FattyAcid _fa, int _position, KnownFunctionalGroups knownFunctionalGroups){
+
+    public CarbonChain(FattyAcid _fa, int _position, KnownFunctionalGroups knownFunctionalGroups) {
         this(_fa, _position, 1, knownFunctionalGroups);
     }
-    
-    public CarbonChain(FattyAcid _fa, int _position, int _count, KnownFunctionalGroups knownFunctionalGroups){
+
+    public CarbonChain(FattyAcid _fa, int _position, int _count, KnownFunctionalGroups knownFunctionalGroups) {
         super("cc", _position, _count, knownFunctionalGroups);
-        if (_fa != null)
-        {
-            functional_groups.put("cc", new ArrayList<>());
-            functional_groups.get("cc").add(_fa);
+        if (_fa != null) {
+            functionalGroups.put("cc", new ArrayList<>());
+            functionalGroups.get("cc").add(_fa);
         }
 
         elements.put(Element.H, 1);
         elements.put(Element.O, -1);
     }
 
-
     @Override
-    public FunctionalGroup copy()
-    {
-        return new CarbonChain((FattyAcid)functional_groups.get("cc").get(0).copy(), position, count, knownFunctionalGroups);
+    public FunctionalGroup copy() {
+        return new CarbonChain((FattyAcid) functionalGroups.get("cc").get(0).copy(), position, count, knownFunctionalGroups);
     }
 
-
     @Override
-    public String to_string(LipidLevel level)
-    {
-        return (LipidLevel.is_level(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(position) : "") + "(" + ((FattyAcid)functional_groups.get("cc").get(0)).to_string(level) + ")";
+    public String toString(LipidLevel level) {
+        return (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(position) : "") + "(" + ((FattyAcid) functionalGroups.get("cc").get(0)).toString(level) + ")";
     }
 }

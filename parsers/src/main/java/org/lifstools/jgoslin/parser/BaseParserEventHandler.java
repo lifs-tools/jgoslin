@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidParsingException;
@@ -35,51 +34,48 @@ import java.util.function.Consumer;
  * @param <T>
  */
 public abstract class BaseParserEventHandler<T> {
-    public HashMap<String, Consumer<TreeNode>> registered_events = new HashMap<>();
-    public HashSet<String> rule_names = new HashSet<>();
-    public Parser<T> parser = null;
-    public String debug = "";
-    public T content = null;
 
-    public BaseParserEventHandler()
-    {
-        registered_events = new HashMap<>();
-        rule_names = new HashSet<>();
+    protected HashMap<String, Consumer<TreeNode>> registeredEvents = new HashMap<>();
+    protected HashSet<String> ruleNames = new HashSet<>();
+    protected Parser<T> parser = null;
+    protected String debug = "";
+    protected T content = null;
+
+    public BaseParserEventHandler() {
+        registeredEvents = new HashMap<>();
+        ruleNames = new HashSet<>();
     }
 
-
     // checking if all registered events are reasonable and orrur as rules in the grammar
-    public void sanity_check()
-    {
-        for (String event_name : registered_events.keySet()) {
-            if (!event_name.endsWith("_pre_event") && !event_name.endsWith("_post_event")){
+    void sanityCheck() {
+        for (String event_name : registeredEvents.keySet()) {
+            if (!event_name.endsWith("_pre_event") && !event_name.endsWith("_post_event")) {
                 throw new RuntimeException("Parser event handler error: event '" + event_name + "' does not contain the suffix '_pre_event' or '_post_event'");
             }
             String rule_name = event_name.replace("_pre_event", "").replace("_post_event", "");
-            if (!rule_names.contains(rule_name)){
-                throw new RuntimeException("Parser event handler error: rule '" + rule_name + "' in event '" + event_name + "' is not present in the grammar" + (parser != null ? " '" + parser.grammar_name + "'" : ""));
+            if (!ruleNames.contains(rule_name)) {
+                throw new RuntimeException("Parser event handler error: rule '" + rule_name + "' in event '" + event_name + "' is not present in the grammar" + (parser != null ? " '" + parser.grammarName + "'" : ""));
             }
         }
     }
 
-
-    public void handle_event(String event_name, TreeNode node)
-    {
-        if (debug.equals("full")){
-            String reg_event = registered_events.containsKey(event_name) ? "*" : "";
-            System.out.println(event_name + reg_event + ": \"" + node.get_text() + "\"");
+    void handleEvent(String event_name, TreeNode node) {
+        if (debug.equals("full")) {
+            String reg_event = registeredEvents.containsKey(event_name) ? "*" : "";
+            System.out.println(event_name + reg_event + ": \"" + node.getText() + "\"");
         }
 
-        if (registered_events.containsKey(event_name)){
-            if (!debug.equals("") && !debug.equals("full")){
-                System.out.println(event_name + ": \"" + node.get_text() + "\"");
+        if (registeredEvents.containsKey(event_name)) {
+            if (!debug.equals("") && !debug.equals("full")) {
+                System.out.println(event_name + ": \"" + node.getText() + "\"");
             }
             try {
-                registered_events.get(event_name).accept(node);
-            }
-            catch (Exception e){
+                registeredEvents.get(event_name).accept(node);
+            } catch (Exception e) {
                 throw new LipidParsingException(e.toString(), e);
             }
         }
     }
-}   
+    
+    abstract void resetParser(TreeNode node);
+}

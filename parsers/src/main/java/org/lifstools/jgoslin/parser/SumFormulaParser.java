@@ -31,7 +31,7 @@ import org.lifstools.jgoslin.domain.ElementTable;
  * @author dominik
  */
 public class SumFormulaParser extends Parser<ElementTable> {
-    
+
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SumFormula.g4");
 
     private SumFormulaParser(String grammarContent, char quote) {
@@ -45,5 +45,5 @@ public class SumFormulaParser extends Parser<ElementTable> {
     public static SumFormulaParser newInstance() {
         return new SumFormulaParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
-    
+
 }

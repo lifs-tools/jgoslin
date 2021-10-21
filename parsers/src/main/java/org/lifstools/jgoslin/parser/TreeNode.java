@@ -20,24 +20,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.parser;
 
 /**
  *
  * @author dominik
  */
-public class TreeNode{
-    public long rule_index;
-    public TreeNode left;
-    public TreeNode right;
-    public char terminal;
-    public boolean fire_event;
+public final class TreeNode {
+
+    long rule_index;
+    TreeNode left;
+    TreeNode right;
+    char terminal;
+    boolean fire_event;
     public static final char EOF_SIGN = '\0';
     public static final String ONE_STR = "\0";
 
-    public TreeNode(long _rule, boolean _fire_event){
+    TreeNode(long _rule, boolean _fire_event) {
         rule_index = _rule;
         left = null;
         right = null;
@@ -45,16 +45,16 @@ public class TreeNode{
         fire_event = _fire_event;
     }
 
-    public String get_text(){
-        if (terminal == '\0'){
-            String left_str = left.get_text();
-            String right_str = right != null ? right.get_text() : "";
+    String getText() {
+        if (terminal == '\0') {
+            String left_str = left.getText();
+            String right_str = right != null ? right.getText() : "";
             return (!left_str.equals(ONE_STR) ? left_str : "") + (!right_str.equals(ONE_STR) ? right_str : "");
         }
         return String.valueOf(terminal);
     }
-    
-    public int get_int(){
-        return Integer.valueOf(get_text());
+
+    int getInt() {
+        return Integer.valueOf(getText());
     }
 }

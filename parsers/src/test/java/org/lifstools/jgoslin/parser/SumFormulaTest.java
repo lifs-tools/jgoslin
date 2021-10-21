@@ -49,7 +49,7 @@ public class SumFormulaTest {
         ////////////////////////////////////////////////////////////////////////////
         LipidAdduct lipid = lipid_maps_parser.parse(lipid_name);
         assertTrue(lipid != null);
-        assertEquals(correct_formula, lipid.get_sum_formula(), "Error for lipid '" + lipid_name + "': " + lipid.get_sum_formula() + " != " + correct_formula + " (reference)");
+        assertEquals(correct_formula, lipid.getSumFormula(), "Error for lipid '" + lipid_name + "': " + lipid.getSumFormula() + " != " + correct_formula + " (reference)");
     }
 
     @ParameterizedTest
@@ -60,7 +60,7 @@ public class SumFormulaTest {
         ////////////////////////////////////////////////////////////////////////////
         LipidAdduct lipid = swiss_lipids_parser.parse(lipid_name);
         assertTrue(lipid != null);
-        assertEquals(correct_formula, lipid.get_sum_formula(), "Error for lipid '" + lipid_name + "': " + lipid.get_sum_formula() + " != " + correct_formula + " (reference)");
+        assertEquals(correct_formula, lipid.getSumFormula(), "Error for lipid '" + lipid_name + "': " + lipid.getSumFormula() + " != " + correct_formula + " (reference)");
     }
 
     @ParameterizedTest
@@ -71,10 +71,10 @@ public class SumFormulaTest {
         ////////////////////////////////////////////////////////////////////////////
         String full_lipid_name = lipid_name + lipid_adduct;
         LipidAdduct lipid = goslin_parser.parse(full_lipid_name);
-        assertEquals(lipid_class, lipid.get_lipid_string(LipidLevel.CLASS), lipid.get_lipid_string(LipidLevel.CLASS) + " != " + lipid_class + "(reference)");
-        assertEquals(lipid_formula, StringFunctions.compute_sum_formula(lipid.lipid.get_elements()), lipid_formula + " (reference) != " + StringFunctions.compute_sum_formula(lipid.lipid.get_elements()));
-        assertTrue(Math.abs(lipid.get_mass() - lipid_mass) < 0.001, "lipid: " + lipid.get_mass() + " != " + lipid_mass + " (reference)");
-        assertEquals(lipid_charge, lipid.adduct.get_charge(), lipid.adduct.get_charge() + " != " + lipid_charge + " (reference)");
+        assertEquals(lipid_class, lipid.getLipidString(LipidLevel.CLASS), lipid.getLipidString(LipidLevel.CLASS) + " != " + lipid_class + "(reference)");
+        assertEquals(lipid_formula, StringFunctions.computeSumFormula(lipid.lipid.getElements()), lipid_formula + " (reference) != " + StringFunctions.computeSumFormula(lipid.lipid.getElements()));
+        assertTrue(Math.abs(lipid.getMass() - lipid_mass) < 0.001, "lipid: " + lipid.getMass() + " != " + lipid_mass + " (reference)");
+        assertEquals(lipid_charge, lipid.adduct.getCharge(), lipid.adduct.getCharge() + " != " + lipid_charge + " (reference)");
     }
 
 }

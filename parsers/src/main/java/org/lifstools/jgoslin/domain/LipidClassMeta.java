@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
@@ -30,24 +30,24 @@ import java.util.HashSet;
  *
  * @author dominik
  */
-public class LipidClassMeta{
-    public LipidCategory lipid_category;
-    public String class_name;
+public class LipidClassMeta {
+
+    public LipidCategory lipidCategory;
+    public String className;
     public String description;
-    public int max_num_fa;
-    public int possible_num_fa;
-    public HashSet<String> special_cases;
+    public int maxNumFa;
+    public int possibleNumFa;
+    public HashSet<String> specialCases;
     public ElementTable elements;
     public ArrayList<String> synonyms;
 
-    
-    public LipidClassMeta(LipidCategory _lipid_category, String _class_name, String _description, int _max_num_fa, int _possible_num_fa, HashSet<String> _special_cases, ElementTable _elements, ArrayList<String> _synonyms){
-        lipid_category = _lipid_category;
-        class_name = _class_name;
+    public LipidClassMeta(LipidCategory _lipid_category, String _class_name, String _description, int _max_num_fa, int _possible_num_fa, HashSet<String> _special_cases, ElementTable _elements, ArrayList<String> _synonyms) {
+        lipidCategory = _lipid_category;
+        className = _class_name;
         description = _description;
-        max_num_fa = _max_num_fa;
-        possible_num_fa = _possible_num_fa;
-        special_cases = _special_cases;
+        maxNumFa = _max_num_fa;
+        possibleNumFa = _possible_num_fa;
+        specialCases = _special_cases;
         elements = _elements;
         synonyms = _synonyms;
     }

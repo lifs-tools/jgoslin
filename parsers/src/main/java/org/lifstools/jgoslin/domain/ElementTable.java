@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 import java.util.HashMap;
@@ -31,27 +30,27 @@ import java.util.HashMap;
  * @author dominik
  */
 public class ElementTable extends HashMap<Element, Integer> {
-    
-    public ElementTable(){
+
+    public ElementTable() {
         super();
-        Elements.element_masses.keySet().forEach(e -> {
+        Elements.ELEMENT_MASSES.keySet().forEach(e -> {
             put(e, 0);
         });
     }
-    
-    public void add(ElementTable elements){
+
+    public void add(ElementTable elements) {
         elements.entrySet().forEach(kv -> {
             put(kv.getKey(), get(kv.getKey()) + kv.getValue());
         });
     }
-    
-    public void add(ElementTable elements, int count){
+
+    public void add(ElementTable elements, int count) {
         elements.entrySet().forEach(kv -> {
             put(kv.getKey(), get(kv.getKey()) + kv.getValue() * count);
         });
     }
-    
-    public ElementTable copy(){
+
+    public ElementTable copy() {
         ElementTable e = new ElementTable();
         entrySet().forEach(kv -> {
             e.put(kv.getKey(), kv.getValue());

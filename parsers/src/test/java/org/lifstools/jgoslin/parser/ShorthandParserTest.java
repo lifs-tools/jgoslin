@@ -45,124 +45,124 @@ public class ShorthandParserTest {
     public void testShorthandParserTest() {
         ShorthandParser parser = ShorthandParser.newInstance();
         LipidAdduct l = parser.parse("PE 18:1(8Z);1OH,3OH/24:0");
-        assertEquals("PE 18:1(8Z);1OH,3OH/24:0", l.get_lipid_string());
-        assertEquals("PE 18:1(8);(OH)2/24:0", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("PE 18:1;O2/24:0", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("PE 18:1;O2_24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("PE 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
+        assertEquals("PE 18:1(8Z);1OH,3OH/24:0", l.getLipidString());
+        assertEquals("PE 18:1(8);(OH)2/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("PE 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("PE 18:1;O2_24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("PE 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
 
         l = parser.parse("Cer 18:1(8Z);1OH,3OH/24:0");
-        assertEquals("Cer 18:1(8Z);1OH,3OH/24:0", l.get_lipid_string());
-        assertEquals("Cer 18:1(8);(OH)2/24:0", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("Cer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C42H83NO3", l.get_sum_formula());
+        assertEquals("Cer 18:1(8Z);1OH,3OH/24:0", l.getLipidString());
+        assertEquals("Cer 18:1(8);(OH)2/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("Cer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("Cer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("Cer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C42H83NO3", l.getSumFormula());
 
         l = parser.parse("Cer 18:1(8);(OH)2/24:0");
-        assertEquals("Cer 18:1(8);(OH)2/24:0", l.get_lipid_string());
-        assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("Cer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C42H83NO3", l.get_sum_formula());
+        assertEquals("Cer 18:1(8);(OH)2/24:0", l.getLipidString());
+        assertEquals("Cer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("Cer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("Cer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C42H83NO3", l.getSumFormula());
 
         l = parser.parse("Cer 18:1;O2/24:0");
-        assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string());
-        assertEquals("Cer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("Cer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C42H83NO3", l.get_sum_formula());
+        assertEquals("Cer 18:1;O2/24:0", l.getLipidString());
+        assertEquals("Cer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("Cer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C42H83NO3", l.getSumFormula());
 
         l = parser.parse("Cer 42:1;O2");
-        assertEquals("Cer 42:1;O2", l.get_lipid_string());
-        assertEquals("C42H83NO3", l.get_sum_formula());
+        assertEquals("Cer 42:1;O2", l.getLipidString());
+        assertEquals("C42H83NO3", l.getSumFormula());
 
         l = parser.parse("Gal-Cer(1) 18:1(5Z);3OH/24:0");
-        assertEquals("Gal-Cer(1) 18:1(5Z);3OH/24:0", l.get_lipid_string());
-        assertEquals("Gal-Cer 18:1(5);OH/24:0", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("GalCer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("GalCer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("GalCer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C48H93NO8", l.get_sum_formula());
+        assertEquals("Gal-Cer(1) 18:1(5Z);3OH/24:0", l.getLipidString());
+        assertEquals("Gal-Cer 18:1(5);OH/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("GalCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("Gal-Cer 18:1(5);OH/24:0");
-        assertEquals("Gal-Cer 18:1(5);OH/24:0", l.get_lipid_string());
-        assertEquals("GalCer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("GalCer 18:1;O2/24:0", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("GalCer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C48H93NO8", l.get_sum_formula());
+        assertEquals("Gal-Cer 18:1(5);OH/24:0", l.getLipidString());
+        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("GalCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("GalCer 18:1;O2/24:0");
-        assertEquals("GalCer 18:1;O2/24:0", l.get_lipid_string());
-        assertEquals("GalCer 42:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C48H93NO8", l.get_sum_formula());
+        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString());
+        assertEquals("GalCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("GalCer 42:1;O2");
-        assertEquals("GalCer 42:1;O2", l.get_lipid_string());
-        assertEquals("C48H93NO8", l.get_sum_formula());
+        assertEquals("GalCer 42:1;O2", l.getLipidString());
+        assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("SPB 18:1(4Z);1OH,3OH");
-        assertEquals("SPB 18:1(4Z);1OH,3OH", l.get_lipid_string());
-        assertEquals("SPB 18:1(4);(OH)2", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C18H37NO2", l.get_sum_formula());
+        assertEquals("SPB 18:1(4Z);1OH,3OH", l.getLipidString());
+        assertEquals("SPB 18:1(4);(OH)2", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C18H37NO2", l.getSumFormula());
 
         l = parser.parse("SPB 18:1(4);(OH)2");
-        assertEquals("SPB 18:1(4);(OH)2", l.get_lipid_string());
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C18H37NO2", l.get_sum_formula());
+        assertEquals("SPB 18:1(4);(OH)2", l.getLipidString());
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C18H37NO2", l.getSumFormula());
 
         l = parser.parse("SPB 18:1;O2");
-        assertEquals("SPB 18:1;O2", l.get_lipid_string());
-        assertEquals("SPB 18:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C18H37NO2", l.get_sum_formula());
+        assertEquals("SPB 18:1;O2", l.getLipidString());
+        assertEquals("SPB 18:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C18H37NO2", l.getSumFormula());
 
         l = parser.parse("LSM(1) 17:1(4E);3OH");
-        assertEquals("LSM(1) 17:1(4E);3OH", l.get_lipid_string());
-        assertEquals("LSM 17:1(4);OH", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C22H47N2O5P", l.get_sum_formula());
+        assertEquals("LSM(1) 17:1(4E);3OH", l.getLipidString());
+        assertEquals("LSM 17:1(4);OH", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C22H47N2O5P", l.getSumFormula());
 
         l = parser.parse("LSM 17:1(4);OH");
-        assertEquals("LSM 17:1(4);OH", l.get_lipid_string());
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C22H47N2O5P", l.get_sum_formula());
+        assertEquals("LSM 17:1(4);OH", l.getLipidString());
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C22H47N2O5P", l.getSumFormula());
 
         l = parser.parse("LSM 17:1;O2");
-        assertEquals("LSM 17:1;O2", l.get_lipid_string());
-        assertEquals("LSM 17:1;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C22H47N2O5P", l.get_sum_formula());
+        assertEquals("LSM 17:1;O2", l.getLipidString());
+        assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C22H47N2O5P", l.getSumFormula());
 
         l = parser.parse("EPC(1) 14:1(4E);3OH/20:1(11Z)");
-        assertEquals("EPC(1) 14:1(4E);3OH/20:1(11Z)", l.get_lipid_string());
-        assertEquals("EPC 14:1(4);OH/20:1(11)", l.get_lipid_string(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("EPC 14:1;O2/20:1", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("EPC 14:1;O2/20:1", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("EPC 34:2;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C36H71N2O6P", l.get_sum_formula());
+        assertEquals("EPC(1) 14:1(4E);3OH/20:1(11Z)", l.getLipidString());
+        assertEquals("EPC 14:1(4);OH/20:1(11)", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("EPC 14:1;O2/20:1", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("EPC 14:1;O2/20:1", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("EPC 34:2;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C36H71N2O6P", l.getSumFormula());
 
         l = parser.parse("EPC 14:1(4);OH/20:1(11)");
-        assertEquals("EPC 14:1(4);OH/20:1(11)", l.get_lipid_string());
-        assertEquals("EPC 14:1;O2/20:1", l.get_lipid_string(LipidLevel.SN_POSITION));
-        assertEquals("EPC 14:1;O2/20:1", l.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("EPC 34:2;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C36H71N2O6P", l.get_sum_formula());
+        assertEquals("EPC 14:1(4);OH/20:1(11)", l.getLipidString());
+        assertEquals("EPC 14:1;O2/20:1", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("EPC 14:1;O2/20:1", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("EPC 34:2;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C36H71N2O6P", l.getSumFormula());
 
         l = parser.parse("EPC 14:1;O2/20:1");
-        assertEquals("EPC 14:1;O2/20:1", l.get_lipid_string());
-        assertEquals("EPC 34:2;O2", l.get_lipid_string(LipidLevel.SPECIES));
-        assertEquals("C36H71N2O6P", l.get_sum_formula());
+        assertEquals("EPC 14:1;O2/20:1", l.getLipidString());
+        assertEquals("EPC 34:2;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C36H71N2O6P", l.getSumFormula());
 
         l = parser.parse("EPC 34:2;O2");
-        assertEquals("EPC 34:2;O2", l.get_lipid_string());
-        assertEquals("C36H71N2O6P", l.get_sum_formula());
+        assertEquals("EPC 34:2;O2", l.getLipidString());
+        assertEquals("C36H71N2O6P", l.getSumFormula());
     }
 
     @ParameterizedTest
@@ -174,24 +174,24 @@ public class ShorthandParserTest {
         LipidAdduct lipid = parser.parse(fullStructure);
         String formula;
         if (sumFormula == null) {
-            formula = lipid.get_sum_formula();
+            formula = lipid.getSumFormula();
         } else {
             formula = sumFormula;
-            assertTrue(formula.equals(lipid.get_sum_formula()));
+            assertTrue(formula.equals(lipid.getSumFormula()));
         }
 
         List<String> lipidNamesOnLevel = Arrays.asList(fullStructure, structureDefined, snPosition, molecularSpecies, species);
 
         for (int lev = 0; lev < levels.size(); ++lev) {
             LipidLevel lipid_level = levels.get(lev);
-            String n = lipid.get_lipid_string(lipid_level);
+            String n = lipid.getLipidString(lipid_level);
             assertEquals(lipidNamesOnLevel.get(lev), n);
-            assertEquals(formula, lipid.get_sum_formula());
+            assertEquals(formula, lipid.getSumFormula());
 
             LipidAdduct lipid2 = parser.parse(n);
             for (int ll = lev; ll < col_num; ++ll) {
-                assertEquals(lipidNamesOnLevel.get(ll), lipid2.get_lipid_string(levels.get(ll)), "input " + n + " compare " + lipidNamesOnLevel.get(ll) + " vs. " + lipid2.get_lipid_string(levels.get(ll)));
-                assertEquals(formula, lipid2.get_sum_formula());
+                assertEquals(lipidNamesOnLevel.get(ll), lipid2.getLipidString(levels.get(ll)), "input " + n + " compare " + lipidNamesOnLevel.get(ll) + " vs. " + lipid2.getLipidString(levels.get(ll)));
+                assertEquals(formula, lipid2.getSumFormula());
             }
         }
     }

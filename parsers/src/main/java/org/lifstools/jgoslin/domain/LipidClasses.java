@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.domain;
 
 import org.lifstools.jgoslin.parser.SumFormulaParser;
@@ -39,76 +38,83 @@ import java.util.stream.Collectors;
  * @author dominik
  */
 public class LipidClasses extends ArrayList<LipidClassMeta> {
-    private static LipidClasses lipid_classes = null;
+
+    private static LipidClasses LIPID_CLASSES = new LipidClasses();
     public static final int UNDEFINED_CLASS = 0;
-    
+
     private LipidClasses() {
         this("lipid-list.csv");
     }
-    
+
     private LipidClasses(String resourceName) {
         add(new LipidClassMeta(LipidCategory.NO_CATEGORY,
-            "UNDEFINED",
-            "",
-            0,
-            0,
-            new HashSet<>(),
-            new ElementTable(),
-            new ArrayList<>(Arrays.asList("UNDEFINED"))
+                "UNDEFINED",
+                "",
+                0,
+                0,
+                new HashSet<>(),
+                new ElementTable(),
+                new ArrayList<>(Arrays.asList("UNDEFINED"))
         ));
-        
+
         ArrayList<String> lines = new ArrayList<>();
-        
+
         // read resource from classpath and current thread's context class loader
         try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)));) {
             lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
-        } catch(IOException e) {
+        } catch (IOException e) {
             //always pass on the original exception
-            throw new RuntimeException("Error: Resource "+ resourceName + " cannot be read.", e);
+            throw new RuntimeException("Error: Resource " + resourceName + " cannot be read.", e);
         }
-        
+
         int lineCounter = 0;
         int SYNONYM_START_INDEX = 7;
 
-        HashMap<String, ArrayList<String> > data = new HashMap<>();
+        HashMap<String, ArrayList<String>> data = new HashMap<>();
         HashSet<String> keys = new HashSet<>();
-        HashMap<String, Integer> enum_names = new HashMap<String, Integer>(){{
-            put("GL", 1);
-            put("GP", 1);
-            put("SP", 1);
-            put("ST", 1);
-            put("FA", 1);
-            put("PK", 1);
-            put("SL", 1);
-            put("UNDEFINED", 1);
-        }};
-        
-        
-        HashMap<String, LipidCategory> names_to_category = new HashMap<>(){{
-            put("GL", LipidCategory.GL);
-            put("GP", LipidCategory.GP);
-            put("SP", LipidCategory.SP);
-            put("ST", LipidCategory.ST);
-            put("FA", LipidCategory.FA);
-            put("PK", LipidCategory.PK);
-            put("SL", LipidCategory.SL);
-            put("UNDEFINED", LipidCategory.UNDEFINED);
-        }};
+        HashMap<String, Integer> enum_names = new HashMap<String, Integer>() {
+            {
+                put("GL", 1);
+                put("GP", 1);
+                put("SP", 1);
+                put("ST", 1);
+                put("FA", 1);
+                put("PK", 1);
+                put("SL", 1);
+                put("UNDEFINED", 1);
+            }
+        };
 
+        HashMap<String, LipidCategory> names_to_category = new HashMap<>() {
+            {
+                put("GL", LipidCategory.GL);
+                put("GP", LipidCategory.GP);
+                put("SP", LipidCategory.SP);
+                put("ST", LipidCategory.ST);
+                put("FA", LipidCategory.FA);
+                put("PK", LipidCategory.PK);
+                put("SL", LipidCategory.SL);
+                put("UNDEFINED", LipidCategory.UNDEFINED);
+            }
+        };
 
-        for (String line : lines){
-            if (lineCounter++ == 0) continue;
-            ArrayList<String> tokens = StringFunctions.split_string(line, ',', '"', true);
-            
-            if (keys.contains(tokens.get(0))){
+        for (String line : lines) {
+            if (lineCounter++ == 0) {
+                continue;
+            }
+            ArrayList<String> tokens = StringFunctions.splitString(line, ',', '"', true);
+
+            if (keys.contains(tokens.get(0))) {
                 throw new RuntimeException("Error: lipid name '" + tokens.get(0) + "' occurs multiple times in the lipid list.");
             }
             keys.add(tokens.get(0));
 
-            for (int i = SYNONYM_START_INDEX; i < tokens.size(); ++i){
+            for (int i = SYNONYM_START_INDEX; i < tokens.size(); ++i) {
                 String test_lipid_name = tokens.get(i);
-                if (test_lipid_name.length() == 0) continue;
-                if (keys.contains(test_lipid_name)){
+                if (test_lipid_name.length() == 0) {
+                    continue;
+                }
+                if (keys.contains(test_lipid_name)) {
                     throw new RuntimeException("Error: lipid name '" + test_lipid_name + "' occurs multiple times in the lipid list.");
                 }
                 keys.add(test_lipid_name);
@@ -116,38 +122,31 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
 
             String enum_name = tokens.get(0);
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < enum_name.length(); ++i){
+            for (int i = 0; i < enum_name.length(); ++i) {
                 char c = enum_name.charAt(i);
-                if ('A' <= c && c <= 'Z'){
+                if ('A' <= c && c <= 'Z') {
                     sb.append(c);
-                }
-                else if ('0' <= c && c <= '9'){
+                } else if ('0' <= c && c <= '9') {
                     sb.append(c);
-                }
-                else if ('a' <= c && c <= 'z'){
+                } else if ('a' <= c && c <= 'z') {
                     sb.append(Character.toString(c - ('a' - 'A')));
-                }
-                else
-                {
+                } else {
                     sb.append('_');
                 }
             }
             enum_name = sb.toString();
 
-
-            if (enum_name.charAt(0) == '_'){
+            if (enum_name.charAt(0) == '_') {
                 enum_name = "L" + enum_name;
             }
 
-            if (enum_name.charAt(0) < 'A' || 'Z' < enum_name.charAt(0)){
+            if (enum_name.charAt(0) < 'A' || 'Z' < enum_name.charAt(0)) {
                 enum_name = "L" + enum_name;
             }
 
-            if (!enum_names.containsKey(enum_name)){
+            if (!enum_names.containsKey(enum_name)) {
                 enum_names.put(enum_name, 1);
-            }
-            else
-            {
+            } else {
                 int cnt = enum_names.get(enum_name) + 1;
                 enum_names.put(enum_name, cnt);
                 enum_name += ('A' + cnt - 1);
@@ -156,19 +155,19 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
 
             data.put(enum_name, tokens);
         }
-        
+
         // creating the lipid class dictionary
         SumFormulaParser sfp = SumFormulaParser.newInstance();
         data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
-            StringFunctions.split_string(kv.getValue().get(5), ';', '"').forEach(scase -> {
+            StringFunctions.splitString(kv.getValue().get(5), ';', '"').forEach(scase -> {
                 special_cases.add(StringFunctions.strip(scase, '"'));
             });
             ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6)) : new ElementTable();
             ArrayList<String> synonyms = new ArrayList<>();
-            synonyms.add(kv.getValue().get(0)); 
+            synonyms.add(kv.getValue().get(0));
             for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) {
-                if (kv.getValue().get(ii).length() > 0){
+                if (kv.getValue().get(ii).length() > 0) {
                     synonyms.add(StringFunctions.strip(kv.getValue().get(ii), '"'));
                 }
             }
@@ -182,10 +181,8 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
                     synonyms));
         });
     }
-            
-            
-    public static LipidClasses get_instance(){
-        if (lipid_classes == null) lipid_classes = new LipidClasses();
-        return lipid_classes;
+
+    public static LipidClasses getInstance() {
+        return LIPID_CLASSES;
     }
 }

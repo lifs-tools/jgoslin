@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidException;
@@ -35,66 +34,55 @@ import org.lifstools.jgoslin.domain.ElementTable;
  * @author dominik
  */
 public class SumFormulaParserEventHandler extends BaseParserEventHandler<ElementTable> {
-    
-    public Element element;
-    public int count;
-    
-    public SumFormulaParserEventHandler(){
+
+    private Element element;
+    private int count;
+
+    public SumFormulaParserEventHandler() {
         try {
-            registered_events.put("molecule_pre_event", this::reset_parser);
-            registered_events.put("element_group_post_event", this::element_group_post_event);
-            registered_events.put("element_pre_event", this::element_pre_event);
-            registered_events.put("single_element_pre_event", this::single_element_group_pre_event);
-            registered_events.put("count_pre_event", this::count_pre_event);
-        }
-        catch(Exception e){
+            registeredEvents.put("molecule_pre_event", this::resetParser);
+            registeredEvents.put("element_group_post_event", this::elementGroupPostEvent);
+            registeredEvents.put("element_pre_event", this::elementPreEvent);
+            registeredEvents.put("single_element_pre_event", this::singleElementGroupPreEvent);
+            registeredEvents.put("count_pre_event", this::countPreEvent);
+        } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");
         }
     }
-     
-    
-    public void reset_parser(TreeNode node){
+
+    @Override
+    protected void resetParser(TreeNode node) {
         content = new ElementTable();
         element = Element.H;
         count = 0;
     }
-    
-    
-    public void element_group_post_event(TreeNode node){
-         content.put(element, content.get(element) + count);
+
+    private void elementGroupPostEvent(TreeNode node) {
+        content.put(element, content.get(element) + count);
     }
-    
-    
-    public void element_pre_event(TreeNode node){
-        
-        String parsed_element = node.get_text();
 
-        if (Elements.element_positions.containsKey(parsed_element))
-        {
-            element = Elements.element_positions.get(parsed_element);
-        }
+    private void elementPreEvent(TreeNode node) {
 
-        else {
+        String parsed_element = node.getText();
+
+        if (Elements.ELEMENT_POSITIONS.containsKey(parsed_element)) {
+            element = Elements.ELEMENT_POSITIONS.get(parsed_element);
+        } else {
             throw new LipidException("Error: element '" + parsed_element + "' is unknown");
         }
     }
-    
-    
-    public void single_element_group_pre_event(TreeNode node){
-        String parsed_element = node.get_text();
-        if (Elements.element_positions.containsKey(parsed_element))
-        {
-            element = Elements.element_positions.get(parsed_element);
+
+    private void singleElementGroupPreEvent(TreeNode node) {
+        String parsed_element = node.getText();
+        if (Elements.ELEMENT_POSITIONS.containsKey(parsed_element)) {
+            element = Elements.ELEMENT_POSITIONS.get(parsed_element);
             content.put(element, content.get(element) + 1);
-        }
-
-        else {
+        } else {
             throw new LipidException("Error: element '" + parsed_element + "' is unknown");
         }
     }
-    
-    
-    public void count_pre_event(TreeNode node){
-        count = Integer.valueOf(node.get_text());
+
+    private void countPreEvent(TreeNode node) {
+        count = Integer.valueOf(node.getText());
     }
 }

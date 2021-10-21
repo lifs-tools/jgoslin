@@ -72,7 +72,7 @@ public class CmdLineParser {
 
     public static final String LIPIDMAPS_CLASS_REGEXP = ".+\\[([A-Z0-9]+)\\]";
     private static final Map<ValidationResult.Grammar, Parser<LipidAdduct>> DEFAULT_PARSERS = loadParsers();
-    private static final LipidClasses LIPID_CLASSES = LipidClasses.get_instance();
+    private static final LipidClasses LIPID_CLASSES = LipidClasses.getInstance();
 
     private static String getAppInfo() throws IOException {
         Properties p = new Properties();
@@ -245,24 +245,24 @@ public class CmdLineParser {
             m.put("Grammar", t.getGrammar().name());
             m.put("Message", t.getMessages().stream().collect(Collectors.joining(" | ")));
             if (t.getLipidAdduct() != null) {
-                m.put("Adduct", t.getLipidAdduct().adduct == null ? "" : t.getLipidAdduct().adduct.get_lipid_string());
-                m.put("Sum Formula", t.getLipidAdduct().get_sum_formula());
-                m.put("Mass", String.format(Locale.US, "%.4f", t.getLipidAdduct().get_mass()));
-                m.put("Lipid Maps Category", t.getLipidAdduct().lipid.getHeadgroup().lipid_category.getFullName() + " [" + t.getLipidAdduct().lipid.getHeadgroup().lipid_category.name() + "]");
-                LipidClassMeta lclass = LIPID_CLASSES.get(t.getLipidAdduct().lipid.getInfo().lipid_class);
+                m.put("Adduct", t.getLipidAdduct().adduct == null ? "" : t.getLipidAdduct().adduct.getLipidString());
+                m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
+                m.put("Mass", String.format(Locale.US, "%.4f", t.getLipidAdduct().getMass()));
+                m.put("Lipid Maps Category", t.getLipidAdduct().lipid.getHeadgroup().lipidCategory.getFullName() + " [" + t.getLipidAdduct().lipid.getHeadgroup().lipidCategory.name() + "]");
+                LipidClassMeta lclass = LIPID_CLASSES.get(t.getLipidAdduct().lipid.getInfo().lipidClass);
 // FIXME retrieve lipid maps main class info, functional class abbreviation and synonyms
                 m.put("Lipid Maps Main Class", lclass.description);
                 String lclassAbbr = getLipidMapsClassAbbreviation(lclass.description);
                 m.put("Functional Class Abbr", "[" + lclassAbbr + "]");
                 m.put("Functional Class Synonyms", "[" + lclass.synonyms.stream().collect(Collectors.joining(", ")) + "]");
                 m.put("Level", t.level.name());
-                m.put("Total #C", t.lipidSpeciesInfo.num_carbon + "");
+                m.put("Total #C", t.lipidSpeciesInfo.numCarbon + "");
                 // FIXME add OH and other functional groups
 //                t.getLipidSpeciesInfo().
 //                m.put("Total #OH", t.lipidSpeciesInfo.getNHydroxy() + "");
-                m.put("Total #DB", t.lipidSpeciesInfo.double_bonds.num_double_bonds + "");
-                for (String functionalGroupKey : t.lipidSpeciesInfo.functional_groups.keySet()) {
-                    ArrayList<FunctionalGroup> fg = t.lipidSpeciesInfo.functional_groups.get(functionalGroupKey);
+                m.put("Total #DB", t.lipidSpeciesInfo.doubleBonds.numDoubleBonds + "");
+                for (String functionalGroupKey : t.lipidSpeciesInfo.functionalGroups.keySet()) {
+                    ArrayList<FunctionalGroup> fg = t.lipidSpeciesInfo.functionalGroups.get(functionalGroupKey);
                     String fgCounts = fg.stream().map((sfg) -> {
                         return "" + sfg.count;
                     }).collect(Collectors.joining("|"));
@@ -270,18 +270,18 @@ public class CmdLineParser {
                 }
                 for (FattyAcid fa : t.getFattyAcids()) {
                     m.put(fa.name + " SN Position", fa.position + "");
-                    m.put(fa.name + " #C", fa.num_carbon + "");
+                    m.put(fa.name + " #C", fa.numCarbon + "");
                     //FIXME add OH and other functional groups
-                    m.put(fa.name + " #DB", fa.double_bonds.num_double_bonds + "");
-//                    for(fa.functional_groups)
+                    m.put(fa.name + " #DB", fa.doubleBonds.numDoubleBonds + "");
+//                    for(fa.functionalGroups)
 //                    m.put(fa.name + " #OH", fa.getNHydroxy() + "");
-                    m.put(fa.name + " Bond Type", fa.lipid_FA_bond_type.name() + "");
-                    String dbPositions = fa.double_bonds.double_bond_positions.entrySet().stream().map((entry) -> {
+                    m.put(fa.name + " Bond Type", fa.lipidFaBondType.name() + "");
+                    String dbPositions = fa.doubleBonds.doubleBondPositions.entrySet().stream().map((entry) -> {
                         return entry.getKey() + "" + entry.getValue();
                     }).collect(Collectors.joining("|"));
                     m.put(fa.name + " DB Positions", dbPositions + "");
-                    for (String functionalGroupKey : fa.functional_groups.keySet()) {
-                        ArrayList<FunctionalGroup> fg = fa.functional_groups.get(functionalGroupKey);
+                    for (String functionalGroupKey : fa.functionalGroups.keySet()) {
+                        ArrayList<FunctionalGroup> fg = fa.functionalGroups.get(functionalGroupKey);
                         String fgCounts = fg.stream().map((sfg) -> {
                             return "" + sfg.count;
                         }).collect(Collectors.joining("|"));
@@ -352,12 +352,12 @@ public class CmdLineParser {
                 validationResult.setLipidName(lipidName);
                 validationResult.setLipidAdduct(la);
                 validationResult.setGrammar(grammar);
-                validationResult.setLevel(la.get_lipid_level());
-                validationResult.setLipidMapsCategory(LIPID_CLASSES.get(la.lipid.getInfo().lipid_class).lipid_category.name());
-                validationResult.setLipidMapsClass(getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.lipid.getInfo().lipid_class).class_name));
+                validationResult.setLevel(la.getLipidLevel());
+                validationResult.setLipidMapsCategory(LIPID_CLASSES.get(la.lipid.getInfo().lipidClass).lipidCategory.name());
+                validationResult.setLipidMapsClass(getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.lipid.getInfo().lipidClass).className));
                 validationResult.setLipidSpeciesInfo(la.lipid.getInfo());
                 try {
-                    String normalizedName = la.get_lipid_string();
+                    String normalizedName = la.getLipidString();
                     validationResult.setCanonicalName(normalizedName);
                 } catch (RuntimeException re) {
                     log.debug("Parsing error for {}!", lipidName);
@@ -408,7 +408,7 @@ public class CmdLineParser {
     }
 
     private static void extractFas(LipidAdduct la, ValidationResult result) {
-        result.setFattyAcids(la.lipid.get_fa_list());
+        result.setFattyAcids(la.lipid.getFaList());
     }
 
     private static String getLipidMapsClassAbbreviation(String lipidMapsClass) {

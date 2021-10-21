@@ -48,16 +48,16 @@ public class FattyAcidParserTest {
         fatty_acid_parser = FattyAcidParser.newInstance();
         shorthand_parser = ShorthandParser.newInstance();
     }
-    
+
     @Test
-    public void testSumFormulaFailures(){
+    public void testSumFormulaFailures() {
         //"molecular LMFA01100037 '4-amino-4-cyano-butanoic acid': C5H8N2O2 != C5H12N2O2 (computed) ==> expected: <C5H8N2O2> but was: <C5H12N2O2>"
-        String computed_formula = StringFunctions.compute_sum_formula(sfp.parse("C5H8N2O2"));
+        String computed_formula = StringFunctions.computeSumFormula(sfp.parse("C5H8N2O2"));
         LipidAdduct lipid = fatty_acid_parser.parse("4-amino-4-cyano-butanoic acid");
-        String lipid_formula = lipid.get_sum_formula();
+        String lipid_formula = lipid.getSumFormula();
         assertEquals(computed_formula, lipid_formula);
-        LipidAdduct lipid2 = shorthand_parser.parse(lipid.get_lipid_string());
-        String lipid_formula2 = lipid2.get_sum_formula();
+        LipidAdduct lipid2 = shorthand_parser.parse(lipid.getLipidString());
+        String lipid_formula2 = lipid2.getSumFormula();
         assertEquals(computed_formula, lipid_formula2);
     }
 
@@ -67,26 +67,26 @@ public class FattyAcidParserTest {
         ////////////////////////////////////////////////////////////////////////////
         // Test for correctness
         ////////////////////////////////////////////////////////////////////////////
-        String computed_formula = StringFunctions.compute_sum_formula(sfp.parse(formula));
+        String computed_formula = StringFunctions.computeSumFormula(sfp.parse(formula));
         LipidAdduct lipid = fatty_acid_parser.parse(lipid_name);
-        String lipid_formula = lipid.get_sum_formula();
+        String lipid_formula = lipid.getSumFormula();
 
-        assertEquals(expected_lipid_name, lipid.get_lipid_string(), lmid + " '" + lipid_name + "': " + expected_lipid_name + " != " + lipid.get_lipid_string() + " (computed)");
+        assertEquals(expected_lipid_name, lipid.getLipidString(), lmid + " '" + lipid_name + "': " + expected_lipid_name + " != " + lipid.getLipidString() + " (computed)");
         assertEquals(computed_formula, lipid_formula, "formula " + lmid + " '" + lipid_name + "': " + computed_formula + " != " + lipid_formula + " (computed)");
 
         if (!lipid_name.toLowerCase().contains("cyano")) {
-            LipidAdduct lipid2 = shorthand_parser.parse(lipid.get_lipid_string());
-            lipid_formula = lipid2.get_sum_formula();
+            LipidAdduct lipid2 = shorthand_parser.parse(lipid.getLipidString());
+            lipid_formula = lipid2.getSumFormula();
 
             assertEquals(computed_formula, lipid_formula, "lipid " + lmid + " '" + lipid_name + "': " + computed_formula + " != " + lipid_formula + " (computed)");
 
-            lipid2 = shorthand_parser.parse(lipid.get_lipid_string(LipidLevel.MOLECULAR_SPECIES));
-            lipid_formula = lipid2.get_sum_formula();
+            lipid2 = shorthand_parser.parse(lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+            lipid_formula = lipid2.getSumFormula();
 
             assertEquals(computed_formula, lipid_formula, "molecular " + lmid + " '" + lipid_name + "': " + computed_formula + " != " + lipid_formula + " (computed)");
 
-            lipid2 = shorthand_parser.parse(lipid.get_lipid_string(LipidLevel.SPECIES));
-            lipid_formula = lipid2.get_sum_formula();
+            lipid2 = shorthand_parser.parse(lipid.getLipidString(LipidLevel.SPECIES));
+            lipid_formula = lipid2.getSumFormula();
 
             assertEquals(computed_formula, lipid_formula, "species " + lmid + " '" + lipid_name + "': " + computed_formula + " != " + lipid_formula + " (computed)");
         }
