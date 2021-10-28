@@ -66,15 +66,17 @@ public class LipidParser {
     public LipidAdduct parse(String lipid_name) {
         lastSuccessfulParser = null;
         Parser<LipidAdduct> lastParser = null;
+        BaseParserEventHandler<LipidAdduct> eventHandler = null;
         for (Parser<LipidAdduct> parser : parserList) {
             lastParser = parser;
-            LipidAdduct lipid = parser.parse(lipid_name, false);
+            eventHandler = parser.newEventHandler();
+            LipidAdduct lipid = parser.parse(lipid_name, eventHandler, false);
             if (lipid != null) {
                 lastSuccessfulParser = parser;
                 return lipid;
             }
         }
-        throw new LipidParsingException("Could not parse lipid '" + lipid_name + "'with any parser!" + ((lastParser != null) ? " Last message was: " + lastParser.errorMessage : ""));
+        throw new LipidParsingException("Could not parse lipid '" + lipid_name + "'with any parser!" + ((lastParser != null) ? " Last message was: " + ((eventHandler == null) ? "unknown" : eventHandler.errorMessage) : ""));
     }
 
     /**

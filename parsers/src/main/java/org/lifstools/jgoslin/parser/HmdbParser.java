@@ -27,7 +27,7 @@ public class HmdbParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("HMDB.g4");
 
     private HmdbParser(String grammarContent, char quote) {
-        super(new HmdbParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static HmdbParser newInstance(String grammarResourcePath, char quote) {
@@ -36,6 +36,11 @@ public class HmdbParser extends Parser<LipidAdduct> {
 
     public static HmdbParser newInstance() {
         return new HmdbParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public HmdbParserEventHandler newEventHandler() {
+        return new HmdbParserEventHandler();
     }
 
 }

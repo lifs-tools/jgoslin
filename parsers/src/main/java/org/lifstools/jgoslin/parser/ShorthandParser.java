@@ -35,7 +35,7 @@ public class ShorthandParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Shorthand2020.g4");
 
     private ShorthandParser(String grammarContent, char quote) {
-        super(new ShorthandParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static ShorthandParser newInstance(String grammarResourcePath, char quote) {
@@ -44,6 +44,11 @@ public class ShorthandParser extends Parser<LipidAdduct> {
 
     public static ShorthandParser newInstance() {
         return new ShorthandParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public ShorthandParserEventHandler newEventHandler() {
+        return new ShorthandParserEventHandler();
     }
 
 }

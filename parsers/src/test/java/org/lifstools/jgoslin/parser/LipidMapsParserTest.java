@@ -32,50 +32,52 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 public class LipidMapsParserTest {
 
     private static LipidMapsParser parser;
+    private static LipidMapsParserEventHandler handler;
 
     @BeforeAll
     public static void setupParser() {
         parser = LipidMapsParser.newInstance();
+        handler = parser.newEventHandler();
     }
 
     @Test
     public void testLipidMapsParserTest() {
-        LipidAdduct lipid = parser.parse("Cer(d18:1(8Z)/24:0)");
+        LipidAdduct lipid = parser.parse("Cer(d18:1(8Z)/24:0)", handler);
         assertEquals("Cer 18:1(8);(OH)2/24:0", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("Cer 18:1;O2/24:0", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("Cer 18:1;O2/24:0", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("Cer 42:1;O2", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C42H83NO3", lipid.getSumFormula());
 
-        lipid = parser.parse("GalCer(d18:1(5Z)/24:0)");
+        lipid = parser.parse("GalCer(d18:1(5Z)/24:0)", handler);
         assertEquals("GalCer 18:1(5);OH/24:0", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("GalCer 18:1;O2/24:0", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("GalCer 18:1;O2/24:0", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("GalCer 42:1;O2", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C48H93NO8", lipid.getSumFormula());
 
-        lipid = parser.parse("LysoSM(d17:1(4E))");
+        lipid = parser.parse("LysoSM(d17:1(4E))", handler);
         assertEquals("LSM 17:1(4);OH", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("LSM 17:1;O2", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("LSM 17:1;O2", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("LSM 17:1;O2", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C22H47N2O5P", lipid.getSumFormula());
 
-        lipid = parser.parse("PE-Cer(d14:1(4E)/20:1(11Z))");
+        lipid = parser.parse("PE-Cer(d14:1(4E)/20:1(11Z))", handler);
         assertEquals("EPC 14:1(4);OH/20:1(11)", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("EPC 14:1;O2/20:1", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("EPC 14:1;O2/20:1", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("EPC 34:2;O2", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C36H71N2O6P", lipid.getSumFormula());
 
-        lipid = parser.parse("MIPC(t18:0/24:0)");
+        lipid = parser.parse("MIPC(t18:0/24:0)", handler);
         assertEquals("MIPC 18:0;(OH)2/24:0", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("MIPC 18:0;O3/24:0", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("MIPC 18:0;O3/24:0", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("MIPC 42:0;O3", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C54H106NO17P", lipid.getSumFormula());
 
-        lipid = parser.parse("PE-Cer(d16:2(4E,6E)/22:1(13Z)(2OH))");
+        lipid = parser.parse("PE-Cer(d16:2(4E,6E)/22:1(13Z)(2OH))", handler);
         assertEquals("EPC 16:2(4,6);OH/22:1(13);OH", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
@@ -95,7 +97,7 @@ public class LipidMapsParserTest {
                 //skip test
                 assertTrue(true, "Skipping trivial / unsupported name: " + lipid_name);
             } else {
-                LipidAdduct lipid = parser.parse(lipid_name);
+                LipidAdduct lipid = parser.parse(lipid_name, handler);
                 assertTrue(lipid != null);
                 if (!correct_lipid_name.equals("Unsupported lipid") && correct_lipid_name.length() > 0) {
                     assertEquals(correct_lipid_name, lipid.getLipidString(), lipid_name + " . " + lipid.getLipidString() + " != " + correct_lipid_name + " (reference)");

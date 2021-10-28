@@ -35,7 +35,7 @@ public class SwissLipidsParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SwissLipids.g4");
 
     private SwissLipidsParser(String grammarContent, char quote) {
-        super(new SwissLipidsParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static SwissLipidsParser newInstance(String grammarResourcePath, char quote) {
@@ -44,6 +44,11 @@ public class SwissLipidsParser extends Parser<LipidAdduct> {
 
     public static SwissLipidsParser newInstance() {
         return new SwissLipidsParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public SwissLipidsParserEventHandler newEventHandler() {
+        return new SwissLipidsParserEventHandler();
     }
 
 }

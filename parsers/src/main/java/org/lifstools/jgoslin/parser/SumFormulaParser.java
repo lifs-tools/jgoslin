@@ -35,7 +35,7 @@ public class SumFormulaParser extends Parser<ElementTable> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SumFormula.g4");
 
     private SumFormulaParser(String grammarContent, char quote) {
-        super(new SumFormulaParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static SumFormulaParser newInstance(String grammarResourcePath, char quote) {
@@ -44,6 +44,11 @@ public class SumFormulaParser extends Parser<ElementTable> {
 
     public static SumFormulaParser newInstance() {
         return new SumFormulaParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public SumFormulaParserEventHandler newEventHandler() {
+        return new SumFormulaParserEventHandler();
     }
 
 }

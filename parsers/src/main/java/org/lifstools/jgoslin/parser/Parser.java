@@ -33,8 +33,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Optional;
 
-public class Parser<T> {
+public abstract class Parser<T> {
 
     // DP stands for dynamic programming
     final class DPNode {
@@ -71,30 +72,33 @@ public class Parser<T> {
     protected static final String EOF_RULE_NAME = "EOF";
 
     protected long nextFreeRuleIndex;
-    protected HashMap<Character, HashSet<Long>> TtoNT = new HashMap<>();
-    protected HashMap<Character, Long> originalTtoNT = new HashMap<>();
-    protected HashMap<Long, HashSet<Long>> NTtoNT = new HashMap<>();
-    protected HashMap<Long, String> NTtoRule = new HashMap<>();
-    protected HashMap<Long, ArrayList<Long>> substitution = new HashMap<>();
-    protected ArrayList<Bitfield> rightPair = new ArrayList<>();
+    protected final HashMap<Character, HashSet<Long>> TtoNT = new HashMap<>();
+    protected final HashMap<Character, Long> originalTtoNT = new HashMap<>();
+    protected final HashMap<String, Long> ruleToNT = new HashMap<>();
+    protected final HashMap<Long, HashSet<Long>> NTtoNT = new HashMap<>();
+    protected final HashMap<Long, String> NTtoRule = new HashMap<>();
+    protected final HashMap<Long, ArrayList<Long>> substitution = new HashMap<>();
+    protected final ArrayList<Bitfield> rightPair = new ArrayList<>();
     protected int avgPair;
     protected char quote;
-    protected BaseParserEventHandler<T> parserEventHandler = null;
-    protected boolean wordInGrammar = false;
+//    protected BaseParserEventHandler<T> parserEventHandler = null;
+//    protected boolean wordInGrammar = false;
     protected String grammarName = "";
     protected boolean usedEof = false;
     protected static final char DEFAULT_QUOTE = '\'';
-    protected String errorMessage = "";
+//    protected String errorMessage = "";
 
-    public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammarContent) {
-        this(_parserEventHandler, grammarContent, (char) '\0');
+    public Parser(String grammarContent) {
+        this(grammarContent, (char) '\0');
     }
 
-    public Parser(BaseParserEventHandler<T> _parserEventHandler, String grammarContent, char _quote) {
+    public Parser(String grammarContent, char _quote) {
         this.quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
-        this.parserEventHandler = _parserEventHandler;
+//        this.parserEventHandler = _parserEventHandler;
         readGrammar(grammarContent);
     }
+    
+    public abstract BaseParserEventHandler<T> newEventHandler();
 
     long get_next_free_rule_index() {
         if (nextFreeRuleIndex <= MASK) {
@@ -105,10 +109,10 @@ public class Parser<T> {
 
     final void readGrammar(String grammar) {
         nextFreeRuleIndex = START_RULE;
-        wordInGrammar = false;
+//        wordInGrammar = false;
         grammarName = "";
         usedEof = false;
-        HashMap<String, Long> ruleToNT = new HashMap<>();
+//        ruleToNT = new HashMap<>();
 
         // interpret the rules and create the structure for parsing
         ArrayList<String> rules = extract_text_based_rules(grammar, quote);
@@ -236,13 +240,6 @@ public class Parser<T> {
             }
         }
 
-        // adding all rule names into the event handler
-        for (Entry<String, Long> rule_name : ruleToNT.entrySet()) {
-            parserEventHandler.ruleNames.add(rule_name.getKey());
-        }
-
-        parserEventHandler.sanityCheck();
-
         // keeping the original terminal dictionary
         for (Entry<Character, HashSet<Long>> kv : TtoNT.entrySet()) {
             for (long rule : kv.getValue()) {
@@ -254,7 +251,7 @@ public class Parser<T> {
         // creating substitution dictionary for adding single rule chains into the parsing tree
         HashSet<Long> visited = new HashSet<>();
         for (Entry<Long, HashSet<Long>> kv : NTtoNT.entrySet()) {
-            HashSet<Long> values = new HashSet<Long>();
+            HashSet<Long> values = new HashSet<>();
             values.add(kv.getKey());
             for (long rule : values) {
                 if (visited.contains(rule)) {
@@ -600,7 +597,7 @@ public class Parser<T> {
         return collection;
     }
 
-    void raise_events(TreeNode node) {
+    void raise_events(TreeNode node, BaseParserEventHandler parserEventHandler) {
         if (node != null) {
             String node_rule_name = node.fire_event ? NTtoRule.get(node.rule_index) : "";
             if (node.fire_event) {
@@ -608,9 +605,9 @@ public class Parser<T> {
             }
 
             if (node.left != null) { // node.terminal is != None when node is leaf
-                raise_events(node.left);
+                raise_events(node.left, parserEventHandler);
                 if (node.right != null) {
-                    raise_events(node.right);
+                    raise_events(node.right, parserEventHandler);
                 }
             }
 
@@ -654,33 +651,53 @@ public class Parser<T> {
         }
     }
 
-    public String get_error_message() {
-        return errorMessage;
-    }
+//    public String get_error_message() {
+//        return errorMessage;
+//    }
 
-    public T parse(String text_to_parse) {
-        return parse(text_to_parse, true);
+    public T parse(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {
+        return parse(text_to_parse, parserEventHandler, true);
     }
 
     // re-implementation of Cocke-Younger-Kasami algorithm
-    public T parse(String text_to_parse, boolean throw_error) {
-        errorMessage = "";
+    public T parse(String text_to_parse, BaseParserEventHandler<T> parserEventHandler, boolean throw_error) {
         String old_text = text_to_parse;
         if (usedEof) {
             text_to_parse += EOF_SIGN;
         }
         parserEventHandler.content = null;
-
-        parse_regular(text_to_parse);
-        if (throw_error && !wordInGrammar) {
-            throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
+        
+        // adding all rule names into the event handler
+        for (Entry<String, Long> rule_name : ruleToNT.entrySet()) {
+            parserEventHandler.ruleNames.add(rule_name.getKey());
         }
-        T t = this.parserEventHandler.content;
-        return t;
+
+        parserEventHandler.sanityCheck(this);
+
+        Optional<ParsingErrors> parsingErrors = parse_regular(text_to_parse, parserEventHandler);
+        if (parsingErrors.isPresent() && !parsingErrors.get().wordInGrammar) {
+            if (throw_error) {
+                throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
+            } else {
+                parserEventHandler.errorMessage = parsingErrors.get().errorMessage;
+            }
+        }
+        return parserEventHandler.content;
+    }
+    
+    private class ParsingErrors {
+        final boolean wordInGrammar;
+        final String errorMessage;
+
+        ParsingErrors(boolean wordInGrammar, String errorMessage) {
+            this.wordInGrammar = wordInGrammar;
+            this.errorMessage = errorMessage;
+        }
+        
     }
 
-    void parse_regular(String text_to_parse) {
-        wordInGrammar = false;
+    Optional<ParsingErrors> parse_regular(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {
+        boolean wordInGrammar = false;
 
         int n = text_to_parse.length();
         // dp stands for dynamic programming, nothing else
@@ -759,7 +776,7 @@ public class Parser<T> {
                     wordInGrammar = true;
                     TreeNode parse_tree = new TreeNode(START_RULE, NTtoRule.containsKey(START_RULE));
                     fill_tree(parse_tree, DP.get(0).get(i).get(START_RULE));
-                    raise_events(parse_tree);
+                    raise_events(parse_tree, parserEventHandler);
                     break;
                 }
             }
@@ -771,12 +788,13 @@ public class Parser<T> {
 
                         TreeNode parse_tree = new TreeNode(first_rule, NTtoRule.containsKey(first_rule));
                         fill_tree(parse_tree, DP.get(0).get(i).get(first_rule));
-                        errorMessage = parse_tree.getText();
-                        break;
+                        return Optional.of(new ParsingErrors(wordInGrammar, parse_tree.getText()));
+//                        break;
                     }
                 }
             }
         }
+        return Optional.empty();
     }
 
     static String readGrammarContent(String grammarResourcePath) {

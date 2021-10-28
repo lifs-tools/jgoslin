@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
 
 /**
  *
@@ -158,12 +159,13 @@ public class LipidClasses extends ArrayList<LipidClassMeta> {
 
         // creating the lipid class dictionary
         SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParserEventHandler handler = sfp.newEventHandler();
         data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
             StringFunctions.splitString(kv.getValue().get(5), ';', '"').forEach(scase -> {
                 special_cases.add(StringFunctions.strip(scase, '"'));
             });
-            ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6)) : new ElementTable();
+            ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6), handler) : new ElementTable();
             ArrayList<String> synonyms = new ArrayList<>();
             synonyms.add(kv.getValue().get(0));
             for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) {

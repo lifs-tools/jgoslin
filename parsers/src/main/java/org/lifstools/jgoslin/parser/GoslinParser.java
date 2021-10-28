@@ -35,7 +35,7 @@ public final class GoslinParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Goslin.g4");
 
     private GoslinParser(String grammarContent, char quote) {
-        super(new GoslinParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static GoslinParser newInstance(String grammarResourcePath, char quote) {
@@ -44,6 +44,11 @@ public final class GoslinParser extends Parser<LipidAdduct> {
 
     public static GoslinParser newInstance() {
         return new GoslinParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public GoslinParserEventHandler newEventHandler() {
+        return new GoslinParserEventHandler();
     }
 
 }

@@ -35,7 +35,7 @@ public final class FattyAcidParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("FattyAcids.g4");
 
     private FattyAcidParser(String grammarContent, char quote) {
-        super(new FattyAcidParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static FattyAcidParser newInstance(String grammarResourcePath, char quote) {
@@ -47,13 +47,18 @@ public final class FattyAcidParser extends Parser<LipidAdduct> {
     }
 
     @Override
-    public LipidAdduct parse(String text) {
-        return super.parse(text.toLowerCase(), true);
+    public LipidAdduct parse(String text, BaseParserEventHandler eventHandler) {
+        return super.parse(text.toLowerCase(), eventHandler, true);
     }
 
     @Override
-    public LipidAdduct parse(String text, boolean with_exception) {
-        return super.parse(text.toLowerCase(), with_exception);
+    public LipidAdduct parse(String text, BaseParserEventHandler eventHandler, boolean with_exception) {
+        return super.parse(text.toLowerCase(), eventHandler, with_exception);
+    }
+
+    @Override
+    public FattyAcidParserEventHandler newEventHandler() {
+        return new FattyAcidParserEventHandler();
     }
 
 }

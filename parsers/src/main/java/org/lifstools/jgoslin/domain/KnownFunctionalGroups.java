@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
 
 /**
  *
@@ -68,10 +69,11 @@ public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
         }
 
         SumFormulaParser sfp = sumFormulaParser;
+        SumFormulaParserEventHandler handler = sfp.newEventHandler();
         for (ArrayList<String> row : functional_data) {
             row.add(row.get(1));
             for (int i = 6; i < row.size(); ++i) {
-                ElementTable et = row.get(2).length() > 0 ? sfp.parse(row.get(2)) : new ElementTable();
+                ElementTable et = row.get(2).length() > 0 ? sfp.parse(row.get(2), handler) : new ElementTable();
                 if (row.get(0).equals("FG")) {
                     put(row.get(i), new FunctionalGroup(
                             row.get(1),

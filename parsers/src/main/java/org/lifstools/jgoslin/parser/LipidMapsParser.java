@@ -35,7 +35,7 @@ public class LipidMapsParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("LipidMaps.g4");
 
     private LipidMapsParser(String grammarContent, char quote) {
-        super(new LipidMapsParserEventHandler(), grammarContent, quote);
+        super(grammarContent, quote);
     }
 
     public static LipidMapsParser newInstance(String grammarResourcePath, char quote) {
@@ -44,6 +44,11 @@ public class LipidMapsParser extends Parser<LipidAdduct> {
 
     public static LipidMapsParser newInstance() {
         return new LipidMapsParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public LipidMapsParserEventHandler newEventHandler() {
+        return new LipidMapsParserEventHandler();
     }
 
 }

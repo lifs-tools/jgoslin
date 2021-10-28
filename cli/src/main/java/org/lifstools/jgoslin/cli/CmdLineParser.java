@@ -54,6 +54,7 @@ import org.lifstools.jgoslin.domain.LipidClasses;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import org.lifstools.jgoslin.domain.LipidSpeciesInfo;
+import org.lifstools.jgoslin.parser.BaseParserEventHandler;
 import org.lifstools.jgoslin.parser.FattyAcidParser;
 import org.lifstools.jgoslin.parser.GoslinParser;
 import org.lifstools.jgoslin.parser.HmdbParser;
@@ -342,12 +343,13 @@ public class CmdLineParser {
             throw new ConstraintViolationException("Unsupported grammar: " + grammar);
         }
         try {
-            LipidAdduct la = parser.parse(lipidName, false);
+            BaseParserEventHandler<LipidAdduct> handler = parser.newEventHandler();
+            LipidAdduct la = parser.parse(lipidName, handler, false);
             if (la == null) {
                 validationResult.setLipidName(lipidName);
-                validationResult.setMessages(Arrays.asList(parser.get_error_message()));
+                validationResult.setMessages(Arrays.asList(handler.getErrorMessage()));
                 validationResult.setGrammar(grammar);
-                log.debug("Could not parse " + lipidName + " with " + grammar + " grammar: " + grammar + ". Message: " + parser.get_error_message());
+                log.debug("Could not parse " + lipidName + " with " + grammar + " grammar: " + grammar + ". Message: " + handler.getErrorMessage());
             } else {
                 validationResult.setLipidName(lipidName);
                 validationResult.setLipidAdduct(la);

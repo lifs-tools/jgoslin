@@ -37,9 +37,9 @@ public abstract class BaseParserEventHandler<T> {
 
     protected HashMap<String, Consumer<TreeNode>> registeredEvents = new HashMap<>();
     protected HashSet<String> ruleNames = new HashSet<>();
-    protected Parser<T> parser = null;
     protected String debug = "";
     protected T content = null;
+    protected String errorMessage = "";
 
     public BaseParserEventHandler() {
         registeredEvents = new HashMap<>();
@@ -47,7 +47,7 @@ public abstract class BaseParserEventHandler<T> {
     }
 
     // checking if all registered events are reasonable and orrur as rules in the grammar
-    void sanityCheck() {
+    void sanityCheck(Parser<T> parser) {
         for (String event_name : registeredEvents.keySet()) {
             if (!event_name.endsWith("_pre_event") && !event_name.endsWith("_post_event")) {
                 throw new RuntimeException("Parser event handler error: event '" + event_name + "' does not contain the suffix '_pre_event' or '_post_event'");
@@ -78,4 +78,8 @@ public abstract class BaseParserEventHandler<T> {
     }
     
     abstract void resetParser(TreeNode node);
+    
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
 }
