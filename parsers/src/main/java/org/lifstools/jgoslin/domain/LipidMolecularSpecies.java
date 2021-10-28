@@ -65,11 +65,11 @@ public class LipidMolecularSpecies extends LipidSpecies {
             level = LipidLevel.MOLECULAR_SPECIES;
         }
 
-        String fa_separator = (level != LipidLevel.MOLECULAR_SPECIES || headgroup.lipidCategory == LipidCategory.SP) ? "/" : "_";
+        String fa_separator = (level != LipidLevel.MOLECULAR_SPECIES || headGroup.lipidCategory == LipidCategory.SP) ? "/" : "_";
         StringBuilder lipid_name = new StringBuilder();
-        lipid_name.append(headgroup.getLipidString(level));
+        lipid_name.append(headGroup.getLipidString(level));
 
-        String fa_headgroup_separator = (headgroup.lipidCategory != LipidCategory.ST) ? " " : "/";
+        String fa_headgroup_separator = (headGroup.lipidCategory != LipidCategory.ST) ? " " : "/";
 
         switch (level) {
             case COMPLETE_STRUCTURE:
@@ -122,7 +122,7 @@ public class LipidMolecularSpecies extends LipidSpecies {
 
     @Override
     public ElementTable getElements() {
-        ElementTable elements = headgroup.getElements();
+        ElementTable elements = headGroup.getElements();
 
         // add elements from all fatty acyl chains
         faList.forEach(fatty_acid -> {

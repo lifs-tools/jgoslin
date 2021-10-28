@@ -97,7 +97,7 @@ public abstract class Parser<T> {
 //        this.parserEventHandler = _parserEventHandler;
         readGrammar(grammarContent);
     }
-    
+
     public abstract BaseParserEventHandler<T> newEventHandler();
 
     long get_next_free_rule_index() {
@@ -654,7 +654,6 @@ public abstract class Parser<T> {
 //    public String get_error_message() {
 //        return errorMessage;
 //    }
-
     public T parse(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {
         return parse(text_to_parse, parserEventHandler, true);
     }
@@ -666,26 +665,34 @@ public abstract class Parser<T> {
             text_to_parse += EOF_SIGN;
         }
         parserEventHandler.content = null;
-        
+
         // adding all rule names into the event handler
         for (Entry<String, Long> rule_name : ruleToNT.entrySet()) {
             parserEventHandler.ruleNames.add(rule_name.getKey());
         }
 
         parserEventHandler.sanityCheck(this);
-
-        Optional<ParsingErrors> parsingErrors = parse_regular(text_to_parse, parserEventHandler);
-        if (parsingErrors.isPresent() && !parsingErrors.get().wordInGrammar) {
+        try {
+            Optional<ParsingErrors> parsingErrors = parse_regular(text_to_parse, parserEventHandler);
+            if (parsingErrors.isPresent() && !parsingErrors.get().wordInGrammar) {
+                if (throw_error) {
+                    throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
+                } else {
+                    parserEventHandler.errorMessage = parsingErrors.get().errorMessage;
+                }
+            }
+        } catch (RuntimeException lpe) {
             if (throw_error) {
-                throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
+                throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "': ", lpe);
             } else {
-                parserEventHandler.errorMessage = parsingErrors.get().errorMessage;
+                parserEventHandler.errorMessage = lpe.getLocalizedMessage();
             }
         }
         return parserEventHandler.content;
     }
-    
+
     private class ParsingErrors {
+
         final boolean wordInGrammar;
         final String errorMessage;
 
@@ -693,7 +700,7 @@ public abstract class Parser<T> {
             this.wordInGrammar = wordInGrammar;
             this.errorMessage = errorMessage;
         }
-        
+
     }
 
     Optional<ParsingErrors> parse_regular(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {

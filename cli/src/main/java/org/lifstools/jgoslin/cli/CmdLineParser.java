@@ -249,7 +249,7 @@ public class CmdLineParser {
                 m.put("Adduct", t.getLipidAdduct().adduct == null ? "" : t.getLipidAdduct().adduct.getLipidString());
                 m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
                 m.put("Mass", String.format(Locale.US, "%.4f", t.getLipidAdduct().getMass()));
-                m.put("Lipid Maps Category", t.getLipidAdduct().lipid.getHeadgroup().lipidCategory.getFullName() + " [" + t.getLipidAdduct().lipid.getHeadgroup().lipidCategory.name() + "]");
+                m.put("Lipid Maps Category", t.getLipidAdduct().lipid.getHeadGroup().lipidCategory.getFullName() + " [" + t.getLipidAdduct().lipid.getHeadGroup().lipidCategory.name() + "]");
                 LipidClassMeta lclass = LIPID_CLASSES.get(t.getLipidAdduct().lipid.getInfo().lipidClass);
 // FIXME retrieve lipid maps main class info, functional class abbreviation and synonyms
                 m.put("Lipid Maps Main Class", lclass.description);

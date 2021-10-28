@@ -26,16 +26,15 @@ package org.lifstools.jgoslin.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import lombok.Data;
+import java.util.Map;
 
 /**
  *
  * @author dominik
  */
-@Data
 public class LipidSpecies {
 
-    protected Headgroup headgroup;
+    protected Headgroup headGroup;
     protected LipidSpeciesInfo info;
 
     protected HashMap<String, FattyAcid> fa = new HashMap<>();
@@ -45,10 +44,10 @@ public class LipidSpecies {
         this(_headgroup, null, knownFunctionalGroups);
     }
 
-    public LipidSpecies(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
-        headgroup = _headgroup;
+    public LipidSpecies(Headgroup _headGroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
+        headGroup = _headGroup;
 
-        info = new LipidSpeciesInfo(headgroup.lipidClass, knownFunctionalGroups);
+        info = new LipidSpeciesInfo(headGroup.lipidClass, knownFunctionalGroups);
         info.level = LipidLevel.SPECIES;
 
         // add fatty acids
@@ -62,6 +61,18 @@ public class LipidSpecies {
 
     public LipidLevel getLipidLevel() {
         return LipidLevel.SPECIES;
+    }
+    
+    public LipidSpeciesInfo getInfo() {
+        return info;
+    }
+    
+    public Map<String, FattyAcid> getFa() {
+        return fa;
+    }
+    
+    public Headgroup getHeadGroup() {
+        return headGroup;
     }
 
     public String getLipidString() {
@@ -79,31 +90,31 @@ public class LipidSpecies {
 
             case CLASS:
             case CATEGORY:
-                return headgroup.getLipidString(level);
+                return headGroup.getLipidString(level);
 
             case NO_LEVEL:
             case SPECIES:
                 StringBuilder lipid_string = new StringBuilder();
-                lipid_string.append(headgroup.getLipidString(level));
+                lipid_string.append(headGroup.getLipidString(level));
 
                 if (info.elements.get(Element.C) > 0 || info.numCarbon > 0) {
                     LipidSpeciesInfo lsi = info.copy();
-                    for (HeadgroupDecorator decorator : headgroup.decorators) {
+                    for (HeadgroupDecorator decorator : headGroup.decorators) {
                         if (decorator.name.equals("decorator_alkyl") || decorator.name.equals("decorator_acyl")) {
                             ElementTable e = decorator.getElements();
                             lsi.numCarbon += e.get(Element.C);
                             lsi.doubleBonds.numDoubleBonds += decorator.getDoubleBonds();
                         }
                     }
-                    lipid_string.append(headgroup.lipidCategory != LipidCategory.ST ? " " : "/").append(lsi.toString());
+                    lipid_string.append(headGroup.lipidCategory != LipidCategory.ST ? " " : "/").append(lsi.toString());
                 }
                 return lipid_string.toString();
         }
     }
 
     public String getExtendedClass() {
-        boolean special_case = (info.numCarbon > 0) ? (headgroup.lipidCategory == LipidCategory.GP) : false;
-        String class_name = headgroup.getClassName();
+        boolean special_case = (info.numCarbon > 0) ? (headGroup.lipidCategory == LipidCategory.GP) : false;
+        String class_name = headGroup.getClassName();
         if (special_case && (info.extendedClass == LipidFaBondType.ETHER_PLASMANYL || info.extendedClass == LipidFaBondType.ETHER_UNSPECIFIED)) {
             return class_name + "-O";
         } else if (special_case && info.extendedClass == LipidFaBondType.ETHER_PLASMENYL) {
@@ -132,22 +143,22 @@ public class LipidSpecies {
                 throw new LipidException("Element table cannot be computed for lipid level " + info.level.toString());
         }
 
-        if (headgroup.useHeadgroup) {
+        if (headGroup.useHeadgroup) {
             throw new LipidException("Element table cannot be computed for lipid level " + info.level.toString());
         }
 
-        ElementTable elements = headgroup.getElements();
+        ElementTable elements = headGroup.getElements();
         elements.add(info.getElements());
 
         // since only one FA info is provided, we have to treat this single information as
         // if we would have the complete information about all possible FAs in that lipid
-        LipidClassMeta meta = LipidClasses.getInstance().get(headgroup.lipidClass);
+        LipidClassMeta meta = LipidClasses.getInstance().get(headGroup.lipidClass);
 
         int additional_fa = meta.possibleNumFa;
         int remaining_H = meta.maxNumFa - additional_fa;
         int hydrochain = meta.specialCases.contains("HC") ? 1 : 0;
 
-        elements.put(Element.O, elements.get(Element.O) - (-additional_fa + info.numEthers + (headgroup.spException ? 1 : 0) + hydrochain));
+        elements.put(Element.O, elements.get(Element.O) - (-additional_fa + info.numEthers + (headGroup.spException ? 1 : 0) + hydrochain));
         elements.put(Element.H, elements.get(Element.H) + (-additional_fa + remaining_H + 2 * info.numEthers + 2 * hydrochain));
 
         return elements;

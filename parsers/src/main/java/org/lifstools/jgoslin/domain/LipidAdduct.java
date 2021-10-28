@@ -67,27 +67,27 @@ public class LipidAdduct {
     }
 
     public String getClassName() {
-        return (lipid != null) ? lipid.headgroup.getClassName() : "";
+        return (lipid != null) ? lipid.headGroup.getClassName() : "";
     }
 
     public boolean isLyso() {
-        return (LipidClasses.getInstance().size() > lipid.headgroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headgroup.lipidClass).specialCases.contains("Lyso") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Lyso") : false;
     }
 
     public boolean isCardioLipin() {
-        return (LipidClasses.getInstance().size() > lipid.headgroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headgroup.lipidClass).specialCases.contains("Cardio") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Cardio") : false;
     }
 
     public boolean containsSugar() {
-        return (LipidClasses.getInstance().size() > lipid.headgroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headgroup.lipidClass).specialCases.contains("Sugar") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Sugar") : false;
     }
 
     public boolean containsEster() {
-        return (LipidClasses.getInstance().size() > lipid.headgroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headgroup.lipidClass).specialCases.contains("Ester") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Ester") : false;
     }
 
     public boolean isSpException() {
-        return (LipidClasses.getInstance().size() > lipid.headgroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headgroup.lipidClass).specialCases.contains("SP_Exception") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("SP_Exception") : false;
     }
 
     public LipidLevel getLipidLevel() {

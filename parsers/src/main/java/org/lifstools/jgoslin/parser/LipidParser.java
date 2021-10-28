@@ -76,7 +76,17 @@ public class LipidParser {
                 return lipid;
             }
         }
-        throw new LipidParsingException("Could not parse lipid '" + lipid_name + "'with any parser!" + ((lastParser != null) ? " Last message was: " + ((eventHandler == null) ? "unknown" : eventHandler.errorMessage) : ""));
+        String message = " Parsing failed ";
+        if (eventHandler == null) {
+            message += " with unknown reason.";
+        } else {
+            String errorMessage = eventHandler.errorMessage;
+            if (errorMessage == null || errorMessage.isEmpty()) {
+                errorMessage = lipid_name;
+            }
+            message += ("at or after " + errorMessage);
+        }
+        throw new LipidParsingException("Could not parse lipid '" + lipid_name + " 'with any parser!" + message);
     }
 
     /**
