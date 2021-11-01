@@ -74,13 +74,10 @@ hg_tgl : 'TAG';
 
 
 /* phospholipid rules (56 classes) */
-pl : lpl | dpl | tpl | pl_o | cl | mlcl | dlcl;
-pl_o : lpl_o | dpl_o;
+pl : lpl | dpl | tpl | cl | mlcl | dlcl;
 lpl : hg_lplc headgroup_separator fa;
-lpl_o : hg_lpl_oc plasmalogen_separator fa;
 dpl : hg_plc headgroup_separator pl_species | hg_plc headgroup_separator pl_subspecies;
 tpl : hg_tplc headgroup_separator pl_species | hg_tplc headgroup_separator tpl_subspecies;
-dpl_o : hg_pl_oc plasmalogen_separator pl_species | hg_pl_oc plasmalogen_separator pl_subspecies;
 dlcl : hg_dlclc headgroup_separator pl_species | hg_dlclc headgroup_separator dlcl_subspecies;
 mlcl : hg_mlclc headgroup_separator pl_species | hg_mlclc headgroup_separator mlcl_subspecies;
 cl : hg_clc headgroup_separator pl_species | hg_clc headgroup_separator cl_subspecies;
@@ -97,11 +94,11 @@ heavy_hg : heavy;
 
 hg_clc : hg_cl | hg_cl heavy_hg;
 hg_cl : 'CL' | 'SLBPA' | 'MLCL' | 'BMP';
-hg_mlclc : hg_mlcl | hg_mlcl heavy_hg;
+hg_mlclc : hg_mlcl | hg_mlcl heavy_hg | hg_mlcl plasmalogen_hg | hg_mlcl heavy_hg plasmalogen_hg;
 hg_mlcl : 'MLCL';
-hg_dlclc : hg_dlcl | hg_dlcl heavy_hg;
+hg_dlclc : hg_dlcl | hg_dlcl heavy_hg | hg_dlcl plasmalogen_hg | hg_dlcl heavy_hg plasmalogen_hg;
 hg_dlcl : 'DLCL';
-hg_plc : hg_pl | hg_pl heavy_hg;
+hg_plc : hg_pl | hg_pl heavy_hg | hg_pl plasmalogen_hg | hg_pl heavy_hg plasmalogen_hg;
 hg_pl : 'BMP' | 'CDP-DAG' | 'DMPE' | 'MMPE' | 'PA' | 'PC' | 'PE' | 'PEt' | 'PG' | 'PI' | hg_pip | 'PS' | 'LBPA' | 'PGP' | 'PPA' | 'Glc-GP' | '6-Ac-Glc-GP' | hg_pim | 'PnC' | 'PnE' | 'PT' | 'PE-NMe2' | 'PE-NMe' | 'PIMIP' | 'CDPDAG';
 hg_pim : 'PIM' hg_pim_number;
 hg_pim_number : number;
@@ -113,15 +110,13 @@ hg_pip_t : '3' | '3[3\',4\',5\']';
 hg_tplc : hg_tpl | hg_tpl heavy_hg;
 hg_tpl : slbpa | 'NAPE';
 slbpa : 'SLBPA';
-hg_lplc : hg_lpl | hg_lpl heavy_hg;
+hg_lplc : hg_lpl | hg_lpl heavy_hg | hg_lpl plasmalogen_hg | hg_lpl heavy_hg plasmalogen_hg;
 hg_lpl : 'LPA' | 'LPC' | 'LPE' | 'LPG' | 'LPI' | 'LPS' | hg_lpim | 'CPA' | 'LCDPDAG' | 'LDMPE' | 'LMMPE' | 'LPIMIP' | 'LPIN';
 hg_lpim : 'LPIM' hg_lpim_number;
 hg_lpim_number : number;
-hg_lpl_oc : hg_lpl_o ' O' | hg_lpl_o heavy_hg ' O';
-hg_lpl_o : hg_lpl;
-hg_pl_oc : hg_pl_o ' O' | hg_pl_o heavy_hg ' O';
-hg_pl_o : hg_pl;
 
+plasmalogen_hg : plasmalogen_separator plasmalogen plasmalogen_separator | plasmalogen_separator plasmalogen | plasmalogen plasmalogen_separator;
+plasmalogen : 'O' | 'o' | 'P' | 'p';
 
 
 /* sphingolipid rules (21) */
@@ -133,9 +128,9 @@ sl_species : lcb;
 sl_subspecies : lcb sorted_fa_separator fa;
 
 hg_lslc : hg_lsl | hg_lsl heavy_hg;
-hg_lsl : 'LCB' | 'LCBP' | 'LHexCer' | 'LSM';
+hg_lsl : 'LCB' | 'LCBP' | 'LHexCer' | 'LSM' | 'LIPC' | 'So' | 'Sa' | 'SPH' | 'Sph' | 'LCB' | 'S1P' | 'SPH-P' | 'SIP' | 'Sa1P';
 hg_dslc : hg_dsl | hg_dsl heavy_hg;
-hg_dsl : 'Cer' | 'CerP' | 'EPC' | 'GB4' | 'GD3' | 'GB3' | 'GM1' | 'GM3' | 'GM4' | 'Hex3Cer' | 'Hex2Cer' | 'HexCer' | 'IPC' | 'M(IP)2C' | 'MIPC' | 'SHexCer' | 'SM' | 'FMC-5' | 'FMC-6' ;
+hg_dsl : 'Cer' | 'CerP' | 'EPC' | 'GB4' | 'GD3' | 'GB3' | 'GM1' | 'GM3' | 'GM4' | 'Hex3Cer' | 'Hex2Cer' | 'HexCer' | 'IPC' | 'MIP2C' | 'M(IP)2C' | 'MIPC' | 'SHexCer' | 'SM' | 'FMC-5' | 'FMC-6' | 'CerPE' | 'PE-Cer';
 
 
 
@@ -144,7 +139,7 @@ hg_dsl : 'Cer' | 'CerP' | 'EPC' | 'GB4' | 'GD3' | 'GB3' | 'GM1' | 'GM3' | 'GM4' 
 /* sterol lipids (2 classes) */
 sterol : stc | ste | stes;
 stc : st | st heavy_hg;
-st : 'Ch' | 'Cholesterol' | 'ST 27:1;1' | 'ST 27:2;1' | 'ST 28:3;1' | 'ST 30:2;1' | 'ST 29:2;1' | 'ST 28:2;1' | 'Desmosterol' | 'Stigmasterol' | 'Ergosterol' | 'Lanosterol';
+st : 'Ch' | 'Cholesterol' | 'ST 27:1;1' | 'ST 27:2;1' | 'ST 28:3;1' | 'ST 30:2;1' | 'ST 29:2;1' | 'ST 28:2;1' | 'Desmosterol' | 'Stigmasterol' | 'Ergosterol' | 'Lanosterol' | 'Ergostadienol' | 'Campesterol' | 'Sitosterol';
 ste : hg_stc sorted_fa_separator fa;
 stes : hg_stcs headgroup_separator fa;
 hg_stc : hg_ste | hg_ste heavy_hg;
@@ -176,13 +171,15 @@ sac_f_subspecies : fa4;
 
 
 /* generic rules */
-fa : fa_pure | fa_pure heavy_fa | fa_pure ether | fa_pure ether heavy_fa;
+fa : fa_ester | fa_ether;
+fa_ester : fa_pure | fa_pure heavy_fa;
+fa_ether : plasmalogen_hg fa_pure | plasmalogen_hg fa_pure ether | fa_pure ether | plasmalogen_hg fa_pure heavy_fa | plasmalogen_hg fa_pure ether heavy_fa | fa_pure ether heavy_fa;
 heavy_fa : heavy;
 fa_pure : carbon carbon_db_separator db | carbon carbon_db_separator db db_hydroxyl_separator hydroxyl;
 ether : 'a' | 'p';
 lcb : lcb_pure | lcb_pure heavy_lcb;
 heavy_lcb : heavy;
-lcb_pure : carbon carbon_db_separator db db_hydroxyl_separator hydroxyl | old_hydroxyl carbon carbon_db_separator db;
+lcb_pure : carbon carbon_db_separator db db_hydroxyl_separator hydroxyl | old_hydroxyl carbon carbon_db_separator db | old_hydroxyl DASH carbon carbon_db_separator db;
 carbon : number;
 db : db_count | db_count db_positions;
 db_count : number;
@@ -224,7 +221,7 @@ FRAGMENT_SEPARATOR : ' - ';
 sorted_fa_separator : SLASH | BACKSLASH;
 adduct_separator : SPACE;
 unsorted_fa_separator : DASH | UNDERSCORE;
-plasmalogen_separator : headgroup_separator | DASH;
+plasmalogen_separator : headgroup_separator | DASH | DASH SPACE;
 headgroup_separator : SPACE;
 carbon_db_separator : COLON;
 db_hydroxyl_separator : SEMICOLON;
