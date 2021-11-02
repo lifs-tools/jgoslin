@@ -25,6 +25,7 @@ package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -105,6 +106,10 @@ public class FunctionalGroup {
             });
         });
     }
+    
+    public Map<String, ArrayList<FunctionalGroup>> getFunctionalGroups() {
+        return functionalGroups;
+    }
 
     public ElementTable getFunctionalGroupElements() {
         ElementTable _elements = new ElementTable();
@@ -144,11 +149,11 @@ public class FunctionalGroup {
         return fg_string;
     }
 
-    public int getDoubleBonds() throws ConstraintViolationException {
+    public int getNDoubleBonds() throws ConstraintViolationException {
         int db = count * doubleBonds.getNum();
         for (Entry<String, ArrayList<FunctionalGroup>> kv : functionalGroups.entrySet()) {
             for (FunctionalGroup func_group : kv.getValue()) {
-                db += func_group.getDoubleBonds();
+                db += func_group.getNDoubleBonds();
             }
         }
 

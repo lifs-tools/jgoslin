@@ -113,8 +113,8 @@ public class FattyAcid extends FunctionalGroup {
     }
 
     @Override
-    public int getDoubleBonds() {
-        return super.getDoubleBonds() + ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
+    public int getNDoubleBonds() {
+        return super.getNDoubleBonds() + ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
     }
 
     public boolean lipidFaBondTypePrefix(LipidFaBondType lipid_FA_bond_type) {
@@ -135,7 +135,7 @@ public class FattyAcid extends FunctionalGroup {
         if (LipidLevel.isLevel(level, LipidLevel.SN_POSITION.level | LipidLevel.MOLECULAR_SPECIES.level)) {
             ElementTable e = getElements();
             num_carbons = e.get(Element.C);
-            num_double_bonds = getDoubleBonds() - ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
+            num_double_bonds = getNDoubleBonds() - ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
         }
 
         fa_string.append(num_carbons).append(":").append(num_double_bonds);

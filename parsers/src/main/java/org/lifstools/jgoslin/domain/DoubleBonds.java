@@ -24,6 +24,8 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -32,16 +34,16 @@ import java.util.HashMap;
 public class DoubleBonds {
 
     public int numDoubleBonds;
-    public final HashMap<Integer, String> doubleBondPositions;
+    public final Map<Integer, String> doubleBondPositions;
 
     public DoubleBonds() {
         numDoubleBonds = 0;
-        doubleBondPositions = new HashMap<>();
+        doubleBondPositions = new TreeMap<>();
     }
 
     public DoubleBonds(int num) {
         numDoubleBonds = num;
-        doubleBondPositions = new HashMap<>();
+        doubleBondPositions = new TreeMap<>();
     }
 
     public DoubleBonds copy() {

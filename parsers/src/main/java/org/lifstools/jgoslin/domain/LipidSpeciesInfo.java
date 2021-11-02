@@ -106,7 +106,7 @@ public class LipidSpeciesInfo extends FattyAcid {
 
         ElementTable e = _fa.getElements();
         numCarbon += e.get(Element.C);
-        doubleBonds.numDoubleBonds += _fa.getDoubleBonds();
+        doubleBonds.numDoubleBonds += _fa.getNDoubleBonds();
 
     }
 

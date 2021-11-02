@@ -103,7 +103,7 @@ public class LipidSpecies {
                         if (decorator.name.equals("decorator_alkyl") || decorator.name.equals("decorator_acyl")) {
                             ElementTable e = decorator.getElements();
                             lsi.numCarbon += e.get(Element.C);
-                            lsi.doubleBonds.numDoubleBonds += decorator.getDoubleBonds();
+                            lsi.doubleBonds.numDoubleBonds += decorator.getNDoubleBonds();
                         }
                     }
                     lipid_string.append(headGroup.lipidCategory != LipidCategory.ST ? " " : "/").append(lsi.toString());

@@ -78,8 +78,8 @@ public class Cycle extends FunctionalGroup {
     }
 
     @Override
-    public int getDoubleBonds() throws ConstraintViolationException {
-        return super.getDoubleBonds() + 1;
+    public int getNDoubleBonds() throws ConstraintViolationException {
+        return super.getNDoubleBonds() + 1;
     }
 
     @Override
