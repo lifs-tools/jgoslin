@@ -39,7 +39,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     private int dbPosition;
     private String dbCistrans;
-    private boolean unspecifiedEther;
+    private char plasmalogen;
 
     public GoslinParserEventHandler() {
         this(new KnownFunctionalGroups());
@@ -55,8 +55,6 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             registeredEvents.put("hg_mlcl_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_pl_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_lpl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_lpl_o_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_pl_o_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_lsl_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_dsl_pre_event", this::setHeadGroupName);
             registeredEvents.put("st_pre_event", this::setHeadGroupName);
@@ -104,9 +102,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             registeredEvents.put("charge_sign_pre_event", this::addChargeSign);
 
             registeredEvents.put("lpl_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("lpl_o_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("hg_lpl_oc_pre_event", this::setUnspecifiedEther);
-            registeredEvents.put("hg_pl_oc_pre_event", this::setUnspecifiedEther);
+            registeredEvents.put("plasmalogen_pre_event", this::setPlasmalogen);
 
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize GoslinParserEventHandler");
@@ -124,11 +120,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         adduct = null;
         dbPosition = 0;
         dbCistrans = "";
-        unspecifiedEther = false;
-    }
-
-    public void setUnspecifiedEther(TreeNode node) {
-        unspecifiedEther = true;
+        plasmalogen = '\0';
     }
 
     public void setHeadGroupName(TreeNode node) {
@@ -152,6 +144,11 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             }
         }
     }
+    
+    public void setPlasmalogen(TreeNode node) {
+        char p = node.getText().toUpperCase().charAt(0);
+        
+    }
 
     public void addDbPositionNumber(TreeNode node) {
         dbPosition = Integer.valueOf(node.getText());
@@ -167,10 +164,6 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     public void newFa(TreeNode node) {
         LipidFaBondType lipid_FA_bond_type = LipidFaBondType.ESTER;
-        if (unspecifiedEther) {
-            unspecifiedEther = false;
-            lipid_FA_bond_type = LipidFaBondType.ETHER_UNSPECIFIED;
-        }
         currentFa = new FattyAcid("FA" + (faList.size() + 1), 2, null, null, lipid_FA_bond_type, knownFunctionalGroups);
     }
 
@@ -217,6 +210,11 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             lcb = null;
             currentFa = null;
         }
+        
+        
+        if (plasmalogen != '\0' && faList.size() > 0 && lcb == null){
+            faList.get(0).lipidFaBondType = plasmalogen == 'O' ? LipidFaBondType.ETHER_PLASMANYL : LipidFaBondType.ETHER_PLASMENYL;
+        }
 
         Headgroup headgroup = prepareHeadgroupAndChecks();
 
@@ -235,6 +233,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             currentFa.lipidFaBondType = LipidFaBondType.ETHER_PLASMENYL;
             currentFa.doubleBonds.numDoubleBonds = Math.max(0, currentFa.doubleBonds.numDoubleBonds - 1);
         }
+        plasmalogen = '\0';
     }
 
     public void addOldHydroxyl(TreeNode node) {
