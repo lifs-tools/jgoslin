@@ -41,6 +41,7 @@ toc::[]
 
 == Building the project and generating client code from the command-line
 
+JGoslin uses the latest Long Term Support Java release version (17). 
 In order to build the client code and run the unit tests, execute the following command from a terminal:
 
 	./mvnw install
