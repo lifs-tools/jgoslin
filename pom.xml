@@ -57,12 +57,11 @@
     </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <junit.vintage.version>5.5.2</junit.vintage.version>
-        <lombok.version>1.18.10</lombok.version>
         <dockerfile.plugin.version>1.4.10</dockerfile.plugin.version>
         <slf4j.version>1.7.26</slf4j.version>
         <jacoco.version>0.8.5</jacoco.version>
@@ -180,13 +179,6 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
-                            </path>
-                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -320,12 +312,6 @@
     </build>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <scope>provided</scope>
-            </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>

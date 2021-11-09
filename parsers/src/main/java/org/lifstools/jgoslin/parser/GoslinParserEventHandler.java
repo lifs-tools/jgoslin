@@ -146,8 +146,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     }
     
     public void setPlasmalogen(TreeNode node) {
-        char p = node.getText().toUpperCase().charAt(0);
-        
+        plasmalogen = node.getText().toUpperCase().charAt(0);
     }
 
     public void addDbPositionNumber(TreeNode node) {

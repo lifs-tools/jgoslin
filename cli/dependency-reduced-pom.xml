@@ -89,14 +89,6 @@
       </properties>
     </profile>
   </profiles>
-  <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.10</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
   <properties>
     <assembly.dir>jgoslin-cli</assembly.dir>
   </properties>

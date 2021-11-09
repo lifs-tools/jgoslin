@@ -32,6 +32,7 @@ import org.junit.jupiter.api.AssertionsKt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.LipidFaBondType;
 
 /**
  *
@@ -108,6 +109,24 @@ public class GoslinParserTest {
         assertEquals(4, l.lipid.getFaList().size());
         assertEquals("FA1", l.lipid.getFaList().get(0).name);
         assertEquals(0, l.lipid.getFaList().get(0).position);
+        assertEquals("FA2", l.lipid.getFaList().get(1).name);
+        assertEquals(0, l.lipid.getFaList().get(1).position);
+        
+        l = parser.parse("PC O-18:1-18:1", handler);
+        assertEquals("C44H86NO7P", l.getSumFormula());
+        assertEquals(2, l.lipid.getFaList().size());
+        assertEquals("FA1", l.lipid.getFaList().get(0).name);
+        assertEquals(0, l.lipid.getFaList().get(0).position);
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.lipid.getFaList().get(0).lipidFaBondType);
+        assertEquals("FA2", l.lipid.getFaList().get(1).name);
+        assertEquals(0, l.lipid.getFaList().get(1).position);
+        
+        l = parser.parse("PC-O 18:1_18:1", handler);
+        assertEquals("C44H86NO7P", l.getSumFormula());
+        assertEquals(2, l.lipid.getFaList().size());
+        assertEquals("FA1", l.lipid.getFaList().get(0).name);
+        assertEquals(0, l.lipid.getFaList().get(0).position);
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.lipid.getFaList().get(0).lipidFaBondType);
         assertEquals("FA2", l.lipid.getFaList().get(1).name);
         assertEquals(0, l.lipid.getFaList().get(1).position);
     }
