@@ -39,19 +39,19 @@ public class LipidMolecularSpecies extends LipidSpecies {
         super(_headgroup, _fa, knownFunctionalGroups);
         info.level = LipidLevel.MOLECULAR_SPECIES;
         faList.stream().map(fatty_acid -> {
-            if (fa.containsKey(fatty_acid.name)) {
-                throw new ConstraintViolationException("FA names must be unique! FA with name " + fatty_acid.name + " was already added!");
+            if (fa.containsKey(fatty_acid.getName())) {
+                throw new ConstraintViolationException("FA names must be unique! FA with name " + fatty_acid.getName() + " was already added!");
             }
             return fatty_acid;
         }).forEachOrdered(fatty_acid -> {
-            fa.put(fatty_acid.name, fatty_acid);
+            fa.put(fatty_acid.getName(), fatty_acid);
         });
 
         // add 0:0 dummys
         for (int i = _fa.size(); i < info.totalFa; ++i) {
             FattyAcid fatty_acid = new FattyAcid("FA" + Integer.toString(i + _fa.size() + 1), knownFunctionalGroups);
             info.add(fatty_acid);
-            fa.put(fatty_acid.name, fatty_acid);
+            fa.put(fatty_acid.getName(), fatty_acid);
             faList.add(fatty_acid);
         }
     }
@@ -126,7 +126,7 @@ public class LipidMolecularSpecies extends LipidSpecies {
 
         // add elements from all fatty acyl chains
         faList.forEach(fatty_acid -> {
-            elements.add(fatty_acid.getElements());
+            elements.add(fatty_acid.computeAndCopyElements());
         });
 
         return elements;

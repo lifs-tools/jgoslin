@@ -86,7 +86,7 @@ public class LipidMapsParserTest {
 
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testLipidMapsParserFromFileTest(String lipid_name, String correct_lipid_name) {
         ////////////////////////////////////////////////////////////////////////////

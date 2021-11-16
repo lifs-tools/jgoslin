@@ -53,19 +53,14 @@ public class LipidStructureDefined extends LipidSnPosition {
     @Override
     public String getLipidString(LipidLevel level) {
         switch (level) {
-            case NO_LEVEL:
-            case STRUCTURE_DEFINED:
+            case NO_LEVEL, STRUCTURE_DEFINED -> {
                 return buildLipidSubspeciesName(LipidLevel.STRUCTURE_DEFINED);
-
-            case SN_POSITION:
-            case MOLECULAR_SPECIES:
-            case CATEGORY:
-            case CLASS:
-            case SPECIES:
+            }
+            case SN_POSITION, MOLECULAR_SPECIES, CATEGORY, CLASS, SPECIES -> {
                 return super.getLipidString(level);
+            }
 
-            default:
-                throw new RuntimeException("LipidStructureDefined does not know how to create a lipid string for level " + level.toString());
+            default -> throw new RuntimeException("LipidStructureDefined does not know how to create a lipid string for level " + level.toString());
         }
     }
 

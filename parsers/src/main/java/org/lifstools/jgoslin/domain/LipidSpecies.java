@@ -97,13 +97,13 @@ public class LipidSpecies {
                 StringBuilder lipid_string = new StringBuilder();
                 lipid_string.append(headGroup.getLipidString(level));
 
-                if (info.elements.get(Element.C) > 0 || info.numCarbon > 0) {
+                if (info.getElements().get(Element.C) > 0 || info.numCarbon > 0) {
                     LipidSpeciesInfo lsi = info.copy();
                     for (HeadgroupDecorator decorator : headGroup.decorators) {
-                        if (decorator.name.equals("decorator_alkyl") || decorator.name.equals("decorator_acyl")) {
-                            ElementTable e = decorator.getElements();
+                        if (decorator.getName().equals("decorator_alkyl") || decorator.getName().equals("decorator_acyl")) {
+                            ElementTable e = decorator.computeAndCopyElements();
                             lsi.numCarbon += e.get(Element.C);
-                            lsi.doubleBonds.numDoubleBonds += decorator.getNDoubleBonds();
+                            lsi.doubleBonds.setNumDoubleBonds(lsi.doubleBonds.getNumDoubleBonds()+ decorator.getNDoubleBonds());
                         }
                     }
                     lipid_string.append(headGroup.lipidCategory != LipidCategory.ST ? " " : "/").append(lsi.toString());

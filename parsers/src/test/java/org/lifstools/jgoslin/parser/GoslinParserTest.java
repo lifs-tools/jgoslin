@@ -57,10 +57,10 @@ public class GoslinParserTest {
         assertEquals("Cer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("Cer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C42H83NO3", l.getSumFormula());
-        assertEquals("LCB", l.lipid.getFaList().get(0).name);
-        assertEquals(0, l.lipid.getFaList().get(0).position);
-        assertEquals("FA1", l.lipid.getFaList().get(1).name);
-        assertEquals(2, l.lipid.getFaList().get(1).position);
+        assertEquals("LCB", l.lipid.getFaList().get(0).getName());
+        assertEquals(0, l.lipid.getFaList().get(0).getPosition());
+        assertEquals("FA1", l.lipid.getFaList().get(1).getName());
+        assertEquals(2, l.lipid.getFaList().get(1).getPosition());
 
         l = parser.parse("HexCer 18:1(5Z);2/24:0", handler);
         assertEquals("HexCer 18:1(5);OH/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
@@ -107,31 +107,31 @@ public class GoslinParserTest {
         l = parser.parse("BMP 18:1-18:1", handler);
         assertEquals("C42H79O10P", l.getSumFormula());
         assertEquals(4, l.lipid.getFaList().size());
-        assertEquals("FA1", l.lipid.getFaList().get(0).name);
-        assertEquals(0, l.lipid.getFaList().get(0).position);
-        assertEquals("FA2", l.lipid.getFaList().get(1).name);
-        assertEquals(0, l.lipid.getFaList().get(1).position);
+        assertEquals("FA1", l.lipid.getFaList().get(0).getName());
+        assertEquals(0, l.lipid.getFaList().get(0).getPosition());
+        assertEquals("FA2", l.lipid.getFaList().get(1).getName());
+        assertEquals(0, l.lipid.getFaList().get(1).getPosition());
         
         l = parser.parse("PC O-18:1-18:1", handler);
         assertEquals("C44H86NO7P", l.getSumFormula());
         assertEquals(2, l.lipid.getFaList().size());
-        assertEquals("FA1", l.lipid.getFaList().get(0).name);
-        assertEquals(0, l.lipid.getFaList().get(0).position);
+        assertEquals("FA1", l.lipid.getFaList().get(0).getName());
+        assertEquals(0, l.lipid.getFaList().get(0).getPosition());
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.lipid.getFaList().get(0).lipidFaBondType);
-        assertEquals("FA2", l.lipid.getFaList().get(1).name);
-        assertEquals(0, l.lipid.getFaList().get(1).position);
+        assertEquals("FA2", l.lipid.getFaList().get(1).getName());
+        assertEquals(0, l.lipid.getFaList().get(1).getPosition());
         
         l = parser.parse("PC-O 18:1_18:1", handler);
         assertEquals("C44H86NO7P", l.getSumFormula());
         assertEquals(2, l.lipid.getFaList().size());
-        assertEquals("FA1", l.lipid.getFaList().get(0).name);
-        assertEquals(0, l.lipid.getFaList().get(0).position);
+        assertEquals("FA1", l.lipid.getFaList().get(0).getName());
+        assertEquals(0, l.lipid.getFaList().get(0).getPosition());
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.lipid.getFaList().get(0).lipidFaBondType);
-        assertEquals("FA2", l.lipid.getFaList().get(1).name);
-        assertEquals(0, l.lipid.getFaList().get(1).position);
+        assertEquals("FA2", l.lipid.getFaList().get(1).getName());
+        assertEquals(0, l.lipid.getFaList().get(1).getPosition());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/goslin-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void testGoslinParserFromFileTest(String lipid_name) {
         ////////////////////////////////////////////////////////////////////////////

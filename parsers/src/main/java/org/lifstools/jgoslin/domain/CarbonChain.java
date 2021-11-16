@@ -52,11 +52,11 @@ public class CarbonChain extends FunctionalGroup {
 
     @Override
     public FunctionalGroup copy() {
-        return new CarbonChain((FattyAcid) functionalGroups.get("cc").get(0).copy(), position, count, knownFunctionalGroups);
+        return new CarbonChain((FattyAcid) functionalGroups.get("cc").get(0).copy(), getPosition(), getCount(), knownFunctionalGroups);
     }
 
     @Override
     public String toString(LipidLevel level) {
-        return (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(position) : "") + "(" + ((FattyAcid) functionalGroups.get("cc").get(0)).toString(level) + ")";
+        return (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(getPosition()) : "") + "(" + ((FattyAcid) functionalGroups.get("cc").get(0)).toString(level) + ")";
     }
 }

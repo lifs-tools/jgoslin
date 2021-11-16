@@ -31,10 +31,10 @@ import java.util.HashMap;
  */
 public final class Adduct {
 
-    public String sumFormula;
-    public String adductString;
-    public int charge;
-    public int chargeSign;
+    private String sumFormula;
+    private String adductString;
+    private int charge;
+    private int chargeSign;
 
     public static final HashMap<String, ElementTable> ADDUCTS = new HashMap<>() {
         {
@@ -143,6 +143,22 @@ public final class Adduct {
         setChargeSign(_sign);
 
     }
+    
+    public void setSumFormula(String sumFormula)  {
+        this.sumFormula = sumFormula;
+    }
+    
+    public String getSumFormula() {
+        return this.sumFormula;
+    }
+    
+    public void setAdductString(String adductString) {
+        this.adductString = adductString;
+    }
+    
+    public String getAdductString() {
+        return this.adductString;
+    }
 
     public void setChargeSign(int _sign) {
         if (-1 <= _sign && _sign <= 1) {
@@ -150,6 +166,19 @@ public final class Adduct {
         } else {
             throw new ConstraintViolationException("Sign can only be -1, 0, or 1");
         }
+    }
+    
+    public int getChargeSign() {
+        return this.chargeSign;
+    }
+    
+    public void setCharge(int charge) {
+        if(charge>0) {
+            this.chargeSign = 1;
+        } else {
+            this.chargeSign = -1;
+        }
+        this.charge = charge;
     }
 
     public String getLipidString() {

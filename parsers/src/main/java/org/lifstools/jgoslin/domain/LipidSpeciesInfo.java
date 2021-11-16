@@ -56,7 +56,7 @@ public class LipidSpeciesInfo extends FattyAcid {
         lsi.level = level;
         lsi.numEthers = numEthers;
         lsi.numSpecifiedFa = numSpecifiedFa;
-        lsi.position = position;
+        lsi.setPosition(getPosition());
         lsi.totalFa = totalFa;
         lsi.extendedClass = extendedClass;
         lsi.numCarbon = numCarbon;
@@ -76,7 +76,7 @@ public class LipidSpeciesInfo extends FattyAcid {
 
     @Override
     public ElementTable getElements() {
-        ElementTable elements = super.getElements();
+        ElementTable elements = super.computeAndCopyElements();
         if (lipidFaBondType != LipidFaBondType.LCB_EXCEPTION) {
             elements.put(Element.O, elements.get(Element.O) - ((numEthers == 0) ? 1 : 0));
         }
@@ -104,9 +104,9 @@ public class LipidSpeciesInfo extends FattyAcid {
             }
         }
 
-        ElementTable e = _fa.getElements();
+        ElementTable e = _fa.computeAndCopyElements();
         numCarbon += e.get(Element.C);
-        doubleBonds.numDoubleBonds += _fa.getNDoubleBonds();
+        doubleBonds.setNumDoubleBonds(doubleBonds.getNumDoubleBonds() + _fa.getNDoubleBonds());
 
     }
 
@@ -114,7 +114,7 @@ public class LipidSpeciesInfo extends FattyAcid {
     public String toString() {
         StringBuilder info_string = new StringBuilder();
         info_string.append(ETHER_PREFIX[numEthers]);
-        info_string.append(numCarbon).append(":").append(doubleBonds.getNum());
+        info_string.append(numCarbon).append(":").append(doubleBonds.getNumDoubleBonds());
 
         ElementTable fg_elements = getFunctionalGroupElements();
         for (int i = 2; i < Elements.ELEMENT_ORDER.size(); ++i) {

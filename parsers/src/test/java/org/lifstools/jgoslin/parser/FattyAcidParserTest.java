@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.lifstools.jgoslin.domain.ElementTable;
 
 /**
  *
@@ -68,7 +67,7 @@ public class FattyAcidParserTest {
         assertEquals(computed_formula, lipid_formula2);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/fatty-acids-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testFattyAcidParserTest(String lmid, String lipid_name, String formula, String expected_lipid_name) {
         ////////////////////////////////////////////////////////////////////////////

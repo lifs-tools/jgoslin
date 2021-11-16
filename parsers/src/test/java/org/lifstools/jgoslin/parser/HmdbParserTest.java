@@ -86,7 +86,7 @@ public class HmdbParserTest {
 
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/hmdb-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void testHmdbParserFromFileTest(String lipid_name) {
         ////////////////////////////////////////////////////////////////////////////

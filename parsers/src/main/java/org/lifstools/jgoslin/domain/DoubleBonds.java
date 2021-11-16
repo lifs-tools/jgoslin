@@ -23,7 +23,6 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.domain;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,7 +32,7 @@ import java.util.TreeMap;
  */
 public class DoubleBonds {
 
-    public int numDoubleBonds;
+    private int numDoubleBonds;
     public final Map<Integer, String> doubleBondPositions;
 
     public DoubleBonds() {
@@ -54,10 +53,15 @@ public class DoubleBonds {
         return db;
     }
 
-    public int getNum() {
+    public int getNumDoubleBonds() {
         if (doubleBondPositions.size() > 0 && doubleBondPositions.size() != numDoubleBonds) {
             throw new ConstraintViolationException("Number of double bonds '" + Integer.toString(numDoubleBonds) + "' does not match to number of double bond positions '" + Integer.toString(doubleBondPositions.size()) + "'");
         }
         return numDoubleBonds;
     }
+    
+    public void setNumDoubleBonds(int numDoubleBonds) {
+        this.numDoubleBonds = numDoubleBonds;
+    }
+    
 }

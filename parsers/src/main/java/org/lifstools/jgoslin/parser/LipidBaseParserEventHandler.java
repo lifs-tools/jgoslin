@@ -81,7 +81,7 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
 
         int true_fa = 0;
         for (FattyAcid fa : faList) {
-            true_fa += (fa.numCarbon > 0 || fa.doubleBonds.getNum() > 0) ? 1 : 0;
+            true_fa += (fa.numCarbon > 0 || fa.getDoubleBonds().getNumDoubleBonds() > 0) ? 1 : 0;
         }
         int poss_fa = (LipidClasses.getInstance().size() > headgroup.lipidClass) ? LipidClasses.getInstance().get(headgroup.lipidClass).possibleNumFa : 0;
 

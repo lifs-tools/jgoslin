@@ -79,7 +79,7 @@ public class SwissLipidsParserTest {
 
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/swiss-lipids-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void testSwissLipidsParserFromFileTest(String lipid_name) {
         ////////////////////////////////////////////////////////////////////////////

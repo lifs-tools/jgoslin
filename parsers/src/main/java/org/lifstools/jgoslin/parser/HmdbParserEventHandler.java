@@ -125,7 +125,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
     public void addDbPosition(TreeNode node) {
         if (currentFa != null) {
-            currentFa.doubleBonds.doubleBondPositions.put(dbPositions, dbCistrans);
+            currentFa.getDoubleBonds().doubleBondPositions.put(dbPositions, dbCistrans);
             if (!dbCistrans.equals("E") && !dbCistrans.equals("Z")) {
                 setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
             }
@@ -169,22 +169,22 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void cleanLcb(TreeNode node) {
-        if (currentFa.doubleBonds.doubleBondPositions.isEmpty() && currentFa.doubleBonds.getNum() > 0) {
+        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
         currentFa = null;
     }
 
     public void appendFa(TreeNode node) {
-        if (currentFa.doubleBonds.getNum() < 0) {
+        if (currentFa.getDoubleBonds().getNumDoubleBonds() < 0) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
-        if (currentFa.doubleBonds.doubleBondPositions.isEmpty() && currentFa.doubleBonds.getNum() > 0) {
+        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
 
         if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level | LipidLevel.SN_POSITION.level)) {
-            currentFa.position = faList.size() + 1;
+            currentFa.setPosition(faList.size() + 1);
         }
 
         faList.add(currentFa);
@@ -194,7 +194,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     public void buildLipid(TreeNode node) {
         if (lcb != null) {
             for (FattyAcid fa : faList) {
-                fa.position += 1;
+                fa.setPosition(fa.getPosition() + 1);
             }
             faList.add(0, lcb);
         }
@@ -232,38 +232,38 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
-        functional_group.count = num_h;
-        if (!currentFa.functionalGroups.containsKey("OH")) {
-            currentFa.functionalGroups.put("OH", new ArrayList<>());
+        functional_group.setCount(num_h);
+        if (!currentFa.getFunctionalGroups().containsKey("OH")) {
+            currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
         }
-        currentFa.functionalGroups.get("OH").add(functional_group);
+        currentFa.getFunctionalGroups().get("OH").add(functional_group);
     }
 
     public void addMethyl(TreeNode node) {
         FunctionalGroup functional_group = knownFunctionalGroups.get("Me");
-        functional_group.position = currentFa.numCarbon - (node.getText().equals("i-") ? 1 : 2);
+        functional_group.setPosition(currentFa.numCarbon - (node.getText().equals("i-") ? 1 : 2));
         currentFa.numCarbon -= 1;
 
-        if (!currentFa.functionalGroups.containsKey("Me")) {
-            currentFa.functionalGroups.put("Me", new ArrayList<>());
+        if (!currentFa.getFunctionalGroups().containsKey("Me")) {
+            currentFa.getFunctionalGroups().put("Me", new ArrayList<>());
         }
-        currentFa.functionalGroups.get("Me").add(functional_group);
+        currentFa.getFunctionalGroups().get("Me").add(functional_group);
     }
 
     public void addOneHydroxyl(TreeNode node) {
-        if (currentFa.functionalGroups.containsKey("OH") && currentFa.functionalGroups.get("OH").get(0).position == -1) {
-            currentFa.functionalGroups.get("OH").get(0).count += 1;
+        if (currentFa.getFunctionalGroups().containsKey("OH") && currentFa.getFunctionalGroups().get("OH").get(0).getPosition() == -1) {
+            currentFa.getFunctionalGroups().get("OH").get(0).setCount(currentFa.getFunctionalGroups().get("OH").get(0).getCount() + 1);
         } else {
             FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
-            if (!currentFa.functionalGroups.containsKey("OH")) {
-                currentFa.functionalGroups.put("OH", new ArrayList<>());
+            if (!currentFa.getFunctionalGroups().containsKey("OH")) {
+                currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
             }
-            currentFa.functionalGroups.get("OH").add(functional_group);
+            currentFa.getFunctionalGroups().get("OH").add(functional_group);
         }
     }
 
     public void addDoubleBonds(TreeNode node) {
-        currentFa.doubleBonds.numDoubleBonds = node.getInt();
+        currentFa.getDoubleBonds().setNumDoubleBonds(node.getInt());
     }
 
     public void addCarbon(TreeNode node) {
@@ -289,22 +289,22 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
         if (((String) furan.get("type")).equals("m")) {
             FunctionalGroup fg = knownFunctionalGroups.get("Me");
-            fg.position = 1 + start;
+            fg.setPosition(1 + start);
             cyclo_fg.get("Me").add(fg);
         } else if (((String) furan.get("type")).equals("d")) {
             FunctionalGroup fg = knownFunctionalGroups.get("Me");
-            fg.position = 1 + start;
+            fg.setPosition(1 + start);
             cyclo_fg.get("Me").add(fg);
             fg = knownFunctionalGroups.get("Me");
-            fg.position = 2 + start;
+            fg.setPosition(2 + start);
             cyclo_fg.get("Me").add(fg);
         }
 
         ArrayList<Element> bridge_chain = new ArrayList<>();
         bridge_chain.add(Element.O);
         Cycle cycle = new Cycle(end - start + 1 + bridge_chain.size(), start, end, cyclo_db, cyclo_fg, bridge_chain, knownFunctionalGroups);
-        currentFa.functionalGroups.put("cy", new ArrayList<>());
-        currentFa.functionalGroups.get("cy").add(cycle);
+        currentFa.getFunctionalGroups().put("cy", new ArrayList<>());
+        currentFa.getFunctionalGroups().get("cy").add(cycle);
     }
 
     public void furanFaMono(TreeNode node) {
@@ -336,11 +336,11 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void addAdduct(TreeNode node) {
-        adduct.adductString = node.getText();
+        adduct.setAdductString(node.getText());
     }
 
     public void addCharge(TreeNode node) {
-        adduct.charge = Integer.valueOf(node.getText());
+        adduct.setCharge(Integer.valueOf(node.getText()));
     }
 
     public void addChargeSign(TreeNode node) {

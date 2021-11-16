@@ -47,7 +47,7 @@ public class SumFormulaTest {
         gHandler = goslin_parser.newEventHandler();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/formulas-lipid-maps.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testSumFormulaLM(String lipid_name, String correct_formula) {
         ////////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ public class SumFormulaTest {
         assertEquals(correct_formula, lipid.getSumFormula(), "Error for lipid '" + lipid_name + "': " + lipid.getSumFormula() + " != " + correct_formula + " (reference)");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/formulas-swiss-lipids.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testSumFormulaSL(String lipid_name, String correct_formula) {
         ////////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ public class SumFormulaTest {
         assertEquals(correct_formula, lipid.getSumFormula(), "Error for lipid '" + lipid_name + "': " + lipid.getSumFormula() + " != " + correct_formula + " (reference)");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/lipid-masses.csv", numLinesToSkip = 1, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testMasses(String lipid_class, String lipid_name, String lipid_formula, String lipid_adduct, double lipid_mass, int lipid_charge) {
         ////////////////////////////////////////////////////////////////////////////

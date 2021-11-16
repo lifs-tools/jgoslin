@@ -34,15 +34,15 @@ import java.util.Map.Entry;
  */
 public class FunctionalGroup {
 
-    public String name;
-    public int position = -1;
-    public int count;
-    public String stereochemistry;
-    public String ringStereo;
-    public DoubleBonds doubleBonds;
-    public boolean isAtomic;
-    public ElementTable elements;
-    public HashMap<String, ArrayList<FunctionalGroup>> functionalGroups;
+    protected String name;
+    protected int position = -1;
+    protected int count;
+    protected String stereochemistry;
+    protected String ringStereo;
+    protected DoubleBonds doubleBonds;
+    protected boolean atomic;
+    protected ElementTable elements;
+    protected Map<String, ArrayList<FunctionalGroup>> functionalGroups;
     protected KnownFunctionalGroups knownFunctionalGroups;
 
     public FunctionalGroup(String _name, KnownFunctionalGroups knownFunctionalGroups) {
@@ -64,7 +64,7 @@ public class FunctionalGroup {
         stereochemistry = _stereochemistry;
         ringStereo = "";
         doubleBonds = (_double_bonds != null) ? _double_bonds : new DoubleBonds(0);
-        isAtomic = _is_atomic;
+        atomic = _is_atomic;
         elements = (_elements != null) ? _elements : new ElementTable();
         functionalGroups = (_functional_groups != null) ? _functional_groups : (new HashMap<>());
         this.knownFunctionalGroups = knownFunctionalGroups;
@@ -86,12 +86,76 @@ public class FunctionalGroup {
             e.put(kv.getKey(), kv.getValue());
         });
 
-        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, isAtomic, stereochemistry, e, fg, knownFunctionalGroups);
+        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, e, fg, knownFunctionalGroups);
         func_group_new.ringStereo = ringStereo;
         return func_group_new;
     }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return this.name;
+    }
+    
+    public void setPosition(int position) {
+        this.position = position;
+    }
+    
+    public int getPosition() {
+        return this.position;
+    }
+    
+    public void setCount(int count) {
+        this.count = count;
+    }
+    
+    public int getCount() {
+        return this.count;
+    }
+    
+    public String getStereochemistry() {
+        return stereochemistry;
+    }
 
+    public void setStereochemistry(String stereochemistry) {
+        this.stereochemistry = stereochemistry;
+    }
+
+    public String getRingStereo() {
+        return ringStereo;
+    }
+
+    public void setRingStereo(String ringStereo) {
+        this.ringStereo = ringStereo;
+    }
+    
+    public DoubleBonds getDoubleBonds() {
+        return this.doubleBonds;
+    }
+    
+    public void setDoubleBonds(DoubleBonds doubleBonds) {
+        this.doubleBonds = doubleBonds;
+    }
+    
+    public void setAtomic(boolean atomic) {
+        this.atomic = atomic;
+    }
+    
+    public boolean isAtomic() {
+        return this.atomic;
+    }
+    
     public ElementTable getElements() {
+        return this.elements;
+    }
+    
+    public void setElements(ElementTable elements) {
+        this.elements = elements;
+    }
+
+    public ElementTable computeAndCopyElements() {
         computeElements();
         ElementTable _elements = elements.copy();
         _elements.add(getFunctionalGroupElements());
@@ -110,13 +174,17 @@ public class FunctionalGroup {
     public Map<String, ArrayList<FunctionalGroup>> getFunctionalGroups() {
         return functionalGroups;
     }
+    
+    public void setFunctionalGroups(Map<String, ArrayList<FunctionalGroup>> functionalGroups) {
+        this.functionalGroups = functionalGroups;
+    }
 
     public ElementTable getFunctionalGroupElements() {
         ElementTable _elements = new ElementTable();
 
         functionalGroups.entrySet().forEach(kv -> {
             kv.getValue().forEach(func_group -> {
-                _elements.add(func_group.getElements(), func_group.count);
+                _elements.add(func_group.computeAndCopyElements(), func_group.count);
             });
         });
 
@@ -150,7 +218,7 @@ public class FunctionalGroup {
     }
 
     public int getNDoubleBonds() throws ConstraintViolationException {
-        int db = count * doubleBonds.getNum();
+        int db = count * doubleBonds.getNumDoubleBonds();
         for (Entry<String, ArrayList<FunctionalGroup>> kv : functionalGroups.entrySet()) {
             for (FunctionalGroup func_group : kv.getValue()) {
                 db += func_group.getNDoubleBonds();

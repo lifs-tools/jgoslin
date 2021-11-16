@@ -125,7 +125,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
     public void addDbPosition(TreeNode node) {
         if (currentFa != null) {
-            currentFa.doubleBonds.doubleBondPositions.put(dbPosition, dbCistrans);
+            currentFa.getDoubleBonds().doubleBondPositions.put(dbPosition, dbCistrans);
             if (!dbCistrans.equals("E") && !dbCistrans.equals("Z")) {
                 setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
             }
@@ -136,8 +136,8 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
         headGroup = "PE-N";
         HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);
         headgroupDecorators.add(hgd);
-        hgd.functionalGroups.put("decorator_acyl", new ArrayList<>());
-        hgd.functionalGroups.get("decorator_acyl").add(faList.get(faList.size() - 1));
+        hgd.getFunctionalGroups().put("decorator_acyl", new ArrayList<>());
+        hgd.getFunctionalGroups().get("decorator_acyl").add(faList.get(faList.size() - 1));
         faList.remove(faList.size() - 1);
     }
 
@@ -182,23 +182,23 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void cleanLcb(TreeNode node) {
-        if (currentFa.doubleBonds.doubleBondPositions.isEmpty() && currentFa.doubleBonds.getNum() > 0) {
+        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
         currentFa = null;
     }
 
     public void appendFa(TreeNode node) {
-        if (currentFa.doubleBonds.getNum() < 0) {
+        if (currentFa.getDoubleBonds().getNumDoubleBonds() < 0) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
 
-        if (currentFa.doubleBonds.doubleBondPositions.isEmpty() && currentFa.doubleBonds.getNum() > 0) {
+        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
 
         if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level | LipidLevel.SN_POSITION.level)) {
-            currentFa.position = faList.size() + 1;
+            currentFa.setPosition(faList.size() + 1);
         }
 
         faList.add(currentFa);
@@ -208,7 +208,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     public void buildLipid(TreeNode node) {
         if (lcb != null) {
             faList.forEach(fa -> {
-                fa.position += 1;
+                fa.setPosition(fa.getPosition() + 1);
             });
             faList.add(0, lcb);
         }
@@ -243,22 +243,22 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
             num_h -= 1;
         }
         FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
-        functional_group.count = num_h;
-        if (!currentFa.functionalGroups.containsKey("OH")) {
-            currentFa.functionalGroups.put("OH", new ArrayList<>());
+        functional_group.setCount(num_h);
+        if (!currentFa.getFunctionalGroups().containsKey("OH")) {
+            currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
         }
-        currentFa.functionalGroups.get("OH").add(functional_group);
+        currentFa.getFunctionalGroups().get("OH").add(functional_group);
     }
 
     public void addOneHydroxyl(TreeNode node) {
-        if (!currentFa.functionalGroups.containsKey("OH") && currentFa.functionalGroups.get("OH").get(0).position == -1) {
-            currentFa.functionalGroups.get("OH").get(0).count += 1;
+        if (!currentFa.getFunctionalGroups().containsKey("OH") && currentFa.getFunctionalGroups().get("OH").get(0).getPosition() == -1) {
+            currentFa.getFunctionalGroups().get("OH").get(0).setCount(currentFa.getFunctionalGroups().get("OH").get(0).getCount() + 1);
         } else {
             FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
-            if (!currentFa.functionalGroups.containsKey("OH")) {
-                currentFa.functionalGroups.put("OH", new ArrayList<>());
+            if (!currentFa.getFunctionalGroups().containsKey("OH")) {
+                currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
             }
-            currentFa.functionalGroups.get("OH").add(functional_group);
+            currentFa.getFunctionalGroups().get("OH").add(functional_group);
         }
     }
 
@@ -274,20 +274,20 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         FunctionalGroup functional_group = knownFunctionalGroups.get(suffix_type);
-        functional_group.position = suffixNumber;
-        if (functional_group.position == -1) {
+        functional_group.setPosition(suffixNumber);
+        if (functional_group.getPosition() == -1) {
             setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }
-        if (!currentFa.functionalGroups.containsKey(suffix_type)) {
-            currentFa.functionalGroups.put(suffix_type, new ArrayList<>());
+        if (!currentFa.getFunctionalGroups().containsKey(suffix_type)) {
+            currentFa.getFunctionalGroups().put(suffix_type, new ArrayList<>());
         }
-        currentFa.functionalGroups.get(suffix_type).add(functional_group);
+        currentFa.getFunctionalGroups().get(suffix_type).add(functional_group);
 
         suffixNumber = -1;
     }
 
     public void addDoubleBonds(TreeNode node) {
-        currentFa.doubleBonds.numDoubleBonds += node.getInt();
+        currentFa.getDoubleBonds().setNumDoubleBonds(currentFa.getDoubleBonds().getNumDoubleBonds() + node.getInt());
     }
 
     public void addCarbon(TreeNode node) {
@@ -297,7 +297,7 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     public void setSpeciesFa(TreeNode node) {
         headGroup += " 27:1";
         faList.get(faList.size() - 1).numCarbon -= 27;
-        faList.get(faList.size() - 1).doubleBonds.numDoubleBonds -= 1;
+        faList.get(faList.size() - 1).getDoubleBonds().setNumDoubleBonds(faList.get(faList.size() - 1).getDoubleBonds().getNumDoubleBonds() - 1);
     }
 
     public void newAdduct(TreeNode node) {
@@ -305,11 +305,11 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void addAdduct(TreeNode node) {
-        adduct.adductString = node.getText();
+        adduct.setAdductString(node.getText());
     }
 
     public void addCharge(TreeNode node) {
-        adduct.charge = Integer.valueOf(node.getText());
+        adduct.setCharge(Integer.valueOf(node.getText()));
     }
 
     public void addChargeSign(TreeNode node) {

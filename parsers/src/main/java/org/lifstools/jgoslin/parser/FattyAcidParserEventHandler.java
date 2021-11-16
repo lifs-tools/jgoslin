@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -345,22 +346,22 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             for (int i = 0; i < s; ++i) {
                 int pos = (int) ((GenericList) tmp.get("post_adding")).get(i);
                 curr_fa_p.addPosition(pos);
-                DoubleBonds db = new DoubleBonds(curr_fa_p.doubleBonds.numDoubleBonds);
-                for (Entry<Integer, String> kv : curr_fa_p.doubleBonds.doubleBondPositions.entrySet()) {
+                DoubleBonds db = new DoubleBonds(curr_fa_p.getDoubleBonds().getNumDoubleBonds());
+                for (Entry<Integer, String> kv : curr_fa_p.getDoubleBonds().doubleBondPositions.entrySet()) {
                     db.doubleBondPositions.put(kv.getKey() + (kv.getKey() >= pos ? 1 : 0), kv.getValue());
                 }
-                db.numDoubleBonds = db.doubleBondPositions.size();
-                curr_fa_p.doubleBonds = db;
+                db.setNumDoubleBonds(db.doubleBondPositions.size());
+                curr_fa_p.setDoubleBonds(db);
             }
         }
 
         FattyAcid curr_fa = fattyAcylStack.peekLast();
-        if (curr_fa.doubleBonds.doubleBondPositions.size() > 0) {
+        if (curr_fa.getDoubleBonds().doubleBondPositions.size() > 0) {
             int db_right = 0;
-            for (Entry<Integer, String> kv : curr_fa.doubleBonds.doubleBondPositions.entrySet()) {
+            for (Entry<Integer, String> kv : curr_fa.getDoubleBonds().doubleBondPositions.entrySet()) {
                 db_right += kv.getValue().length() > 0 ? 1 : 0;
             }
-            if (db_right != curr_fa.doubleBonds.doubleBondPositions.size()) {
+            if (db_right != curr_fa.getDoubleBonds().doubleBondPositions.size()) {
                 set_lipid_level(LipidLevel.STRUCTURE_DEFINED);
             }
         }
@@ -416,8 +417,8 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     public void add_amine(TreeNode node) {
         FattyAcid fa = fattyAcylStack.pollLast();
 
-        fa.name += "1";
-        fattyAcylStack.peekLast().name += "2";
+        fa.setName(fa.getName() + "1");
+        fattyAcylStack.peekLast().setName(fa.getName() + "2");
         fa.lipidFaBondType = LipidFaBondType.AMINE;
         fattyAcylStack.addFirst(fa);
     }
@@ -458,47 +459,47 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                 throw new RuntimeException("Cannot determine fatty acid and double bond length in '" + node.getText() + "'");
             }
             curr_fa.numCarbon += l;
-            if (curr_fa.doubleBonds.doubleBondPositions.isEmpty() && d > 0) {
-                curr_fa.doubleBonds.numDoubleBonds = d;
+            if (curr_fa.getDoubleBonds().doubleBondPositions.isEmpty() && d > 0) {
+                curr_fa.getDoubleBonds().setNumDoubleBonds(d);
             }
         }
 
-        if (curr_fa.functionalGroups.containsKey("noyloxy")) {
+        if (curr_fa.getFunctionalGroups().containsKey("noyloxy")) {
             if (headgroup.equals("FA")) {
                 headgroup = "FAHFA";
             }
 
-            while (curr_fa.functionalGroups.get("noyloxy").size() > 0) {
-                FattyAcid fa = (FattyAcid) curr_fa.functionalGroups.get("noyloxy").get(curr_fa.functionalGroups.get("noyloxy").size() - 1);
-                curr_fa.functionalGroups.get("noyloxy").remove(curr_fa.functionalGroups.get("noyloxy").size() - 1);
+            while (curr_fa.getFunctionalGroups().get("noyloxy").size() > 0) {
+                FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroups().get("noyloxy").get(curr_fa.getFunctionalGroups().get("noyloxy").size() - 1);
+                curr_fa.getFunctionalGroups().get("noyloxy").remove(curr_fa.getFunctionalGroups().get("noyloxy").size() - 1);
 
                 AcylAlkylGroup acyl = new AcylAlkylGroup(fa, knownFunctionalGroups);
-                acyl.position = fa.position;
+                acyl.setPosition(fa.getPosition());
 
-                if (!curr_fa.functionalGroups.containsKey("acyl")) {
-                    curr_fa.functionalGroups.put("acyl", new ArrayList<>());
+                if (!curr_fa.getFunctionalGroups().containsKey("acyl")) {
+                    curr_fa.getFunctionalGroups().put("acyl", new ArrayList<>());
                 }
-                curr_fa.functionalGroups.get("acyl").add(acyl);
+                curr_fa.getFunctionalGroups().get("acyl").add(acyl);
             }
-            curr_fa.functionalGroups.remove("noyloxy");
-        } else if (curr_fa.functionalGroups.containsKey("nyloxy") || curr_fa.functionalGroups.containsKey("yloxy")) {
-            String yloxy = curr_fa.functionalGroups.containsKey("nyloxy") ? "nyloxy" : "yloxy";
-            while (curr_fa.functionalGroups.get(yloxy).size() > 0) {
-                FattyAcid fa = (FattyAcid) curr_fa.functionalGroups.get(yloxy).get(curr_fa.functionalGroups.get(yloxy).size() - 1);
-                curr_fa.functionalGroups.get(yloxy).remove(curr_fa.functionalGroups.get(yloxy).size() - 1);
+            curr_fa.getFunctionalGroups().remove("noyloxy");
+        } else if (curr_fa.getFunctionalGroups().containsKey("nyloxy") || curr_fa.getFunctionalGroups().containsKey("yloxy")) {
+            String yloxy = curr_fa.getFunctionalGroups().containsKey("nyloxy") ? "nyloxy" : "yloxy";
+            while (curr_fa.getFunctionalGroups().get(yloxy).size() > 0) {
+                FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroups().get(yloxy).get(curr_fa.getFunctionalGroups().get(yloxy).size() - 1);
+                curr_fa.getFunctionalGroups().get(yloxy).remove(curr_fa.getFunctionalGroups().get(yloxy).size() - 1);
 
                 AcylAlkylGroup alkyl = new AcylAlkylGroup(fa, -1, 1, true, knownFunctionalGroups);
-                alkyl.position = fa.position;
+                alkyl.setPosition(fa.getPosition());
 
-                if (!curr_fa.functionalGroups.containsKey("alkyl")) {
-                    curr_fa.functionalGroups.put("alkyl", new ArrayList<>());
+                if (!curr_fa.getFunctionalGroups().containsKey("alkyl")) {
+                    curr_fa.getFunctionalGroups().put("alkyl", new ArrayList<>());
                 }
-                curr_fa.functionalGroups.get("alkyl").add(alkyl);
+                curr_fa.getFunctionalGroups().get("alkyl").add(alkyl);
             }
-            curr_fa.functionalGroups.remove(yloxy);
+            curr_fa.getFunctionalGroups().remove(yloxy);
         } else {
             boolean has_yl = false;
-            for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.functionalGroups.entrySet()) {
+            for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.getFunctionalGroups().entrySet()) {
                 if (kv.getKey().endsWith("yl")) {
                     has_yl = true;
                     break;
@@ -507,7 +508,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             if (has_yl) {
                 while (true) {
                     String yl = "";
-                    for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.functionalGroups.entrySet()) {
+                    for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.getFunctionalGroups().entrySet()) {
                         if (kv.getKey().endsWith("yl")) {
                             yl = kv.getKey();
                             break;
@@ -517,14 +518,14 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                         break;
                     }
 
-                    while (curr_fa.functionalGroups.get(yl).size() > 0) {
-                        FattyAcid fa = (FattyAcid) curr_fa.functionalGroups.get(yl).get(curr_fa.functionalGroups.get(yl).size() - 1);
-                        curr_fa.functionalGroups.get(yl).remove(curr_fa.functionalGroups.get(yl).size() - 1);
+                    while (curr_fa.getFunctionalGroups().get(yl).size() > 0) {
+                        FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroups().get(yl).get(curr_fa.getFunctionalGroups().get(yl).size() - 1);
+                        curr_fa.getFunctionalGroups().get(yl).remove(curr_fa.getFunctionalGroups().get(yl).size() - 1);
 
                         if (tmp.containsKey("cyclo")) {
                             int cyclo_len = curr_fa.numCarbon;
                             tmp.put("cyclo_len", cyclo_len);
-                            if (fa.position != cyclo_len && !tmp.containsKey("furan")) {
+                            if (fa.getPosition() != cyclo_len && !tmp.containsKey("furan")) {
                                 switch_position(curr_fa, 2 + cyclo_len);
                             }
                             fa.shiftPositions(cyclo_len);
@@ -532,29 +533,29 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                                 curr_fa.shiftPositions(-1);
                             }
 
-                            for (Entry<String, ArrayList<FunctionalGroup>> kv : fa.functionalGroups.entrySet()) {
-                                if (!curr_fa.functionalGroups.containsKey(kv.getKey())) {
-                                    curr_fa.functionalGroups.put(kv.getKey(), new ArrayList<>());
+                            for (Entry<String, ArrayList<FunctionalGroup>> kv : fa.getFunctionalGroups().entrySet()) {
+                                if (!curr_fa.getFunctionalGroups().containsKey(kv.getKey())) {
+                                    curr_fa.getFunctionalGroups().put(kv.getKey(), new ArrayList<>());
                                 }
                                 for (FunctionalGroup func_group : kv.getValue()) {
-                                    curr_fa.functionalGroups.get(kv.getKey()).add(func_group);
+                                    curr_fa.getFunctionalGroups().get(kv.getKey()).add(func_group);
                                 }
                             }
 
                             curr_fa.numCarbon = cyclo_len + fa.numCarbon;
 
-                            for (Entry<Integer, String> kv : fa.doubleBonds.doubleBondPositions.entrySet()) {
-                                curr_fa.doubleBonds.doubleBondPositions.put(kv.getKey() + cyclo_len, kv.getValue());
+                            for (Entry<Integer, String> kv : fa.getDoubleBonds().doubleBondPositions.entrySet()) {
+                                curr_fa.getDoubleBonds().doubleBondPositions.put(kv.getKey() + cyclo_len, kv.getValue());
                             }
-                            curr_fa.doubleBonds.numDoubleBonds = curr_fa.doubleBonds.doubleBondPositions.size();
+                            curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().doubleBondPositions.size());
 
                             if (!tmp.containsKey("tetrahydrofuran") && tmp.containsKey("furan")) {
-                                curr_fa.doubleBonds.numDoubleBonds += 2;
-                                if (!curr_fa.doubleBonds.doubleBondPositions.containsKey(1)) {
-                                    curr_fa.doubleBonds.doubleBondPositions.put(1, "E");
+                                curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getNumDoubleBonds() + 2);
+                                if (!curr_fa.getDoubleBonds().doubleBondPositions.containsKey(1)) {
+                                    curr_fa.getDoubleBonds().doubleBondPositions.put(1, "E");
                                 }
-                                if (!curr_fa.doubleBonds.doubleBondPositions.containsKey(3)) {
-                                    curr_fa.doubleBonds.doubleBondPositions.put(3, "E");
+                                if (!curr_fa.getDoubleBonds().doubleBondPositions.containsKey(3)) {
+                                    curr_fa.getDoubleBonds().doubleBondPositions.put(3, "E");
                                 }
                             }
 
@@ -563,7 +564,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                             // add carbon chains here here
                             // special chains: i.e. ethyl, methyl
                             String fg_name = "";
-                            if (fa.doubleBonds.getNum() == 0 && fa.functionalGroups.isEmpty()) {
+                            if (fa.getDoubleBonds().getNumDoubleBonds() == 0 && fa.getFunctionalGroups().isEmpty()) {
                                 FunctionalGroup fg = null;
                                 if (fa.numCarbon == 1) {
                                     fg_name = "Me";
@@ -572,34 +573,34 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                                     fg_name = "Et";
                                     fg = knownFunctionalGroups.get(fg_name);
                                 }
-                                if (fg_name.length() > 0) {
-                                    fg.position = fa.position;
-                                    if (!curr_fa.functionalGroups.containsKey(fg_name)) {
-                                        curr_fa.functionalGroups.put(fg_name, new ArrayList<>());
+                                if (fg != null && fg_name.length() > 0) {
+                                    fg.setPosition(fa.getPosition());
+                                    if (!curr_fa.getFunctionalGroups().containsKey(fg_name)) {
+                                        curr_fa.getFunctionalGroups().put(fg_name, new ArrayList<>());
                                     }
-                                    curr_fa.functionalGroups.get(fg_name).add(fg);
+                                    curr_fa.getFunctionalGroups().get(fg_name).add(fg);
                                 }
                             }
                             if (fg_name.length() == 0) {
-                                CarbonChain cc = new CarbonChain(fa, fa.position, knownFunctionalGroups);
-                                if (!curr_fa.functionalGroups.containsKey("cc")) {
-                                    curr_fa.functionalGroups.put("cc", new ArrayList<>());
+                                CarbonChain cc = new CarbonChain(fa, fa.getPosition(), knownFunctionalGroups);
+                                if (!curr_fa.getFunctionalGroups().containsKey("cc")) {
+                                    curr_fa.getFunctionalGroups().put("cc", new ArrayList<>());
                                 }
-                                curr_fa.functionalGroups.get("cc").add(cc);
+                                curr_fa.getFunctionalGroups().get("cc").add(cc);
                             }
                         }
                     }
                     if (tmp.containsKey("cyclo")) {
                         tmp.remove("cyclo");
                     }
-                    curr_fa.functionalGroups.remove(yl);
+                    curr_fa.getFunctionalGroups().remove(yl);
                 }
             }
         }
 
-        if (curr_fa.functionalGroups.containsKey("cyclo")) {
-            FattyAcid fa = (FattyAcid) curr_fa.functionalGroups.get("cyclo").get(0);
-            curr_fa.functionalGroups.remove("cyclo");
+        if (curr_fa.getFunctionalGroups().containsKey("cyclo")) {
+            FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroups().get("cyclo").get(0);
+            curr_fa.getFunctionalGroups().remove("cyclo");
             if (!tmp.containsKey("cyclo_len")) {
                 tmp.put("cyclo_len", 5);
             }
@@ -607,32 +608,32 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             int end_pos = curr_fa.numCarbon + (int) tmp.get("cyclo_len");
             fa.shiftPositions(start_pos - 1);
 
-            if (curr_fa.functionalGroups.containsKey("cy")) {
-                for (FunctionalGroup cy : curr_fa.functionalGroups.get("cy")) {
+            if (curr_fa.getFunctionalGroups().containsKey("cy")) {
+                for (FunctionalGroup cy : curr_fa.getFunctionalGroups().get("cy")) {
                     cy.shiftPositions(start_pos - 1);
                 }
             }
-            for (Entry<String, ArrayList<FunctionalGroup>> kv : fa.functionalGroups.entrySet()) {
-                if (!curr_fa.functionalGroups.containsKey(kv.getKey())) {
-                    curr_fa.functionalGroups.put(kv.getKey(), new ArrayList<>());
+            for (Entry<String, ArrayList<FunctionalGroup>> kv : fa.getFunctionalGroups().entrySet()) {
+                if (!curr_fa.getFunctionalGroups().containsKey(kv.getKey())) {
+                    curr_fa.getFunctionalGroups().put(kv.getKey(), new ArrayList<>());
                 }
                 for (FunctionalGroup func_group : kv.getValue()) {
-                    curr_fa.functionalGroups.get(kv.getKey()).add(func_group);
+                    curr_fa.getFunctionalGroups().get(kv.getKey()).add(func_group);
                 }
             }
 
-            for (Entry<Integer, String> kv : fa.doubleBonds.doubleBondPositions.entrySet()) {
-                curr_fa.doubleBonds.doubleBondPositions.put(kv.getKey() + start_pos - 1, kv.getValue());
+            for (Entry<Integer, String> kv : fa.getDoubleBonds().doubleBondPositions.entrySet()) {
+                curr_fa.getDoubleBonds().doubleBondPositions.put(kv.getKey() + start_pos - 1, kv.getValue());
             }
-            curr_fa.doubleBonds.numDoubleBonds = curr_fa.doubleBonds.doubleBondPositions.size();
+            curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().doubleBondPositions.size());
 
             if (!tmp.containsKey("tetrahydrofuran") && tmp.containsKey("furan")) {
-                curr_fa.doubleBonds.numDoubleBonds += 2;
-                if (!curr_fa.doubleBonds.doubleBondPositions.containsKey(1 + curr_fa.numCarbon)) {
-                    curr_fa.doubleBonds.doubleBondPositions.put(1 + curr_fa.numCarbon, "E");
+                curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getNumDoubleBonds() + 2);
+                if (!curr_fa.getDoubleBonds().doubleBondPositions.containsKey(1 + curr_fa.numCarbon)) {
+                    curr_fa.getDoubleBonds().doubleBondPositions.put(1 + curr_fa.numCarbon, "E");
                 }
-                if (!curr_fa.doubleBonds.doubleBondPositions.containsKey(3 + curr_fa.numCarbon)) {
-                    curr_fa.doubleBonds.doubleBondPositions.put(3 + curr_fa.numCarbon, "E");
+                if (!curr_fa.getDoubleBonds().doubleBondPositions.containsKey(3 + curr_fa.numCarbon)) {
+                    curr_fa.getDoubleBonds().doubleBondPositions.put(3 + curr_fa.numCarbon, "E");
                 }
             }
 
@@ -678,8 +679,8 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     }
 
     public void switch_position(FunctionalGroup func_group, int switch_num) {
-        func_group.position = switch_num - func_group.position;
-        for (Entry<String, ArrayList<FunctionalGroup>> kv : func_group.functionalGroups.entrySet()) {
+        func_group.setPosition(switch_num - func_group.getPosition());
+        for (Entry<String, ArrayList<FunctionalGroup>> kv : func_group.getFunctionalGroups().entrySet()) {
             for (FunctionalGroup fg : kv.getValue()) {
                 switch_position(fg, switch_num);
             }
@@ -692,18 +693,18 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
 
         DoubleBonds cyclo_db = new DoubleBonds();
         // check double bonds
-        if (fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.size() > 0) {
-            for (Entry<Integer, String> kv : fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.entrySet()) {
+        if (fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.size() > 0) {
+            for (Entry<Integer, String> kv : fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.entrySet()) {
                 if (start <= kv.getKey() && kv.getKey() <= end) {
                     cyclo_db.doubleBondPositions.put(kv.getKey(), kv.getValue());
                 }
             }
-            cyclo_db.numDoubleBonds = cyclo_db.doubleBondPositions.size();
+            cyclo_db.setNumDoubleBonds(cyclo_db.doubleBondPositions.size());
 
             for (Entry<Integer, String> kv : cyclo_db.doubleBondPositions.entrySet()) {
-                fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.remove(kv.getKey());
+                fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.remove(kv.getKey());
             }
-            fattyAcylStack.peekLast().doubleBonds.numDoubleBonds = fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.size();
+            fattyAcylStack.peekLast().getDoubleBonds().setNumDoubleBonds(fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.size());
 
         }
         // check functionalGroups
@@ -711,34 +712,34 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         HashSet<String> remove_list = new HashSet<>();
         FattyAcid curr_fa = fattyAcylStack.peekLast();
 
-        if (curr_fa.functionalGroups.containsKey("noyloxy")) {
+        if (curr_fa.getFunctionalGroups().containsKey("noyloxy")) {
             ArrayList<Integer> remove_item = new ArrayList<>();
             int i = 0;
-            for (FunctionalGroup func_group : curr_fa.functionalGroups.get("noyloxy")) {
-                if (start <= func_group.position && func_group.position <= end) {
-                    CarbonChain cc = new CarbonChain((FattyAcid) func_group, func_group.position, knownFunctionalGroups);
+            for (FunctionalGroup func_group : curr_fa.getFunctionalGroups().get("noyloxy")) {
+                if (start <= func_group.getPosition() && func_group.getPosition() <= end) {
+                    CarbonChain cc = new CarbonChain((FattyAcid) func_group, func_group.getPosition(), knownFunctionalGroups);
 
-                    if (!curr_fa.functionalGroups.containsKey("cc")) {
-                        curr_fa.functionalGroups.put("cc", new ArrayList<>());
+                    if (!curr_fa.getFunctionalGroups().containsKey("cc")) {
+                        curr_fa.getFunctionalGroups().put("cc", new ArrayList<>());
                     }
-                    curr_fa.functionalGroups.get("cc").add(cc);
+                    curr_fa.getFunctionalGroups().get("cc").add(cc);
                     remove_item.add(i);
                 }
                 ++i;
             }
             for (int ii = remove_item.size() - 1; ii >= 0; --ii) {
-                curr_fa.functionalGroups.get("noyloxy").remove((int) remove_item.get(ii));
+                curr_fa.getFunctionalGroups().get("noyloxy").remove((int) remove_item.get(ii));
             }
-            if (curr_fa.functionalGroups.get("noyloxy").isEmpty()) {
+            if (curr_fa.getFunctionalGroups().get("noyloxy").isEmpty()) {
                 remove_list.add("noyloxy");
             }
         }
 
-        for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.functionalGroups.entrySet()) {
+        for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.getFunctionalGroups().entrySet()) {
             ArrayList<Integer> remove_item = new ArrayList<>();
             int i = 0;
             for (FunctionalGroup func_group : kv.getValue()) {
-                if (start <= func_group.position && func_group.position <= end) {
+                if (start <= func_group.getPosition() && func_group.getPosition() <= end) {
                     if (!cyclo_fg.containsKey(kv.getKey())) {
                         cyclo_fg.put(kv.getKey(), new ArrayList<>());
                     }
@@ -755,7 +756,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             }
         }
         for (String fg : remove_list) {
-            curr_fa.functionalGroups.remove(fg);
+            curr_fa.getFunctionalGroups().remove(fg);
         }
 
         ArrayList<Element> bridge_chain = new ArrayList<>();
@@ -765,17 +766,17 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
 
         Cycle cycle = new Cycle(end - start + 1 + bridge_chain.size(), start, end, cyclo_db, cyclo_fg, bridge_chain, knownFunctionalGroups);
-        if (!fattyAcylStack.peekLast().functionalGroups.containsKey("cy")) {
-            fattyAcylStack.peekLast().functionalGroups.put("cy", new ArrayList<>());
+        if (!fattyAcylStack.peekLast().getFunctionalGroups().containsKey("cy")) {
+            fattyAcylStack.peekLast().getFunctionalGroups().put("cy", new ArrayList<>());
         }
-        fattyAcylStack.peekLast().functionalGroups.get("cy").add(cycle);
+        fattyAcylStack.peekLast().getFunctionalGroups().get("cy").add(cycle);
     }
 
     public void add_wax_ester(TreeNode node) {
         FattyAcid fa = fattyAcylStack.pollLast();
-        fa.name += "1";
+        fa.setName(fa.getName() + "1");
         fa.lipidFaBondType = LipidFaBondType.AMINE;
-        fattyAcylStack.peekLast().name += "2";
+        fattyAcylStack.peekLast().setName(fa.getName() + "2");
         fattyAcylStack.addFirst(fa);
     }
 
@@ -858,11 +859,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         curr_fa.numCarbon -= 1;
         FunctionalGroup fg = knownFunctionalGroups.get("Me");
-        fg.position = 2;
-        if (!curr_fa.functionalGroups.containsKey("Me")) {
-            curr_fa.functionalGroups.put("Me", new ArrayList<>());
+        fg.setPosition(2);
+        if (!curr_fa.getFunctionalGroups().containsKey("Me")) {
+            curr_fa.getFunctionalGroups().put("Me", new ArrayList<>());
         }
-        curr_fa.functionalGroups.get("Me").add(fg);
+        curr_fa.getFunctionalGroups().get("Me").add(fg);
     }
 
     public void set_prosta(TreeNode node) {
@@ -906,9 +907,9 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             for (Entry<String, Object> kv : ((Dictionary) ((Dictionary) tmp.get(fa_i)).get("fg_pos_summary")).entrySet()) {
                 int k = Integer.valueOf(kv.getKey());
                 String v = (String) ((Dictionary) ((Dictionary) tmp.get(fa_i)).get("fg_pos_summary")).get(kv.getKey());
-                if (k > 0 && !curr_fa.doubleBonds.doubleBondPositions.containsKey(k) && (v.equals("E") || v.equals("Z") || v.length() == 0)) {
-                    curr_fa.doubleBonds.doubleBondPositions.put(k, v);
-                    curr_fa.doubleBonds.numDoubleBonds = curr_fa.doubleBonds.doubleBondPositions.size();
+                if (k > 0 && !curr_fa.getDoubleBonds().doubleBondPositions.containsKey(k) && (v.equals("E") || v.equals("Z") || v.length() == 0)) {
+                    curr_fa.getDoubleBonds().doubleBondPositions.put(k, v);
+                    curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().doubleBondPositions.size());
                 }
             }
         }
@@ -942,65 +943,65 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         } else {
             FattyAcid fa = new FattyAcid("FA", l, knownFunctionalGroups);
             // shift functional groups
-            for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.functionalGroups.entrySet()) {
+            for (Entry<String, ArrayList<FunctionalGroup>> kv : curr_fa.getFunctionalGroups().entrySet()) {
                 ArrayList<Integer> remove_item = new ArrayList<>();
                 int i = 0;
                 for (FunctionalGroup func_group : kv.getValue()) {
-                    if (func_group.position <= l) {
+                    if (func_group.getPosition() <= l) {
                         remove_item.add(i);
-                        if (!fa.functionalGroups.containsKey(kv.getKey())) {
-                            fa.functionalGroups.put(kv.getKey(), new ArrayList<>());
+                        if (!fa.getFunctionalGroups().containsKey(kv.getKey())) {
+                            fa.getFunctionalGroups().put(kv.getKey(), new ArrayList<>());
                         }
-                        func_group.position = l + 1 - func_group.position;
-                        fa.functionalGroups.get(kv.getKey()).add(func_group);
+                        func_group.setPosition(l + 1 - func_group.getPosition());
+                        fa.getFunctionalGroups().get(kv.getKey()).add(func_group);
                     }
                 }
                 for (int ii = remove_item.size() - 1; ii >= 0; --ii) {
-                    curr_fa.functionalGroups.get(kv.getKey()).remove((int) remove_item.get(ii));
+                    curr_fa.getFunctionalGroups().get(kv.getKey()).remove((int) remove_item.get(ii));
                 }
             }
-            HashMap<String, ArrayList<FunctionalGroup>> func_dict = curr_fa.functionalGroups;
-            curr_fa.functionalGroups = new HashMap<>();
+            Map<String, ArrayList<FunctionalGroup>> func_dict = curr_fa.getFunctionalGroups();
+            curr_fa.setFunctionalGroups(new HashMap<>());
             for (Entry<String, ArrayList<FunctionalGroup>> kv : func_dict.entrySet()) {
                 if (kv.getValue().size() > 0) {
-                    curr_fa.functionalGroups.put(kv.getKey(), kv.getValue());
+                    curr_fa.getFunctionalGroups().put(kv.getKey(), kv.getValue());
                 }
             }
 
             // shift double bonds
-            if (curr_fa.doubleBonds.doubleBondPositions.size() > 0) {
-                fa.doubleBonds = new DoubleBonds();
-                for (Entry<Integer, String> kv : curr_fa.doubleBonds.doubleBondPositions.entrySet()) {
+            if (curr_fa.getDoubleBonds().doubleBondPositions.size() > 0) {
+                fa.setDoubleBonds(new DoubleBonds());
+                for (Entry<Integer, String> kv : curr_fa.getDoubleBonds().doubleBondPositions.entrySet()) {
                     if (kv.getKey() <= l) {
-                        fa.doubleBonds.doubleBondPositions.put(l + 1 - kv.getKey(), kv.getValue());
+                        fa.getDoubleBonds().doubleBondPositions.put(l + 1 - kv.getKey(), kv.getValue());
                     }
                 }
-                fa.doubleBonds.numDoubleBonds = fa.doubleBonds.doubleBondPositions.size();
-                for (Entry<Integer, String> kv : fa.doubleBonds.doubleBondPositions.entrySet()) {
-                    curr_fa.doubleBonds.doubleBondPositions.remove(kv.getKey());
+                fa.getDoubleBonds().setNumDoubleBonds(fa.getDoubleBonds().doubleBondPositions.size());
+                for (Entry<Integer, String> kv : fa.getDoubleBonds().doubleBondPositions.entrySet()) {
+                    curr_fa.getDoubleBonds().doubleBondPositions.remove(kv.getKey());
                 }
             }
             fname = "cc";
             fg = new CarbonChain(fa, knownFunctionalGroups);
         }
         curr_fa.numCarbon -= l;
-        fg.position = l;
+        fg.setPosition(l);
         curr_fa.shiftPositions(-l);
-        if (!curr_fa.functionalGroups.containsKey(fname)) {
-            curr_fa.functionalGroups.put(fname, new ArrayList<>());
+        if (!curr_fa.getFunctionalGroups().containsKey(fname)) {
+            curr_fa.getFunctionalGroups().put(fname, new ArrayList<>());
         }
-        curr_fa.functionalGroups.get(fname).add(fg);
+        curr_fa.getFunctionalGroups().get(fname).add(fg);
     }
 
     public void set_dial(TreeNode node) {
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         int pos = curr_fa.numCarbon;
         FunctionalGroup fg = knownFunctionalGroups.get("oxo");
-        fg.position = pos;
-        if (!curr_fa.functionalGroups.containsKey("oxo")) {
-            curr_fa.functionalGroups.put("oxo", new ArrayList<>());
+        fg.setPosition(pos);
+        if (!curr_fa.getFunctionalGroups().containsKey("oxo")) {
+            curr_fa.getFunctionalGroups().put("oxo", new ArrayList<>());
         }
-        curr_fa.functionalGroups.get("oxo").add(fg);
+        curr_fa.getFunctionalGroups().get("oxo").add(fg);
     }
 
     public void open_db_length(TreeNode node) {
@@ -1019,11 +1020,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
         fattyAcylStack.peekLast().numCarbon -= 1;
         FunctionalGroup func_group = knownFunctionalGroups.get("COOH");
-        func_group.position = pos - 1;
-        if (!fattyAcylStack.peekLast().functionalGroups.containsKey("COOH")) {
-            fattyAcylStack.peekLast().functionalGroups.put("COOH", new ArrayList<>());
+        func_group.setPosition(pos - 1);
+        if (!fattyAcylStack.peekLast().getFunctionalGroups().containsKey("COOH")) {
+            fattyAcylStack.peekLast().getFunctionalGroups().put("COOH", new ArrayList<>());
         }
-        fattyAcylStack.peekLast().functionalGroups.get("COOH").add(func_group);
+        fattyAcylStack.peekLast().getFunctionalGroups().get("COOH").add(func_group);
     }
 
     public void setup_hydroxyl(TreeNode node) {
@@ -1042,11 +1043,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             for (int i = 0; i < sorted_pos.size() - 1; ++i) {
                 int pos = sorted_pos.get(i);
                 FunctionalGroup fg_insert = fg_oh.copy();
-                fg_insert.position = pos;
-                if (!fattyAcylStack.peekLast().functionalGroups.containsKey("OH")) {
-                    fattyAcylStack.peekLast().functionalGroups.put("OH", new ArrayList<>());
+                fg_insert.setPosition(pos);
+                if (!fattyAcylStack.peekLast().getFunctionalGroups().containsKey("OH")) {
+                    fattyAcylStack.peekLast().getFunctionalGroups().put("OH", new ArrayList<>());
                 }
-                fattyAcylStack.peekLast().functionalGroups.get("OH").add(fg_insert);
+                fattyAcylStack.peekLast().getFunctionalGroups().get("OH").add(fg_insert);
             }
         }
     }
@@ -1093,8 +1094,8 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
 
         FattyAcid fa = fattyAcylStack.peekLast();
-        if (!fa.functionalGroups.containsKey(t)) {
-            fa.functionalGroups.put(t, new ArrayList<>());
+        if (!fa.getFunctionalGroups().containsKey(t)) {
+            fa.getFunctionalGroups().put(t, new ArrayList<>());
         }
         int l = ((GenericList) tmp.get("fg_pos")).size();
         for (Object o : (GenericList) tmp.get("fg_pos")) {
@@ -1109,8 +1110,8 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                 }
             }
             FunctionalGroup fg_insert = fg.copy();
-            fg_insert.position = pos - num_pos;
-            fa.functionalGroups.get(t).add(fg_insert);
+            fg_insert.setPosition(pos - num_pos);
+            fa.getFunctionalGroups().get(t).add(fg_insert);
         }
     }
 
@@ -1138,9 +1139,9 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         if (!cistrans.equals("E") && !cistrans.equals("Z")) {
             cistrans = "";
         }
-        if (!fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.containsKey(pos) || fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.get(pos).length() == 0) {
-            fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.put(pos, cistrans);
-            fattyAcylStack.peekLast().doubleBonds.numDoubleBonds = fattyAcylStack.peekLast().doubleBonds.doubleBondPositions.size();
+        if (!fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.containsKey(pos) || fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.get(pos).length() == 0) {
+            fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.put(pos, cistrans);
+            fattyAcylStack.peekLast().getDoubleBonds().setNumDoubleBonds(fattyAcylStack.peekLast().getDoubleBonds().doubleBondPositions.size());
         }
     }
 
@@ -1211,7 +1212,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     public void reduction(TreeNode node) {
         int shift_len = -((GenericList) tmp.get("fg_pos")).size();
         fattyAcylStack.peekLast().numCarbon += shift_len;
-        for (Entry<String, ArrayList<FunctionalGroup>> kv : fattyAcylStack.peekLast().functionalGroups.entrySet()) {
+        for (Entry<String, ArrayList<FunctionalGroup>> kv : fattyAcylStack.peekLast().getFunctionalGroups().entrySet()) {
             for (FunctionalGroup func_group : kv.getValue()) {
                 func_group.shiftPositions(shift_len);
             }
@@ -1244,9 +1245,9 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
 
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         int start = (int) ((GenericList) ((GenericList) tmp.get("fg_pos")).get(0)).get(0);
-        if (curr_fa.functionalGroups.containsKey("cy")) {
-            for (FunctionalGroup cy : curr_fa.functionalGroups.get("cy")) {
-                int shift_val = start - cy.position;
+        if (curr_fa.getFunctionalGroups().containsKey("cy")) {
+            for (FunctionalGroup cy : curr_fa.getFunctionalGroups().get("cy")) {
+                int shift_val = start - cy.getPosition();
                 if (shift_val == 0) {
                     continue;
                 }
@@ -1267,7 +1268,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         int pos = (int) ((Dictionary) tmp.get(FA_I())).get("recursion_pos");
         FattyAcid fa = fattyAcylStack.pollLast();
 
-        fa.position = pos;
+        fa.setPosition(pos);
         FattyAcid curr_fa = fattyAcylStack.peekLast();
 
         String fname = "";
@@ -1277,10 +1278,10 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         } else {
             fname = headgroup;
         }
-        if (!curr_fa.functionalGroups.containsKey(fname)) {
-            curr_fa.functionalGroups.put(fname, new ArrayList<>());
+        if (!curr_fa.getFunctionalGroups().containsKey(fname)) {
+            curr_fa.getFunctionalGroups().put(fname, new ArrayList<>());
         }
-        curr_fa.functionalGroups.get(fname).add(fa);
+        curr_fa.getFunctionalGroups().get(fname).add(fa);
         tmp.put("added_func_group", 1);
     }
 

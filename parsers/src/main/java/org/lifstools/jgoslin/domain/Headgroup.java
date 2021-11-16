@@ -177,7 +177,7 @@ public class Headgroup {
 
         ElementTable elements = LipidClasses.getInstance().get(lipidClass).elements.copy();
         decorators.forEach(hgd -> {
-            elements.add(hgd.getElements());
+            elements.add(hgd.computeAndCopyElements());
         });
 
         return elements;

@@ -55,16 +55,16 @@ public class HeadgroupDecorator extends FunctionalGroup {
     @Override
     public FunctionalGroup copy() {
         ElementTable e = new ElementTable();
-        for (Entry<Element, Integer> kv : elements.entrySet()) {
+        for (Entry<Element, Integer> kv : computeAndCopyElements().entrySet()) {
             e.put(kv.getKey(), e.get(kv.getKey()) + kv.getValue());
         }
-        return new HeadgroupDecorator(name, position, count, e, suffix, lowestVisibleLevel, knownFunctionalGroups);
+        return new HeadgroupDecorator(getName(), getPosition(), getCount(), e, suffix, lowestVisibleLevel, knownFunctionalGroups);
     }
 
     @Override
     public String toString(LipidLevel level) {
         if (!suffix) {
-            return name;
+            return getName();
         }
         String decorator_string = "";
         if ((lowestVisibleLevel == LipidLevel.NO_LEVEL) || (lowestVisibleLevel.level <= level.level)) {
@@ -83,7 +83,7 @@ public class HeadgroupDecorator extends FunctionalGroup {
                     decorator_string = "FA";
                 }
             } else {
-                decorator_string = name;
+                decorator_string = getName();
             }
             decorator_string = "(" + decorator_string + ")";
         }

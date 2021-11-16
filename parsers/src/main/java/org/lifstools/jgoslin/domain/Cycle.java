@@ -111,12 +111,12 @@ public class Cycle extends FunctionalGroup {
         parent.doubleBonds.doubleBondPositions.entrySet().stream().filter(kv -> (start <= kv.getKey() && kv.getKey() <= end)).forEachOrdered(kv -> {
             doubleBonds.doubleBondPositions.put(kv.getKey(), kv.getValue());
         });
-        doubleBonds.numDoubleBonds = doubleBonds.doubleBondPositions.size();
+        doubleBonds.setNumDoubleBonds(doubleBonds.doubleBondPositions.size());
 
         doubleBonds.doubleBondPositions.entrySet().forEach(kv -> {
             parent.doubleBonds.doubleBondPositions.remove(kv.getKey());
         });
-        parent.doubleBonds.numDoubleBonds = parent.doubleBonds.doubleBondPositions.size();
+        parent.doubleBonds.setNumDoubleBonds(parent.doubleBonds.doubleBondPositions.size());
 
         HashSet<String> remove_list = new HashSet<>();
         for (Entry<String, ArrayList<FunctionalGroup>> kv : parent.functionalGroups.entrySet()) {
@@ -124,7 +124,7 @@ public class Cycle extends FunctionalGroup {
 
             int i = 0;
             for (FunctionalGroup func_group : kv.getValue()) {
-                if (start <= func_group.position && func_group.position <= end && func_group != this) {
+                if (start <= func_group.getPosition() && func_group.getPosition() <= end && func_group != this) {
                     if (!functionalGroups.containsKey(kv.getKey())) {
                         functionalGroups.put(kv.getKey(), new ArrayList<>());
                     }
@@ -158,14 +158,14 @@ public class Cycle extends FunctionalGroup {
         for (Entry<Integer, String> kv : doubleBonds.doubleBondPositions.entrySet()) {
             db.doubleBondPositions.put(kv.getKey() + shift, kv.getValue());
         }
-        db.numDoubleBonds = db.doubleBondPositions.size();
+        db.setNumDoubleBonds(db.doubleBondPositions.size());
         doubleBonds = db;
     }
 
     @Override
     public void computeElements() {
         elements = new ElementTable();
-        elements.put(Element.H, -2 - 2 * doubleBonds.numDoubleBonds);
+        elements.put(Element.H, -2 - 2 * doubleBonds.getNumDoubleBonds());
 
         for (Element chain_element : bridgeChain) {
             try {
@@ -226,7 +226,7 @@ public class Cycle extends FunctionalGroup {
             }
         }
         cycle_string.append("cy").append(cycle);
-        cycle_string.append(":").append(doubleBonds.getNum());
+        cycle_string.append(":").append(doubleBonds.getNumDoubleBonds());
 
         if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
             if (doubleBonds.doubleBondPositions.size() > 0) {
@@ -259,7 +259,7 @@ public class Cycle extends FunctionalGroup {
                     continue;
                 }
 
-                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -> a.position - b.position);
+                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -> a.getPosition() - b.getPosition());
                 int i = 0;
                 cycle_string.append(";");
                 for (FunctionalGroup func_group : fg_list) {
@@ -276,12 +276,12 @@ public class Cycle extends FunctionalGroup {
             for (String fg : fg_names) {
                 ArrayList<FunctionalGroup> fg_list = functionalGroups.get(fg);
                 if (fg_list.size() > 0) {
-                    if (fg_list.size() == 1 && fg_list.get(0).count == 1) {
+                    if (fg_list.size() == 1 && fg_list.get(0).getCount() == 1) {
                         cycle_string.append(";").append(fg_list.get(0).toString(level));
                     } else {
                         int fg_count = 0;
                         for (FunctionalGroup func_group : fg_list) {
-                            fg_count += func_group.count;
+                            fg_count += func_group.getCount();
                         }
                         if (fg_count > 1) {
                             cycle_string.append(";(").append(fg).append(")").append(fg_count);
@@ -294,8 +294,8 @@ public class Cycle extends FunctionalGroup {
         }
 
         cycle_string.append("]");
-        if (stereochemistry.length() > 0) {
-            cycle_string.append("[").append(stereochemistry).append("]");
+        if (getStereochemistry().length() > 0) {
+            cycle_string.append("[").append(getStereochemistry()).append("]");
         }
 
         return cycle_string.toString();

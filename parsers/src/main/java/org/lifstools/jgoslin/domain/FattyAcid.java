@@ -66,12 +66,12 @@ public class FattyAcid extends FunctionalGroup {
             throw new ConstraintViolationException("FattyAcid must have at least 2 carbons! Got " + Integer.toString(numCarbon));
         }
 
-        if (position < 0) {
-            throw new ConstraintViolationException("FattyAcid position must be greater or equal to 0! Got " + Integer.toString(position));
+        if (getPosition() < 0) {
+            throw new ConstraintViolationException("FattyAcid position must be greater or equal to 0! Got " + Integer.toString(getPosition()));
         }
 
-        if (doubleBonds.getNum() < 0) {
-            throw new ConstraintViolationException("FattyAcid must have at least 0 double bonds! Got " + Integer.toString(doubleBonds.getNum()));
+        if (doubleBonds.getNumDoubleBonds() < 0) {
+            throw new ConstraintViolationException("FattyAcid must have at least 0 double bonds! Got " + Integer.toString(doubleBonds.getNumDoubleBonds()));
         }
     }
 
@@ -86,7 +86,7 @@ public class FattyAcid extends FunctionalGroup {
             }
         }
 
-        return new FattyAcid(name, numCarbon, db, fg, lipidFaBondType, position, knownFunctionalGroups);
+        return new FattyAcid(getName(), numCarbon, db, fg, lipidFaBondType, getPosition(), knownFunctionalGroups);
     }
 
     public void setType(LipidFaBondType _lipid_FA_bond_type) {
@@ -98,7 +98,7 @@ public class FattyAcid extends FunctionalGroup {
             functionalGroups.remove("[X]");
         }
 
-        name = (lipidFaBondType != LipidFaBondType.LCB_EXCEPTION && lipidFaBondType != LipidFaBondType.LCB_REGULAR) ? "FA" : "LCB";
+        setName((lipidFaBondType != LipidFaBondType.LCB_EXCEPTION && lipidFaBondType != LipidFaBondType.LCB_REGULAR) ? "FA" : "LCB");
     }
 
     public String getPrefix(LipidFaBondType lipid_FA_bond_type) {
@@ -126,14 +126,14 @@ public class FattyAcid extends FunctionalGroup {
         StringBuilder fa_string = new StringBuilder();
         fa_string.append(getPrefix(lipidFaBondType));
         int num_carbons = numCarbon;
-        int num_double_bonds = doubleBonds.getNum();
+        int num_double_bonds = doubleBonds.getNumDoubleBonds();
 
         if (num_carbons == 0 && num_double_bonds == 0 && !LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level | LipidLevel.SN_POSITION.level)) {
             return "";
         }
 
         if (LipidLevel.isLevel(level, LipidLevel.SN_POSITION.level | LipidLevel.MOLECULAR_SPECIES.level)) {
-            ElementTable e = getElements();
+            ElementTable e = computeAndCopyElements();
             num_carbons = e.get(Element.C);
             num_double_bonds = getNDoubleBonds() - ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
         }
@@ -174,7 +174,7 @@ public class FattyAcid extends FunctionalGroup {
                     continue;
                 }
 
-                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -> a.position - b.position);
+                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -> a.getPosition() - b.getPosition());
 
                 int i = 0;
                 fa_string.append(";");
@@ -213,11 +213,11 @@ public class FattyAcid extends FunctionalGroup {
                 } else {
                     int fg_count = 0;
                     for (FunctionalGroup func_group : fg_list) {
-                        fg_count += func_group.count;
+                        fg_count += func_group.getCount();
                     }
 
                     if (fg_count > 1) {
-                        fa_string.append(";").append(!fg_list.get(0).isAtomic ? ("(" + fg + ")" + Integer.toString(fg_count)) : (fg + Integer.toString(fg_count)));
+                        fa_string.append(";").append(!fg_list.get(0).atomic ? ("(" + fg + ")" + Integer.toString(fg_count)) : (fg + Integer.toString(fg_count)));
                     } else {
                         fa_string.append(";").append(fg);
                     }
@@ -256,7 +256,7 @@ public class FattyAcid extends FunctionalGroup {
     public void computeElements() {
         elements = new ElementTable();
 
-        int num_double_bonds = doubleBonds.numDoubleBonds;
+        int num_double_bonds = doubleBonds.getNumDoubleBonds();
         if (lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) {
             num_double_bonds += 1;
         }

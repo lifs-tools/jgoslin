@@ -50,7 +50,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
             functionalGroups.put(key, new ArrayList<>());
             functionalGroups.get(key).add(_fa);
         }
-        doubleBonds.numDoubleBonds = alkyl ? 0 : 1;
+        doubleBonds.setNumDoubleBonds(alkyl ? 0 : 1);
         setNbondType(_N_bond);
 
     }
@@ -58,7 +58,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
     @Override
     public FunctionalGroup copy() {
         String key = alkyl ? "alkyl" : "acyl";
-        return new AcylAlkylGroup((FattyAcid) functionalGroups.get(key).get(0).copy(), position, count, alkyl, nitrogenBond, knownFunctionalGroups);
+        return new AcylAlkylGroup((FattyAcid) functionalGroups.get(key).get(0).copy(), getPosition(), getCount(), alkyl, nitrogenBond, knownFunctionalGroups);
     }
 
     public void setNbondType(boolean _N_bond) {
@@ -78,7 +78,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
     public String toString(LipidLevel level) {
         StringBuilder acyl_alkyl_string = new StringBuilder();
         if (level == LipidLevel.FULL_STRUCTURE) {
-            acyl_alkyl_string.append(position);
+            acyl_alkyl_string.append(getPosition());
         }
         acyl_alkyl_string.append(nitrogenBond ? "N" : "O").append("(");
         if (!alkyl) {
