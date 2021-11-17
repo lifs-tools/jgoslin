@@ -48,7 +48,7 @@ public class LipidMapsParser extends Parser<LipidAdduct> {
 
     @Override
     public LipidMapsParserEventHandler newEventHandler() {
-        return new LipidMapsParserEventHandler();
+        return new LipidMapsParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
     }
 
 }

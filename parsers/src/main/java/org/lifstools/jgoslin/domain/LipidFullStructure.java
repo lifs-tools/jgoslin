@@ -37,7 +37,7 @@ public class LipidFullStructure extends LipidStructureDefined {
 
     public LipidFullStructure(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
-        info.level = LipidLevel.FULL_STRUCTURE;
+        info.setLevel(LipidLevel.FULL_STRUCTURE);
     }
 
     @Override
@@ -53,20 +53,14 @@ public class LipidFullStructure extends LipidStructureDefined {
     @Override
     public String getLipidString(LipidLevel level) {
         switch (level) {
-            case NO_LEVEL:
-            case FULL_STRUCTURE:
+            case NO_LEVEL, FULL_STRUCTURE -> {
                 return super.buildLipidSubspeciesName(LipidLevel.FULL_STRUCTURE);
-
-            case STRUCTURE_DEFINED:
-            case SN_POSITION:
-            case MOLECULAR_SPECIES:
-            case SPECIES:
-            case CATEGORY:
-            case CLASS:
+            }
+            case STRUCTURE_DEFINED, SN_POSITION, MOLECULAR_SPECIES, SPECIES, CATEGORY, CLASS -> {
                 return super.getLipidString(level);
+            }
 
-            default:
-                throw new IllegalArgumentException("LipidFullStructure does not know how to create a lipid string for level " + level.toString());
+            default -> throw new IllegalArgumentException("LipidFullStructure does not know how to create a lipid string for level " + level.toString());
         }
     }
 

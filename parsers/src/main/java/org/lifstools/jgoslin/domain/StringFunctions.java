@@ -29,7 +29,7 @@ import java.util.ArrayList;
  *
  * @author dominik
  */
-public class StringFunctions {
+public final class StringFunctions {
 
     public static char DEFAULT_QUOTE = '\'';
 

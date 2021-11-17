@@ -37,7 +37,7 @@ public class LipidStructureDefined extends LipidSnPosition {
 
     public LipidStructureDefined(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
-        info.level = LipidLevel.STRUCTURE_DEFINED;
+        info.setLevel(LipidLevel.STRUCTURE_DEFINED);
     }
 
     @Override

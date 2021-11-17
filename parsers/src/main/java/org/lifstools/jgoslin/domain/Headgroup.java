@@ -33,18 +33,19 @@ import java.util.HashSet;
  *
  * @author dominik
  */
-public class Headgroup {
+public final class Headgroup {
 
     public static HashMap<String, LipidCategory> StringCategory = new HashMap<>();
     public static HashMap<String, Integer> StringClass = new HashMap<>();
     public static HashMap<Integer, String> ClassString = new HashMap<>();
-    public String headgroup;
-    public LipidCategory lipidCategory;
-    public int lipidClass;
-    public boolean useHeadgroup;
-    public ArrayList<HeadgroupDecorator> decorators;
-    public boolean spException;
     public static HashSet<String> exceptionHeadgroups = new HashSet<>(Arrays.asList("Cer", "SPB"));
+
+    private String headgroup;
+    private LipidCategory lipidCategory;
+    private int lipidClass;
+    private boolean useHeadgroup;
+    private ArrayList<HeadgroupDecorator> decorators;
+    private boolean spException;
 
     public static final HashMap<LipidCategory, String> CategoryString = new HashMap<>() {
         {
@@ -137,7 +138,7 @@ public class Headgroup {
         if (!LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
             ArrayList<String> prefixes = new ArrayList<>();
             for (HeadgroupDecorator hgd : decorators) {
-                if (!hgd.suffix) {
+                if (!hgd.isSuffix()) {
                     prefixes.add(hgd.toString(level));
                 }
             }
@@ -147,7 +148,7 @@ public class Headgroup {
             }
         } else {
             for (HeadgroupDecorator hgd : decorators) {
-                if (!hgd.suffix) {
+                if (!hgd.isSuffix()) {
                     headgoup_string.append(hgd.toString(level)).append("-");
                 }
             }
@@ -158,7 +159,7 @@ public class Headgroup {
 
         // ading suffixes to the headgroup
         for (HeadgroupDecorator hgd : decorators) {
-            if (hgd.suffix) {
+            if (hgd.isSuffix()) {
                 headgoup_string.append(hgd.toString(level));
             }
         }
@@ -182,4 +183,53 @@ public class Headgroup {
 
         return elements;
     }
+
+    public String getHeadgroup() {
+        return headgroup;
+    }
+
+    public void setHeadgroup(String headgroup) {
+        this.headgroup = headgroup;
+    }
+
+    public LipidCategory getLipidCategory() {
+        return lipidCategory;
+    }
+
+    public void setLipidCategory(LipidCategory lipidCategory) {
+        this.lipidCategory = lipidCategory;
+    }
+
+    public int getLipidClass() {
+        return lipidClass;
+    }
+
+    public void setLipidClass(int lipidClass) {
+        this.lipidClass = lipidClass;
+    }
+
+    public boolean isUseHeadgroup() {
+        return useHeadgroup;
+    }
+
+    public void setUseHeadgroup(boolean useHeadgroup) {
+        this.useHeadgroup = useHeadgroup;
+    }
+
+    public boolean isSpException() {
+        return spException;
+    }
+
+    public void setSpException(boolean spException) {
+        this.spException = spException;
+    }
+
+    public ArrayList<HeadgroupDecorator> getDecorators() {
+        return decorators;
+    }
+
+    public void setDecorators(ArrayList<HeadgroupDecorator> decorators) {
+        this.decorators = decorators;
+    }
+
 }

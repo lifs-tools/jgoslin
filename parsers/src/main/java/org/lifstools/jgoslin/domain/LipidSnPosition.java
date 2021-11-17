@@ -37,7 +37,7 @@ public class LipidSnPosition extends LipidMolecularSpecies {
 
     public LipidSnPosition(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
-        info.level = LipidLevel.SN_POSITION;
+        info.setLevel(LipidLevel.SN_POSITION);
     }
 
     @Override
@@ -53,18 +53,14 @@ public class LipidSnPosition extends LipidMolecularSpecies {
     @Override
     public String getLipidString(LipidLevel level) {
         switch (level) {
-            case NO_LEVEL:
-            case SN_POSITION:
+            case NO_LEVEL, SN_POSITION -> {
                 return buildLipidSubspeciesName(LipidLevel.SN_POSITION);
-
-            case MOLECULAR_SPECIES:
-            case CATEGORY:
-            case CLASS:
-            case SPECIES:
+            }
+            case MOLECULAR_SPECIES, CATEGORY, CLASS, SPECIES -> {
                 return super.getLipidString(level);
+            }
 
-            default:
-                throw new RuntimeException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
+            default -> throw new RuntimeException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
         }
     }
 

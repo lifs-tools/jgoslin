@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  *
@@ -36,9 +37,9 @@ import java.util.Map.Entry;
  */
 public class FattyAcid extends FunctionalGroup {
 
-    public int numCarbon;
-    public LipidFaBondType lipidFaBondType;
-    public HashSet<String> fgExceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
+    protected int numCarbon;
+    protected LipidFaBondType lipidFaBondType;
+    protected Set<String> fgExceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
 
     public FattyAcid(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
@@ -287,4 +288,29 @@ public class FattyAcid extends FunctionalGroup {
             elements.put(Element.N, 1); // nitrogen
         }
     }
+
+    public int getNumCarbon() {
+        return numCarbon;
+    }
+
+    public void setNumCarbon(int numCarbon) {
+        this.numCarbon = numCarbon;
+    }
+
+    public LipidFaBondType getLipidFaBondType() {
+        return lipidFaBondType;
+    }
+
+    public void setLipidFaBondType(LipidFaBondType lipidFaBondType) {
+        this.lipidFaBondType = lipidFaBondType;
+    }
+
+    public Set<String> getFgExceptions() {
+        return fgExceptions;
+    }
+
+    public void setFgExceptions(Set<String> fgExceptions) {
+        this.fgExceptions = fgExceptions;
+    }
+    
 }

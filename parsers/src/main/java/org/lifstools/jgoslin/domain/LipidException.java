@@ -28,7 +28,7 @@ package org.lifstools.jgoslin.domain;
  * @author dominik
  */
 public class LipidException extends RuntimeException {
-
+    
     protected LipidException() {
         super();
     }

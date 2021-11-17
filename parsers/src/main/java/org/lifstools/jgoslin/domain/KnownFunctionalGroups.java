@@ -37,8 +37,7 @@ import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
  *
  * @author dominik
  */
-public class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
-//    private static KnownFunctionalGroups known_functional_groups = null;
+public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
 
     public KnownFunctionalGroups(String resourceName, SumFormulaParser sumFormulaParser) {
         ArrayList<String> lines = new ArrayList<>();

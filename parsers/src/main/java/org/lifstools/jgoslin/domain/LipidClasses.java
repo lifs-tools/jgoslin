@@ -38,7 +38,7 @@ import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
  *
  * @author dominik
  */
-public class LipidClasses extends ArrayList<LipidClassMeta> {
+public final class LipidClasses extends ArrayList<LipidClassMeta> {
 
     private static LipidClasses LIPID_CLASSES = new LipidClasses();
     public static final int UNDEFINED_CLASS = 0;

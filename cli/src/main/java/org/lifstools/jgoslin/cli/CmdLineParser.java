@@ -241,45 +241,38 @@ public class CmdLineParser {
             m.put("Grammar", t.grammar.name());
             m.put("Message", t.messages.stream().collect(Collectors.joining(" | ")));
             if (t.lipidAdduct != null) {
-                m.put("Adduct", t.lipidAdduct.adduct == null ? "" : t.lipidAdduct.adduct.getLipidString());
+                m.put("Adduct", t.lipidAdduct.getAdduct() == null ? "" : t.lipidAdduct.getAdduct().getLipidString());
                 m.put("Sum Formula", t.lipidAdduct.getSumFormula());
                 m.put("Mass", String.format(Locale.US, "%.4f", t.lipidAdduct.getMass()));
-                m.put("Lipid Maps Category", t.lipidAdduct.lipid.getHeadGroup().lipidCategory.getFullName() + " [" + t.lipidAdduct.lipid.getHeadGroup().lipidCategory.name() + "]");
-                LipidClassMeta lclass = LIPID_CLASSES.get(t.lipidAdduct.lipid.getInfo().lipidClass);
-// FIXME retrieve lipid maps main class info, functional class abbreviation and synonyms
+                m.put("Lipid Maps Category", t.lipidAdduct.getLipid().getHeadGroup().getLipidCategory().getFullName() + " [" + t.lipidAdduct.getLipid().getHeadGroup().getLipidCategory().name() + "]");
+                LipidClassMeta lclass = LIPID_CLASSES.get(t.lipidAdduct.getLipid().getInfo().lipidClass);
                 m.put("Lipid Maps Main Class", lclass.description);
                 String lclassAbbr = getLipidMapsClassAbbreviation(lclass.description);
                 m.put("Functional Class Abbr", "[" + lclassAbbr + "]");
                 m.put("Functional Class Synonyms", "[" + lclass.synonyms.stream().collect(Collectors.joining(", ")) + "]");
                 m.put("Level", t.level.name());
-                m.put("Total #C", t.lipidSpeciesInfo.numCarbon + "");
-                // FIXME add OH and other functional groups
-//                t.getLipidSpeciesInfo().
-//                m.put("Total #OH", t.lipidSpeciesInfo.getNHydroxy() + "");
-                m.put("Total #DB", t.lipidSpeciesInfo.doubleBonds.numDoubleBonds + "");
-                for (String functionalGroupKey : t.lipidSpeciesInfo.functionalGroups.keySet()) {
-                    ArrayList<FunctionalGroup> fg = t.lipidSpeciesInfo.functionalGroups.get(functionalGroupKey);
+                m.put("Total #C", t.lipidSpeciesInfo.getNumCarbon() + "");
+                m.put("Total #DB", t.lipidSpeciesInfo.getDoubleBonds().getNumDoubleBonds() + "");
+                for (String functionalGroupKey : t.lipidSpeciesInfo.getFunctionalGroups().keySet()) {
+                    ArrayList<FunctionalGroup> fg = t.lipidSpeciesInfo.getFunctionalGroups().get(functionalGroupKey);
                     String fgCounts = fg.stream().map((sfg) -> {
-                        return "" + sfg.count;
+                        return "" + sfg.getCount();
                     }).collect(Collectors.joining("|"));
                     m.put("Total #" + functionalGroupKey, fgCounts);
                 }
                 for (FattyAcid fa : t.fattyAcids()) {
-                    m.put(fa.name + " SN Position", fa.position + "");
-                    m.put(fa.name + " #C", fa.numCarbon + "");
-                    //FIXME add OH and other functional groups
-                    m.put(fa.name + " #DB", fa.doubleBonds.numDoubleBonds + "");
-//                    for(fa.functionalGroups)
-//                    m.put(fa.name + " #OH", fa.getNHydroxy() + "");
-                    m.put(fa.name + " Bond Type", fa.lipidFaBondType.name() + "");
-                    String dbPositions = fa.doubleBonds.doubleBondPositions.entrySet().stream().map((entry) -> {
+                    m.put(fa.getName() + " SN Position", fa.getPosition() + "");
+                    m.put(fa.getName() + " #C", fa.getNumCarbon() + "");
+                    m.put(fa.getName() + " #DB", fa.getDoubleBonds().getNumDoubleBonds() + "");
+                    m.put(fa.getName() + " Bond Type", fa.getLipidFaBondType().name() + "");
+                    String dbPositions = fa.getDoubleBonds().getDoubleBondPositions().entrySet().stream().map((entry) -> {
                         return entry.getKey() + "" + entry.getValue();
                     }).collect(Collectors.joining("|"));
-                    m.put(fa.name + " DB Positions", dbPositions + "");
-                    for (String functionalGroupKey : fa.functionalGroups.keySet()) {
-                        ArrayList<FunctionalGroup> fg = fa.functionalGroups.get(functionalGroupKey);
+                    m.put(fa.getName() + " DB Positions", dbPositions + "");
+                    for (String functionalGroupKey : fa.getFunctionalGroups().keySet()) {
+                        ArrayList<FunctionalGroup> fg = fa.getFunctionalGroups().get(functionalGroupKey);
                         String fgCounts = fg.stream().map((sfg) -> {
-                            return "" + sfg.count;
+                            return "" + sfg.getCount();
                         }).collect(Collectors.joining("|"));
                         m.put("Total #" + functionalGroupKey, fgCounts);
                     }
@@ -291,7 +284,6 @@ public class CmdLineParser {
                 m.put("Functional Class Synonyms", "");
                 m.put("Level", "");
                 m.put("Total #C", "");
-//                m.put("Total #OH", "");
                 m.put("Total #DB", "");
             }
             keys.addAll(m.keySet());
@@ -370,10 +362,10 @@ public class CmdLineParser {
                         la.getLipidLevel(),
                         Arrays.asList(handler.getErrorMessage()),
                         la,
-                        la.lipid.getInfo(),
+                        la.getLipid().getInfo(),
                         canonicalName,
-                        LIPID_CLASSES.get(la.lipid.getInfo().lipidClass).lipidCategory.name(),
-                        getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.lipid.getInfo().lipidClass).className),
+                        LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).lipidCategory.name(),
+                        getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).className),
                         fas
                 );
                 return Pair.of(lipidName, validationResult);
@@ -430,7 +422,7 @@ public class CmdLineParser {
     }
     
     private static ArrayList<FattyAcid> extractFas(LipidAdduct la) {
-        return la.lipid.getFaList();
+        return la.getLipid().getFaList();
     }
     
     private static String getLipidMapsClassAbbreviation(String lipidMapsClass) {

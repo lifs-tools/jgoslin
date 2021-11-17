@@ -58,7 +58,7 @@ public final class FattyAcidParser extends Parser<LipidAdduct> {
 
     @Override
     public FattyAcidParserEventHandler newEventHandler() {
-        return new FattyAcidParserEventHandler();
+        return new FattyAcidParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
     }
 
 }

@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Optional;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 
 public abstract class Parser<T> {
 
@@ -87,6 +88,8 @@ public abstract class Parser<T> {
     protected boolean usedEof = false;
     protected static final char DEFAULT_QUOTE = '\'';
 //    protected String errorMessage = "";
+    
+    protected static final KnownFunctionalGroups KNOWN_FUNCTIONAL_GROUPS = new KnownFunctionalGroups();
 
     public Parser(String grammarContent) {
         this(grammarContent, (char) '\0');

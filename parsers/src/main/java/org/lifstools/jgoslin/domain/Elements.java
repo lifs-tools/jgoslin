@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author dominik
  */
-public class Elements {
+public final class Elements {
 
     public static final double ELECTRON_REST_MASS = 0.00054857990946;
 

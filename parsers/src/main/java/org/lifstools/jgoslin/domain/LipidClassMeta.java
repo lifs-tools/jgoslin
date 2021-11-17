@@ -25,21 +25,22 @@ package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  *
  * @author dominik
  */
-public class LipidClassMeta {
+public final class LipidClassMeta {
 
-    public LipidCategory lipidCategory;
-    public String className;
-    public String description;
-    public int maxNumFa;
-    public int possibleNumFa;
-    public HashSet<String> specialCases;
-    public ElementTable elements;
-    public ArrayList<String> synonyms;
+    public final LipidCategory lipidCategory;
+    public final String className;
+    public final String description;
+    public final int maxNumFa;
+    public final int possibleNumFa;
+    public final HashSet<String> specialCases;
+    public final ElementTable elements;
+    public final ArrayList<String> synonyms;
 
     public LipidClassMeta(LipidCategory _lipid_category, String _class_name, String _description, int _max_num_fa, int _possible_num_fa, HashSet<String> _special_cases, ElementTable _elements, ArrayList<String> _synonyms) {
         lipidCategory = _lipid_category;
@@ -51,4 +52,95 @@ public class LipidClassMeta {
         elements = _elements;
         synonyms = _synonyms;
     }
+
+    public LipidCategory getLipidCategory() {
+        return lipidCategory;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getMaxNumFa() {
+        return maxNumFa;
+    }
+
+    public int getPossibleNumFa() {
+        return possibleNumFa;
+    }
+
+    public HashSet<String> getSpecialCases() {
+        return specialCases;
+    }
+
+    public ElementTable getElements() {
+        return elements;
+    }
+
+    public ArrayList<String> getSynonyms() {
+        return synonyms;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + Objects.hashCode(this.lipidCategory);
+        hash = 23 * hash + Objects.hashCode(this.className);
+        hash = 23 * hash + Objects.hashCode(this.description);
+        hash = 23 * hash + this.maxNumFa;
+        hash = 23 * hash + this.possibleNumFa;
+        hash = 23 * hash + Objects.hashCode(this.specialCases);
+        hash = 23 * hash + Objects.hashCode(this.elements);
+        hash = 23 * hash + Objects.hashCode(this.synonyms);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LipidClassMeta other = (LipidClassMeta) obj;
+        if (this.maxNumFa != other.maxNumFa) {
+            return false;
+        }
+        if (this.possibleNumFa != other.possibleNumFa) {
+            return false;
+        }
+        if (!Objects.equals(this.className, other.className)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (this.lipidCategory != other.lipidCategory) {
+            return false;
+        }
+        if (!Objects.equals(this.specialCases, other.specialCases)) {
+            return false;
+        }
+        if (!Objects.equals(this.elements, other.elements)) {
+            return false;
+        }
+        if (!Objects.equals(this.synonyms, other.synonyms)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "LipidClassMeta{" + "lipidCategory=" + lipidCategory + ", className=" + className + ", description=" + description + ", maxNumFa=" + maxNumFa + ", possibleNumFa=" + possibleNumFa + ", specialCases=" + specialCases + ", elements=" + elements + ", synonyms=" + synonyms + '}';
+    }
+
 }

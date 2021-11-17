@@ -70,7 +70,7 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
     }
 
     public boolean spRegularLcb() {
-        return Headgroup.getCategory(headGroup) == LipidCategory.SP && (currentFa.lipidFaBondType == LipidFaBondType.LCB_REGULAR || currentFa.lipidFaBondType == LipidFaBondType.LCB_EXCEPTION) && !(SP_EXCEPTION_CLASSES.contains(headGroup) && headgroupDecorators.isEmpty());
+        return Headgroup.getCategory(headGroup) == LipidCategory.SP && (currentFa.getLipidFaBondType() == LipidFaBondType.LCB_REGULAR || currentFa.getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION) && !(SP_EXCEPTION_CLASSES.contains(headGroup) && headgroupDecorators.isEmpty());
     }
 
     public Headgroup prepareHeadgroupAndChecks() {
@@ -81,43 +81,43 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
 
         int true_fa = 0;
         for (FattyAcid fa : faList) {
-            true_fa += (fa.numCarbon > 0 || fa.getDoubleBonds().getNumDoubleBonds() > 0) ? 1 : 0;
+            true_fa += (fa.getNumCarbon() > 0 || fa.getDoubleBonds().getNumDoubleBonds() > 0) ? 1 : 0;
         }
-        int poss_fa = (LipidClasses.getInstance().size() > headgroup.lipidClass) ? LipidClasses.getInstance().get(headgroup.lipidClass).possibleNumFa : 0;
+        int poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
 
         // make lyso
         boolean can_be_lyso = (LipidClasses.getInstance().size() > Headgroup.getClass("L" + headGroup)) ? LipidClasses.getInstance().get(Headgroup.getClass("L" + headGroup)).specialCases.contains("Lyso") : false;
         LipidClassMeta l = LipidClasses.getInstance().get(Headgroup.getClass("LCL"));
-        if (true_fa + 1 == poss_fa && level != LipidLevel.SPECIES && headgroup.lipidCategory == LipidCategory.GP && can_be_lyso) {
+        if (true_fa + 1 == poss_fa && level != LipidLevel.SPECIES && headgroup.getLipidCategory() == LipidCategory.GP && can_be_lyso) {
             headGroup = "L" + headGroup;
             headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
-            poss_fa = (LipidClasses.getInstance().size() > headgroup.lipidClass) ? LipidClasses.getInstance().get(headgroup.lipidClass).possibleNumFa : 0;
-        } else if (true_fa + 2 == poss_fa && level != LipidLevel.SPECIES && headgroup.lipidCategory == LipidCategory.GP && headGroup.equals("CL")) {
+            poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
+        } else if (true_fa + 2 == poss_fa && level != LipidLevel.SPECIES && headgroup.getLipidCategory() == LipidCategory.GP && headGroup.equals("CL")) {
             headGroup = "DL" + headGroup;
             headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
-            poss_fa = (LipidClasses.getInstance().size() > headgroup.lipidClass) ? LipidClasses.getInstance().get(headgroup.lipidClass).possibleNumFa : 0;
+            poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
         }
 
         if (level == LipidLevel.SPECIES) {
             if (true_fa == 0 && poss_fa != 0) {
-                String hg_name = headgroup.headgroup;
+                String hg_name = headgroup.getHeadgroup();
                 throw new ConstraintViolationException("No fatty acyl information lipid class '" + hg_name + "' provided.");
             }
         } else if (true_fa != poss_fa && LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
-            String hg_name = headgroup.headgroup;
+            String hg_name = headgroup.getHeadgroup();
             throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + hg_name + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
         }
 
-        if (LipidClasses.getInstance().get(headgroup.lipidClass).specialCases.contains("HC")) {
-            faList.get(0).lipidFaBondType = LipidFaBondType.AMINE;
+        if (LipidClasses.getInstance().get(headgroup.getLipidClass()).specialCases.contains("HC")) {
+            faList.get(0).setLipidFaBondType(LipidFaBondType.AMINE);
         }
 
-        int max_num_fa = (LipidClasses.getInstance().size() > headgroup.lipidClass) ? LipidClasses.getInstance().get(headgroup.lipidClass).maxNumFa : 0;
+        int max_num_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).maxNumFa : 0;
         if (max_num_fa != faList.size()) {
             setLipidLevel(LipidLevel.MOLECULAR_SPECIES);
         }
 
-        if (faList.size() > 0 && headgroup.spException) {
+        if (faList.size() > 0 && headgroup.isSpException()) {
             faList.get(0).setType(LipidFaBondType.LCB_EXCEPTION);
         }
 

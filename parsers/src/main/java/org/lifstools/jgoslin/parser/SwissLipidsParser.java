@@ -48,7 +48,7 @@ public class SwissLipidsParser extends Parser<LipidAdduct> {
 
     @Override
     public SwissLipidsParserEventHandler newEventHandler() {
-        return new SwissLipidsParserEventHandler();
+        return new SwissLipidsParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
     }
 
 }

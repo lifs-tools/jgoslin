@@ -23,33 +23,71 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.domain;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 
 /**
  *
  * @author dominik
  */
-public class ElementTable extends HashMap<Element, Integer> {
+public final class ElementTable extends EnumMap<Element, Integer> {
 
+    private ElementTable(Class<Element> keyType) {
+        super(keyType);
+    }
+
+    /**
+     * Create a new element table.
+     */
     public ElementTable() {
-        super();
+        this(Element.class);
         Elements.ELEMENT_MASSES.keySet().forEach(e -> {
             put(e, 0);
         });
     }
 
+    /**
+     * Create a new element table from the provided entries.
+     * @param entries the entries
+     * @return a new element table.
+     */
+    public static ElementTable of(Entry<Element, Integer>... entries) {
+        ElementTable et = new ElementTable();
+        for (Entry<Element, Integer> e : entries) {
+            et.put(e.getKey(), e.getValue());
+        }
+        return et;
+    }
+
+    /**
+     * Add all elements and counts to those in this element table.
+     *
+     * @param elements
+     */
     public void add(ElementTable elements) {
         elements.entrySet().forEach(kv -> {
             put(kv.getKey(), get(kv.getKey()) + kv.getValue());
         });
     }
 
-    public void add(ElementTable elements, int count) {
+    /**
+     * Add all alements and counts to those in this element table, but use the
+     * count argument to multiply count values in the provided table.
+     *
+     * @param elements
+     * @param multiplier
+     */
+    public void add(ElementTable elements, int multiplier) {
         elements.entrySet().forEach(kv -> {
-            put(kv.getKey(), get(kv.getKey()) + kv.getValue() * count);
+            put(kv.getKey(), get(kv.getKey()) + kv.getValue() * multiplier);
         });
     }
 
+    /**
+     * Copy all entries in this element table. The copy will be completely
+     * independent of this instance.
+     *
+     * @return a copy of this element table.
+     */
     public ElementTable copy() {
         ElementTable e = new ElementTable();
         entrySet().forEach(kv -> {

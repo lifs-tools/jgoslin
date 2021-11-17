@@ -48,7 +48,7 @@ public class ShorthandParser extends Parser<LipidAdduct> {
 
     @Override
     public ShorthandParserEventHandler newEventHandler() {
-        return new ShorthandParserEventHandler();
+        return new ShorthandParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
     }
 
 }

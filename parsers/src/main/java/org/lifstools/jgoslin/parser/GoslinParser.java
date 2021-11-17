@@ -48,7 +48,7 @@ public final class GoslinParser extends Parser<LipidAdduct> {
 
     @Override
     public GoslinParserEventHandler newEventHandler() {
-        return new GoslinParserEventHandler();
+        return new GoslinParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
     }
 
 }

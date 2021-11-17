@@ -37,7 +37,7 @@ public class LipidMolecularSpecies extends LipidSpecies {
 
     public LipidMolecularSpecies(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
-        info.level = LipidLevel.MOLECULAR_SPECIES;
+        info.setLevel(LipidLevel.MOLECULAR_SPECIES);
         faList.stream().map(fatty_acid -> {
             if (fa.containsKey(fatty_acid.getName())) {
                 throw new ConstraintViolationException("FA names must be unique! FA with name " + fatty_acid.getName() + " was already added!");
@@ -65,17 +65,14 @@ public class LipidMolecularSpecies extends LipidSpecies {
             level = LipidLevel.MOLECULAR_SPECIES;
         }
 
-        String fa_separator = (level != LipidLevel.MOLECULAR_SPECIES || headGroup.lipidCategory == LipidCategory.SP) ? "/" : "_";
+        String fa_separator = (level != LipidLevel.MOLECULAR_SPECIES || headGroup.getLipidCategory() == LipidCategory.SP) ? "/" : "_";
         StringBuilder lipid_name = new StringBuilder();
         lipid_name.append(headGroup.getLipidString(level));
 
-        String fa_headgroup_separator = (headGroup.lipidCategory != LipidCategory.ST) ? " " : "/";
+        String fa_headgroup_separator = (headGroup.getLipidCategory() != LipidCategory.ST) ? " " : "/";
 
         switch (level) {
-            case COMPLETE_STRUCTURE:
-            case FULL_STRUCTURE:
-            case STRUCTURE_DEFINED:
-            case SN_POSITION:
+            case COMPLETE_STRUCTURE, FULL_STRUCTURE, STRUCTURE_DEFINED, SN_POSITION -> {
                 if (faList.size() > 0) {
                     lipid_name.append(fa_headgroup_separator);
                     int i = 0;
@@ -87,9 +84,8 @@ public class LipidMolecularSpecies extends LipidSpecies {
                         lipid_name.append(fatty_acid.toString(level));
                     }
                 }
-                break;
-
-            default:
+            }
+            default -> {
                 boolean go_on = false;
                 for (FattyAcid fatty_acid : faList) {
                     if (fatty_acid.numCarbon > 0) {
@@ -110,7 +106,7 @@ public class LipidMolecularSpecies extends LipidSpecies {
                         }
                     }
                 }
-                break;
+            }
         }
         return lipid_name.toString();
     }
@@ -141,17 +137,14 @@ public class LipidMolecularSpecies extends LipidSpecies {
     @Override
     public String getLipidString(LipidLevel level) {
         switch (level) {
-            case NO_LEVEL:
-            case MOLECULAR_SPECIES:
+            case NO_LEVEL, MOLECULAR_SPECIES -> {
                 return buildLipidSubspeciesName(LipidLevel.MOLECULAR_SPECIES);
-
-            case CATEGORY:
-            case CLASS:
-            case SPECIES:
+            }
+            case CATEGORY, CLASS, SPECIES -> {
                 return super.getLipidString(level);
+            }
 
-            default:
-                throw new IllegalArgumentException("LipidMolecularSpecies does not know how to create a lipid string for level " + level.toString());
+            default -> throw new IllegalArgumentException("LipidMolecularSpecies does not know how to create a lipid string for level " + level.toString());
         }
     }
 }

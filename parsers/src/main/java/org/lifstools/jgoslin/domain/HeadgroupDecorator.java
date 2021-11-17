@@ -29,10 +29,10 @@ import java.util.Map.Entry;
  *
  * @author dominik
  */
-public class HeadgroupDecorator extends FunctionalGroup {
+public final class HeadgroupDecorator extends FunctionalGroup {
 
-    public boolean suffix;
-    public LipidLevel lowestVisibleLevel;
+    private final boolean suffix;
+    private final LipidLevel lowestVisibleLevel;
 
     public HeadgroupDecorator(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, -1, 1, null, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);
@@ -89,6 +89,14 @@ public class HeadgroupDecorator extends FunctionalGroup {
         }
 
         return decorator_string;
+    }
+
+    public boolean isSuffix() {
+        return suffix;
+    }
+
+    public LipidLevel getLowestVisibleLevel() {
+        return lowestVisibleLevel;
     }
 
 }

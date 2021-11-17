@@ -30,10 +30,10 @@ import java.util.TreeMap;
  *
  * @author dominik
  */
-public class DoubleBonds {
+public final class DoubleBonds {
 
     private int numDoubleBonds;
-    public final Map<Integer, String> doubleBondPositions;
+    protected final Map<Integer, String> doubleBondPositions;
 
     public DoubleBonds() {
         numDoubleBonds = 0;
@@ -63,5 +63,9 @@ public class DoubleBonds {
     public void setNumDoubleBonds(int numDoubleBonds) {
         this.numDoubleBonds = numDoubleBonds;
     }
-    
+
+    public Map<Integer, String> getDoubleBondPositions() {
+        return doubleBondPositions;
+    }
+
 }

@@ -27,7 +27,7 @@ package org.lifstools.jgoslin.domain;
  *
  * @author dominik
  */
-public class LipidParsingException extends LipidException {
+public final class LipidParsingException extends LipidException {
 
     protected LipidParsingException() {
         super();

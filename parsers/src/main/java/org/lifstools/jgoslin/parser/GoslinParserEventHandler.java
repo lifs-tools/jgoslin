@@ -138,7 +138,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     public void addDbPosition(TreeNode node) {
         if (currentFa != null) {
-            currentFa.getDoubleBonds().doubleBondPositions.put(dbPosition, dbCistrans);
+            currentFa.getDoubleBonds().getDoubleBondPositions().put(dbPosition, dbCistrans);
             if (!dbCistrans.equals("E") && !dbCistrans.equals("Z")) {
                 setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
             }
@@ -174,17 +174,17 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void cleanLcb(TreeNode node) {
-        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
+        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
         currentFa = null;
     }
 
     public void appendFa(TreeNode node) {
-        if (currentFa.lipidFaBondType == LipidFaBondType.ETHER_UNSPECIFIED) {
+        if (currentFa.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED) {
             throw new LipidException("Lipid with unspecified ether bond cannot be treated properly.");
         }
-        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
+        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
 
@@ -212,14 +212,12 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         
         
         if (plasmalogen != '\0' && faList.size() > 0 && lcb == null){
-            faList.get(0).lipidFaBondType = plasmalogen == 'O' ? LipidFaBondType.ETHER_PLASMANYL : LipidFaBondType.ETHER_PLASMENYL;
+            faList.get(0).setLipidFaBondType(plasmalogen == 'O' ? LipidFaBondType.ETHER_PLASMANYL : LipidFaBondType.ETHER_PLASMENYL);
         }
 
         Headgroup headgroup = prepareHeadgroupAndChecks();
 
-        LipidAdduct lipid = new LipidAdduct();
-        lipid.lipid = assembleLipid(headgroup);
-        lipid.adduct = adduct;
+        LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);
         content = lipid;
 
     }
@@ -227,9 +225,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     public void addEther(TreeNode node) {
         String ether = node.getText();
         if (ether.equals("a")) {
-            currentFa.lipidFaBondType = LipidFaBondType.ETHER_PLASMANYL;
+            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
         } else if (ether.equals("p")) {
-            currentFa.lipidFaBondType = LipidFaBondType.ETHER_PLASMENYL;
+            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
             currentFa.getDoubleBonds().setNumDoubleBonds(Math.max(0, currentFa.getDoubleBonds().getNumDoubleBonds() - 1));
         }
         plasmalogen = '\0';
@@ -261,7 +259,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void addCarbon(TreeNode node) {
-        currentFa.numCarbon = Integer.valueOf(node.getText());
+        currentFa.setNumCarbon(Integer.valueOf(node.getText()));
     }
 
     public void addHydroxyl(TreeNode node) {

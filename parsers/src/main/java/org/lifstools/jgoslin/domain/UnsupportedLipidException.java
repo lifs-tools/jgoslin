@@ -19,7 +19,7 @@ package org.lifstools.jgoslin.domain;
  *
  * @author dominik
  */
-public class UnsupportedLipidException extends LipidException {
+public final class UnsupportedLipidException extends LipidException {
 
     protected UnsupportedLipidException() {
         super();

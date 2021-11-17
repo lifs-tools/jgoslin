@@ -29,14 +29,19 @@ import java.util.Map.Entry;
  *
  * @author dominik
  */
-public class LipidAdduct {
+public final class LipidAdduct {
 
-    public LipidSpecies lipid;
-    public Adduct adduct;
+    private LipidSpecies lipid;
+    private Adduct adduct;
 
     public LipidAdduct() {
         lipid = null;
         adduct = null;
+    }
+    
+    public LipidAdduct(LipidSpecies lipid, Adduct adduct) {
+        this.lipid = lipid;
+        this.adduct = adduct;
     }
 
     public String getLipidString() {
@@ -71,23 +76,23 @@ public class LipidAdduct {
     }
 
     public boolean isLyso() {
-        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Lyso") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Lyso") : false;
     }
 
     public boolean isCardioLipin() {
-        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Cardio") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Cardio") : false;
     }
 
     public boolean containsSugar() {
-        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Sugar") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Sugar") : false;
     }
 
     public boolean containsEster() {
-        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("Ester") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Ester") : false;
     }
 
     public boolean isSpException() {
-        return (LipidClasses.getInstance().size() > lipid.headGroup.lipidClass) ? LipidClasses.getInstance().get(lipid.headGroup.lipidClass).specialCases.contains("SP_Exception") : false;
+        return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("SP_Exception") : false;
     }
 
     public LipidLevel getLipidLevel() {
@@ -145,4 +150,21 @@ public class LipidAdduct {
     public String getSumFormula() {
         return StringFunctions.computeSumFormula(getElements());
     }
+
+    public LipidSpecies getLipid() {
+        return lipid;
+    }
+
+    public void setLipid(LipidSpecies lipid) {
+        this.lipid = lipid;
+    }
+
+    public Adduct getAdduct() {
+        return adduct;
+    }
+
+    public void setAdduct(Adduct adduct) {
+        this.adduct = adduct;
+    }
+    
 }

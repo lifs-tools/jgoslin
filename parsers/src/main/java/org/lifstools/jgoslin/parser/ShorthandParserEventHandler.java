@@ -196,23 +196,20 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     public void buildLipid(TreeNode node) {
         if (acerSpecies) {
-            faList.get(0).numCarbon -= 2;
+            faList.get(0).setNumCarbon(faList.get(0).getNumCarbon() - 2);
         }
         Headgroup headgroup = prepareHeadgroupAndChecks();
 
         // add count numbers for fatty acyl chains
-        int fa_it = (faList.size() > 0 && (faList.get(0).lipidFaBondType == LipidFaBondType.LCB_EXCEPTION || faList.get(0).lipidFaBondType == LipidFaBondType.LCB_REGULAR)) ? 1 : 0;
+        int fa_it = (faList.size() > 0 && (faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION || faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_REGULAR)) ? 1 : 0;
         for (int it = fa_it; it < faList.size(); ++it) {
             faList.get(it).setName(faList.get(it) + Integer.toString(it + 1));
         }
 
-        LipidAdduct lipid = new LipidAdduct();
-        lipid.adduct = adduct;
-        lipid.lipid = assembleLipid(headgroup);
-        lipid.adduct = adduct;
+        LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);
 
         if (tmp.containsKey("num_ethers")) {
-            lipid.lipid.getInfo().numEthers = (int) tmp.get("num_ethers");
+            lipid.getLipid().getInfo().numEthers = (int) tmp.get("num_ethers");
         }
 
         content = lipid;
@@ -339,7 +336,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         String fa_i = faI();
         if (currentFas.peekLast().getDoubleBonds().getNumDoubleBonds() != (int) ((Dictionary) tmp.get(fa_i)).get("db_count")) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
-        } else if (currentFas.peekLast().getDoubleBonds().getNumDoubleBonds() > 0 && currentFas.peekLast().getDoubleBonds().doubleBondPositions.isEmpty()) {
+        } else if (currentFas.peekLast().getDoubleBonds().getNumDoubleBonds() > 0 && currentFas.peekLast().getDoubleBonds().getDoubleBondPositions().isEmpty()) {
             setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }
         tmp.remove(fa_i);
@@ -357,7 +354,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void setCarbon(TreeNode node) {
-        ((FattyAcid) currentFas.peekLast()).numCarbon = Integer.valueOf(node.getText());
+        ((FattyAcid) currentFas.peekLast()).setNumCarbon(Integer.valueOf(node.getText()));
     }
 
     public void setDoubleBondCount(TreeNode node) {
@@ -388,7 +385,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
         d.remove("db_position");
         d.remove("db_cistrans");
-        currentFas.peekLast().getDoubleBonds().doubleBondPositions.put(pos, cistrans);
+        currentFas.peekLast().getDoubleBonds().getDoubleBondPositions().put(pos, cistrans);
     }
 
     public void setCisTrans(TreeNode node) {
@@ -398,9 +395,9 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     public void setEtherType(TreeNode node) {
         String ether_type = node.getText();
         if (ether_type.equals("O-")) {
-            ((FattyAcid) currentFas.peekLast()).lipidFaBondType = LipidFaBondType.ETHER_PLASMANYL;
+            ((FattyAcid) currentFas.peekLast()).setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
         } else if (ether_type.equals("P-")) {
-            ((FattyAcid) currentFas.peekLast()).lipidFaBondType = LipidFaBondType.ETHER_PLASMENYL;
+            ((FattyAcid) currentFas.peekLast()).setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
         }
     }
 
@@ -489,12 +486,12 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         GenericList cycle_elements = (GenericList) ((Dictionary) tmp.get(fa_i)).get("cycle_elements");
         Cycle cycle = (Cycle) currentFas.pollLast();
         for (int i = 0; i < cycle_elements.size(); ++i) {
-            cycle.bridgeChain.add((Element) cycle_elements.get(i));
+            cycle.getBridgeChain().add((Element) cycle_elements.get(i));
         }
         ((Dictionary) tmp.get(fa_i)).remove("cycle_elements");
 
-        if (cycle.start > -1 && cycle.end > -1 && cycle.end - cycle.start + 1 + cycle.bridgeChain.size() < cycle.cycle) {
-            throw new ConstraintViolationException("Cycle length '" + Integer.toString(cycle.cycle) + "' does not match with cycle description.");
+        if (cycle.getStart() > -1 && cycle.getEnd() > -1 && cycle.getEnd() - cycle.getStart() + 1 + cycle.getBridgeChain().size() < cycle.getCycle()) {
+            throw new ConstraintViolationException("Cycle length '" + Integer.toString(cycle.getCycle()) + "' does not match with cycle description.");
         }
         if (!currentFas.peekLast().getFunctionalGroups().containsKey("cy")) {
             currentFas.peekLast().getFunctionalGroups().put("cy", new ArrayList<>());
@@ -503,15 +500,15 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void setCycleStart(TreeNode node) {
-        ((Cycle) currentFas.peekLast()).start = Integer.valueOf(node.getText());
+        ((Cycle) currentFas.peekLast()).setStart(Integer.valueOf(node.getText()));
     }
 
     public void setCycleEnd(TreeNode node) {
-        ((Cycle) currentFas.peekLast()).end = Integer.valueOf(node.getText());
+        ((Cycle) currentFas.peekLast()).setEnd(Integer.valueOf(node.getText()));
     }
 
     public void setCycleNumber(TreeNode node) {
-        ((Cycle) currentFas.peekLast()).cycle = Integer.valueOf(node.getText());
+        ((Cycle) currentFas.peekLast()).setCycle(Integer.valueOf(node.getText()));
     }
 
     public void setCycleDbCount(TreeNode node) {
@@ -530,13 +527,13 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     public void setCycleDbPosition(TreeNode node) {
         int pos = Integer.valueOf(node.getText());
-        ((Cycle) currentFas.peekLast()).getDoubleBonds().doubleBondPositions.put(pos, "");
+        ((Cycle) currentFas.peekLast()).getDoubleBonds().getDoubleBondPositions().put(pos, "");
         ((Dictionary) tmp.get(faI())).put("last_db_pos", pos);
     }
 
     public void setCycleDbPositionCistrans(TreeNode node) {
         int pos = (int) ((Dictionary) tmp.get(faI())).get("last_db_pos");
-        ((Cycle) currentFas.peekLast()).getDoubleBonds().doubleBondPositions.put(pos, node.getText());
+        ((Cycle) currentFas.peekLast()).getDoubleBonds().getDoubleBondPositions().put(pos, node.getText());
     }
 
     public void addCycleElement(TreeNode node) {
@@ -564,7 +561,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         AcylAlkylGroup acyl = (AcylAlkylGroup) currentFas.pollLast();
 
         acyl.setPosition(linkage_pos);
-        acyl.setNbondType(linkage_type);
+        acyl.setNitrogenBond(linkage_type);
         if (linkage_pos == -1) {
             setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }

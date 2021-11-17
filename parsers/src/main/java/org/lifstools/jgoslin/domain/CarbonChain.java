@@ -29,7 +29,7 @@ import java.util.ArrayList;
  *
  * @author dominik
  */
-public class CarbonChain extends FunctionalGroup {
+public final class CarbonChain extends FunctionalGroup {
 
     public CarbonChain(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups) {
         this(_fa, -1, 1, knownFunctionalGroups);

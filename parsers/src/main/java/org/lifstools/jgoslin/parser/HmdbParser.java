@@ -40,7 +40,7 @@ public class HmdbParser extends Parser<LipidAdduct> {
 
     @Override
     public HmdbParserEventHandler newEventHandler() {
-        return new HmdbParserEventHandler();
+        return new HmdbParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
     }
 
 }

@@ -24,6 +24,7 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -38,78 +39,19 @@ public final class Adduct {
 
     public static final HashMap<String, ElementTable> ADDUCTS = new HashMap<>() {
         {
-            put("+H", new ElementTable() {
-                {
-                    put(Element.H, 1);
-                }
-            });
-            put("+2H", new ElementTable() {
-                {
-                    put(Element.H, 2);
-                }
-            });
-            put("+3H", new ElementTable() {
-                {
-                    put(Element.H, 3);
-                }
-            });
-            put("+4H", new ElementTable() {
-                {
-                    put(Element.H, 4);
-                }
-            });
-            put("-H", new ElementTable() {
-                {
-                    put(Element.H, -1);
-                }
-            });
-            put("-2H", new ElementTable() {
-                {
-                    put(Element.H, -2);
-                }
-            });
-            put("-3H", new ElementTable() {
-                {
-                    put(Element.H, -3);
-                }
-            });
-            put("-4H", new ElementTable() {
-                {
-                    put(Element.H, -4);
-                }
-            });
-
-            put("+H-H2O", new ElementTable() {
-                {
-                    put(Element.H, -1);
-                    put(Element.O, -1);
-                }
-            });
-            put("+NH4", new ElementTable() {
-                {
-                    put(Element.N, 1);
-                    put(Element.H, 4);
-                }
-            });
-            put("+Cl", new ElementTable() {
-                {
-                    put(Element.Cl, 1);
-                }
-            });
-            put("+HCOO", new ElementTable() {
-                {
-                    put(Element.H, 1);
-                    put(Element.C, 1);
-                    put(Element.O, 2);
-                }
-            });
-            put("+CH3COO", new ElementTable() {
-                {
-                    put(Element.H, 3);
-                    put(Element.C, 2);
-                    put(Element.O, 2);
-                }
-            });
+            put("+H", ElementTable.of(Map.entry(Element.H, 1)));
+            put("+2H", ElementTable.of(Map.entry(Element.H, 2)));
+            put("+3H", ElementTable.of(Map.entry(Element.H, 3)));
+            put("+4H", ElementTable.of(Map.entry(Element.H, 4)));
+            put("-H", ElementTable.of(Map.entry(Element.H, -1)));
+            put("-2H", ElementTable.of(Map.entry(Element.H, -2)));
+            put("-3H", ElementTable.of(Map.entry(Element.H, -3)));
+            put("-4H", ElementTable.of(Map.entry(Element.H, -4)));
+            put("+H-H2O", ElementTable.of(Map.entry(Element.H, -1), Map.entry(Element.O, -1)));
+            put("+NH4", ElementTable.of(Map.entry(Element.N, 1), Map.entry(Element.H, 4)));
+            put("+Cl", ElementTable.of(Map.entry(Element.Cl, 1)));
+            put("+HCOO", ElementTable.of(Map.entry(Element.H, 1), Map.entry(Element.C, 1), Map.entry(Element.O, 2)));
+            put("+CH3COO", ElementTable.of(Map.entry(Element.H, 3), Map.entry(Element.C, 2), Map.entry(Element.O, 2)));
         }
     };
 
@@ -143,19 +85,19 @@ public final class Adduct {
         setChargeSign(_sign);
 
     }
-    
-    public void setSumFormula(String sumFormula)  {
+
+    public void setSumFormula(String sumFormula) {
         this.sumFormula = sumFormula;
     }
-    
+
     public String getSumFormula() {
         return this.sumFormula;
     }
-    
+
     public void setAdductString(String adductString) {
         this.adductString = adductString;
     }
-    
+
     public String getAdductString() {
         return this.adductString;
     }
@@ -167,13 +109,13 @@ public final class Adduct {
             throw new ConstraintViolationException("Sign can only be -1, 0, or 1");
         }
     }
-    
+
     public int getChargeSign() {
         return this.chargeSign;
     }
-    
+
     public void setCharge(int charge) {
-        if(charge>0) {
+        if (charge > 0) {
             this.chargeSign = 1;
         } else {
             this.chargeSign = -1;

@@ -125,7 +125,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
     public void addDbPosition(TreeNode node) {
         if (currentFa != null) {
-            currentFa.getDoubleBonds().doubleBondPositions.put(dbPositions, dbCistrans);
+            currentFa.getDoubleBonds().getDoubleBondPositions().put(dbPositions, dbCistrans);
             if (!dbCistrans.equals("E") && !dbCistrans.equals("Z")) {
                 setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
             }
@@ -169,7 +169,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void cleanLcb(TreeNode node) {
-        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
+        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
         currentFa = null;
@@ -179,7 +179,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         if (currentFa.getDoubleBonds().getNumDoubleBonds() < 0) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
-        if (currentFa.getDoubleBonds().doubleBondPositions.isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
+        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
 
@@ -201,18 +201,16 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
         Headgroup headgroup = prepareHeadgroupAndChecks();
 
-        LipidAdduct lipid = new LipidAdduct();
-        lipid.lipid = assembleLipid(headgroup);
-        lipid.adduct = adduct;
+        LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);
         content = lipid;
     }
 
     public void addEther(TreeNode node) {
         String ether = node.getText();
         if (ether.equals("O-") || ether.equals("o-")) {
-            currentFa.lipidFaBondType = LipidFaBondType.ETHER_PLASMANYL;
+            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
         } else if (ether.equals("P-")) {
-            currentFa.lipidFaBondType = LipidFaBondType.ETHER_PLASMENYL;
+            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
         } else {
             throw new UnsupportedLipidException("Fatty acyl chain of type '" + ether + "' is currently not supported");
         }
@@ -241,8 +239,8 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
     public void addMethyl(TreeNode node) {
         FunctionalGroup functional_group = knownFunctionalGroups.get("Me");
-        functional_group.setPosition(currentFa.numCarbon - (node.getText().equals("i-") ? 1 : 2));
-        currentFa.numCarbon -= 1;
+        functional_group.setPosition(currentFa.getNumCarbon() - (node.getText().equals("i-") ? 1 : 2));
+        currentFa.setNumCarbon(currentFa.getNumCarbon() - 1);
 
         if (!currentFa.getFunctionalGroups().containsKey("Me")) {
             currentFa.getFunctionalGroups().put("Me", new ArrayList<>());
@@ -267,7 +265,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     public void addCarbon(TreeNode node) {
-        currentFa.numCarbon += node.getInt();
+        currentFa.setNumCarbon(currentFa.getNumCarbon() + node.getInt());
     }
 
     public void furanFa(TreeNode node) {
@@ -276,13 +274,13 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
     public void furanFaPost(TreeNode node) {
         int l = 4 + (int) furan.get("len_first") + (int) furan.get("len_second");
-        currentFa.numCarbon = l;
+        currentFa.setNumCarbon(l);
 
         int start = 1 + (int) furan.get("len_first");
         int end = 3 + start;
         DoubleBonds cyclo_db = new DoubleBonds(2);
-        cyclo_db.doubleBondPositions.put(start, "E");
-        cyclo_db.doubleBondPositions.put(2 + start, "E");
+        cyclo_db.getDoubleBondPositions().put(start, "E");
+        cyclo_db.getDoubleBondPositions().put(2 + start, "E");
 
         HashMap<String, ArrayList<FunctionalGroup>> cyclo_fg = new HashMap<>();
         cyclo_fg.put("Me", new ArrayList<>());

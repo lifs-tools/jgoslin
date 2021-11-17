@@ -30,9 +30,9 @@ import java.util.Map.Entry;
  *
  * @author dominik
  */
-public class LipidSpeciesInfo extends FattyAcid {
+public final class LipidSpeciesInfo extends FattyAcid {
 
-    public LipidLevel level;
+    private LipidLevel level;
     public int numEthers;
     public int numSpecifiedFa;
     public int totalFa;
@@ -129,4 +129,53 @@ public class LipidSpeciesInfo extends FattyAcid {
 
         return info_string.toString();
     }
+
+    public LipidLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(LipidLevel level) {
+        this.level = level;
+    }
+
+    public int getNumEthers() {
+        return numEthers;
+    }
+
+    public void setNumEthers(int numEthers) {
+        this.numEthers = numEthers;
+    }
+
+    public int getNumSpecifiedFa() {
+        return numSpecifiedFa;
+    }
+
+    public void setNumSpecifiedFa(int numSpecifiedFa) {
+        this.numSpecifiedFa = numSpecifiedFa;
+    }
+
+    public int getTotalFa() {
+        return totalFa;
+    }
+
+    public void setTotalFa(int totalFa) {
+        this.totalFa = totalFa;
+    }
+
+    public LipidFaBondType getExtendedClass() {
+        return extendedClass;
+    }
+
+    public void setExtendedClass(LipidFaBondType extendedClass) {
+        this.extendedClass = extendedClass;
+    }
+
+    public int getLipidClass() {
+        return lipidClass;
+    }
+
+    public void setLipidClass(int lipidClass) {
+        this.lipidClass = lipidClass;
+    }
+    
 }

@@ -31,8 +31,8 @@ import java.util.ArrayList;
  */
 public final class AcylAlkylGroup extends FunctionalGroup {
 
-    protected boolean alkyl;
-    protected boolean nitrogenBond;
+    private boolean alkyl;
+    private boolean nitrogenBond;
 
     public AcylAlkylGroup(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups) {
         this(_fa, -1, 1, false, false, knownFunctionalGroups);
@@ -51,7 +51,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
             functionalGroups.get(key).add(_fa);
         }
         doubleBonds.setNumDoubleBonds(alkyl ? 0 : 1);
-        setNbondType(_N_bond);
+        setNitrogenBond(_N_bond);
 
     }
 
@@ -60,8 +60,16 @@ public final class AcylAlkylGroup extends FunctionalGroup {
         String key = alkyl ? "alkyl" : "acyl";
         return new AcylAlkylGroup((FattyAcid) functionalGroups.get(key).get(0).copy(), getPosition(), getCount(), alkyl, nitrogenBond, knownFunctionalGroups);
     }
+    
+    public void setAlkyl(boolean alkyl) {
+        this.alkyl = alkyl;
+    }
+    
+    public boolean getAlkyl() {
+        return this.alkyl;
+    }
 
-    public void setNbondType(boolean _N_bond) {
+    public void setNitrogenBond(boolean _N_bond) {
         nitrogenBond = _N_bond;
 
         if (nitrogenBond) {
@@ -72,6 +80,10 @@ public final class AcylAlkylGroup extends FunctionalGroup {
             elements.put(Element.H, (alkyl ? 1 : -1));
             elements.put(Element.O, (alkyl ? 0 : 1));
         }
+    }
+    
+    public boolean getNitrogenBond() {
+        return this.nitrogenBond;
     }
 
     @Override

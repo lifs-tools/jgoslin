@@ -33,12 +33,12 @@ import java.util.Map.Entry;
  *
  * @author dominik
  */
-public class Cycle extends FunctionalGroup {
+public final class Cycle extends FunctionalGroup {
 
-    public int cycle;
-    public int start;
-    public int end;
-    public ArrayList<Element> bridgeChain;
+    private int cycle;
+    private int start;
+    private int end;
+    private final ArrayList<Element> bridgeChain;
 
     public Cycle(int _cycle, KnownFunctionalGroups knownFunctionalGroups) {
         this(_cycle, -1, -1, null, null, null, knownFunctionalGroups);
@@ -75,6 +75,34 @@ public class Cycle extends FunctionalGroup {
         }
 
         return new Cycle(cycle, start, end, db, fg, bc, knownFunctionalGroups);
+    }
+
+    public int getCycle() {
+        return cycle;
+    }
+
+    public void setCycle(int cycle) {
+        this.cycle = cycle;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public int getEnd() {
+        return end;
+    }
+
+    public void setEnd(int end) {
+        this.end = end;
+    }
+
+    public ArrayList<Element> getBridgeChain() {
+        return bridgeChain;
     }
 
     @Override
