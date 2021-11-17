@@ -25,7 +25,6 @@ package org.lifstools.jgoslin.domain;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
 
 /**
  *
@@ -83,64 +82,6 @@ public final class LipidClassMeta {
 
     public ArrayList<String> getSynonyms() {
         return synonyms;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 23 * hash + Objects.hashCode(this.lipidCategory);
-        hash = 23 * hash + Objects.hashCode(this.className);
-        hash = 23 * hash + Objects.hashCode(this.description);
-        hash = 23 * hash + this.maxNumFa;
-        hash = 23 * hash + this.possibleNumFa;
-        hash = 23 * hash + Objects.hashCode(this.specialCases);
-        hash = 23 * hash + Objects.hashCode(this.elements);
-        hash = 23 * hash + Objects.hashCode(this.synonyms);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final LipidClassMeta other = (LipidClassMeta) obj;
-        if (this.maxNumFa != other.maxNumFa) {
-            return false;
-        }
-        if (this.possibleNumFa != other.possibleNumFa) {
-            return false;
-        }
-        if (!Objects.equals(this.className, other.className)) {
-            return false;
-        }
-        if (!Objects.equals(this.description, other.description)) {
-            return false;
-        }
-        if (this.lipidCategory != other.lipidCategory) {
-            return false;
-        }
-        if (!Objects.equals(this.specialCases, other.specialCases)) {
-            return false;
-        }
-        if (!Objects.equals(this.elements, other.elements)) {
-            return false;
-        }
-        if (!Objects.equals(this.synonyms, other.synonyms)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "LipidClassMeta{" + "lipidCategory=" + lipidCategory + ", className=" + className + ", description=" + description + ", maxNumFa=" + maxNumFa + ", possibleNumFa=" + possibleNumFa + ", specialCases=" + specialCases + ", elements=" + elements + ", synonyms=" + synonyms + '}';
     }
 
 }

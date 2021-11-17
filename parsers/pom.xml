@@ -129,6 +129,35 @@
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>plantuml-generator-maven-plugin</artifactId>
+                <groupId>de.elnarion.maven</groupId>
+                <version>1.2.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-simple-diagram</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <outputFilename>goslin-class-diagram.puml</outputFilename>
+                            <hideMethods>false</hideMethods>
+                            <hideFields>false</hideFields>
+                            <maxVisibilityFields>PROTECTED</maxVisibilityFields>
+                            <maxVisibilityMethods>PUBLIC</maxVisibilityMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    org.lifstools.jgoslin.domain
+                                </scanPackage>
+                                <scanPackage>
+                                    org.lifstools.jgoslin.parsers
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>

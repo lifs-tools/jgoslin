@@ -60,11 +60,11 @@ public final class AcylAlkylGroup extends FunctionalGroup {
         String key = alkyl ? "alkyl" : "acyl";
         return new AcylAlkylGroup((FattyAcid) functionalGroups.get(key).get(0).copy(), getPosition(), getCount(), alkyl, nitrogenBond, knownFunctionalGroups);
     }
-    
+
     public void setAlkyl(boolean alkyl) {
         this.alkyl = alkyl;
     }
-    
+
     public boolean getAlkyl() {
         return this.alkyl;
     }
@@ -81,7 +81,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
             elements.put(Element.O, (alkyl ? 0 : 1));
         }
     }
-    
+
     public boolean getNitrogenBond() {
         return this.nitrogenBond;
     }
@@ -101,4 +101,5 @@ public final class AcylAlkylGroup extends FunctionalGroup {
 
         return acyl_alkyl_string.toString();
     }
+
 }

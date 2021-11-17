@@ -59,4 +59,5 @@ public final class CarbonChain extends FunctionalGroup {
     public String toString(LipidLevel level) {
         return (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(getPosition()) : "") + "(" + ((FattyAcid) functionalGroups.get("cc").get(0)).toString(level) + ")";
     }
+    
 }

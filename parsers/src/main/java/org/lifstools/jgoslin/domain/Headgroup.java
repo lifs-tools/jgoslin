@@ -70,7 +70,7 @@ public final class Headgroup {
         lipidClass = getClass(headgroup);
         useHeadgroup = _use_headgroup;
         decorators = (_decorators != null) ? _decorators : new ArrayList<>();
-        spException = (lipidCategory == LipidCategory.SP) && exceptionHeadgroups.contains(LipidClasses.getInstance().get(lipidClass).className) && (decorators.size() == 0);
+        spException = (lipidCategory == LipidCategory.SP) && exceptionHeadgroups.contains(LipidClasses.getInstance().get(lipidClass).className) && (decorators.isEmpty());
     }
 
     public static LipidCategory getCategory(String _headgroup) {
@@ -231,5 +231,5 @@ public final class Headgroup {
     public void setDecorators(ArrayList<HeadgroupDecorator> decorators) {
         this.decorators = decorators;
     }
-
+    
 }

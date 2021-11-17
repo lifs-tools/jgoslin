@@ -1,4 +1,4 @@
-<project name="jmzTab-m Reference">
+<project name="jGoslin Reference">
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
@@ -7,7 +7,7 @@
     <custom>
         <fluidoSkin>
             <gitHub>
-                <projectId>lifs-tools/jgoslin</projectId>
+                <projectId>lifs-tools/jg</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
                 <ribbonColor>black</ribbonColor>
             </gitHub>
