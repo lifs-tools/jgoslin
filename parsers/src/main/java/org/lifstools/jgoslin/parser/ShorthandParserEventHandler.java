@@ -203,7 +203,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         // add count numbers for fatty acyl chains
         int fa_it = (faList.size() > 0 && (faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION || faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_REGULAR)) ? 1 : 0;
         for (int it = fa_it; it < faList.size(); ++it) {
-            faList.get(it).setName(faList.get(it) + Integer.toString(it + 1));
+            faList.get(it).setName(faList.get(it).getName() + Integer.toString(it + 1));
         }
 
         LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);

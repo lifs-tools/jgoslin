@@ -44,7 +44,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
     public static final int UNDEFINED_CLASS = 0;
 
     private LipidClasses() {
-        this("lipid-list.csv");
+        this("/lipid-list.csv");
     }
 
     private LipidClasses(String resourceName) {
@@ -61,7 +61,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
         ArrayList<String> lines = new ArrayList<>();
 
         // read resource from classpath and current thread's context class loader
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)));) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)))) {
             lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
             //always pass on the original exception

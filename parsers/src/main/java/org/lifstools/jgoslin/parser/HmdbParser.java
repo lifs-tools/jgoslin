@@ -24,7 +24,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  */
 public class HmdbParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("HMDB.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/HMDB.g4");
 
     private HmdbParser(String grammarContent, char quote) {
         super(grammarContent, quote);

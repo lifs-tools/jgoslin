@@ -32,7 +32,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public final class FattyAcidParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("FattyAcids.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/FattyAcids.g4");
 
     private FattyAcidParser(String grammarContent, char quote) {
         super(grammarContent, quote);

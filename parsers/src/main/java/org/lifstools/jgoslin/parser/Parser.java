@@ -810,6 +810,7 @@ public abstract class Parser<T> {
     static String readGrammarContent(String grammarResourcePath) {
         StringBuilder sb = new StringBuilder();
         // read resource from classpath and current thread's context class loader
+//        Resource resource = new ClassPathResource("/my/resource.json", this.getClass());
         try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(grammarResourcePath)));) {
             br.lines().forEach(line -> {
                 sb.append(line).append("\n");

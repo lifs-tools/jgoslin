@@ -32,7 +32,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class ShorthandParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Shorthand2020.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/Shorthand2020.g4");
 
     private ShorthandParser(String grammarContent, char quote) {
         super(grammarContent, quote);
