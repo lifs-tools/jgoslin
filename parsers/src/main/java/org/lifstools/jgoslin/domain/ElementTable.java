@@ -95,4 +95,60 @@ public final class ElementTable extends EnumMap<Element, Integer> {
         });
         return e;
     }
+    
+    /**
+     * Returns the sum formula for all elements in this table.
+     *
+     * @return the sum formula. Returns an empty string if the table is empty.
+     */
+    public String getSumFormula() {
+        StringBuilder ss = new StringBuilder();
+        Elements.ELEMENT_ORDER.stream().map(e -> {
+            if (get(e) > 0) {
+                ss.append(Elements.ELEMENT_SHORTCUT.get(e));
+            }
+            return e;
+        }).filter(e -> (get(e) > 1)).forEachOrdered(e -> {
+            ss.append(get(e));
+        });
+        return ss.toString();
+    }
+
+    /**
+     * Returns the individual total mass for the provided element.
+     *
+     * @param element the element to calculate the total mass for.
+     * @return the total mass for the given element, or 0.
+     */
+    public Double getMass(Element element) {
+        Integer count = getOrDefault(element, 0);
+        return count.doubleValue() * Elements.ELEMENT_MASSES.get(element);
+    }
+
+    /**
+     * Returns the total summed mass per number of elements.
+     *
+     * @return the total summed mass for this element table. Returns 0 if the
+     * table is empty.
+     */
+    public Double getMass() {
+        return keySet().stream().map((key) -> {
+            return getMass(key);
+        }).reduce(0.0d, Double::sum);
+    }
+    
+    /**
+     * Returns the total summed mass per number of elements, corrected for charge counts * electron rest mass.
+     *
+     * @param charge the charge of the molecule
+     * @return the total summed mass for this element table. Returns 0 if the
+     * table is empty.
+     */
+    public Double getChargedMass(int charge) {
+        Double mass = getMass();
+        if (charge != 0) {
+            mass = (mass - charge * Elements.ELECTRON_REST_MASS) / Math.abs(charge);
+        }
+        return mass;
+    }
 }

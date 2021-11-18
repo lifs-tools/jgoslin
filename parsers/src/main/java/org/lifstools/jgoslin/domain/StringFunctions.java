@@ -40,20 +40,6 @@ public final class StringFunctions {
 
     public static char DEFAULT_QUOTE = '\'';
 
-    public static String computeSumFormula(ElementTable elements) {
-        StringBuilder ss = new StringBuilder();
-
-        for (Element e : Elements.ELEMENT_ORDER) {
-            if (elements.get(e) > 0) {
-                ss.append(Elements.ELEMENT_SHORTCUT.get(e));
-            }
-            if (elements.get(e) > 1) {
-                ss.append(elements.get(e));
-            }
-        }
-        return ss.toString();
-    }
-
     public static String strip(String s, char c) {
         if (s.length() > 0) {
             int st = 0;

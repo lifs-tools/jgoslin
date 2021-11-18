@@ -82,7 +82,7 @@ public class SumFormulaTest {
         String full_lipid_name = lipid_name + lipid_adduct;
         LipidAdduct lipid = goslin_parser.parse(full_lipid_name, gHandler);
         assertEquals(lipid_class, lipid.getLipidString(LipidLevel.CLASS), lipid.getLipidString(LipidLevel.CLASS) + " != " + lipid_class + "(reference)");
-        assertEquals(lipid_formula, StringFunctions.computeSumFormula(lipid.getLipid().getElements()), lipid_formula + " (reference) != " + StringFunctions.computeSumFormula(lipid.getLipid().getElements()));
+        assertEquals(lipid_formula, lipid.getLipid().getElements().getSumFormula(), lipid_formula + " (reference) != " + lipid.getLipid().getElements().getSumFormula());
         assertTrue(Math.abs(lipid.getMass() - lipid_mass) < 0.001, "lipid: " + lipid.getMass() + " != " + lipid_mass + " (reference)");
         assertEquals(lipid_charge, lipid.getAdduct().getCharge(), lipid.getAdduct().getCharge() + " != " + lipid_charge + " (reference)");
     }

@@ -148,7 +148,7 @@ public final class LipidAdduct {
     }
 
     public String getSumFormula() {
-        return StringFunctions.computeSumFormula(getElements());
+        return getElements().getSumFormula();
     }
 
     public LipidSpecies getLipid() {

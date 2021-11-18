@@ -61,7 +61,7 @@ public class FattyAcidParserTest {
     @Test
     public void testSumFormulaFailures() {
         //"molecular LMFA01100037 '4-amino-4-cyano-butanoic acid': C5H8N2O2 != C5H12N2O2 (computed) ==> expected: <C5H8N2O2> but was: <C5H12N2O2>"
-        String computed_formula = StringFunctions.computeSumFormula(sfp.parse("C5H8N2O2", sfpHandler));
+        String computed_formula = sfp.parse("C5H8N2O2", sfpHandler).getSumFormula();
         LipidAdduct lipid = fatty_acid_parser.parse("4-amino-4-cyano-butanoic acid", faHandler);
         String lipid_formula = lipid.getSumFormula();
         assertEquals(computed_formula, lipid_formula);
@@ -76,7 +76,7 @@ public class FattyAcidParserTest {
         ////////////////////////////////////////////////////////////////////////////
         // Test for correctness
         ////////////////////////////////////////////////////////////////////////////
-        String computed_formula = StringFunctions.computeSumFormula(sfp.parse(formula, sfpHandler));
+        String computed_formula = sfp.parse(formula, sfpHandler).getSumFormula();
         LipidAdduct lipid = fatty_acid_parser.parse(lipid_name, faHandler);
         String lipid_formula = lipid.getSumFormula();
 
