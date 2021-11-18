@@ -61,9 +61,13 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
     protected Adduct adduct = null;
     protected ArrayList<HeadgroupDecorator> headgroupDecorators = new ArrayList<>();
     protected boolean useHeadGroup = false;
-    protected KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups();
+    protected KnownFunctionalGroups knownFunctionalGroups;
 
     protected static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
+    
+    public LipidBaseParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+        this.knownFunctionalGroups = knownFunctionalGroups;
+    }
 
     public void setLipidLevel(LipidLevel _level) {
         level = level.level < _level.level ? level : _level;

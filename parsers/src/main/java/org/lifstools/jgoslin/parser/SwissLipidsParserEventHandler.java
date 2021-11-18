@@ -46,12 +46,8 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     public String dbCistrans;
     public int suffixNumber;
 
-    public SwissLipidsParserEventHandler() {
-        this(new KnownFunctionalGroups());
-    }
-
     public SwissLipidsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
-        this.knownFunctionalGroups = knownFunctionalGroups;
+        super(knownFunctionalGroups);
         try {
             registeredEvents.put("lipid_pre_event", this::resetParser);
             registeredEvents.put("lipid_post_event", this::buildLipid);

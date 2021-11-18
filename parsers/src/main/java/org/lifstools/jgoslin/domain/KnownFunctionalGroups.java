@@ -24,14 +24,12 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 import org.lifstools.jgoslin.parser.SumFormulaParser;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.stream.Collectors;
-import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
+import java.util.List;
+import org.lifstools.jgoslin.parser.BaseParserEventHandler;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -39,17 +37,9 @@ import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
  */
 public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
 
-    public KnownFunctionalGroups(String resourceName, SumFormulaParser sumFormulaParser) {
-        ArrayList<String> lines = new ArrayList<>();
+    public static final int UNDEFINED_CLASS = 0;
 
-        // read resource from classpath and current thread's context class loader
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)))) {
-            lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
-        } catch (IOException e) {
-            //always pass on the original exception
-            throw new RuntimeException("Error: Resource " + resourceName + " cannot be read.", e);
-        }
-
+    private void loadData(List<String> lines, SumFormulaParser sumFormulaParser) {
         int lineCounter = 0;
         ArrayList< ArrayList<String>> functional_data = new ArrayList<>();
         HashSet<String> functional_data_set = new HashSet<>();
@@ -68,7 +58,7 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
         }
 
         SumFormulaParser sfp = sumFormulaParser;
-        SumFormulaParserEventHandler handler = sfp.newEventHandler();
+        BaseParserEventHandler<ElementTable> handler = sfp.newEventHandler();
         for (ArrayList<String> row : functional_data) {
             row.add(row.get(1));
             for (int i = 6; i < row.size(); ++i) {
@@ -96,10 +86,19 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
             }
         }
     }
-
+    
     public KnownFunctionalGroups() {
-        this("functional-groups.csv", SumFormulaParser.newInstance());
+        this(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), SumFormulaParser.newInstance());
     }
+
+    public KnownFunctionalGroups(List<String> lines, SumFormulaParser sumFormulaParser) {
+        super();
+        loadData(lines, sumFormulaParser);
+    }
+    
+//    public static KnownFunctionalGroups getInstance() {
+//        return KNOWN_FUNCTIONAL_GROUPS;
+//    }
 
     public FunctionalGroup get(String s) {
         return super.get(s).copy();

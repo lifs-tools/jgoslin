@@ -54,12 +54,12 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     private boolean acerSpecies = false;
     private static final HashSet<String> SPECIAL_TYPES = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
 
-    public ShorthandParserEventHandler() {
-        this(new KnownFunctionalGroups());
-    }
+//    public ShorthandParserEventHandler() {
+//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
+//    }
 
     public ShorthandParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
-        this.knownFunctionalGroups = knownFunctionalGroups;
+        super(knownFunctionalGroups);
         try {
             registeredEvents.put("lipid_pre_event", this::resetParser);
             registeredEvents.put("lipid_post_event", this::buildLipid);

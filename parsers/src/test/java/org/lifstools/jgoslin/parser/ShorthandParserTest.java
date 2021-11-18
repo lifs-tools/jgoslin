@@ -34,6 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  * This class tests the shorthand nomenclature parser.
@@ -47,7 +50,9 @@ public class ShorthandParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = ShorthandParser.newInstance();
+        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+        parser = ShorthandParser.newInstance(knownFunctionalGroups, "Shorthand2020.g4", DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
     

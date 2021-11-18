@@ -23,8 +23,10 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -32,23 +34,30 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public final class GoslinParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Goslin.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("Goslin.g4"));
 
-    private GoslinParser(String grammarContent, char quote) {
+    private final KnownFunctionalGroups knownFunctionalGroups;
+    
+    private GoslinParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public static GoslinParser newInstance(String grammarResourcePath, char quote) {
-        return new GoslinParser(readGrammarContent(grammarResourcePath), quote);
+    public static GoslinParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
+        return new GoslinParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
+    
+    public static GoslinParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }    
 
     public static GoslinParser newInstance() {
-        return new GoslinParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
-
+    
     @Override
     public GoslinParserEventHandler newEventHandler() {
-        return new GoslinParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
+        return new GoslinParserEventHandler(knownFunctionalGroups);
     }
 
 }

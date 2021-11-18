@@ -23,8 +23,8 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.domain;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -37,11 +37,11 @@ public final class LipidClassMeta {
     public final String description;
     public final int maxNumFa;
     public final int possibleNumFa;
-    public final HashSet<String> specialCases;
+    public final Set<String> specialCases;
     public final ElementTable elements;
-    public final ArrayList<String> synonyms;
+    public final List<String> synonyms;
 
-    public LipidClassMeta(LipidCategory _lipid_category, String _class_name, String _description, int _max_num_fa, int _possible_num_fa, HashSet<String> _special_cases, ElementTable _elements, ArrayList<String> _synonyms) {
+    public LipidClassMeta(LipidCategory _lipid_category, String _class_name, String _description, int _max_num_fa, int _possible_num_fa, Set<String> _special_cases, ElementTable _elements, List<String> _synonyms) {
         lipidCategory = _lipid_category;
         className = _class_name;
         description = _description;
@@ -72,7 +72,7 @@ public final class LipidClassMeta {
         return possibleNumFa;
     }
 
-    public HashSet<String> getSpecialCases() {
+    public Set<String> getSpecialCases() {
         return specialCases;
     }
 
@@ -80,7 +80,7 @@ public final class LipidClassMeta {
         return elements;
     }
 
-    public ArrayList<String> getSynonyms() {
+    public List<String> getSynonyms() {
         return synonyms;
     }
 

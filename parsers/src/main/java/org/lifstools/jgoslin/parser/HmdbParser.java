@@ -15,8 +15,10 @@
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.StringFunctions;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -24,23 +26,30 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  */
 public class HmdbParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("HMDB.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("HMDB.g4"));
 
-    private HmdbParser(String grammarContent, char quote) {
+    private final KnownFunctionalGroups knownFunctionalGroups;
+    
+    private HmdbParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public static HmdbParser newInstance(String grammarResourcePath, char quote) {
-        return new HmdbParser(readGrammarContent(grammarResourcePath), quote);
+    public static HmdbParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
+        return new HmdbParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
 
+    public static HmdbParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+    
     public static HmdbParser newInstance() {
-        return new HmdbParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override
     public HmdbParserEventHandler newEventHandler() {
-        return new HmdbParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
+        return new HmdbParserEventHandler(knownFunctionalGroups);
     }
 
 }

@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Optional;
-import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 
 public abstract class Parser<T> {
 
@@ -82,14 +81,11 @@ public abstract class Parser<T> {
     protected final ArrayList<Bitfield> rightPair = new ArrayList<>();
     protected int avgPair;
     protected char quote;
-//    protected BaseParserEventHandler<T> parserEventHandler = null;
 //    protected boolean wordInGrammar = false;
     protected String grammarName = "";
     protected boolean usedEof = false;
     protected static final char DEFAULT_QUOTE = '\'';
 //    protected String errorMessage = "";
-    
-    protected static final KnownFunctionalGroups KNOWN_FUNCTIONAL_GROUPS = new KnownFunctionalGroups();
 
     public Parser(String grammarContent) {
         this(grammarContent, (char) '\0');
@@ -97,10 +93,9 @@ public abstract class Parser<T> {
 
     public Parser(String grammarContent, char _quote) {
         this.quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
-//        this.parserEventHandler = _parserEventHandler;
         readGrammar(grammarContent);
     }
-
+    
     public abstract BaseParserEventHandler<T> newEventHandler();
 
     long get_next_free_rule_index() {

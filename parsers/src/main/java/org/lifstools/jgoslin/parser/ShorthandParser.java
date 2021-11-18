@@ -23,8 +23,10 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -32,23 +34,30 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class ShorthandParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Shorthand2020.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("Shorthand2020.g4"));
 
-    private ShorthandParser(String grammarContent, char quote) {
+    private final KnownFunctionalGroups knownFunctionalGroups;
+    
+    private ShorthandParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public static ShorthandParser newInstance(String grammarResourcePath, char quote) {
-        return new ShorthandParser(readGrammarContent(grammarResourcePath), quote);
+    public static ShorthandParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
+        return new ShorthandParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
+    }
+    
+    public static ShorthandParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, DEFAULT_QUOTE);
     }
 
     public static ShorthandParser newInstance() {
-        return new ShorthandParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override
     public ShorthandParserEventHandler newEventHandler() {
-        return new ShorthandParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
+        return new ShorthandParserEventHandler(knownFunctionalGroups);
     }
 
 }

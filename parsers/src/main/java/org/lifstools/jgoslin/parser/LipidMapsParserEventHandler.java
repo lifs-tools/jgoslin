@@ -70,12 +70,12 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
     };
 
-    public LipidMapsParserEventHandler() {
-        this(new KnownFunctionalGroups());
-    }
+//    public LipidMapsParserEventHandler() {
+//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
+//    }
 
     public LipidMapsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
-        this.knownFunctionalGroups = knownFunctionalGroups;
+        super(knownFunctionalGroups);
         try {
             registeredEvents.put("lipid_pre_event", this::resetParser);
             registeredEvents.put("lipid_post_event", this::buildLipid);

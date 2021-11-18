@@ -20,10 +20,12 @@ import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.AssertionsKt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  *
@@ -36,7 +38,9 @@ public class LipidMapsParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = LipidMapsParser.newInstance();
+        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+        parser = LipidMapsParser.newInstance(knownFunctionalGroups, "LipidMaps.g4", DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 
@@ -89,22 +93,15 @@ public class LipidMapsParserTest {
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testLipidMapsParserFromFileTest(String lipid_name, String correct_lipid_name) {
-        ////////////////////////////////////////////////////////////////////////////
-        // Test for correctness
-        ////////////////////////////////////////////////////////////////////////////
-        try {
-            if (correct_lipid_name == null || correct_lipid_name.isEmpty()) {
-                //skip test
-                assertTrue(true, "Skipping trivial / unsupported name: " + lipid_name);
-            } else {
-                LipidAdduct lipid = parser.parse(lipid_name, handler);
-                assertTrue(lipid != null);
-                if (!correct_lipid_name.equals("Unsupported lipid") && correct_lipid_name.length() > 0) {
-                    assertEquals(correct_lipid_name, lipid.getLipidString(), lipid_name + " . " + lipid.getLipidString() + " != " + correct_lipid_name + " (reference)");
-                }
+        if (correct_lipid_name == null || correct_lipid_name.isEmpty()) {
+            //skip test
+            assertTrue(true, "Skipping trivial / unsupported name: " + lipid_name);
+        } else {
+            LipidAdduct lipid = parser.parse(lipid_name, handler);
+            assertTrue(lipid != null);
+            if (!correct_lipid_name.equals("Unsupported lipid") && correct_lipid_name.length() > 0) {
+                assertEquals(correct_lipid_name, lipid.getLipidString(), lipid_name + " . " + lipid.getLipidString() + " != " + correct_lipid_name + " (reference)");
             }
-        } catch (RuntimeException re) {
-            AssertionsKt.fail("Parsing failed for " + lipid_name, re);
         }
     }
 }

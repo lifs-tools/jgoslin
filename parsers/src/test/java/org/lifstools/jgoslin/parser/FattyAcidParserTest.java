@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  *
@@ -48,10 +50,11 @@ public class FattyAcidParserTest {
     @BeforeAll
     public static void setupParsers() {
         sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         sfpHandler = sfp.newEventHandler();
-        fatty_acid_parser = FattyAcidParser.newInstance();
+        fatty_acid_parser = FattyAcidParser.newInstance(knownFunctionalGroups, "FattyAcids.g4", DEFAULT_QUOTE);
         faHandler = fatty_acid_parser.newEventHandler();
-        shorthand_parser = ShorthandParser.newInstance();
+        shorthand_parser = ShorthandParser.newInstance(knownFunctionalGroups, "Shorthand2020.g4", DEFAULT_QUOTE);
         shHandler = shorthand_parser.newEventHandler();
     }
 

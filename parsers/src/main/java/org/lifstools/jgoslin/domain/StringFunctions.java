@@ -23,7 +23,14 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.domain;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -119,5 +126,39 @@ public final class StringFunctions {
             throw new RuntimeException("Error: corrupted token in grammar");
         }
         return tokens;
+    }
+
+    public static List<String> getResourceAsStringList(Resource resource) {
+        ArrayList<String> lines;
+        // read resource from classpath and current thread's context class loader
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+            lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
+        } catch (IOException e) {
+            //always pass on the original exception
+            throw new RuntimeException("Error: Resource " + resource.getDescription() + " cannot be read.", e);
+        }
+        return lines;
+    }
+
+    public static List<String> getResourceAsStringList(String resourcePath) {
+        return getResourceAsStringList(new ClassPathResource(resourcePath));
+    }
+
+    public static String getResourceAsString(Resource resource) {
+        StringBuilder sb = new StringBuilder();
+        // read resource from classpath and current thread's context class loader
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+            br.lines().forEach(line -> {
+                sb.append(line).append("\n");
+            });
+            return sb.toString();
+        } catch (IOException e) {
+            //always pass on the original exception
+            throw new RuntimeException("Error: resource '" + resource.getDescription() + "' does not exist.", e);
+        }
+    }
+
+    public static String getResourceAsString(String resourcePath) {
+        return getResourceAsString(new ClassPathResource(resourcePath));
     }
 }

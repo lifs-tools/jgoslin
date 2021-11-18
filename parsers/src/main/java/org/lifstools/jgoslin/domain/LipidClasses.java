@@ -24,15 +24,13 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 import org.lifstools.jgoslin.parser.SumFormulaParser;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.stream.Collectors;
-import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
+import java.util.List;
+import org.lifstools.jgoslin.parser.BaseParserEventHandler;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -40,14 +38,15 @@ import org.lifstools.jgoslin.parser.SumFormulaParserEventHandler;
  */
 public final class LipidClasses extends ArrayList<LipidClassMeta> {
 
-    private static LipidClasses LIPID_CLASSES = new LipidClasses();
+    private static final LipidClasses LIPID_CLASSES = new LipidClasses();
     public static final int UNDEFINED_CLASS = 0;
-
+    
     private LipidClasses() {
-        this("lipid-list.csv");
+        super();
+    	loadData(StringFunctions.getResourceAsStringList(new ClassPathResource("lipid-list.csv")), SumFormulaParser.newInstance());
     }
-
-    private LipidClasses(String resourceName) {
+    
+    private void loadData(List<String> lines, SumFormulaParser sfp) {
         add(new LipidClassMeta(LipidCategory.NO_CATEGORY,
                 "UNDEFINED",
                 "",
@@ -57,16 +56,6 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
                 new ElementTable(),
                 new ArrayList<>(Arrays.asList("UNDEFINED"))
         ));
-
-        ArrayList<String> lines = new ArrayList<>();
-
-        // read resource from classpath and current thread's context class loader
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName)))) {
-            lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
-        } catch (IOException e) {
-            //always pass on the original exception
-            throw new RuntimeException("Error: Resource " + resourceName + " cannot be read.", e);
-        }
 
         int lineCounter = 0;
         int SYNONYM_START_INDEX = 7;
@@ -158,8 +147,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
         }
 
         // creating the lipid class dictionary
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
-        SumFormulaParserEventHandler handler = sfp.newEventHandler();
+        BaseParserEventHandler<ElementTable> handler = sfp.newEventHandler();
         data.entrySet().forEach(kv -> {
             HashSet<String> special_cases = new HashSet<>();
             StringFunctions.splitString(kv.getValue().get(5), ';', '"').forEach(scase -> {

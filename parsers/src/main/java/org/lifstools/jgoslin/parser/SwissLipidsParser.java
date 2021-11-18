@@ -23,8 +23,10 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.StringFunctions;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -32,23 +34,30 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  */
 public class SwissLipidsParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SwissLipids.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("SwissLipids.g4"));
+    
+    private final KnownFunctionalGroups knownFunctionalGroups;
 
-    private SwissLipidsParser(String grammarContent, char quote) {
+    private SwissLipidsParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public static SwissLipidsParser newInstance(String grammarResourcePath, char quote) {
-        return new SwissLipidsParser(readGrammarContent(grammarResourcePath), quote);
+    public static SwissLipidsParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
+        return new SwissLipidsParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
 
+    public static SwissLipidsParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+    
     public static SwissLipidsParser newInstance() {
-        return new SwissLipidsParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override
     public SwissLipidsParserEventHandler newEventHandler() {
-        return new SwissLipidsParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
+        return new SwissLipidsParserEventHandler(knownFunctionalGroups);
     }
 
 }

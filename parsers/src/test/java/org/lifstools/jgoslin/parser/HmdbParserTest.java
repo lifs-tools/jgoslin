@@ -5,10 +5,12 @@ import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.AssertionsKt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /*
  * Copyright 2021 dominik.
@@ -36,7 +38,9 @@ public class HmdbParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = HmdbParser.newInstance();
+        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+        parser = HmdbParser.newInstance(knownFunctionalGroups, "HMDB.g4", DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 
@@ -83,20 +87,15 @@ public class HmdbParserTest {
         assertEquals("EPC 16:2;O2/22:1;O", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("EPC 38:3;O3", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C40H77N2O7P", l.getSumFormula());
-
+        
+        l = parser.parse("CL(i-12:0/i-13:0/18:2(9Z,11Z)/a-13:0)[rac]", handler);
+        assertTrue(l != null);
     }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/hmdb-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void testHmdbParserFromFileTest(String lipid_name) {
-        ////////////////////////////////////////////////////////////////////////////
-        // Test for correctness
-        ////////////////////////////////////////////////////////////////////////////
-        try {
-            LipidAdduct lipid = parser.parse(lipid_name, handler);
-            assertTrue(lipid != null);
-        } catch (RuntimeException re) {
-            AssertionsKt.fail("Parsing failed for " + lipid_name, re);
-        }
+        LipidAdduct lipid = parser.parse(lipid_name, handler);
+        assertTrue(lipid != null);
     }
 }

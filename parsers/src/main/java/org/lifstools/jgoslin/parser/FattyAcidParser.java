@@ -23,8 +23,10 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -32,18 +34,25 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public final class FattyAcidParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("FattyAcids.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("FattyAcids.g4"));
 
-    private FattyAcidParser(String grammarContent, char quote) {
+    private final KnownFunctionalGroups knownFunctionalGroups;
+    
+    private FattyAcidParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public static FattyAcidParser newInstance(String grammarResourcePath, char quote) {
-        return new FattyAcidParser(readGrammarContent(grammarResourcePath), quote);
+    public static FattyAcidParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
+        return new FattyAcidParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
+    }
+    
+    public static FattyAcidParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
     public static FattyAcidParser newInstance() {
-        return new FattyAcidParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override
@@ -55,10 +64,10 @@ public final class FattyAcidParser extends Parser<LipidAdduct> {
     public LipidAdduct parse(String text, BaseParserEventHandler eventHandler, boolean with_exception) {
         return super.parse(text.toLowerCase(), eventHandler, with_exception);
     }
-
+    
     @Override
     public FattyAcidParserEventHandler newEventHandler() {
-        return new FattyAcidParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
+        return new FattyAcidParserEventHandler(knownFunctionalGroups);
     }
 
 }

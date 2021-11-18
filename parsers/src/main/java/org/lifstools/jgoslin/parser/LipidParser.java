@@ -26,7 +26,10 @@ package org.lifstools.jgoslin.parser;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.Arrays;
 import java.util.List;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidParsingException;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -37,25 +40,35 @@ public class LipidParser {
     private final List<Parser<LipidAdduct>> parserList;
     private Parser<LipidAdduct> lastSuccessfulParser = null;
 
-    public LipidParser(Parser<LipidAdduct>... parsers) {
+    private LipidParser(Parser<LipidAdduct>... parsers) {
         parserList = Arrays.asList(parsers);
     }
+    
+    public static LipidParser newInstance() {
+        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), sfp);
+        return newInstance(knownFunctionalGroups);
+    }
+    
+    public static LipidParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return new LipidParser(knownFunctionalGroups);
+    }
 
-    public LipidParser() {
+    private LipidParser(KnownFunctionalGroups knownFunctionalGroups) {
         this(
-                ShorthandParser.newInstance(),
-                FattyAcidParser.newInstance(),
-                GoslinParser.newInstance(),
-                LipidMapsParser.newInstance(),
-                SwissLipidsParser.newInstance(),
-                HmdbParser.newInstance()
+                ShorthandParser.newInstance(knownFunctionalGroups, "Shorthand2020.g4", StringFunctions.DEFAULT_QUOTE),
+                FattyAcidParser.newInstance(knownFunctionalGroups, "FattyAcids.g4", StringFunctions.DEFAULT_QUOTE),
+                GoslinParser.newInstance(knownFunctionalGroups, "Goslin.g4", StringFunctions.DEFAULT_QUOTE),
+                LipidMapsParser.newInstance(knownFunctionalGroups, "LipidMaps.g4", StringFunctions.DEFAULT_QUOTE),
+                SwissLipidsParser.newInstance(knownFunctionalGroups, "SwissLipids.g4", StringFunctions.DEFAULT_QUOTE),
+                HmdbParser.newInstance(knownFunctionalGroups, "HMDB.g4", StringFunctions.DEFAULT_QUOTE)
         );
     }
 
     /**
      * This method tries multiple parsers in a defined order to parse the
-     * provided lipid name. If no parser is able to parse the name successfully,
-     * an exception is thrown.
+     * provided lipid name.If no parser is able to parse the name successfully,
+ an exception is thrown.
      *
      * @param lipid_name the lipid name to parse.
      * @return the {@link LipidAdduct} if parsing with at least one parser

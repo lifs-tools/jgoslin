@@ -23,8 +23,10 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -32,23 +34,30 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class LipidMapsParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("LipidMaps.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("LipidMaps.g4"));
 
-    private LipidMapsParser(String grammarContent, char quote) {
+    private final KnownFunctionalGroups knownFunctionalGroups;
+    
+    private LipidMapsParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public static LipidMapsParser newInstance(String grammarResourcePath, char quote) {
-        return new LipidMapsParser(readGrammarContent(grammarResourcePath), quote);
+    public static LipidMapsParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
+        return new LipidMapsParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
 
+    public static LipidMapsParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
+        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    }
+    
     public static LipidMapsParser newInstance() {
-        return new LipidMapsParser(DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override
     public LipidMapsParserEventHandler newEventHandler() {
-        return new LipidMapsParserEventHandler(KNOWN_FUNCTIONAL_GROUPS);
+        return new LipidMapsParserEventHandler(knownFunctionalGroups);
     }
 
 }

@@ -20,10 +20,12 @@ import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.AssertionsKt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  *
@@ -36,7 +38,9 @@ public class SwissLipidsParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = SwissLipidsParser.newInstance();
+        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+        parser = SwissLipidsParser.newInstance(knownFunctionalGroups, "SwissLipids.g4", DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 
@@ -82,15 +86,8 @@ public class SwissLipidsParserTest {
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/swiss-lipids-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void testSwissLipidsParserFromFileTest(String lipid_name) {
-        ////////////////////////////////////////////////////////////////////////////
-        // Test for correctness
-        ////////////////////////////////////////////////////////////////////////////
-        try {
-            LipidAdduct lipid = parser.parse(lipid_name, handler);
-            assertTrue(lipid != null);
-        } catch (RuntimeException re) {
-            AssertionsKt.fail("Parsing failed for " + lipid_name, re);
-        }
+        LipidAdduct lipid = parser.parse(lipid_name, handler);
+        assertTrue(lipid != null);
     }
 
 }

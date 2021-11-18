@@ -193,9 +193,9 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     private static final HashSet<String> NAL_SET = new HashSet<>(Arrays.asList("nal", "dial"));
     private static final HashSet<String> ACETATE_SET = new HashSet<>(Arrays.asList("acetate", "noate", "nate"));
 
-    public FattyAcidParserEventHandler() {
-        this(new KnownFunctionalGroups());
-    }
+//    public FattyAcidParserEventHandler() {
+//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
+//    }
 
     public FattyAcidParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;

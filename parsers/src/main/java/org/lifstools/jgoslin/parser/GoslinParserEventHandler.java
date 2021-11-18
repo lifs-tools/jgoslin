@@ -41,12 +41,12 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private String dbCistrans;
     private char plasmalogen;
 
-    public GoslinParserEventHandler() {
-        this(new KnownFunctionalGroups());
-    }
+//    public GoslinParserEventHandler() {
+//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
+//    }
 
     public GoslinParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
-        this.knownFunctionalGroups = knownFunctionalGroups;
+        super(knownFunctionalGroups);
         try {
             registeredEvents.put("lipid_pre_event", this::resetParser);
             registeredEvents.put("lipid_post_event", this::buildLipid);

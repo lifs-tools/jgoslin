@@ -43,12 +43,12 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     private String dbCistrans;
     private Dictionary furan = null;
 
-    public HmdbParserEventHandler() {
-        this(new KnownFunctionalGroups());
-    }
+//    public HmdbParserEventHandler() {
+//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
+//    }
 
     public HmdbParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
-        this.knownFunctionalGroups = knownFunctionalGroups;
+        super(knownFunctionalGroups);
         try {
             registeredEvents.put("lipid_pre_event", this::resetParser);
             registeredEvents.put("lipid_post_event", this::buildLipid);

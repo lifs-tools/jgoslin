@@ -28,11 +28,13 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.AssertionsKt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidFaBondType;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  *
@@ -45,7 +47,9 @@ public class GoslinParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        parser = GoslinParser.newInstance();
+        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+        parser = GoslinParser.newInstance(knownFunctionalGroups, "Goslin.g4", DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 
@@ -111,7 +115,7 @@ public class GoslinParserTest {
         assertEquals(0, l.getLipid().getFaList().get(0).getPosition());
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
         assertEquals(0, l.getLipid().getFaList().get(1).getPosition());
-        
+
         l = parser.parse("PC O-18:1-18:1", handler);
         assertEquals("C44H86NO7P", l.getSumFormula());
         assertEquals(2, l.getLipid().getFaList().size());
@@ -120,7 +124,7 @@ public class GoslinParserTest {
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.getLipid().getFaList().get(0).getLipidFaBondType());
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
         assertEquals(0, l.getLipid().getFaList().get(1).getPosition());
-        
+
         l = parser.parse("PC-O 18:1_18:1", handler);
         assertEquals("C44H86NO7P", l.getSumFormula());
         assertEquals(2, l.getLipid().getFaList().size());
@@ -134,14 +138,7 @@ public class GoslinParserTest {
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/goslin-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void testGoslinParserFromFileTest(String lipid_name) {
-        ////////////////////////////////////////////////////////////////////////////
-        // Test for correctness
-        ////////////////////////////////////////////////////////////////////////////
-        try {
-            LipidAdduct lipid = parser.parse(lipid_name, handler);
-            assertTrue(lipid != null);
-        } catch (RuntimeException re) {
-            AssertionsKt.fail("Parsing failed for " + lipid_name, re);
-        }
+        LipidAdduct lipid = parser.parse(lipid_name, handler);
+        assertTrue(lipid != null);
     }
 }
