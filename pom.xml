@@ -60,11 +60,11 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <junit.jupiter.version>5.5.2</junit.jupiter.version>
-        <junit.vintage.version>5.5.2</junit.vintage.version>
-        <dockerfile.plugin.version>1.4.10</dockerfile.plugin.version>
-        <slf4j.version>1.7.26</slf4j.version>
-        <jacoco.version>0.8.5</jacoco.version>
+        <junit.jupiter.version>5.8.1</junit.jupiter.version>
+        <junit.vintage.version>5.8.1</junit.vintage.version>
+        <dockerfile.plugin.version>1.4.13</dockerfile.plugin.version>
+        <slf4j.version>1.7.32</slf4j.version>
+        <jacoco.version>0.8.7</jacoco.version>
     </properties>
     <build>
         <pluginManagement>
@@ -183,7 +183,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M4</version>
+                    <version>3.0.0-M5</version>
                     <configuration>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <trimStackTrace>false</trimStackTrace>
@@ -192,7 +192,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M4</version>
+                    <version>3.0.0-M5</version>
                     <executions>
                         <execution>
                             <configuration>
@@ -210,12 +210,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.2.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -290,7 +290,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.9.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

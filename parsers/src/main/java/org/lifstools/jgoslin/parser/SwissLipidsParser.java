@@ -32,7 +32,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
  */
 public class SwissLipidsParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/SwissLipids.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SwissLipids.g4");
 
     private SwissLipidsParser(String grammarContent, char quote) {
         super(grammarContent, quote);

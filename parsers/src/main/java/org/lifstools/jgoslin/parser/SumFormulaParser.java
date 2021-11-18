@@ -32,7 +32,7 @@ import org.lifstools.jgoslin.domain.ElementTable;
  */
 public class SumFormulaParser extends Parser<ElementTable> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/SumFormula.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("SumFormula.g4");
 
     private SumFormulaParser(String grammarContent, char quote) {
         super(grammarContent, quote);

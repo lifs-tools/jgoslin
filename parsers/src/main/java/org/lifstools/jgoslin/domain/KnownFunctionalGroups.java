@@ -98,7 +98,7 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
     }
 
     public KnownFunctionalGroups() {
-        this("/functional-groups.csv", SumFormulaParser.newInstance());
+        this("functional-groups.csv", SumFormulaParser.newInstance());
     }
 
     public FunctionalGroup get(String s) {

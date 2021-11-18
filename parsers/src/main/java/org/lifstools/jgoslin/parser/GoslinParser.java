@@ -32,7 +32,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public final class GoslinParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/Goslin.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("Goslin.g4");
 
     private GoslinParser(String grammarContent, char quote) {
         super(grammarContent, quote);

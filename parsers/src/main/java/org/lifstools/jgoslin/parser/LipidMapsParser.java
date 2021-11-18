@@ -32,7 +32,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
  */
 public class LipidMapsParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("/LipidMaps.g4");
+    private static final String DEFAULT_GRAMMAR_CONTENT = readGrammarContent("LipidMaps.g4");
 
     private LipidMapsParser(String grammarContent, char quote) {
         super(grammarContent, quote);

@@ -44,7 +44,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
     public static final int UNDEFINED_CLASS = 0;
 
     private LipidClasses() {
-        this("/lipid-list.csv");
+        this("lipid-list.csv");
     }
 
     private LipidClasses(String resourceName) {
