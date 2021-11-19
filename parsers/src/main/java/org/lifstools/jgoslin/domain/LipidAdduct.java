@@ -83,11 +83,11 @@ public final class LipidAdduct {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Cardio") : false;
     }
 
-    public boolean containsSugar() {
+    public boolean isContainsSugar() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Sugar") : false;
     }
 
-    public boolean containsEster() {
+    public boolean isContainsEster() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Ester") : false;
     }
 

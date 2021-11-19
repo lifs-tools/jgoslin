@@ -39,7 +39,7 @@ public class FattyAcid extends FunctionalGroup {
 
     protected int numCarbon;
     protected LipidFaBondType lipidFaBondType;
-    protected Set<String> fgExceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
+    private final Set<String> fgExceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
 
     public FattyAcid(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
@@ -303,14 +303,6 @@ public class FattyAcid extends FunctionalGroup {
 
     public void setLipidFaBondType(LipidFaBondType lipidFaBondType) {
         this.lipidFaBondType = lipidFaBondType;
-    }
-
-    public Set<String> getFgExceptions() {
-        return fgExceptions;
-    }
-
-    public void setFgExceptions(Set<String> fgExceptions) {
-        this.fgExceptions = fgExceptions;
     }
     
 }
