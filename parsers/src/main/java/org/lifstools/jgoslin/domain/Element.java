@@ -24,7 +24,8 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 /**
- *
+ * Enumeration for typical chemical elements in lipids. Also supports heavy
+ * variants, e.g. C13 as the heavy C13 isotope.
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */

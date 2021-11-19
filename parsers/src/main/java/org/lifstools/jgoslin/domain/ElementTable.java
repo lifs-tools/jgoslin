@@ -26,6 +26,9 @@ package org.lifstools.jgoslin.domain;
 import java.util.EnumMap;
 
 /**
+ * Accounting table for chemical element frequency. This is used to calculate
+ * sum formulas and total masses for a given chemical element distribution, e.g.
+ * in a lipid.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -62,7 +65,7 @@ public final class ElementTable extends EnumMap<Element, Integer> {
     /**
      * Add all elements and counts to those in this element table.
      *
-     * @param elements
+     * @param elements the table to add to this one.
      */
     public void add(ElementTable elements) {
         elements.entrySet().forEach(kv -> {

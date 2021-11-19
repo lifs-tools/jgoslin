@@ -32,6 +32,8 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 /**
+ * This class represents functional head groups of lipids. This is where the
+ * association to {@link LipidClass} and {@link LipidCategory} is maintained.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -51,14 +53,14 @@ public final class Headgroup {
     private boolean spException;
 
     public static final Map<LipidCategory, String> CategoryString = Map.ofEntries(
-        entry(LipidCategory.NO_CATEGORY, "NO_CATEGORY"),
-        entry(LipidCategory.UNDEFINED, "UNDEFINED"),
-        entry(LipidCategory.GL, "GL"),
-        entry(LipidCategory.GP, "GP"),
-        entry(LipidCategory.SP, "SP"),
-        entry(LipidCategory.ST, "ST"),
-        entry(LipidCategory.FA, "FA"),
-        entry(LipidCategory.SL, "SL")
+            entry(LipidCategory.NO_CATEGORY, "NO_CATEGORY"),
+            entry(LipidCategory.UNDEFINED, "UNDEFINED"),
+            entry(LipidCategory.GL, "GL"),
+            entry(LipidCategory.GP, "GP"),
+            entry(LipidCategory.SP, "SP"),
+            entry(LipidCategory.ST, "ST"),
+            entry(LipidCategory.FA, "FA"),
+            entry(LipidCategory.SL, "SL")
     );
 
     public Headgroup(String _headgroup) {
@@ -232,5 +234,5 @@ public final class Headgroup {
     public void setDecorators(ArrayList<HeadgroupDecorator> decorators) {
         this.decorators = decorators;
     }
-    
+
 }

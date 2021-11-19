@@ -27,6 +27,8 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 /**
+ * An adduct, generally, consists of a sum formula part, an adduct string, the
+ * charge and the charge sign. An example for a valid adduct is : [M+H]1+.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -146,6 +148,11 @@ public final class Adduct {
         return elements;
     }
 
+    /**
+     * Returns the positive elementary charge times the charge sign.
+     *
+     * @return the net charge.
+     */
     public int getCharge() {
         return charge * chargeSign;
     }

@@ -27,7 +27,12 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 
 /**
- *
+ * This class summarizes the FA parts of a lipid, independent of its head group.
+ * Thus, it accounts the total number of carbon atoms, double bonds, the number
+ * of hydroxylations, the overall FA-headgroup bond type, e.g. ETHER PLASMANYL /
+ * PLASMENYL, if any of a lipid's FA chains has such a bond type, or ESTER, AMINE, LCB or
+ * UNDEFINED for other cases.
+ * 
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */

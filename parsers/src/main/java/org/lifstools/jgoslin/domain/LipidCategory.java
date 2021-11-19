@@ -28,7 +28,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * The lipid category nomenclature follows the shorthand notation of
+ * <pre>Liebisch, G., Vizcaíno,
+ * J.A., Köfeler, H., Trötzmüller, M., Griffiths, W.J., Schmitz, G., Spener, F.,
+ * and Wakelam, M.J.O. (2013). Shorthand notation for lipid structures derived
+ * from mass spectrometry. J. Lipid Res. 54, 1523–1530.</pre>
  *
+ * We use the associations to either LipidMAPS or SwissLipids (Saccharolipids),
+ * where appropriate.
+ * 
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */

@@ -26,7 +26,8 @@ package org.lifstools.jgoslin.domain;
 import java.util.Map.Entry;
 
 /**
- *
+ * * Base class for lipid names parsed using the different grammars. This can
+ * contain a lipid, an adduct and a sum formula.
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */

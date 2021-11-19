@@ -24,7 +24,10 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 /**
- *
+ * Defines the taxonomy of lipid levels, including UNDEFINED for lipids where
+ * the level can not be inferred or does not apply. The levels are based on
+ * <pre>Gerhard Liebisch et al. Update on LIPID MAPS classification, nomenclature, and shorthand notation for MS-derived lipid structures. J. Lipid Res. Volume 61, ISSUE 12, P1539-1555, December 01, 2020.</pre>
+ * 
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */

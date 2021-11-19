@@ -24,7 +24,9 @@ SOFTWARE.
 package org.lifstools.jgoslin.domain;
 
 /**
- *
+ * The lipid fatty acyl bond types define how the FA is connected to the head
+ * group or which variant of a particular bond type it is.
+ * 
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */

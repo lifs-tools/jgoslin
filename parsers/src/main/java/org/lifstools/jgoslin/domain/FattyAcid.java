@@ -32,6 +32,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
+ * A fatty acid with a specific type. This object defines the name, position,
+ * number of carbon atoms, hydroxyls and double bonds, as well as the bond type
+ * to the head group. A FattyAcid can carry optional modifications / functional groups and can
+ * report double bond positions.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

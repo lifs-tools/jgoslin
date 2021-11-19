@@ -28,7 +28,15 @@ import java.util.Collection;
 import java.util.HashMap;
 
 /**
+ * A lipid species is the factual root of the object hierarchy. Lipid category
+ * and class are used as taxonomic roots of a lipid species. Partial structural
+ * knowledge, apart from the head group, is first encoded in the lipid species.
  *
+ * A typical lipid species is PC 32:0 (SwissLipids SLM:000056493), where the
+ * head group is defined as PC (Glycerophosphocholines), with fatty acyl chains
+ * of unknown individual composition, but known total composition (32 carbon
+ * atoms, zero double bonds, no hydroxylations or other functions).
+ * 
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
