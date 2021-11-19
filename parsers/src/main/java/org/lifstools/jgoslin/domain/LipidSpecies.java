@@ -67,10 +67,6 @@ public class LipidSpecies {
         return info;
     }
     
-    public Map<String, FattyAcid> getFa() {
-        return fa;
-    }
-    
     public Headgroup getHeadGroup() {
         return headGroup;
     }
