@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  nils.hoffmann.
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,6 @@ public class CmdLineParser {
     private static final Logger log = LoggerFactory.getLogger(CmdLineParser.class);
 
     public static final String LIPIDMAPS_CLASS_REGEXP = ".+\\[([A-Z0-9]+)\\]";
-    private static final Map<Grammar, Parser<LipidAdduct>> DEFAULT_PARSERS = loadParsers();
     private static final LipidClasses LIPID_CLASSES = LipidClasses.getInstance();
 
     private static String getAppInfo() throws IOException {
@@ -233,7 +232,7 @@ public class CmdLineParser {
         HashSet<String> keys = new LinkedHashSet<>();
         List<ValidationResult> validationResults = results.stream().map((t) -> {
             return t.getValue();
-        }).flatMap(List::stream).collect(Collectors.toList());
+        }).flatMap(List::stream).toList();
         List<Map<String, String>> entries = validationResults.stream().map((t) -> {
             Map<String, String> m = new LinkedHashMap<>();
             m.put("Normalized Name", Optional.ofNullable(t.canonicalName).orElse(""));
@@ -288,7 +287,7 @@ public class CmdLineParser {
             }
             keys.addAll(m.keySet());
             return m;
-        }).collect(Collectors.toList());
+        }).toList();
         sb.append(keys.stream().collect(Collectors.joining("\t"))).append("\n");
         for (Map<String, String> m : entries) {
             List<String> l = new LinkedList();
@@ -312,15 +311,15 @@ public class CmdLineParser {
     private static List<Pair<String, List<ValidationResult>>> parseNames(Stream<String> lipidNames) {
         return lipidNames.map((t) -> {
             return parseName(t);
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private static List<Pair<String, List<ValidationResult>>> parseNamesWith(Stream<String> lipidNames, Grammar grammar) {
         return lipidNames.map((t) -> {
             return parseNameWith(t, grammar);
-        }).collect(Collectors.toList()).stream().map((t) -> {
+        }).toList().stream().map((t) -> {
             return Pair.of(t.getKey(), Arrays.asList(t.getValue()));
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private static Pair<String, ValidationResult> parseNameWith(String lipidName, Grammar grammar) {
