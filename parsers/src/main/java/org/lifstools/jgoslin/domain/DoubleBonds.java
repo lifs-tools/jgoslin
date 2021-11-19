@@ -45,6 +45,11 @@ public final class DoubleBonds {
         doubleBondPositions = new TreeMap<>();
     }
 
+    public DoubleBonds(TreeMap<Integer, String> db) {
+        numDoubleBonds = db.size();
+        doubleBondPositions = db;
+    }
+
     public DoubleBonds copy() {
         DoubleBonds db = new DoubleBonds(numDoubleBonds);
         doubleBondPositions.entrySet().forEach(kv -> {

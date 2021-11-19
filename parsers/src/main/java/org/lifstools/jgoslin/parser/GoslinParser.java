@@ -34,7 +34,7 @@ import org.springframework.core.io.ClassPathResource;
  */
 public final class GoslinParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("Goslin.g4"));
+    private static final String DEFAULT_GRAMMAR_CONTENT = "Goslin.g4";
 
     private final KnownFunctionalGroups knownFunctionalGroups;
     

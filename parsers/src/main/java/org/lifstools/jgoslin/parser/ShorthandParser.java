@@ -26,7 +26,6 @@ package org.lifstools.jgoslin.parser;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -34,7 +33,7 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class ShorthandParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = StringFunctions.getResourceAsString(new ClassPathResource("Shorthand2020.g4"));
+    private static final String DEFAULT_GRAMMAR_CONTENT = "Shorthand2020.g4";
 
     private final KnownFunctionalGroups knownFunctionalGroups;
     

@@ -30,20 +30,33 @@ import org.lifstools.jgoslin.domain.LipidException;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import org.lifstools.jgoslin.domain.FattyAcid;
+import org.lifstools.jgoslin.domain.DoubleBonds;
 import org.lifstools.jgoslin.domain.Headgroup;
+import org.lifstools.jgoslin.domain.Cycle;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     private int dbPosition;
     private String dbCistrans;
     private char plasmalogen;
+    private String mediatorFunction;
+    private ArrayList<Integer> mediatorFunctionPositions = new ArrayList<>();
+    private boolean mediatorSuffix;
+    
+    private final static HashMap<String, Integer> MEDIATOR_FA = new HashMap<>(){{
+        put("H", 17); put("O", 18); put("E", 20); put("Do", 22);
+    }};
+    private final static HashMap<String, Integer> MEDIATOR_DB = new HashMap<>(){{
+        put("M", 1); put("D", 2); put("Tr", 3); put("T", 4); put("P", 5); put("H", 6);
+    }};
+    //const map<string, int> GoslinParserEventHandler::mediator_trivial{{"Palmitic acid", 0}, {"Linoleic acid", 1}, {"AA", 2}, {"ALA", 3}, {"EPA", 4}, {"DHA", 5}, {"LTB4", 6}, {"Resolvin D3", 7}, {"Maresin 1", 8},  {"Resolvin D2", 9}, {"Resolvin D5", 10}, {"Resolvin D1", 11}, {"TXB1", 12}, {"TXB2", 13}, {"TXB3", 14}, {"PGF2alpha", 15}, {"PGD2", 16}, {"PGE2", 17}, {"PGB2", 18}, {"15d-PGJ2", 19}};
 
-//    public GoslinParserEventHandler() {
-//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
-//    }
 
     public GoslinParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         super(knownFunctionalGroups);
@@ -60,7 +73,6 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             registeredEvents.put("st_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_ste_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_stes_pre_event", this::setHeadGroupName);
-            registeredEvents.put("mediator_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_mgl_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_dgl_pre_event", this::setHeadGroupName);
             registeredEvents.put("hg_sgl_pre_event", this::setHeadGroupName);
@@ -103,6 +115,19 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
             registeredEvents.put("lpl_pre_event", this::setMolecularSubspeciesLevel);
             registeredEvents.put("plasmalogen_pre_event", this::setPlasmalogen);
+        
+            registeredEvents.put("mediator_pre_event", this::setMediator);
+            registeredEvents.put("mediator_post_event", this::addMediator);
+            registeredEvents.put("unstructured_mediator_pre_event", this::setUnstructuredMediator);
+            registeredEvents.put("trivial_mediator_pre_event", this::setTrivialMediator);
+            registeredEvents.put("mediator_carbon_pre_event", this::setMediatorCarbon);
+            registeredEvents.put("mediator_db_pre_event", this::setMediatorDB);
+            registeredEvents.put("mediator_mono_functions_pre_event", this::setMediatorFunction);
+            registeredEvents.put("mediator_di_functions_pre_event", this::setMediatorFunction);
+            registeredEvents.put("mediator_position_pre_event", this::setMediatorFunctionPosition);
+            registeredEvents.put("mediator_functional_group_post_event", this::addMediatorFunction);
+            registeredEvents.put("mediator_suffix_pre_event", this::addMediatorSuffix);
+            registeredEvents.put("mediator_tetranor_pre_event", this::setMediatorTetranor);
 
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize GoslinParserEventHandler");
@@ -121,7 +146,12 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         dbPosition = 0;
         dbCistrans = "";
         plasmalogen = '\0';
+        mediatorFunction = "";
+        mediatorFunctionPositions.clear();
+        mediatorSuffix = false;
+        useHeadGroup = false;
     }
+
 
     public void setHeadGroupName(TreeNode node) {
         headGroup = node.getText();
@@ -296,6 +326,325 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             adduct.setChargeSign(1);
         } else if (sign.equals("-")) {
             adduct.setChargeSign(-1);
+        }
+    }
+
+    public void setMediator(TreeNode node){
+        headGroup = "FA";
+        currentFa = new FattyAcid("FA", knownFunctionalGroups);
+        faList.add(currentFa);
+        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
+    }
+
+
+    public void setUnstructuredMediator(TreeNode node){
+        headGroup = node.getText();
+        useHeadGroup = true;
+        faList.clear();
+    }
+
+
+    public void setMediatorTetranor(TreeNode node){
+        currentFa.setNumCarbon(currentFa.getNumCarbon() - 4);
+    }
+
+
+    public void setMediatorCarbon(TreeNode node){
+        currentFa.setNumCarbon(currentFa.getNumCarbon() + MEDIATOR_FA.get(node.getText()));
+    }
+
+
+    public void setMediatorDB(TreeNode node){
+        currentFa.getDoubleBonds().setNumDoubleBonds(MEDIATOR_DB.get(node.getText()));
+    }
+
+
+    public void setMediatorFunction(TreeNode node){
+        mediatorFunction = node.getText();
+    }
+
+
+    public void setMediatorFunctionPosition(TreeNode node){
+        mediatorFunctionPositions.add(node.getInt());
+    }
+
+
+    public void addMediatorFunction(TreeNode node){
+        FunctionalGroup functionalGroup = null;
+        String fg = "";
+        if (mediatorFunction.equals("H")){
+            functionalGroup = knownFunctionalGroups.get("OH");
+            fg = "OH";
+            if (mediatorFunctionPositions.size() > 0) functionalGroup.setPosition(mediatorFunctionPositions.get(0));
+        }
+
+        else if (mediatorFunction.equals("Oxo")){
+            functionalGroup = knownFunctionalGroups.get("oxo");
+            fg = "oxo";
+            if (mediatorFunctionPositions.size() > 0) functionalGroup.setPosition(mediatorFunctionPositions.get(0));
+        }
+
+        else if (mediatorFunction.equals("E") || mediatorFunction.equals("Ep")){
+            functionalGroup = knownFunctionalGroups.get("Ep");
+            fg = "Ep";
+            if (mediatorFunctionPositions.size() > 0) functionalGroup.setPosition(mediatorFunctionPositions.get(0));
+        }
+
+        else if (mediatorFunction.equals("DH") || mediatorFunction.equals("DiH")){
+            functionalGroup = knownFunctionalGroups.get("OH");
+            fg = "OH";
+            if (mediatorFunctionPositions.size() > 0){
+                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
+                FunctionalGroup functionalGroup2 = knownFunctionalGroups.get("OH");
+                functionalGroup2.setPosition(mediatorFunctionPositions.get(1));
+                currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
+                currentFa.getFunctionalGroups().get("OH").add(functionalGroup2);
+            }
+        }
+
+        if (!currentFa.getFunctionalGroups().containsKey(fg)) currentFa.getFunctionalGroups().put(fg, new ArrayList<>());
+        currentFa.getFunctionalGroups().get(fg).add(functionalGroup);
+    }
+    
+
+    public void setTrivialMediator(TreeNode node){
+        headGroup = "FA";
+
+        switch(node.getText()){
+            case "Palmitic acid":
+                currentFa = new FattyAcid("FA", 16, knownFunctionalGroups);
+                break;
+
+            case "Linoleic acid":
+                currentFa = new FattyAcid("FA", 18, new DoubleBonds(2), knownFunctionalGroups);
+                break;
+
+            case "AA":
+                currentFa = new FattyAcid("FA", 20, new DoubleBonds(4), knownFunctionalGroups);
+                break;
+
+            case "ALA":
+                currentFa = new FattyAcid("FA", 18, new DoubleBonds(3), knownFunctionalGroups);
+                break;
+
+            case "EPA":
+                currentFa = new FattyAcid("FA", 20, new DoubleBonds(5), knownFunctionalGroups);
+                break;
+
+            case "DHA":
+                currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), knownFunctionalGroups);
+                break;
+
+            case "LTB4":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(5);
+                    f2.setPosition(12);
+                    DoubleBonds db = new DoubleBonds(new TreeMap<Integer, String>(){{put(6, "Z"); put(8, "E"); put(10, "E"); put(14, "Z");}});
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2)));}};
+                    currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "Resolvin D3":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(4);
+                    f2.setPosition(11);
+                    f3.setPosition(17);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2, f3)));}};
+                    currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "Maresin 1":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(4);
+                    f2.setPosition(14);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2)));}};
+                    currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "Resolvin D2":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(4);
+                    f2.setPosition(16);
+                    f3.setPosition(17);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2, f3)));}};
+                    currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "Resolvin D5":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(7);
+                    f2.setPosition(17);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2)));}};
+                    currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "Resolvin D1":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(7);
+                    f2.setPosition(8);
+                    f3.setPosition(17);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2, f3)));}};
+                    currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "TXB1":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f4 = knownFunctionalGroups.get("oxy");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    f3.setPosition(11);
+                    f4.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3))); put("oxo", new ArrayList<>(Arrays.asList(f4))); }};
+                    Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(1), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "TXB2":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f4 = knownFunctionalGroups.get("oxy");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    f3.setPosition(11);
+                    f4.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3))); put("oxy", new ArrayList<>(Arrays.asList(f4))); }};
+                    Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "TXB3":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f4 = knownFunctionalGroups.get("oxy");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    f3.setPosition(11);
+                    f4.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3))); put("oxy", new ArrayList<>(Arrays.asList(f4))); }};
+                    Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "PGF2alpha":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    f3.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3)));}};
+                    Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "PGD2":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    f3.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2))); put("oxo", new ArrayList<>(Arrays.asList(f3))); }};
+                    Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "PGE2":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+                    FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    f3.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f3))); put("oxo", new ArrayList<>(Arrays.asList(f2))); }};
+                    Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "PGB2":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                    f1.setPosition(15);
+                    f2.setPosition(9);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2)));}};
+                    Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+                }
+                break;
+
+            case "15d-PGJ2":
+                {
+                    FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                    FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+                    f1.setPosition(15);
+                    f2.setPosition(11);
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("oxo", new ArrayList<>(Arrays.asList(f2))); }};
+                    Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    currentFa = new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
+                }
+                break;
+        }
+
+        faList.clear();
+        faList.add(currentFa);
+        mediatorSuffix = true;
+    }
+
+
+    void addMediatorSuffix(TreeNode node){
+        mediatorSuffix = true;
+    }
+
+
+    void addMediator(TreeNode node){
+        if (!mediatorSuffix){
+            currentFa.getDoubleBonds().setNumDoubleBonds(currentFa.getDoubleBonds().getNumDoubleBonds() - 1);
         }
     }
 
