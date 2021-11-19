@@ -204,8 +204,9 @@ acer_med : med;
 
 /* sterol lipids */
 sterol : st | st_ester;
-st : st_hg headgroup_separator fatty_acyl_chain;
-st_ester : st_hg_ester headgroup_separator fatty_acyl_chain sorted_fa_separator fatty_acyl_chain;
+st : st_hg headgroup_separator sterol_definition;
+st_ester : st_hg_ester headgroup_separator sterol_definition sorted_fa_separator fatty_acyl_chain;
+sterol_definition : fatty_acyl_chain;
 st_hg : 'ST' | 'BA' | 'FC' | 'CE' | 'SG' | 'ASG';
 st_hg_ester : 'SE';
 
