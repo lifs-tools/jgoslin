@@ -36,7 +36,8 @@ import org.springframework.core.io.ClassPathResource;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class LipidClasses extends ArrayList<LipidClassMeta> {
 

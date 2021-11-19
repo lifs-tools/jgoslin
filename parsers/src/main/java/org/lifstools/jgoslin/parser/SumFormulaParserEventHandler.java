@@ -33,7 +33,8 @@ import org.lifstools.jgoslin.domain.ElementTable;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class SumFormulaParserEventHandler extends BaseParserEventHandler<ElementTable> {
 

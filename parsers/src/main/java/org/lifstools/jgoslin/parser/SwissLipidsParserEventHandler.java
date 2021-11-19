@@ -40,7 +40,8 @@ import static java.util.Map.entry;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 

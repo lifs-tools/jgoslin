@@ -27,7 +27,8 @@ import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 // this class is dedicated to have an efficient sorted set class storing
 // values within 0..n-1 and fast sequencial iterator

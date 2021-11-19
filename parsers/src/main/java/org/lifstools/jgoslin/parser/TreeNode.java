@@ -25,7 +25,8 @@ package org.lifstools.jgoslin.parser;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class TreeNode {
 

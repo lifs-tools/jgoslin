@@ -27,7 +27,8 @@ import java.util.ArrayList;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class GenericList extends ArrayList<Object> {
 

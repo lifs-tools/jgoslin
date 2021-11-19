@@ -42,6 +42,7 @@ import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
  * This class tests the shorthand nomenclature parser.
  *
  * @author Dominik Kopczynski
+ * @author Nils Hoffmann Kopczynski
  */
 public class ShorthandParserTest {
 

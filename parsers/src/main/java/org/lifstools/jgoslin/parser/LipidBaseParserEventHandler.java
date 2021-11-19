@@ -49,7 +49,8 @@ import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
 

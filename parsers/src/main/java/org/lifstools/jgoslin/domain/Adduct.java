@@ -28,7 +28,8 @@ import static java.util.Map.entry;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class Adduct {
 

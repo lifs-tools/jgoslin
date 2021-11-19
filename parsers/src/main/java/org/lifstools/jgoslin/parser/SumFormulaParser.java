@@ -28,7 +28,8 @@ import org.lifstools.jgoslin.domain.ElementTable;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class SumFormulaParser extends Parser<ElementTable> {
 

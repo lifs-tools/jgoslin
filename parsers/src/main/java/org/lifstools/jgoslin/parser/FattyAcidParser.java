@@ -29,7 +29,8 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class FattyAcidParser extends Parser<LipidAdduct> {
 

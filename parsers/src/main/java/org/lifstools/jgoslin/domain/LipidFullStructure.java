@@ -27,7 +27,8 @@ import java.util.Collection;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class LipidFullStructure extends LipidStructureDefined {
 

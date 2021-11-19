@@ -28,7 +28,8 @@ import java.util.Set;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class LipidClassMeta {
 

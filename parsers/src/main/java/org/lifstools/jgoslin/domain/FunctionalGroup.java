@@ -30,7 +30,8 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class FunctionalGroup {
 

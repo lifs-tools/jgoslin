@@ -33,7 +33,8 @@ import org.springframework.core.io.ClassPathResource;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class LipidParser {
 
@@ -68,7 +69,7 @@ public class LipidParser {
     /**
      * This method tries multiple parsers in a defined order to parse the
      * provided lipid name.If no parser is able to parse the name successfully,
- an exception is thrown.
+     * an exception is thrown.
      *
      * @param lipid_name the lipid name to parse.
      * @return the {@link LipidAdduct} if parsing with at least one parser

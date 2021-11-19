@@ -25,7 +25,8 @@ package org.lifstools.jgoslin.domain;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class ConstraintViolationException extends LipidException {
 

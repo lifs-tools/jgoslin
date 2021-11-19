@@ -21,7 +21,8 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class HmdbParser extends Parser<LipidAdduct> {
 

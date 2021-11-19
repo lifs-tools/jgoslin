@@ -26,6 +26,7 @@ import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 /**
  *
  * @author Dominik Kopczynski
+ * @author Nils Hoffmann Kopczynski
  */
 public class LipidParserTest {
 

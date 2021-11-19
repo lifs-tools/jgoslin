@@ -36,7 +36,8 @@ import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class FattyAcidParserTest {
 

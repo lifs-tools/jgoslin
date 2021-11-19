@@ -29,7 +29,8 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class SwissLipidsParser extends Parser<LipidAdduct> {
 

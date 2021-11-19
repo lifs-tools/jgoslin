@@ -29,6 +29,7 @@ import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 /**
  *
  * @author Dominik Kopczynski
+ * @author Nils Hoffmann Kopczynski
  */
 public class SumFormulaTest {
 

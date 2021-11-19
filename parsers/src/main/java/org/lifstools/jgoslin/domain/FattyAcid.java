@@ -33,7 +33,8 @@ import java.util.Set;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class FattyAcid extends FunctionalGroup {
 

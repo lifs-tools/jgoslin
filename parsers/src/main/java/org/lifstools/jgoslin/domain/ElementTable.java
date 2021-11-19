@@ -27,7 +27,8 @@ import java.util.EnumMap;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class ElementTable extends EnumMap<Element, Integer> {
 

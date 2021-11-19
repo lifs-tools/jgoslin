@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author dominik
- * @autho Nils Hoffmann
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public enum LipidCategory {
 

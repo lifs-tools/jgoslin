@@ -34,7 +34,8 @@ import org.springframework.core.io.Resource;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class StringFunctions {
 

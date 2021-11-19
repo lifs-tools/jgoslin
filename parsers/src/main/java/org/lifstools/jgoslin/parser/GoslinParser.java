@@ -30,7 +30,8 @@ import org.springframework.core.io.ClassPathResource;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class GoslinParser extends Parser<LipidAdduct> {
 

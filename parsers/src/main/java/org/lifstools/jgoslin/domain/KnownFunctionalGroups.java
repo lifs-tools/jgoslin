@@ -33,7 +33,8 @@ import org.springframework.core.io.ClassPathResource;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
 

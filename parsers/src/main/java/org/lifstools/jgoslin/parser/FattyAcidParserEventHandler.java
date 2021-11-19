@@ -57,7 +57,8 @@ import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
 

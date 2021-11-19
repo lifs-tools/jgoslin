@@ -29,7 +29,8 @@ import java.util.HashMap;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  */
 public class LipidSpecies {
 

@@ -33,7 +33,8 @@ import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
  *
- * @author dominik
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
  * @param <T>
  */
 public abstract class BaseParserEventHandler<T> {
