@@ -170,6 +170,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
             registeredEvents.put("hg_PE_PS_type_pre_event", this::suffixDecoratorSpecies);
             registeredEvents.put("acer_hg_post_event", this::setAcer);
             registeredEvents.put("acer_species_post_event", this::setAcerSpecies);
+            
+            registeredEvents.put("sterol_definition_post_event", this::setSterolDefinition);
 
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");
@@ -213,6 +215,13 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         content = lipid;
+    }
+    
+    
+    public void setSterolDefinition(TreeNode node){
+        headGroup += " " + node.getText();
+        faList.remove(0);
+        
     }
 
     public void preSphingolipid(TreeNode node) {

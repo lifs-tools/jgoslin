@@ -47,6 +47,16 @@ public final class Cycle extends FunctionalGroup {
     public Cycle(int _cycle, int _start, int _end, KnownFunctionalGroups knownFunctionalGroups) {
         this(_cycle, _start, _end, null, null, null, knownFunctionalGroups);
     }
+    
+    public Cycle(int _cycle, int _start, int _end, HashMap<String, ArrayList< FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+        this(_cycle, _start, _end, null, _functional_groups, null, knownFunctionalGroups);
+    
+    }
+    
+    public Cycle(int _cycle, int _start, int _end, DoubleBonds _double_bonds, HashMap<String, ArrayList< FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+        this(_cycle, _start, _end, _double_bonds, _functional_groups, null, knownFunctionalGroups);
+    
+    }
 
     public Cycle(int _cycle, int _start, int _end, DoubleBonds _double_bonds, HashMap<String, ArrayList< FunctionalGroup>> _functional_groups, ArrayList< Element> _bridge_chain, KnownFunctionalGroups knownFunctionalGroups) {
         super("cy", _start, 1, _double_bonds, false, "", null, _functional_groups, knownFunctionalGroups);
