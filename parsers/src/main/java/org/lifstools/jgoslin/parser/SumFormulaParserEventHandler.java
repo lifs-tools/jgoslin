@@ -23,6 +23,8 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import java.util.Map;
+import static java.util.Map.entry;
 import org.lifstools.jgoslin.domain.LipidException;
 import org.lifstools.jgoslin.domain.Element;
 import org.lifstools.jgoslin.domain.LipidParsingException;
@@ -40,11 +42,13 @@ public class SumFormulaParserEventHandler extends BaseParserEventHandler<Element
 
     public SumFormulaParserEventHandler() {
         try {
-            registeredEvents.put("molecule_pre_event", this::resetParser);
-            registeredEvents.put("element_group_post_event", this::elementGroupPostEvent);
-            registeredEvents.put("element_pre_event", this::elementPreEvent);
-            registeredEvents.put("single_element_pre_event", this::singleElementGroupPreEvent);
-            registeredEvents.put("count_pre_event", this::countPreEvent);
+            registeredEvents = Map.ofEntries(
+                entry("molecule_pre_event", this::resetParser),
+                entry("element_group_post_event", this::elementGroupPostEvent),
+                entry("element_pre_event", this::elementPreEvent),
+                entry("single_element_pre_event", this::singleElementGroupPreEvent),
+                entry("count_pre_event", this::countPreEvent)
+            );
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");
         }

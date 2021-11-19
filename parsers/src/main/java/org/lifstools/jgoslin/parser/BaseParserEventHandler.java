@@ -26,6 +26,8 @@ package org.lifstools.jgoslin.parser;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
@@ -36,8 +38,8 @@ import org.lifstools.jgoslin.domain.ConstraintViolationException;
  */
 public abstract class BaseParserEventHandler<T> {
 
-    protected HashMap<String, Consumer<TreeNode>> registeredEvents = new HashMap<>();
-    protected HashSet<String> ruleNames = new HashSet<>();
+    protected Map<String, Consumer<TreeNode>> registeredEvents = new HashMap<>();
+    protected Set<String> ruleNames = new HashSet<>();
     protected String debug = "";
     protected T content = null;
     protected String errorMessage = "";

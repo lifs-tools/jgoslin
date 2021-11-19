@@ -44,134 +44,133 @@ import org.lifstools.jgoslin.domain.FattyAcid;
 import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import org.lifstools.jgoslin.domain.Dictionary;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Map;
+import static java.util.Map.entry;
+import java.util.Set;
 
 public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     private ArrayDeque<FunctionalGroup> currentFas = new ArrayDeque<>();
     private Dictionary tmp = new Dictionary();
     private boolean acerSpecies = false;
-    private static final HashSet<String> SPECIAL_TYPES = new HashSet<String>(Arrays.asList("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc"));
-
-//    public ShorthandParserEventHandler() {
-//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
-//    }
+    private static final Set<String> SPECIAL_TYPES = Set.of("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc");
 
     public ShorthandParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         super(knownFunctionalGroups);
         try {
-            registeredEvents.put("lipid_pre_event", this::resetParser);
-            registeredEvents.put("lipid_post_event", this::buildLipid);
+            registeredEvents = Map.ofEntries(
+                entry("lipid_pre_event", this::resetParser),
+                entry("lipid_post_event", this::buildLipid),
 
-            // set categories
-            registeredEvents.put("sl_pre_event", this::preSphingolipid);
-            registeredEvents.put("sl_post_event", this::postSphingolipid);
-            registeredEvents.put("sl_hydroxyl_pre_event", this::setHydroxyl);
+                // set categories
+                entry("sl_pre_event", this::preSphingolipid),
+                entry("sl_post_event", this::postSphingolipid),
+                entry("sl_hydroxyl_pre_event", this::setHydroxyl),
 
-            // set adduct events
-            registeredEvents.put("adduct_info_pre_event", this::newAdduct);
-            registeredEvents.put("adduct_pre_event", this::addAdduct);
-            registeredEvents.put("charge_pre_event", this::addCharge);
-            registeredEvents.put("charge_sign_pre_event", this::addChargeSign);
+                // set adduct events
+                entry("adduct_info_pre_event", this::newAdduct),
+                entry("adduct_pre_event", this::addAdduct),
+                entry("charge_pre_event", this::addCharge),
+                entry("charge_sign_pre_event", this::addChargeSign),
 
-            // set species events
-            registeredEvents.put("med_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("gl_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("gl_molecular_species_pre_event", this::setMolecularLevel);
-            registeredEvents.put("pl_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("pl_molecular_species_pre_event", this::setMolecularLevel);
-            registeredEvents.put("sl_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("pl_single_pre_event", this::setMolecularLevel);
-            registeredEvents.put("unsorted_fa_separator_pre_event", this::setMolecularLevel);
-            registeredEvents.put("ether_num_pre_event", this::setEtherNum);
+                // set species events
+                entry("med_species_pre_event", this::setSpeciesLevel),
+                entry("gl_species_pre_event", this::setSpeciesLevel),
+                entry("gl_molecular_species_pre_event", this::setMolecularLevel),
+                entry("pl_species_pre_event", this::setSpeciesLevel),
+                entry("pl_molecular_species_pre_event", this::setMolecularLevel),
+                entry("sl_species_pre_event", this::setSpeciesLevel),
+                entry("pl_single_pre_event", this::setMolecularLevel),
+                entry("unsorted_fa_separator_pre_event", this::setMolecularLevel),
+                entry("ether_num_pre_event", this::setEtherNum),
 
-            // set head groups events
-            registeredEvents.put("med_hg_single_pre_event", this::setHeadgroupName);
-            registeredEvents.put("med_hg_double_pre_event", this::setHeadgroupName);
-            registeredEvents.put("med_hg_triple_pre_event", this::setHeadgroupName);
-            registeredEvents.put("gl_hg_single_pre_event", this::setHeadgroupName);
-            registeredEvents.put("gl_hg_double_pre_event", this::setHeadgroupName);
-            registeredEvents.put("gl_hg_true_double_pre_event", this::setHeadgroupName);
-            registeredEvents.put("gl_hg_triple_pre_event", this::setHeadgroupName);
-            registeredEvents.put("pl_hg_single_pre_event", this::setHeadgroupName);
-            registeredEvents.put("pl_hg_double_pre_event", this::setHeadgroupName);
-            registeredEvents.put("pl_hg_quadro_pre_event", this::setHeadgroupName);
-            registeredEvents.put("sl_hg_single_pre_event", this::setHeadgroupName);
-            registeredEvents.put("pl_hg_double_fa_hg_pre_event", this::setHeadgroupName);
-            registeredEvents.put("sl_hg_double_name_pre_event", this::setHeadgroupName);
-            registeredEvents.put("st_hg_pre_event", this::setHeadgroupName);
-            registeredEvents.put("st_hg_ester_pre_event", this::setHeadgroupName);
-            registeredEvents.put("hg_pip_pure_m_pre_event", this::setHeadgroupName);
-            registeredEvents.put("hg_pip_pure_d_pre_event", this::setHeadgroupName);
-            registeredEvents.put("hg_pip_pure_t_pre_event", this::setHeadgroupName);
-            registeredEvents.put("hg_PE_PS_pre_event", this::setHeadgroupName);
+                // set head groups events
+                entry("med_hg_single_pre_event", this::setHeadgroupName),
+                entry("med_hg_double_pre_event", this::setHeadgroupName),
+                entry("med_hg_triple_pre_event", this::setHeadgroupName),
+                entry("gl_hg_single_pre_event", this::setHeadgroupName),
+                entry("gl_hg_double_pre_event", this::setHeadgroupName),
+                entry("gl_hg_true_double_pre_event", this::setHeadgroupName),
+                entry("gl_hg_triple_pre_event", this::setHeadgroupName),
+                entry("pl_hg_single_pre_event", this::setHeadgroupName),
+                entry("pl_hg_double_pre_event", this::setHeadgroupName),
+                entry("pl_hg_quadro_pre_event", this::setHeadgroupName),
+                entry("sl_hg_single_pre_event", this::setHeadgroupName),
+                entry("pl_hg_double_fa_hg_pre_event", this::setHeadgroupName),
+                entry("sl_hg_double_name_pre_event", this::setHeadgroupName),
+                entry("st_hg_pre_event", this::setHeadgroupName),
+                entry("st_hg_ester_pre_event", this::setHeadgroupName),
+                entry("hg_pip_pure_m_pre_event", this::setHeadgroupName),
+                entry("hg_pip_pure_d_pre_event", this::setHeadgroupName),
+                entry("hg_pip_pure_t_pre_event", this::setHeadgroupName),
+                entry("hg_PE_PS_pre_event", this::setHeadgroupName),
 
-            // set head group headgroupDecorators
-            registeredEvents.put("carbohydrate_pre_event", this::setCarbohydrate);
-            registeredEvents.put("carbohydrate_structural_pre_event", this::setCarbohydrateStructural);
-            registeredEvents.put("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric);
+                // set head group headgroupDecorators
+                entry("carbohydrate_pre_event", this::setCarbohydrate),
+                entry("carbohydrate_structural_pre_event", this::setCarbohydrateStructural),
+                entry("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric),
 
-            // fatty acyl events
-            registeredEvents.put("lcb_post_event", this::setLcb);
-            registeredEvents.put("fatty_acyl_chain_pre_event", this::newFattyAcylChain);
-            registeredEvents.put("fatty_acyl_chain_post_event", this::addFattyAcylChain);
-            registeredEvents.put("carbon_pre_event", this::setCarbon);
-            registeredEvents.put("db_count_pre_event", this::setDoubleBondCount);
-            registeredEvents.put("db_position_number_pre_event", this::setDoubleBondPosition);
-            registeredEvents.put("db_single_position_pre_event", this::setDoubleBondInformation);
-            registeredEvents.put("db_single_position_post_event", this::addDoubleBondInformation);
-            registeredEvents.put("cistrans_pre_event", this::setCisTrans);
-            registeredEvents.put("ether_type_pre_event", this::setEtherType);
+                // fatty acyl events
+                entry("lcb_post_event", this::setLcb),
+                entry("fatty_acyl_chain_pre_event", this::newFattyAcylChain),
+                entry("fatty_acyl_chain_post_event", this::addFattyAcylChain),
+                entry("carbon_pre_event", this::setCarbon),
+                entry("db_count_pre_event", this::setDoubleBondCount),
+                entry("db_position_number_pre_event", this::setDoubleBondPosition),
+                entry("db_single_position_pre_event", this::setDoubleBondInformation),
+                entry("db_single_position_post_event", this::addDoubleBondInformation),
+                entry("cistrans_pre_event", this::setCisTrans),
+                entry("ether_type_pre_event", this::setEtherType),
 
-            // set functional group events
-            registeredEvents.put("func_group_data_pre_event", this::setFunctionalGroup);
-            registeredEvents.put("func_group_data_post_event", this::addFunctionalGroup);
-            registeredEvents.put("func_group_pos_number_pre_event", this::setFunctionalGroupPosition);
-            registeredEvents.put("func_group_name_pre_event", this::setFunctionalGroupName);
-            registeredEvents.put("func_group_count_pre_event", this::setFunctionalGroupCount);
-            registeredEvents.put("stereo_type_pre_event", this::setFunctionalGroupStereo);
-            registeredEvents.put("molecular_func_group_name_pre_event", this::setMolecularFuncGroup);
+                // set functional group events
+                entry("func_group_data_pre_event", this::setFunctionalGroup),
+                entry("func_group_data_post_event", this::addFunctionalGroup),
+                entry("func_group_pos_number_pre_event", this::setFunctionalGroupPosition),
+                entry("func_group_name_pre_event", this::setFunctionalGroupName),
+                entry("func_group_count_pre_event", this::setFunctionalGroupCount),
+                entry("stereo_type_pre_event", this::setFunctionalGroupStereo),
+                entry("molecular_func_group_name_pre_event", this::setMolecularFuncGroup),
 
-            // set cycle events
-            registeredEvents.put("func_group_cycle_pre_event", this::setCycle);
-            registeredEvents.put("func_group_cycle_post_event", this::addCycle);
-            registeredEvents.put("cycle_start_pre_event", this::setCycleStart);
-            registeredEvents.put("cycle_end_pre_event", this::setCycleEnd);
-            registeredEvents.put("cycle_number_pre_event", this::setCycleNumber);
-            registeredEvents.put("cycle_db_cnt_pre_event", this::setCycleDbCount);
-            registeredEvents.put("cycle_db_positions_pre_event", this::setCycleDbPositions);
-            registeredEvents.put("cycle_db_positions_post_event", this::checkCycleDbPositions);
-            registeredEvents.put("cycle_db_position_number_pre_event", this::setCycleDbPosition);
-            registeredEvents.put("cycle_db_position_cis_trans_pre_event", this::setCycleDbPositionCistrans);
-            registeredEvents.put("cylce_element_pre_event", this::addCycleElement);
+                // set cycle events
+                entry("func_group_cycle_pre_event", this::setCycle),
+                entry("func_group_cycle_post_event", this::addCycle),
+                entry("cycle_start_pre_event", this::setCycleStart),
+                entry("cycle_end_pre_event", this::setCycleEnd),
+                entry("cycle_number_pre_event", this::setCycleNumber),
+                entry("cycle_db_cnt_pre_event", this::setCycleDbCount),
+                entry("cycle_db_positions_pre_event", this::setCycleDbPositions),
+                entry("cycle_db_positions_post_event", this::checkCycleDbPositions),
+                entry("cycle_db_position_number_pre_event", this::setCycleDbPosition),
+                entry("cycle_db_position_cis_trans_pre_event", this::setCycleDbPositionCistrans),
+                entry("cylce_element_pre_event", this::addCycleElement),
 
-            // set linkage events
-            registeredEvents.put("fatty_acyl_linkage_pre_event", this::setAcylLinkage);
-            registeredEvents.put("fatty_acyl_linkage_post_event", this::addAcylLinkage);
-            registeredEvents.put("fatty_alkyl_linkage_pre_event", this::setAlkylLinkage);
-            registeredEvents.put("fatty_alkyl_linkage_post_event", this::addAlkylLinkage);
-            registeredEvents.put("fatty_linkage_number_pre_event", this::setFattyLinkageNumber);
-            registeredEvents.put("fatty_acyl_linkage_sign_pre_event", this::setLinkageType);
-            registeredEvents.put("hydrocarbon_chain_pre_event", this::setHydrocarbonChain);
-            registeredEvents.put("hydrocarbon_chain_post_event", this::addHydrocarbonChain);
-            registeredEvents.put("hydrocarbon_number_pre_event", this::setFattyLinkageNumber);
+                // set linkage events
+                entry("fatty_acyl_linkage_pre_event", this::setAcylLinkage),
+                entry("fatty_acyl_linkage_post_event", this::addAcylLinkage),
+                entry("fatty_alkyl_linkage_pre_event", this::setAlkylLinkage),
+                entry("fatty_alkyl_linkage_post_event", this::addAlkylLinkage),
+                entry("fatty_linkage_number_pre_event", this::setFattyLinkageNumber),
+                entry("fatty_acyl_linkage_sign_pre_event", this::setLinkageType),
+                entry("hydrocarbon_chain_pre_event", this::setHydrocarbonChain),
+                entry("hydrocarbon_chain_post_event", this::addHydrocarbonChain),
+                entry("hydrocarbon_number_pre_event", this::setFattyLinkageNumber),
 
-            // set remaining events
-            registeredEvents.put("ring_stereo_pre_event", this::setRingStereo);
-            registeredEvents.put("pl_hg_fa_pre_event", this::setHgAcyl);
-            registeredEvents.put("pl_hg_fa_post_event", this::addHgAcyl);
-            registeredEvents.put("pl_hg_alk_pre_event", this::setHgAlkyl);
-            registeredEvents.put("pl_hg_alk_post_event", this::addHgAlkyl);
-            registeredEvents.put("pl_hg_species_pre_event", this::addPlSpeciesData);
-            registeredEvents.put("hg_pip_m_pre_event", this::suffixDecoratorMolecular);
-            registeredEvents.put("hg_pip_d_pre_event", this::suffixDecoratorMolecular);
-            registeredEvents.put("hg_pip_t_pre_event", this::suffixDecoratorMolecular);
-            registeredEvents.put("hg_PE_PS_type_pre_event", this::suffixDecoratorSpecies);
-            registeredEvents.put("acer_hg_post_event", this::setAcer);
-            registeredEvents.put("acer_species_post_event", this::setAcerSpecies);
-            
-            registeredEvents.put("sterol_definition_post_event", this::setSterolDefinition);
+                // set remaining events
+                entry("ring_stereo_pre_event", this::setRingStereo),
+                entry("pl_hg_fa_pre_event", this::setHgAcyl),
+                entry("pl_hg_fa_post_event", this::addHgAcyl),
+                entry("pl_hg_alk_pre_event", this::setHgAlkyl),
+                entry("pl_hg_alk_post_event", this::addHgAlkyl),
+                entry("pl_hg_species_pre_event", this::addPlSpeciesData),
+                entry("hg_pip_m_pre_event", this::suffixDecoratorMolecular),
+                entry("hg_pip_d_pre_event", this::suffixDecoratorMolecular),
+                entry("hg_pip_t_pre_event", this::suffixDecoratorMolecular),
+                entry("hg_PE_PS_type_pre_event", this::suffixDecoratorSpecies),
+                entry("acer_hg_post_event", this::setAcer),
+                entry("acer_species_post_event", this::setAcerSpecies),
+
+                entry("sterol_definition_post_event", this::setSterolDefinition)
+            );
 
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");

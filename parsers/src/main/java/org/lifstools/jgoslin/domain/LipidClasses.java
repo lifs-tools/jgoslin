@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import static java.util.Map.entry;
 import org.lifstools.jgoslin.parser.BaseParserEventHandler;
 import org.springframework.core.io.ClassPathResource;
 
@@ -62,31 +64,27 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
 
         HashMap<String, ArrayList<String>> data = new HashMap<>();
         HashSet<String> keys = new HashSet<>();
-        HashMap<String, Integer> enum_names = new HashMap<String, Integer>() {
-            {
-                put("GL", 1);
-                put("GP", 1);
-                put("SP", 1);
-                put("ST", 1);
-                put("FA", 1);
-                put("PK", 1);
-                put("SL", 1);
-                put("UNDEFINED", 1);
-            }
-        };
+        Map<String, Integer> enum_names = new HashMap<>(Map.ofEntries(
+            entry("GL", 1),
+            entry("GP", 1),
+            entry("SP", 1),
+            entry("ST", 1),
+            entry("FA", 1),
+            entry("PK", 1),
+            entry("SL", 1),
+            entry("UNDEFINED", 1)
+        ));
 
-        HashMap<String, LipidCategory> names_to_category = new HashMap<>() {
-            {
-                put("GL", LipidCategory.GL);
-                put("GP", LipidCategory.GP);
-                put("SP", LipidCategory.SP);
-                put("ST", LipidCategory.ST);
-                put("FA", LipidCategory.FA);
-                put("PK", LipidCategory.PK);
-                put("SL", LipidCategory.SL);
-                put("UNDEFINED", LipidCategory.UNDEFINED);
-            }
-        };
+        Map<String, LipidCategory> names_to_category = Map.ofEntries(
+            entry("GL", LipidCategory.GL),
+            entry("GP", LipidCategory.GP),
+            entry("SP", LipidCategory.SP),
+            entry("ST", LipidCategory.ST),
+            entry("FA", LipidCategory.FA),
+            entry("PK", LipidCategory.PK),
+            entry("SL", LipidCategory.SL),
+            entry("UNDEFINED", LipidCategory.UNDEFINED)
+        );
 
         for (String line : lines) {
             if (lineCounter++ == 0) {

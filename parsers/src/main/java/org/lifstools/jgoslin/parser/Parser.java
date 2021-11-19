@@ -25,9 +25,6 @@ package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import org.lifstools.jgoslin.domain.StringFunctions;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -801,20 +798,5 @@ public abstract class Parser<T> {
             }
         }
         return Optional.empty();
-    }
-
-    static String readGrammarContent(String grammarResourcePath) {
-        StringBuilder sb = new StringBuilder();
-        // read resource from classpath and current thread's context class loader
-//        Resource resource = new ClassPathResource("/my/resource.json", this.getClass());
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(grammarResourcePath)));) {
-            br.lines().forEach(line -> {
-                sb.append(line).append("\n");
-            });
-            return sb.toString();
-        } catch (IOException e) {
-            //always pass on the original exception
-            throw new ConstraintViolationException("Error: resource '" + grammarResourcePath + "' does not exist.", e);
-        }
     }
 }

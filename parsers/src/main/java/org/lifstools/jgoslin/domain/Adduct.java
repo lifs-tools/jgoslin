@@ -23,8 +23,8 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.domain;
 
-import java.util.HashMap;
 import java.util.Map;
+import static java.util.Map.entry;
 
 /**
  *
@@ -37,41 +37,37 @@ public final class Adduct {
     private int charge;
     private int chargeSign;
 
-    public static final HashMap<String, ElementTable> ADDUCTS = new HashMap<>() {
-        {
-            put("+H", ElementTable.of(Map.entry(Element.H, 1)));
-            put("+2H", ElementTable.of(Map.entry(Element.H, 2)));
-            put("+3H", ElementTable.of(Map.entry(Element.H, 3)));
-            put("+4H", ElementTable.of(Map.entry(Element.H, 4)));
-            put("-H", ElementTable.of(Map.entry(Element.H, -1)));
-            put("-2H", ElementTable.of(Map.entry(Element.H, -2)));
-            put("-3H", ElementTable.of(Map.entry(Element.H, -3)));
-            put("-4H", ElementTable.of(Map.entry(Element.H, -4)));
-            put("+H-H2O", ElementTable.of(Map.entry(Element.H, -1), Map.entry(Element.O, -1)));
-            put("+NH4", ElementTable.of(Map.entry(Element.N, 1), Map.entry(Element.H, 4)));
-            put("+Cl", ElementTable.of(Map.entry(Element.Cl, 1)));
-            put("+HCOO", ElementTable.of(Map.entry(Element.H, 1), Map.entry(Element.C, 1), Map.entry(Element.O, 2)));
-            put("+CH3COO", ElementTable.of(Map.entry(Element.H, 3), Map.entry(Element.C, 2), Map.entry(Element.O, 2)));
-        }
-    };
+    public static final Map<String, ElementTable> ADDUCTS = Map.ofEntries(
+            entry("+H", ElementTable.of(Map.entry(Element.H, 1))),
+            entry("+2H", ElementTable.of(Map.entry(Element.H, 2))),
+            entry("+3H", ElementTable.of(Map.entry(Element.H, 3))),
+            entry("+4H", ElementTable.of(Map.entry(Element.H, 4))),
+            entry("-H", ElementTable.of(Map.entry(Element.H, -1))),
+            entry("-2H", ElementTable.of(Map.entry(Element.H, -2))),
+            entry("-3H", ElementTable.of(Map.entry(Element.H, -3))),
+            entry("-4H", ElementTable.of(Map.entry(Element.H, -4))),
+            entry("+H-H2O", ElementTable.of(Map.entry(Element.H, -1), Map.entry(Element.O, -1))),
+            entry("+NH4", ElementTable.of(Map.entry(Element.N, 1), Map.entry(Element.H, 4))),
+            entry("+Cl", ElementTable.of(Map.entry(Element.Cl, 1))),
+            entry("+HCOO", ElementTable.of(Map.entry(Element.H, 1), Map.entry(Element.C, 1), Map.entry(Element.O, 2))),
+            entry("+CH3COO", ElementTable.of(Map.entry(Element.H, 3), Map.entry(Element.C, 2), Map.entry(Element.O, 2)))
+    );
 
-    public static final HashMap<String, Integer> ADDUCT_CHARGES = new HashMap<>() {
-        {
-            put("+H", 1);
-            put("+2H", 2);
-            put("+3H", 3);
-            put("+4H", 4);
-            put("-H", -1);
-            put("-2H", -2);
-            put("-3H", -3);
-            put("-4H", -4);
-            put("+H-H2O", 1);
-            put("+NH4", 1);
-            put("+Cl", -1);
-            put("+HCOO", -1);
-            put("+CH3COO", -1);
-        }
-    };
+    public static final Map<String, Integer> ADDUCT_CHARGES = Map.ofEntries(
+            entry("+H", 1),
+            entry("+2H", 2),
+            entry("+3H", 3),
+            entry("+4H", 4),
+            entry("-H", -1),
+            entry("-2H", -2),
+            entry("-3H", -3),
+            entry("-4H", -4),
+            entry("+H-H2O", 1),
+            entry("+NH4", 1),
+            entry("+Cl", -1),
+            entry("+HCOO", -1),
+            entry("+CH3COO", -1)
+    );
 
     public Adduct(String _sum_formula, String _adduct_string) {
         this(_sum_formula, _adduct_string, 1, 1);

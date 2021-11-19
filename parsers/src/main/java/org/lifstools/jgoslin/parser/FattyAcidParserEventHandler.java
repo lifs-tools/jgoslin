@@ -46,12 +46,13 @@ import org.lifstools.jgoslin.domain.LipidSpecies;
 import org.lifstools.jgoslin.domain.LipidFullStructure;
 import org.lifstools.jgoslin.domain.Dictionary;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import static java.util.Map.entry;
+import java.util.Set;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
@@ -66,237 +67,225 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     private ArrayDeque<FattyAcid> fattyAcylStack;
     private Dictionary tmp;
 
-    private static final HashMap<String, Integer> LAST_NUMBERS = new HashMap<>() {
-        {
-            put("un", 1);
-            put("hen", 1);
-            put("do", 2);
-            put("di", 2);
-            put("tri", 3);
-            put("buta", 4);
-            put("but", 4);
-            put("tetra", 4);
-            put("penta", 5);
-            put("pent", 5);
-            put("hexa", 6);
-            put("hex", 6);
-            put("hepta", 7);
-            put("hept", 7);
-            put("octa", 8);
-            put("oct", 8);
-            put("nona", 9);
-            put("non", 9);
-        }
-    };
+    private static final Map<String, Integer> LAST_NUMBERS = Map.ofEntries(
+        entry("un", 1),
+        entry("hen", 1),
+        entry("do", 2),
+        entry("di", 2),
+        entry("tri", 3),
+        entry("buta", 4),
+        entry("but", 4),
+        entry("tetra", 4),
+        entry("penta", 5),
+        entry("pent", 5),
+        entry("hexa", 6),
+        entry("hex", 6),
+        entry("hepta", 7),
+        entry("hept", 7),
+        entry("octa", 8),
+        entry("oct", 8),
+        entry("nona", 9),
+        entry("non", 9)
+    );
 
-    private static final HashMap<String, Integer> SECOND_NUMBERS = new HashMap<>() {
-        {
-            put("deca", 10);
-            put("dec", 10);
-            put("eicosa", 20);
-            put("eicos", 20);
-            put("cosa", 20);
-            put("cos", 20);
-            put("triaconta", 30);
-            put("triacont", 30);
-            put("tetraconta", 40);
-            put("tetracont", 40);
-            put("pentaconta", 50);
-            put("pentacont", 50);
-            put("hexaconta", 60);
-            put("hexacont", 60);
-            put("heptaconta", 70);
-            put("heptacont", 70);
-            put("octaconta", 80);
-            put("octacont", 80);
-            put("nonaconta", 90);
-            put("nonacont", 90);
-        }
-    };
+    private static final Map<String, Integer> SECOND_NUMBERS = Map.ofEntries(
+        entry("deca", 10),
+        entry("dec", 10),
+        entry("eicosa", 20),
+        entry("eicos", 20),
+        entry("cosa", 20),
+        entry("cos", 20),
+        entry("triaconta", 30),
+        entry("triacont", 30),
+        entry("tetraconta", 40),
+        entry("tetracont", 40),
+        entry("pentaconta", 50),
+        entry("pentacont", 50),
+        entry("hexaconta", 60),
+        entry("hexacont", 60),
+        entry("heptaconta", 70),
+        entry("heptacont", 70),
+        entry("octaconta", 80),
+        entry("octacont", 80),
+        entry("nonaconta", 90),
+        entry("nonacont", 90)
+    );
 
-    private static final HashMap<String, String> FUNC_GROUPS = new HashMap<>() {
-        {
-            put("keto", "oxo");
-            put("ethyl", "Et");
-            put("hydroxy", "OH");
-            put("phospho", "Ph");
-            put("oxo", "oxo");
-            put("bromo", "Br");
-            put("methyl", "Me");
-            put("hydroperoxy", "OOH");
-            put("homo", "");
-            put("Epoxy", "Ep");
-            put("fluro", "F");
-            put("fluoro", "F");
-            put("chloro", "Cl");
-            put("methylene", "My");
-            put("sulfooxy", "Su");
-            put("amino", "NH2");
-            put("sulfanyl", "SH");
-            put("methoxy", "OMe");
-            put("iodo", "I");
-            put("cyano", "CN");
-            put("nitro", "NO2");
-            put("OH", "OH");
-            put("thio", "SH");
-            put("mercapto", "SH");
-            put("carboxy", "COOH");
-            put("acetoxy", "Ac");
-            put("cysteinyl", "Cys");
-            put("phenyl", "Phe");
-            put("s-glutathionyl", "SGlu");
-            put("s-cysteinyl", "SCys");
-            put("butylperoxy", "BOO");
-            put("dimethylarsinoyl", "MMAs");
-            put("methylsulfanyl", "SMe");
-            put("imino", "NH");
-            put("s-cysteinylglycinyl", "SCG");
-        }
-    };
+    private static final Map<String, String> FUNC_GROUPS = Map.ofEntries(
+        entry("keto", "oxo"),
+        entry("ethyl", "Et"),
+        entry("hydroxy", "OH"),
+        entry("phospho", "Ph"),
+        entry("oxo", "oxo"),
+        entry("bromo", "Br"),
+        entry("methyl", "Me"),
+        entry("hydroperoxy", "OOH"),
+        entry("homo", ""),
+        entry("Epoxy", "Ep"),
+        entry("fluro", "F"),
+        entry("fluoro", "F"),
+        entry("chloro", "Cl"),
+        entry("methylene", "My"),
+        entry("sulfooxy", "Su"),
+        entry("amino", "NH2"),
+        entry("sulfanyl", "SH"),
+        entry("methoxy", "OMe"),
+        entry("iodo", "I"),
+        entry("cyano", "CN"),
+        entry("nitro", "NO2"),
+        entry("OH", "OH"),
+        entry("thio", "SH"),
+        entry("mercapto", "SH"),
+        entry("carboxy", "COOH"),
+        entry("acetoxy", "Ac"),
+        entry("cysteinyl", "Cys"),
+        entry("phenyl", "Phe"),
+        entry("s-glutathionyl", "SGlu"),
+        entry("s-cysteinyl", "SCys"),
+        entry("butylperoxy", "BOO"),
+        entry("dimethylarsinoyl", "MMAs"),
+        entry("methylsulfanyl", "SMe"),
+        entry("imino", "NH"),
+        entry("s-cysteinylglycinyl", "SCG")
+    );
 
-    private static final HashMap<String, Integer> ATE = new HashMap<>() {
-        {
-            put("formate", 1);
-            put("acetate", 2);
-            put("butyrate", 4);
-            put("propionate", 3);
-            put("valerate", 5);
-            put("isobutyrate", 4);
-        }
-    };
+    private static final Map<String, Integer> ATE = Map.ofEntries(
+        entry("formate", 1),
+        entry("acetate", 2),
+        entry("butyrate", 4),
+        entry("propionate", 3),
+        entry("valerate", 5),
+        entry("isobutyrate", 4)
+    );
 
-    private static final HashMap<String, Integer> SPECIAL_NUMBERS = new HashMap<>() {
-        {
-            put("meth", 1);
-            put("etha", 2);
-            put("eth", 2);
-            put("propa", 3);
-            put("isoprop", 3);
-            put("prop", 3);
-            put("propi", 3);
-            put("propio", 3);
-            put("buta", 4);
-            put("but", 4);
-            put("butr", 4);
-            put("furan", 5);
-            put("valer", 5);
-            put("eicosa", 20);
-            put("eicos", 20);
-            put("icosa", 20);
-            put("icos", 20);
-            put("prosta", 20);
-            put("prost", 20);
-            put("prostan", 20);
-        }
-    };
+    private static final Map<String, Integer> SPECIAL_NUMBERS = Map.ofEntries(
+        entry("meth", 1),
+        entry("etha", 2),
+        entry("eth", 2),
+        entry("propa", 3),
+        entry("isoprop", 3),
+        entry("prop", 3),
+        entry("propi", 3),
+        entry("propio", 3),
+        entry("buta", 4),
+        entry("but", 4),
+        entry("butr", 4),
+        entry("furan", 5),
+        entry("valer", 5),
+        entry("eicosa", 20),
+        entry("eicos", 20),
+        entry("icosa", 20),
+        entry("icos", 20),
+        entry("prosta", 20),
+        entry("prost", 20),
+        entry("prostan", 20)
+    );
 
-    private static final HashSet<String> NOIC_SET = new HashSet<>(Arrays.asList("noic acid", "nic acid", "dioic_acid"));
-    private static final HashSet<String> NAL_SET = new HashSet<>(Arrays.asList("nal", "dial"));
-    private static final HashSet<String> ACETATE_SET = new HashSet<>(Arrays.asList("acetate", "noate", "nate"));
-
-//    public FattyAcidParserEventHandler() {
-//        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), SumFormulaParser.getInstance()));
-//    }
+    private static final Set<String> NOIC_SET = Set.of("noic acid", "nic acid", "dioic_acid");
+    private static final Set<String> NAL_SET = Set.of("nal", "dial");
+    private static final Set<String> ACETATE_SET = Set.of("acetate", "noate", "nate");
 
     public FattyAcidParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;
         try {
-            registeredEvents.put("lipid_pre_event", this::resetParser);
-            registeredEvents.put("lipid_post_event", this::build_lipid);
-            registeredEvents.put("fatty_acid_post_event", this::set_fatty_acid);
-            registeredEvents.put("fatty_acid_recursion_post_event", this::set_fatty_acid);
+            registeredEvents = Map.ofEntries(
+                entry("lipid_pre_event", this::resetParser),
+                entry("lipid_post_event", this::build_lipid),
+                entry("fatty_acid_post_event", this::set_fatty_acid),
+                entry("fatty_acid_recursion_post_event", this::set_fatty_acid),
 
-            registeredEvents.put("acid_single_type_pre_event", this::set_fatty_acyl_type);
-            registeredEvents.put("ol_ending_pre_event", this::set_fatty_acyl_type);
-            registeredEvents.put("double_bond_position_pre_event", this::set_double_bond_information);
-            registeredEvents.put("double_bond_position_post_event", this::add_double_bond_information);
-            registeredEvents.put("db_number_post_event", this::set_double_bond_position);
-            registeredEvents.put("cistrans_post_event", this::set_cistrans);
-            registeredEvents.put("acid_type_double_post_event", this::check_db);
-            registeredEvents.put("db_length_pre_event", this::open_db_length);
-            registeredEvents.put("db_length_post_event", this::close_db_length);
+                entry("acid_single_type_pre_event", this::set_fatty_acyl_type),
+                entry("ol_ending_pre_event", this::set_fatty_acyl_type),
+                entry("double_bond_position_pre_event", this::set_double_bond_information),
+                entry("double_bond_position_post_event", this::add_double_bond_information),
+                entry("db_number_post_event", this::set_double_bond_position),
+                entry("cistrans_post_event", this::set_cistrans),
+                entry("acid_type_double_post_event", this::check_db),
+                entry("db_length_pre_event", this::open_db_length),
+                entry("db_length_post_event", this::close_db_length),
 
-            // lengths
-            registeredEvents.put("functional_length_pre_event", this::reset_length);
-            registeredEvents.put("fatty_length_pre_event", this::reset_length);
-            registeredEvents.put("functional_length_post_event", this::set_functional_length);
-            registeredEvents.put("fatty_length_post_event", this::set_fatty_length);
+                // lengths
+                entry("functional_length_pre_event", this::reset_length),
+                entry("fatty_length_pre_event", this::reset_length),
+                entry("functional_length_post_event", this::set_functional_length),
+                entry("fatty_length_post_event", this::set_fatty_length),
 
-            // numbers
-            registeredEvents.put("notation_specials_pre_event", this::special_number);
-            registeredEvents.put("notation_last_digit_pre_event", this::last_number);
-            registeredEvents.put("notation_second_digit_pre_event", this::second_number);
+                // numbers
+                entry("notation_specials_pre_event", this::special_number),
+                entry("notation_last_digit_pre_event", this::last_number),
+                entry("notation_second_digit_pre_event", this::second_number),
 
-            // functional groups
-            registeredEvents.put("functional_group_pre_event", this::set_functional_group);
-            registeredEvents.put("functional_group_post_event", this::add_functional_group);
-            registeredEvents.put("functional_pos_pre_event", this::set_functional_pos);
-            registeredEvents.put("functional_position_pre_event", this::set_functional_position);
-            registeredEvents.put("functional_group_type_pre_event", this::set_functional_type);
+                // functional groups
+                entry("functional_group_pre_event", this::set_functional_group),
+                entry("functional_group_post_event", this::add_functional_group),
+                entry("functional_pos_pre_event", this::set_functional_pos),
+                entry("functional_position_pre_event", this::set_functional_position),
+                entry("functional_group_type_pre_event", this::set_functional_type),
 
-            // cyclo / epoxy
-            registeredEvents.put("cyclo_position_pre_event", this::set_functional_group);
-            registeredEvents.put("cyclo_position_post_event", this::rearrange_cycle);
-            registeredEvents.put("epoxy_pre_event", this::set_functional_group);
-            registeredEvents.put("epoxy_post_event", this::add_epoxy);
-            registeredEvents.put("cycle_pre_event", this::set_cycle);
-            registeredEvents.put("methylene_post_event", this::set_methylene);
+                // cyclo / epoxy
+                entry("cyclo_position_pre_event", this::set_functional_group),
+                entry("cyclo_position_post_event", this::rearrange_cycle),
+                entry("epoxy_pre_event", this::set_functional_group),
+                entry("epoxy_post_event", this::add_epoxy),
+                entry("cycle_pre_event", this::set_cycle),
+                entry("methylene_post_event", this::set_methylene),
 
-            // dioic
-            registeredEvents.put("dioic_pre_event", this::set_functional_group);
-            registeredEvents.put("dioic_post_event", this::set_dioic);
-            registeredEvents.put("dioic_acid_pre_event", this::set_fatty_acyl_type);
-            registeredEvents.put("dial_post_event", this::set_dial);
+                // dioic
+                entry("dioic_pre_event", this::set_functional_group),
+                entry("dioic_post_event", this::set_dioic),
+                entry("dioic_acid_pre_event", this::set_fatty_acyl_type),
+                entry("dial_post_event", this::set_dial),
 
-            // prosta
-            registeredEvents.put("prosta_pre_event", this::set_prosta);
-            registeredEvents.put("prosta_post_event", this::add_cyclo);
-            registeredEvents.put("reduction_pre_event", this::set_functional_group);
-            registeredEvents.put("reduction_post_event", this::reduction);
-            registeredEvents.put("homo_post_event", this::homo);
+                // prosta
+                entry("prosta_pre_event", this::set_prosta),
+                entry("prosta_post_event", this::add_cyclo),
+                entry("reduction_pre_event", this::set_functional_group),
+                entry("reduction_post_event", this::reduction),
+                entry("homo_post_event", this::homo),
 
-            // recursion
-            registeredEvents.put("recursion_description_pre_event", this::set_recursion);
-            registeredEvents.put("recursion_description_post_event", this::add_recursion);
-            registeredEvents.put("recursion_pos_pre_event", this::set_recursion_pos);
-            registeredEvents.put("yl_ending_pre_event", this::set_yl_ending);
-            registeredEvents.put("acetic_acid_post_event", this::set_acetic_acid);
-            registeredEvents.put("acetic_recursion_pre_event", this::set_recursion);
-            registeredEvents.put("acetic_recursion_post_event", this::add_recursion);
-            registeredEvents.put("hydroxyl_number_pre_event", this::add_hydroxyl);
-            registeredEvents.put("ol_pre_event", this::setup_hydroxyl);
-            registeredEvents.put("ol_post_event", this::add_hydroxyls);
-            registeredEvents.put("ol_pos_post_event", this::set_yl_ending);
+                // recursion
+                entry("recursion_description_pre_event", this::set_recursion),
+                entry("recursion_description_post_event", this::add_recursion),
+                entry("recursion_pos_pre_event", this::set_recursion_pos),
+                entry("yl_ending_pre_event", this::set_yl_ending),
+                entry("acetic_acid_post_event", this::set_acetic_acid),
+                entry("acetic_recursion_pre_event", this::set_recursion),
+                entry("acetic_recursion_post_event", this::add_recursion),
+                entry("hydroxyl_number_pre_event", this::add_hydroxyl),
+                entry("ol_pre_event", this::setup_hydroxyl),
+                entry("ol_post_event", this::add_hydroxyls),
+                entry("ol_pos_post_event", this::set_yl_ending),
 
-            // wax esters
-            registeredEvents.put("wax_ester_pre_event", this::set_recursion);
-            registeredEvents.put("wax_ester_post_event", this::add_wax_ester);
-            registeredEvents.put("ate_post_event", this::set_ate);
-            registeredEvents.put("isoprop_post_event", this::set_iso);
-            registeredEvents.put("isobut_post_event", this::set_iso);
+                // wax esters
+                entry("wax_ester_pre_event", this::set_recursion),
+                entry("wax_ester_post_event", this::add_wax_ester),
+                entry("ate_post_event", this::set_ate),
+                entry("isoprop_post_event", this::set_iso),
+                entry("isobut_post_event", this::set_iso),
 
-            // CoA
-            registeredEvents.put("coa_post_event", this::set_coa);
-            registeredEvents.put("methyl_pre_event", this::set_methyl);
+                // CoA
+                entry("coa_post_event", this::set_coa),
+                entry("methyl_pre_event", this::set_methyl),
 
-            // CAR
-            registeredEvents.put("car_pre_event", this::set_car);
-            registeredEvents.put("car_post_event", this::add_car);
+                // CAR
+                entry("car_pre_event", this::set_car),
+                entry("car_post_event", this::add_car),
 
-            // furan
-            registeredEvents.put("tetrahydrofuran_pre_event", this::set_tetrahydrofuran);
-            registeredEvents.put("furan_pre_event", this::set_furan);
+                // furan
+                entry("tetrahydrofuran_pre_event", this::set_tetrahydrofuran),
+                entry("furan_pre_event", this::set_furan),
 
-            // amine
-            registeredEvents.put("ethanolamine_post_event", this::add_ethanolamine);
-            registeredEvents.put("amine_n_pre_event", this::set_recursion);
-            registeredEvents.put("amine_n_post_event", this::add_amine);
-            registeredEvents.put("amine_post_event", this::add_amine_name);
+                // amine
+                entry("ethanolamine_post_event", this::add_ethanolamine),
+                entry("amine_n_pre_event", this::set_recursion),
+                entry("amine_n_post_event", this::add_amine),
+                entry("amine_post_event", this::add_amine_name),
 
-            // functional group position summary
-            registeredEvents.put("fg_pos_summary_pre_event", this::set_functional_group);
-            registeredEvents.put("fg_pos_summary_post_event", this::add_summary);
-            registeredEvents.put("func_stereo_pre_event", this::add_func_stereo);
+                // functional group position summary
+                entry("fg_pos_summary_pre_event", this::set_functional_group),
+                entry("fg_pos_summary_post_event", this::add_summary),
+                entry("func_stereo_pre_event", this::add_func_stereo)
+            );
         } catch (Exception e) {
             throw new ConstraintViolationException("Cannot initialize FattyAcidParserEventHandler.", e);
         }

@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import static java.util.Map.entry;
 
 /**
  *
@@ -47,18 +49,16 @@ public final class Headgroup {
     private ArrayList<HeadgroupDecorator> decorators;
     private boolean spException;
 
-    public static final HashMap<LipidCategory, String> CategoryString = new HashMap<>() {
-        {
-            put(LipidCategory.NO_CATEGORY, "NO_CATEGORY");
-            put(LipidCategory.UNDEFINED, "UNDEFINED");
-            put(LipidCategory.GL, "GL");
-            put(LipidCategory.GP, "GP");
-            put(LipidCategory.SP, "SP");
-            put(LipidCategory.ST, "ST");
-            put(LipidCategory.FA, "FA");
-            put(LipidCategory.SL, "SL");
-        }
-    };
+    public static final Map<LipidCategory, String> CategoryString = Map.ofEntries(
+        entry(LipidCategory.NO_CATEGORY, "NO_CATEGORY"),
+        entry(LipidCategory.UNDEFINED, "UNDEFINED"),
+        entry(LipidCategory.GL, "GL"),
+        entry(LipidCategory.GP, "GP"),
+        entry(LipidCategory.SP, "SP"),
+        entry(LipidCategory.ST, "ST"),
+        entry(LipidCategory.FA, "FA"),
+        entry(LipidCategory.SL, "SL")
+    );
 
     public Headgroup(String _headgroup) {
         this(_headgroup, null, false);

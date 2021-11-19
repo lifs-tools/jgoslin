@@ -131,26 +131,14 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
     public LipidSpecies assembleLipid(Headgroup headgroup) {
         LipidSpecies ls = null;
         switch (level) {
-            case COMPLETE_STRUCTURE:
-                ls = new LipidCompleteStructure(headgroup, faList, knownFunctionalGroups);
-                break;
-            case FULL_STRUCTURE:
-                ls = new LipidFullStructure(headgroup, faList, knownFunctionalGroups);
-                break;
-            case STRUCTURE_DEFINED:
-                ls = new LipidStructureDefined(headgroup, faList, knownFunctionalGroups);
-                break;
-            case SN_POSITION:
-                ls = new LipidSnPosition(headgroup, faList, knownFunctionalGroups);
-                break;
-            case MOLECULAR_SPECIES:
-                ls = new LipidMolecularSpecies(headgroup, faList, knownFunctionalGroups);
-                break;
-            case SPECIES:
-                ls = new LipidSpecies(headgroup, faList, knownFunctionalGroups);
-                break;
-            default:
-                break;
+            case COMPLETE_STRUCTURE -> ls = new LipidCompleteStructure(headgroup, faList, knownFunctionalGroups);
+            case FULL_STRUCTURE -> ls = new LipidFullStructure(headgroup, faList, knownFunctionalGroups);
+            case STRUCTURE_DEFINED -> ls = new LipidStructureDefined(headgroup, faList, knownFunctionalGroups);
+            case SN_POSITION -> ls = new LipidSnPosition(headgroup, faList, knownFunctionalGroups);
+            case MOLECULAR_SPECIES -> ls = new LipidMolecularSpecies(headgroup, faList, knownFunctionalGroups);
+            case SPECIES -> ls = new LipidSpecies(headgroup, faList, knownFunctionalGroups);
+            default -> {
+            }
         }
         return ls;
     }

@@ -38,6 +38,8 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import static java.util.Map.entry;
 import java.util.TreeMap;
 
 public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
@@ -46,7 +48,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private String dbCistrans;
     private char plasmalogen;
     private String mediatorFunction;
-    private ArrayList<Integer> mediatorFunctionPositions = new ArrayList<>();
+    private final ArrayList<Integer> mediatorFunctionPositions = new ArrayList<>();
     private boolean mediatorSuffix;
     
     private final static HashMap<String, Integer> MEDIATOR_FA = new HashMap<>(){{
@@ -61,73 +63,75 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     public GoslinParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         super(knownFunctionalGroups);
         try {
-            registeredEvents.put("lipid_pre_event", this::resetParser);
-            registeredEvents.put("lipid_post_event", this::buildLipid);
+            registeredEvents = Map.ofEntries(
+                entry("lipid_pre_event", this::resetParser),
+                entry("lipid_post_event", this::buildLipid),
 
-            registeredEvents.put("hg_cl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_mlcl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_pl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_lpl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_lsl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_dsl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("st_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_ste_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_stes_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_mgl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_dgl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_sgl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_tgl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_dlcl_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_sac_di_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_sac_f_pre_event", this::setHeadGroupName);
-            registeredEvents.put("hg_tpl_pre_event", this::setHeadGroupName);
+                entry("hg_cl_pre_event", this::setHeadGroupName),
+                entry("hg_mlcl_pre_event", this::setHeadGroupName),
+                entry("hg_pl_pre_event", this::setHeadGroupName),
+                entry("hg_lpl_pre_event", this::setHeadGroupName),
+                entry("hg_lsl_pre_event", this::setHeadGroupName),
+                entry("hg_dsl_pre_event", this::setHeadGroupName),
+                entry("st_pre_event", this::setHeadGroupName),
+                entry("hg_ste_pre_event", this::setHeadGroupName),
+                entry("hg_stes_pre_event", this::setHeadGroupName),
+                entry("hg_mgl_pre_event", this::setHeadGroupName),
+                entry("hg_dgl_pre_event", this::setHeadGroupName),
+                entry("hg_sgl_pre_event", this::setHeadGroupName),
+                entry("hg_tgl_pre_event", this::setHeadGroupName),
+                entry("hg_dlcl_pre_event", this::setHeadGroupName),
+                entry("hg_sac_di_pre_event", this::setHeadGroupName),
+                entry("hg_sac_f_pre_event", this::setHeadGroupName),
+                entry("hg_tpl_pre_event", this::setHeadGroupName),
 
-            registeredEvents.put("gl_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("pl_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("sl_species_pre_event", this::setSpeciesLevel);
-            registeredEvents.put("fa2_unsorted_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("fa3_unsorted_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("fa4_unsorted_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("slbpa_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("dlcl_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("mlcl_pre_event", this::setMolecularSubspeciesLevel);
+                entry("gl_species_pre_event", this::setSpeciesLevel),
+                entry("pl_species_pre_event", this::setSpeciesLevel),
+                entry("sl_species_pre_event", this::setSpeciesLevel),
+                entry("fa2_unsorted_pre_event", this::setMolecularSubspeciesLevel),
+                entry("fa3_unsorted_pre_event", this::setMolecularSubspeciesLevel),
+                entry("fa4_unsorted_pre_event", this::setMolecularSubspeciesLevel),
+                entry("slbpa_pre_event", this::setMolecularSubspeciesLevel),
+                entry("dlcl_pre_event", this::setMolecularSubspeciesLevel),
+                entry("mlcl_pre_event", this::setMolecularSubspeciesLevel),
 
-            registeredEvents.put("lcb_pre_event", this::newLcb);
-            registeredEvents.put("lcb_post_event", this::cleanLcb);
-            registeredEvents.put("fa_pre_event", this::newFa);
-            registeredEvents.put("fa_post_event", this::appendFa);
+                entry("lcb_pre_event", this::newLcb),
+                entry("lcb_post_event", this::cleanLcb),
+                entry("fa_pre_event", this::newFa),
+                entry("fa_post_event", this::appendFa),
 
-            registeredEvents.put("db_single_position_pre_event", this::setIsomericLevel);
-            registeredEvents.put("db_single_position_post_event", this::addDbPosition);
-            registeredEvents.put("db_position_number_pre_event", this::addDbPositionNumber);
-            registeredEvents.put("cistrans_pre_event", this::addCistrans);
+                entry("db_single_position_pre_event", this::setIsomericLevel),
+                entry("db_single_position_post_event", this::addDbPosition),
+                entry("db_position_number_pre_event", this::addDbPositionNumber),
+                entry("cistrans_pre_event", this::addCistrans),
 
-            registeredEvents.put("ether_pre_event", this::addEther);
-            registeredEvents.put("old_hydroxyl_pre_event", this::addOldHydroxyl);
-            registeredEvents.put("db_count_pre_event", this::addDoubleBonds);
-            registeredEvents.put("carbon_pre_event", this::addCarbon);
-            registeredEvents.put("hydroxyl_pre_event", this::addHydroxyl);
+                entry("ether_pre_event", this::addEther),
+                entry("old_hydroxyl_pre_event", this::addOldHydroxyl),
+                entry("db_count_pre_event", this::addDoubleBonds),
+                entry("carbon_pre_event", this::addCarbon),
+                entry("hydroxyl_pre_event", this::addHydroxyl),
 
-            registeredEvents.put("adduct_info_pre_event", this::newAdduct);
-            registeredEvents.put("adduct_pre_event", this::addAdduct);
-            registeredEvents.put("charge_pre_event", this::addCharge);
-            registeredEvents.put("charge_sign_pre_event", this::addChargeSign);
+                entry("adduct_info_pre_event", this::newAdduct),
+                entry("adduct_pre_event", this::addAdduct),
+                entry("charge_pre_event", this::addCharge),
+                entry("charge_sign_pre_event", this::addChargeSign),
 
-            registeredEvents.put("lpl_pre_event", this::setMolecularSubspeciesLevel);
-            registeredEvents.put("plasmalogen_pre_event", this::setPlasmalogen);
-        
-            registeredEvents.put("mediator_pre_event", this::setMediator);
-            registeredEvents.put("mediator_post_event", this::addMediator);
-            registeredEvents.put("unstructured_mediator_pre_event", this::setUnstructuredMediator);
-            registeredEvents.put("trivial_mediator_pre_event", this::setTrivialMediator);
-            registeredEvents.put("mediator_carbon_pre_event", this::setMediatorCarbon);
-            registeredEvents.put("mediator_db_pre_event", this::setMediatorDB);
-            registeredEvents.put("mediator_mono_functions_pre_event", this::setMediatorFunction);
-            registeredEvents.put("mediator_di_functions_pre_event", this::setMediatorFunction);
-            registeredEvents.put("mediator_position_pre_event", this::setMediatorFunctionPosition);
-            registeredEvents.put("mediator_functional_group_post_event", this::addMediatorFunction);
-            registeredEvents.put("mediator_suffix_pre_event", this::addMediatorSuffix);
-            registeredEvents.put("mediator_tetranor_pre_event", this::setMediatorTetranor);
+                entry("lpl_pre_event", this::setMolecularSubspeciesLevel),
+                entry("plasmalogen_pre_event", this::setPlasmalogen),
+
+                entry("mediator_pre_event", this::setMediator),
+                entry("mediator_post_event", this::addMediator),
+                entry("unstructured_mediator_pre_event", this::setUnstructuredMediator),
+                entry("trivial_mediator_pre_event", this::setTrivialMediator),
+                entry("mediator_carbon_pre_event", this::setMediatorCarbon),
+                entry("mediator_db_pre_event", this::setMediatorDB),
+                entry("mediator_mono_functions_pre_event", this::setMediatorFunction),
+                entry("mediator_di_functions_pre_event", this::setMediatorFunction),
+                entry("mediator_position_pre_event", this::setMediatorFunctionPosition),
+                entry("mediator_functional_group_post_event", this::addMediatorFunction),
+                entry("mediator_suffix_pre_event", this::addMediatorSuffix),
+                entry("mediator_tetranor_pre_event", this::setMediatorTetranor)
+            );
 
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize GoslinParserEventHandler");
@@ -441,8 +445,8 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                     f1.setPosition(5);
                     f2.setPosition(12);
-                    DoubleBonds db = new DoubleBonds(new TreeMap<Integer, String>(){{put(6, "Z"); put(8, "E"); put(10, "E"); put(14, "Z");}});
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2)));}};
+                    DoubleBonds db = new DoubleBonds(new TreeMap<>(Map.of(6, "Z", 8, "E", 10, "E", 14, "Z")));
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2))));
                     currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
                 }
                 break;
@@ -455,7 +459,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f1.setPosition(4);
                     f2.setPosition(11);
                     f3.setPosition(17);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2, f3)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
                     currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
                 }
                 break;
@@ -466,7 +470,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                     f1.setPosition(4);
                     f2.setPosition(14);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2))));
                     currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
                 }
                 break;
@@ -479,7 +483,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f1.setPosition(4);
                     f2.setPosition(16);
                     f3.setPosition(17);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2, f3)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
                     currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
                 }
                 break;
@@ -490,7 +494,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                     f1.setPosition(7);
                     f2.setPosition(17);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2))));
                     currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
                 }
                 break;
@@ -503,7 +507,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f1.setPosition(7);
                     f2.setPosition(8);
                     f3.setPosition(17);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1, f2, f3)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
                     currentFa = new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
                 }
                 break;
@@ -518,9 +522,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f2.setPosition(9);
                     f3.setPosition(11);
                     f4.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3))); put("oxo", new ArrayList<>(Arrays.asList(f4))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)), "oxo", new ArrayList<>(Arrays.asList(f4))));
                     Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(1), fg, knownFunctionalGroups);
                 }
                 break;
@@ -535,9 +539,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f2.setPosition(9);
                     f3.setPosition(11);
                     f4.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3))); put("oxy", new ArrayList<>(Arrays.asList(f4))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)), "oxy", new ArrayList<>(Arrays.asList(f4))));
                     Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
                 }
                 break;
@@ -552,9 +556,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f2.setPosition(9);
                     f3.setPosition(11);
                     f4.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3))); put("oxy", new ArrayList<>(Arrays.asList(f4))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)), "oxy", new ArrayList<>(Arrays.asList(f4))));
                     Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)),"cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
                 }
                 break;
@@ -567,9 +571,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f1.setPosition(15);
                     f2.setPosition(9);
                     f3.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2, f3)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3))));
                     Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
                 }
                 break;
@@ -582,9 +586,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f1.setPosition(15);
                     f2.setPosition(9);
                     f3.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2))); put("oxo", new ArrayList<>(Arrays.asList(f3))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2)), "oxo", new ArrayList<>(Arrays.asList(f3))));
                     Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
                 }
                 break;
@@ -597,9 +601,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     f1.setPosition(15);
                     f2.setPosition(9);
                     f3.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f3))); put("oxo", new ArrayList<>(Arrays.asList(f2))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f3)), "oxo", new ArrayList<>(Arrays.asList(f2))));
                     Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
                 }
                 break;
@@ -610,9 +614,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                     f1.setPosition(15);
                     f2.setPosition(9);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f2)));}};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2))));
                     Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
                 }
                 break;
@@ -623,9 +627,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
                     f1.setPosition(15);
                     f2.setPosition(11);
-                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("oxo", new ArrayList<>(Arrays.asList(f2))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2))));
                     Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
-                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<String, ArrayList<FunctionalGroup>>(){{put("OH", new ArrayList<>(Arrays.asList(f1))); put("cy", new ArrayList<>(Arrays.asList(cy))); }};
+                    HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                     currentFa = new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
                 }
                 break;
