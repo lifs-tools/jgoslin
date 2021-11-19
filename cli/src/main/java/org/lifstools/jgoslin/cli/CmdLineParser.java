@@ -50,8 +50,8 @@ import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidClassMeta;
 import org.lifstools.jgoslin.domain.LipidClasses;
+import org.lifstools.jgoslin.domain.LipidException;
 import org.lifstools.jgoslin.domain.LipidLevel;
-import org.lifstools.jgoslin.domain.LipidParsingException;
 import org.lifstools.jgoslin.domain.LipidSpeciesInfo;
 import org.lifstools.jgoslin.parser.BaseParserEventHandler;
 import org.lifstools.jgoslin.parser.FattyAcidParser;
@@ -370,7 +370,7 @@ public class CmdLineParser {
                 );
                 return Pair.of(lipidName, validationResult);
             }
-        } catch (LipidParsingException ex) {
+        } catch (LipidException ex) {
             validationResult = new ValidationResult(
                     lipidName,
                     grammar,

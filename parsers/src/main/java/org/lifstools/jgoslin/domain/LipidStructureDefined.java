@@ -60,7 +60,7 @@ public class LipidStructureDefined extends LipidSnPosition {
                 return super.getLipidString(level);
             }
 
-            default -> throw new RuntimeException("LipidStructureDefined does not know how to create a lipid string for level " + level.toString());
+            default -> throw new ConstraintViolationException("LipidStructureDefined does not know how to create a lipid string for level " + level.toString());
         }
     }
 

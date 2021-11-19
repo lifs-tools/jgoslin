@@ -109,7 +109,7 @@ public final class StringFunctions {
             tokens.add(sb_string_end);
         }
         if (in_quote) {
-            throw new RuntimeException("Error: corrupted token in grammar");
+            throw new ConstraintViolationException("Error: corrupted token in grammar: " + sb_string_end);
         }
         return tokens;
     }
@@ -121,7 +121,7 @@ public final class StringFunctions {
             lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
             //always pass on the original exception
-            throw new RuntimeException("Error: Resource " + resource.getDescription() + " cannot be read.", e);
+            throw new ConstraintViolationException("Error: Resource " + resource.getDescription() + " cannot be read.", e);
         }
         return lines;
     }
@@ -140,7 +140,7 @@ public final class StringFunctions {
             return sb.toString();
         } catch (IOException e) {
             //always pass on the original exception
-            throw new RuntimeException("Error: resource '" + resource.getDescription() + "' does not exist.", e);
+            throw new ConstraintViolationException("Error: resource '" + resource.getDescription() + "' does not exist.", e);
         }
     }
 

@@ -173,7 +173,7 @@ public final class Headgroup {
     public ElementTable getElements() {
 
         if (useHeadgroup || LipidClasses.getInstance().size() <= lipidClass) {
-            throw new RuntimeException("Element table cannot be computed for lipid '" + headgroup + "'");
+            throw new ConstraintViolationException("Element table cannot be computed for lipid '" + headgroup + "'");
         }
 
         ElementTable elements = LipidClasses.getInstance().get(lipidClass).elements.copy();

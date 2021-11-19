@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
  *
@@ -297,7 +298,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             registeredEvents.put("fg_pos_summary_post_event", this::add_summary);
             registeredEvents.put("func_stereo_pre_event", this::add_func_stereo);
         } catch (Exception e) {
-            throw new RuntimeException("Cannot initialize FattyAcidParserEventHandler.", e);
+            throw new ConstraintViolationException("Cannot initialize FattyAcidParserEventHandler.", e);
         }
     }
 
@@ -456,7 +457,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                     d += num[i];
                 }
             } else if (length_pattern.equals("LLS")) { // false
-                throw new RuntimeException("Cannot determine fatty acid and double bond length in '" + node.getText() + "'");
+                throw new ConstraintViolationException("Cannot determine fatty acid and double bond length in '" + node.getText() + "'");
             }
             curr_fa.setNumCarbon(curr_fa.getNumCarbon() + l);
             if (curr_fa.getDoubleBonds().getDoubleBondPositions().isEmpty() && d > 0) {

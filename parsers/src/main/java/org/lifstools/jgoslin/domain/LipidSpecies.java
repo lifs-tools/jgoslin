@@ -26,7 +26,6 @@ package org.lifstools.jgoslin.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -79,10 +78,10 @@ public class LipidSpecies {
         switch (level) {
 
             default:
-                throw new RuntimeException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
+                throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
 
             case UNDEFINED_LEVEL:
-                throw new RuntimeException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
+                throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
 
             case CLASS:
             case CATEGORY:

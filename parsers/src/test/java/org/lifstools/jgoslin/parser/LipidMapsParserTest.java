@@ -20,9 +20,11 @@ import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
@@ -82,6 +84,11 @@ public class LipidMapsParserTest {
         assertEquals("C54H106NO17P", lipid.getSumFormula());
 
         lipid = parser.parse("PE-Cer(d16:2(4E,6E)/22:1(13Z)(2OH))", handler);
+        final LipidAdduct tl = lipid;
+        assertThrows(ConstraintViolationException.class, () -> {
+            tl.getLipidString(LipidLevel.COMPLETE_STRUCTURE);
+        });
+        assertEquals(LipidLevel.STRUCTURE_DEFINED, lipid.getLipidLevel());
         assertEquals("EPC 16:2(4,6);OH/22:1(13);OH", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));

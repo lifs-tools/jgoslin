@@ -27,6 +27,7 @@ import org.lifstools.jgoslin.domain.LipidParsingException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.Consumer;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
  *
@@ -50,11 +51,11 @@ public abstract class BaseParserEventHandler<T> {
     void sanityCheck(Parser<T> parser) {
         for (String event_name : registeredEvents.keySet()) {
             if (!event_name.endsWith("_pre_event") && !event_name.endsWith("_post_event")) {
-                throw new RuntimeException("Parser event handler error: event '" + event_name + "' does not contain the suffix '_pre_event' or '_post_event'");
+                throw new ConstraintViolationException("Parser event handler error: event '" + event_name + "' does not contain the suffix '_pre_event' or '_post_event'");
             }
             String rule_name = event_name.replace("_pre_event", "").replace("_post_event", "");
             if (!ruleNames.contains(rule_name)) {
-                throw new RuntimeException("Parser event handler error: rule '" + rule_name + "' in event '" + event_name + "' is not present in the grammar" + (parser != null ? " '" + parser.grammarName + "'" : ""));
+                throw new ConstraintViolationException("Parser event handler error: rule '" + rule_name + "' in event '" + event_name + "' is not present in the grammar" + (parser != null ? " '" + parser.grammarName + "'" : ""));
             }
         }
     }

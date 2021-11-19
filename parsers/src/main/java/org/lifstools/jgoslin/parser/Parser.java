@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Optional;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 public abstract class Parser<T> {
 
@@ -102,7 +103,7 @@ public abstract class Parser<T> {
         if (nextFreeRuleIndex <= MASK) {
             return nextFreeRuleIndex++;
         }
-        throw new RuntimeException("Error: grammar is too big.");
+        throw new ConstraintViolationException("Error: grammar is too big.");
     }
 
     final void readGrammar(String grammar) {
@@ -130,17 +131,17 @@ public abstract class Parser<T> {
             }
 
             if (tokens_level_1.size() != 2) {
-                throw new RuntimeException("Error: corrupted token in grammar rule: '" + rule_line + "'");
+                throw new ConstraintViolationException("Error: corrupted token in grammar rule: '" + rule_line + "'");
             }
 
             ArrayList<String> rule_tokens = StringFunctions.splitString(tokens_level_1.get(0), ' ', quote);
             if (rule_tokens.size() > 1) {
-                throw new RuntimeException("Error: several rule names on left hand side in grammar rule: '" + rule_line + "'");
+                throw new ConstraintViolationException("Error: several rule names on left hand side in grammar rule: '" + rule_line + "'");
             }
             String rule = tokens_level_1.get(0);
 
             if (rule.equals(EOF_RULE_NAME)) {
-                throw new RuntimeException("Error: rule name is not allowed to be called EOF");
+                throw new ConstraintViolationException("Error: rule name is not allowed to be called EOF");
             }
 
             ArrayList<String> products = StringFunctions.splitString(tokens_level_1.get(1), RULE_SEPARATOR, quote);
@@ -227,7 +228,7 @@ public abstract class Parser<T> {
                 else if (non_terminal_rules.size() == 1) {
                     long rule_index_1 = non_terminal_rules.pollLast();
                     if (rule_index_1 == new_rule_index) {
-                        throw new RuntimeException("Error: corrupted token in grammar: rule '" + rule + "' is not allowed to refer soleley to itself.");
+                        throw new ConstraintViolationException("Error: corrupted token in grammar: rule '" + rule + "' is not allowed to refer soleley to itself.");
                     }
 
                     if (!NTtoNT.containsKey(rule_index_1)) {
@@ -425,7 +426,7 @@ public abstract class Parser<T> {
         if (current_context == Context.NoContext) {
             sb.append(grammar.substring(current_position, grammar_length));
         } else {
-            throw new RuntimeException("Error: corrupted grammar, ends either in comment or quote");
+            throw new ConstraintViolationException("Error: corrupted grammar, ends either in comment or quote");
         }
 
         grammar = sb.toString();
@@ -435,20 +436,20 @@ public abstract class Parser<T> {
         grammar = StringFunctions.strip(grammar, ' ');
 
         if (grammar.charAt(grammar.length() - 1) != RULE_TERMINAL) {
-            throw new RuntimeException("Error: corrupted grammar, last rule has no termininating sign, was: '" + grammar.substring(grammar.length() - 1) + "'");
+            throw new ConstraintViolationException("Error: corrupted grammar, last rule has no termininating sign, was: '" + grammar.substring(grammar.length() - 1) + "'");
         }
 
         rules = StringFunctions.splitString(grammar, RULE_TERMINAL, _quote);
 
         if (rules.size() < 1) {
-            throw new RuntimeException("Error: corrupted grammar, grammar is empty");
+            throw new ConstraintViolationException("Error: corrupted grammar, grammar is empty");
         }
         ArrayList<String> grammar_name_rule = StringFunctions.splitString(rules.get(0), ' ', _quote);
 
         if (grammar_name_rule.size() > 0 && !grammar_name_rule.get(0).equals("grammar")) {
-            throw new RuntimeException("Error: first rule must start with the keyword 'grammar'");
+            throw new ConstraintViolationException("Error: first rule must start with the keyword 'grammar'");
         } else if (grammar_name_rule.size() != 2) {
-            throw new RuntimeException("Error: incorrect first rule");
+            throw new ConstraintViolationException("Error: incorrect first rule");
         }
 
         return rules;
@@ -813,7 +814,7 @@ public abstract class Parser<T> {
             return sb.toString();
         } catch (IOException e) {
             //always pass on the original exception
-            throw new RuntimeException("Error: resource '" + grammarResourcePath + "' does not exist.", e);
+            throw new ConstraintViolationException("Error: resource '" + grammarResourcePath + "' does not exist.", e);
         }
     }
 }

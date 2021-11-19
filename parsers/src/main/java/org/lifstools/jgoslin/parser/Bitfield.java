@@ -23,6 +23,8 @@ SOFTWARE.
  */
 package org.lifstools.jgoslin.parser;
 
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
+
 /**
  *
  * @author dominik
@@ -82,7 +84,7 @@ final class Bitfield {
     int next() {
         pos += 1;
         if (pos >= length) {
-            throw new RuntimeException("Bitfield out of range");
+            throw new ConstraintViolationException("Bitfield out of range at pos=" + pos + " for length=" + length);
         }
 
         int field_pos = pos >>> 6;
@@ -99,6 +101,6 @@ final class Bitfield {
             }
         } while (field_pos < field_len);
 
-        throw new RuntimeException("Bitfield out of range");
+        throw new ConstraintViolationException("Bitfield out of range at pos=" + pos + " for field_len=" + field_len);
     }
 }

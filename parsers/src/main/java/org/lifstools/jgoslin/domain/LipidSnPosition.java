@@ -60,7 +60,7 @@ public class LipidSnPosition extends LipidMolecularSpecies {
                 return super.getLipidString(level);
             }
 
-            default -> throw new RuntimeException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
+            default -> throw new ConstraintViolationException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
         }
     }
 

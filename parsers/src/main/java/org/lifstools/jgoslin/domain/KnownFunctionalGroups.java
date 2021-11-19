@@ -51,7 +51,7 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
             ArrayList<String> tokens = StringFunctions.splitString(line, ',', '"', true);
             String fd_name = tokens.get(1);
             if (functional_data_set.contains(fd_name)) {
-                throw new RuntimeException("Error: functional group '" + fd_name + "' occurs multiple times in file!");
+                throw new ConstraintViolationException("Error: functional group '" + fd_name + "' occurs multiple times in file!");
             }
             functional_data.add(tokens);
             functional_data_set.add(fd_name);

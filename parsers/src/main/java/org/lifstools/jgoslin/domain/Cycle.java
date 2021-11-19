@@ -238,7 +238,7 @@ public final class Cycle extends FunctionalGroup {
 
                 }
             } catch (Exception e) {
-                throw new RuntimeException("Element '" + Elements.ELEMENT_SHORTCUT.get(chain_element) + "' cannot be part of a cycle bridge");
+                throw new ConstraintViolationException("Element '" + Elements.ELEMENT_SHORTCUT.get(chain_element) + "' cannot be part of a cycle bridge", e);
             }
         }
 

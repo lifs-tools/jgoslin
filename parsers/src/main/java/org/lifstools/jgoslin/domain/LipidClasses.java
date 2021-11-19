@@ -95,7 +95,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
             ArrayList<String> tokens = StringFunctions.splitString(line, ',', '"', true);
 
             if (keys.contains(tokens.get(0))) {
-                throw new RuntimeException("Error: lipid name '" + tokens.get(0) + "' occurs multiple times in the lipid list.");
+                throw new ConstraintViolationException("Error: lipid name '" + tokens.get(0) + "' occurs multiple times in the lipid list.");
             }
             keys.add(tokens.get(0));
 
@@ -105,7 +105,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
                     continue;
                 }
                 if (keys.contains(test_lipid_name)) {
-                    throw new RuntimeException("Error: lipid name '" + test_lipid_name + "' occurs multiple times in the lipid list.");
+                    throw new ConstraintViolationException("Error: lipid name '" + test_lipid_name + "' occurs multiple times in the lipid list.");
                 }
                 keys.add(test_lipid_name);
             }

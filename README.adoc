@@ -1,15 +1,15 @@
 = jgoslin Parser, Validator and Normalized for Shorthand Lipid Nomenclatures
-Nils Hoffmann <nils.hoffmann@isas.de>
+Nils Hoffmann <nils.hoffmann@cebitec-uni-bielefeld.de>
 :toc: macro
 
-image::https://api.bintray.com/packages/lifs/maven/jgoslin-cli/images/download.svg[link="https://bintray.com/lifs/maven/jgoslin-cli/_latestVersion"] 
-image:https://img.shields.io/github/release/lifs-tools/jgoslin.svg["Latest Release", link="https://github.com/lifs-tools/jgoslin/releases/latest"] 
+//image::https://api.bintray.com/packages/lifs/maven/jgoslin-cli/images/download.svg[link="https://bintray.com/lifs/maven/jgoslin-cli/_latestVersion"] 
+image:https://img.shields.io/github/release/lifs-tools/jg.svg["Latest Release", link="https://github.com/lifs-tools/jg/releases/latest"] 
 image:https://zenodo.org/badge/DOI/10.5281/zenodo.3826474.svg["DOI", link="https://doi.org/10.5281/zenodo.3826474"]
-image:https://travis-ci.org/lifs-tools/jgoslin.svg?branch=master["Build Status", link="https://travis-ci.org/lifs-tools/jgoslin"]
-image:https://sonarcloud.io/api/project_badges/measure?branch=master&project=lifs-tools_jgoslin&metric=alert_status["Quality Gate", link=https://sonarcloud.io/dashboard?id=lifs-tools_jgoslin]
+image:https://github.com/lifs-tools/jg/actions/workflows/maven.yml/badge.svg["Build Status", link="https://github.com/lifs-tools/jg/actions/workflows/maven.yml"]
+image:https://sonarcloud.io/api/project_badges/measure?branch=master&project=lifs-tools_jg&metric=alert_status["Quality Gate", link=https://sonarcloud.io/dashboard?id=lifs-tools_jg]
 
 //NOTE: If you use the jGoslin library or the web application, please cite the following paper: +
-//https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[N. Hoffmann et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
+//https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[ et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
 
 
 This project is a parser, validator and normalizer implementation for shorthand lipid nomenclatures, base on the https://github.com/lifs-tools/goslin[Grammar of Succinct Lipid Nomenclatures project].
@@ -30,8 +30,9 @@ The web-based application is available https://github.com/lifs-tools/goslin-weba
 == Related Projects
 
 - https://github.com/lifs-tools/jgoslin[This project]
-- http://github.com/lifs-tools/goslin[Goslin grammars and test files]
+- https://github.com/lifs-tools/goslin[Goslin grammars and test files]
 - https://github.com/lifs-tools/cppgoslin[C++ implementation]
+- https://github.com/lifs-tools/csgoslin[C# implementation]
 - https://github.com/lifs-tools/pygoslin[Python implementation]
 - https://github.com/lifs-tools/rgoslin[R implementation]
 - https://github.com/lifs-tools/goslin-webapp[Webapplication and REST API]
@@ -52,7 +53,7 @@ This generates the necessary domain specific code for Java.
 The `cli` sub-project provides a command line interface for parsing of lipid names either from the command line or from a file with one lipid name per line.
 
 After building the project as mentioned above with `./mvnw install`, the `cli/target` folder will contain the `jgoslin-cli-<version>-bin.zip` file. Alternatively, you can download the latest
-cli zip file from Bintray: https://bintray.com/lifs/maven/jgoslin-cli[Search for latest jgoslin-cli-<VERSION>-bin.zip artefact] and click to download.
+cli zip file from JFrog: https://lifstools.jfrog.io/ui/artifactSearchResults?name=jgoslin-cli&type=artifacts[Search for latest jgoslin-cli-<VERSION>-bin.zip artefact] and click to download.
 
 In order to run the validator, unzip that file, change into the unzipped folder and run
 
@@ -74,11 +75,11 @@ To use a specific grammar, instead of trying all, run
 
 To write output to the tab-separated output file 'goslin-out.tsv', run
 
-
+  java -jar jgoslin-cli-<VERSION>.jar -f examples/lipidNames.txt -o
 
 == Running the Web Application for Validation
 
-The goslin web application is available at: https://apps.lifs.isas.de/goslin
+The goslin web application is available at: https://lifs-tools.org/goslin
 
 == Building the Docker Image
 
@@ -106,9 +107,9 @@ arguments that you would pass normally will work in the same way (please replace
 
 You can also run the docker container without the `-f <YOUR_FILE>` argument to see a list of possible arguments.
 
-== Using the project code releases via Bintray
+== Using the project code releases via JFrog
 
-The library release artifacts are available from Bintray.
+The library release artifacts are available from JFrog.
 If you want to use them, add the following lines to your own Maven pom file :
 
   <profile>
@@ -118,9 +119,9 @@ If you want to use them, add the following lines to your own Maven pom file :
          <snapshots>
              <enabled>false</enabled>
          </snapshots>
-         <id>bintray-lifs</id>
-         <name>bintray-lifs</name>
-         <url>https://dl.bintray.com/lifs/maven</url>
+         <id>lifs-libs-release</id>
+         <name>lifs-libs-release</name>
+         <url>https://lifstools.jfrog.io/artifactory/lifs-libs-release</url>
      </repository>
     </repositories>
   </profile>
@@ -131,12 +132,12 @@ To compile jgoslin against the LIFS Bintray repository, please add the following
     <activeProfile>lifs-repos</activeProfile>
   </activeProfiles>
 
-or use the `-Plifs-repos` command line switch when running Maven to enable the LIFS Bintray maven repositories for parent pom and artifact resolution.
+or use the `-Plifs-repos` command line switch when running Maven to enable the LIFS JFrog maven repositories for parent pom and artifact resolution.
 
 To use the parser libraries (reading and validation) in your own Maven projects, use the following dependency:
 
   <dependency>
-    <groupId>de.isas.lipidomics</groupId>
+    <groupId>org.lifstools</groupId>
     <artifactId>jgoslin-parsers</artifactId>
     <version>${jgoslin.version}</version>
   </dependency>
@@ -144,7 +145,7 @@ To use the parser libraries (reading and validation) in your own Maven projects,
 where `jgoslin.version` is the version of jgoslin you wish to use, e.g. for a release version:
 
   <properties>
-    <jgoslin.version>1.0.0</jgoslin.version>
+    <jgoslin.version>2.0.0</jgoslin.version>
   </properties>
 
 as defined in the properties section of your pom file.
@@ -155,34 +156,37 @@ as defined in the properties section of your pom file.
 
 The following snippet shows how to parse a shorthand lipid name with the different parsers:
 
-	import de.isas.lipidomics.domain.*; // contains Domain objects like LipidAdduct, LipidSpecies ...
-	import de.isas.lipidomics.palinom.*; // contains the parser implementations
+	import org.lifstools.jgoslin.domain.*; // contains Domain objects like LipidAdduct, LipidSpecies ...
+	import org.lifstools.jgoslin.parser.*; // contains the parser implementations
 	...
 
 	String ref = "Cer(d18:1/20:2)";
 	try {
 		// use the SwissLipids parser
-		SwissLipidsVisitorParser slParser = new SwissLipidsVisitorParser();
-		LipidAdduct sllipid = slParser.parse(ref);
-		System.out.println(sllipid.getLipidString()); // to print the lipid name to the console
-	} catch (ParsingException pe) {
-	// catch this for any syntactical issues with the name during parsing with a particular parser
-		pe.printStackTrace();
-	} catch (ParseTreeVisitorException ptve) {
-	// catch this for any structural issues with the name during parsing with a particular parser
+		SwissLipidsParser slParser = SwissLipidsParser.newInstance();
+		// multiple eventhandlers can be used with one parser, e.g. in parallel processing
+		SwissLipidsParserEventHandler slHandler = slParser.newEventHandler();
+		LipidAdduct sllipid = slParser.parse(ref, slHandler);
+		System.out.println(sllipid.getLipidString()); // to print the lipid name at its native level to the console
+	} catch (LipidException ptve) {
+	// catch this for any parsing or semantic issues with a lipid
 		ptve.printStackTrace();
-	}	
+	} 
 
 	//alternatively, use the other parsers. Don't forget to place try catch blocks around the following lines, as for the SwissLipids parser example
 	// use the LipidMAPS parser
-	LipidMapsVisitorParser lmParser = new LipidMapsVisitorParser();
-	LipidAdduct lmlipid = lmParser.parse(ref);
+	LipidMapsParser lmParser = LipidMapsParser.newInstance();
+	LipidMapsParserEventHandler lmHandler = lmParser.newEventHandler();
+	LipidAdduct lmlipid = lmParser.parse(ref, lmHandler);
 	// use the shorthand notation parser GOSLIN
-	GoslinVisitorParser goslinParser = new GoslinVisitorParser();
-	LipidAdduct golipid = goslinParser.parse(ref);
+	GoslinParser goslinParser = GoslinParser.newInstance();
+	GoslinParserEventHandler goslinHandler = goslinParser.newEventHandler();
+	LipidAdduct golipid = goslinParser.parse(ref, goslinHandler);
 	// use the shorthand notation parser with support for fragments GOSLIN_FRAGMENTS
-	GoslinFragmentsVisitorParser goslinFragmentsParser = new GoslinFragmentsVisitorParser();
-	LipidAdduct gflipid = goslinFragmentsParser.parse(ref);
+	ShorthandParser shorthandParser = ShorthandParser.newInstance();
+	ShorthandParserEventHandler shorthandHandler = shorthandParser.newEventHandler();
+	// calling parse with the optional argument false suppresses any exceptions, if errors are encountered, the returned LipidAdduct will be null
+	LipidAdduct shlipid = shorthandParser.parse(ref, shorthandHandler, false);
 
 To retrieve a parsed lipid name on a higher hierarchy of lipid level, simply define the
 level when requesting the lipid name:
@@ -190,13 +194,15 @@ level when requesting the lipid name:
 	System.out.println(sllipid.getLipidString(LipidLevel.CATEGORY));
 	System.out.println(sllipid.getLipidString(LipidLevel.CLASS));
 	System.out.println(sllipid.getLipidString(LipidLevel.SPECIES));
-	System.out.println(sllipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
-	System.out.println(sllipid.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
-	System.out.println(sllipid.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES)); // will throw a ConstraintViolationException since this lipid is only on structural subspecies level
+	System.out.println(sllipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.SN_POSITION));
+	System.out.println(sllipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+	System.out.println(sllipid.getLipidString(LipidLevel.FULL_STRUCTURE));
+	System.out.println(sllipid.getLipidString(LipidLevel.COMPLETE_STRUCTURE));
 
 This functionality allows easy computation of aggregate statistics of lipids
 on lipid class, category or arbitrary levels. Requesting a lipid name on a lower level than the
-provided will raise an exception.
+provided will raise a `org.lifstools.jgoslin.domain.ConstraintViolationException`.
 
 For more examples how the API works, please consult the tests, especially in the `parsers` module.
 
