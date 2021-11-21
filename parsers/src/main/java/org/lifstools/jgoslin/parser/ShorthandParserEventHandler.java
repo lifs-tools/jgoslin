@@ -40,6 +40,12 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Set;
 
+/**
+ * Event handler implementation for the {@link ShorthandParser}.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
 public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     private ArrayDeque<FunctionalGroup> currentFas = new ArrayDeque<>();
@@ -47,121 +53,115 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     private boolean acerSpecies = false;
     private static final Set<String> SPECIAL_TYPES = Set.of("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc");
 
+    /**
+     * Create a new {@code ShorthandParserEventHandler}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
     public ShorthandParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         super(knownFunctionalGroups);
         try {
             registeredEvents = Map.ofEntries(
-                entry("lipid_pre_event", this::resetParser),
-                entry("lipid_post_event", this::buildLipid),
-
-                // set categories
-                entry("sl_pre_event", this::preSphingolipid),
-                entry("sl_post_event", this::postSphingolipid),
-                entry("sl_hydroxyl_pre_event", this::setHydroxyl),
-
-                // set adduct events
-                entry("adduct_info_pre_event", this::newAdduct),
-                entry("adduct_pre_event", this::addAdduct),
-                entry("charge_pre_event", this::addCharge),
-                entry("charge_sign_pre_event", this::addChargeSign),
-
-                // set species events
-                entry("med_species_pre_event", this::setSpeciesLevel),
-                entry("gl_species_pre_event", this::setSpeciesLevel),
-                entry("gl_molecular_species_pre_event", this::setMolecularLevel),
-                entry("pl_species_pre_event", this::setSpeciesLevel),
-                entry("pl_molecular_species_pre_event", this::setMolecularLevel),
-                entry("sl_species_pre_event", this::setSpeciesLevel),
-                entry("pl_single_pre_event", this::setMolecularLevel),
-                entry("unsorted_fa_separator_pre_event", this::setMolecularLevel),
-                entry("ether_num_pre_event", this::setEtherNum),
-
-                // set head groups events
-                entry("med_hg_single_pre_event", this::setHeadgroupName),
-                entry("med_hg_double_pre_event", this::setHeadgroupName),
-                entry("med_hg_triple_pre_event", this::setHeadgroupName),
-                entry("gl_hg_single_pre_event", this::setHeadgroupName),
-                entry("gl_hg_double_pre_event", this::setHeadgroupName),
-                entry("gl_hg_true_double_pre_event", this::setHeadgroupName),
-                entry("gl_hg_triple_pre_event", this::setHeadgroupName),
-                entry("pl_hg_single_pre_event", this::setHeadgroupName),
-                entry("pl_hg_double_pre_event", this::setHeadgroupName),
-                entry("pl_hg_quadro_pre_event", this::setHeadgroupName),
-                entry("sl_hg_single_pre_event", this::setHeadgroupName),
-                entry("pl_hg_double_fa_hg_pre_event", this::setHeadgroupName),
-                entry("sl_hg_double_name_pre_event", this::setHeadgroupName),
-                entry("st_hg_pre_event", this::setHeadgroupName),
-                entry("st_hg_ester_pre_event", this::setHeadgroupName),
-                entry("hg_pip_pure_m_pre_event", this::setHeadgroupName),
-                entry("hg_pip_pure_d_pre_event", this::setHeadgroupName),
-                entry("hg_pip_pure_t_pre_event", this::setHeadgroupName),
-                entry("hg_PE_PS_pre_event", this::setHeadgroupName),
-
-                // set head group headgroupDecorators
-                entry("carbohydrate_pre_event", this::setCarbohydrate),
-                entry("carbohydrate_structural_pre_event", this::setCarbohydrateStructural),
-                entry("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric),
-
-                // fatty acyl events
-                entry("lcb_post_event", this::setLcb),
-                entry("fatty_acyl_chain_pre_event", this::newFattyAcylChain),
-                entry("fatty_acyl_chain_post_event", this::addFattyAcylChain),
-                entry("carbon_pre_event", this::setCarbon),
-                entry("db_count_pre_event", this::setDoubleBondCount),
-                entry("db_position_number_pre_event", this::setDoubleBondPosition),
-                entry("db_single_position_pre_event", this::setDoubleBondInformation),
-                entry("db_single_position_post_event", this::addDoubleBondInformation),
-                entry("cistrans_pre_event", this::setCisTrans),
-                entry("ether_type_pre_event", this::setEtherType),
-
-                // set functional group events
-                entry("func_group_data_pre_event", this::setFunctionalGroup),
-                entry("func_group_data_post_event", this::addFunctionalGroup),
-                entry("func_group_pos_number_pre_event", this::setFunctionalGroupPosition),
-                entry("func_group_name_pre_event", this::setFunctionalGroupName),
-                entry("func_group_count_pre_event", this::setFunctionalGroupCount),
-                entry("stereo_type_pre_event", this::setFunctionalGroupStereo),
-                entry("molecular_func_group_name_pre_event", this::setMolecularFuncGroup),
-
-                // set cycle events
-                entry("func_group_cycle_pre_event", this::setCycle),
-                entry("func_group_cycle_post_event", this::addCycle),
-                entry("cycle_start_pre_event", this::setCycleStart),
-                entry("cycle_end_pre_event", this::setCycleEnd),
-                entry("cycle_number_pre_event", this::setCycleNumber),
-                entry("cycle_db_cnt_pre_event", this::setCycleDbCount),
-                entry("cycle_db_positions_pre_event", this::setCycleDbPositions),
-                entry("cycle_db_positions_post_event", this::checkCycleDbPositions),
-                entry("cycle_db_position_number_pre_event", this::setCycleDbPosition),
-                entry("cycle_db_position_cis_trans_pre_event", this::setCycleDbPositionCistrans),
-                entry("cylce_element_pre_event", this::addCycleElement),
-
-                // set linkage events
-                entry("fatty_acyl_linkage_pre_event", this::setAcylLinkage),
-                entry("fatty_acyl_linkage_post_event", this::addAcylLinkage),
-                entry("fatty_alkyl_linkage_pre_event", this::setAlkylLinkage),
-                entry("fatty_alkyl_linkage_post_event", this::addAlkylLinkage),
-                entry("fatty_linkage_number_pre_event", this::setFattyLinkageNumber),
-                entry("fatty_acyl_linkage_sign_pre_event", this::setLinkageType),
-                entry("hydrocarbon_chain_pre_event", this::setHydrocarbonChain),
-                entry("hydrocarbon_chain_post_event", this::addHydrocarbonChain),
-                entry("hydrocarbon_number_pre_event", this::setFattyLinkageNumber),
-
-                // set remaining events
-                entry("ring_stereo_pre_event", this::setRingStereo),
-                entry("pl_hg_fa_pre_event", this::setHgAcyl),
-                entry("pl_hg_fa_post_event", this::addHgAcyl),
-                entry("pl_hg_alk_pre_event", this::setHgAlkyl),
-                entry("pl_hg_alk_post_event", this::addHgAlkyl),
-                entry("pl_hg_species_pre_event", this::addPlSpeciesData),
-                entry("hg_pip_m_pre_event", this::suffixDecoratorMolecular),
-                entry("hg_pip_d_pre_event", this::suffixDecoratorMolecular),
-                entry("hg_pip_t_pre_event", this::suffixDecoratorMolecular),
-                entry("hg_PE_PS_type_pre_event", this::suffixDecoratorSpecies),
-                entry("acer_hg_post_event", this::setAcer),
-                entry("acer_species_post_event", this::setAcerSpecies),
-
-                entry("sterol_definition_post_event", this::setSterolDefinition)
+                    entry("lipid_pre_event", this::resetParser),
+                    entry("lipid_post_event", this::buildLipid),
+                    // set categories
+                    entry("sl_pre_event", this::preSphingolipid),
+                    entry("sl_post_event", this::postSphingolipid),
+                    entry("sl_hydroxyl_pre_event", this::setHydroxyl),
+                    // set adduct events
+                    entry("adduct_info_pre_event", this::newAdduct),
+                    entry("adduct_pre_event", this::addAdduct),
+                    entry("charge_pre_event", this::addCharge),
+                    entry("charge_sign_pre_event", this::addChargeSign),
+                    // set species events
+                    entry("med_species_pre_event", this::setSpeciesLevel),
+                    entry("gl_species_pre_event", this::setSpeciesLevel),
+                    entry("gl_molecular_species_pre_event", this::setMolecularLevel),
+                    entry("pl_species_pre_event", this::setSpeciesLevel),
+                    entry("pl_molecular_species_pre_event", this::setMolecularLevel),
+                    entry("sl_species_pre_event", this::setSpeciesLevel),
+                    entry("pl_single_pre_event", this::setMolecularLevel),
+                    entry("unsorted_fa_separator_pre_event", this::setMolecularLevel),
+                    entry("ether_num_pre_event", this::setEtherNum),
+                    // set head groups events
+                    entry("med_hg_single_pre_event", this::setHeadgroupName),
+                    entry("med_hg_double_pre_event", this::setHeadgroupName),
+                    entry("med_hg_triple_pre_event", this::setHeadgroupName),
+                    entry("gl_hg_single_pre_event", this::setHeadgroupName),
+                    entry("gl_hg_double_pre_event", this::setHeadgroupName),
+                    entry("gl_hg_true_double_pre_event", this::setHeadgroupName),
+                    entry("gl_hg_triple_pre_event", this::setHeadgroupName),
+                    entry("pl_hg_single_pre_event", this::setHeadgroupName),
+                    entry("pl_hg_double_pre_event", this::setHeadgroupName),
+                    entry("pl_hg_quadro_pre_event", this::setHeadgroupName),
+                    entry("sl_hg_single_pre_event", this::setHeadgroupName),
+                    entry("pl_hg_double_fa_hg_pre_event", this::setHeadgroupName),
+                    entry("sl_hg_double_name_pre_event", this::setHeadgroupName),
+                    entry("st_hg_pre_event", this::setHeadgroupName),
+                    entry("st_hg_ester_pre_event", this::setHeadgroupName),
+                    entry("hg_pip_pure_m_pre_event", this::setHeadgroupName),
+                    entry("hg_pip_pure_d_pre_event", this::setHeadgroupName),
+                    entry("hg_pip_pure_t_pre_event", this::setHeadgroupName),
+                    entry("hg_PE_PS_pre_event", this::setHeadgroupName),
+                    // set head group headgroupDecorators
+                    entry("carbohydrate_pre_event", this::setCarbohydrate),
+                    entry("carbohydrate_structural_pre_event", this::setCarbohydrateStructural),
+                    entry("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric),
+                    // fatty acyl events
+                    entry("lcb_post_event", this::setLcb),
+                    entry("fatty_acyl_chain_pre_event", this::newFattyAcylChain),
+                    entry("fatty_acyl_chain_post_event", this::addFattyAcylChain),
+                    entry("carbon_pre_event", this::setCarbon),
+                    entry("db_count_pre_event", this::setDoubleBondCount),
+                    entry("db_position_number_pre_event", this::setDoubleBondPosition),
+                    entry("db_single_position_pre_event", this::setDoubleBondInformation),
+                    entry("db_single_position_post_event", this::addDoubleBondInformation),
+                    entry("cistrans_pre_event", this::setCisTrans),
+                    entry("ether_type_pre_event", this::setEtherType),
+                    // set functional group events
+                    entry("func_group_data_pre_event", this::setFunctionalGroup),
+                    entry("func_group_data_post_event", this::addFunctionalGroup),
+                    entry("func_group_pos_number_pre_event", this::setFunctionalGroupPosition),
+                    entry("func_group_name_pre_event", this::setFunctionalGroupName),
+                    entry("func_group_count_pre_event", this::setFunctionalGroupCount),
+                    entry("stereo_type_pre_event", this::setFunctionalGroupStereo),
+                    entry("molecular_func_group_name_pre_event", this::setMolecularFuncGroup),
+                    // set cycle events
+                    entry("func_group_cycle_pre_event", this::setCycle),
+                    entry("func_group_cycle_post_event", this::addCycle),
+                    entry("cycle_start_pre_event", this::setCycleStart),
+                    entry("cycle_end_pre_event", this::setCycleEnd),
+                    entry("cycle_number_pre_event", this::setCycleNumber),
+                    entry("cycle_db_cnt_pre_event", this::setCycleDbCount),
+                    entry("cycle_db_positions_pre_event", this::setCycleDbPositions),
+                    entry("cycle_db_positions_post_event", this::checkCycleDbPositions),
+                    entry("cycle_db_position_number_pre_event", this::setCycleDbPosition),
+                    entry("cycle_db_position_cis_trans_pre_event", this::setCycleDbPositionCistrans),
+                    entry("cylce_element_pre_event", this::addCycleElement),
+                    // set linkage events
+                    entry("fatty_acyl_linkage_pre_event", this::setAcylLinkage),
+                    entry("fatty_acyl_linkage_post_event", this::addAcylLinkage),
+                    entry("fatty_alkyl_linkage_pre_event", this::setAlkylLinkage),
+                    entry("fatty_alkyl_linkage_post_event", this::addAlkylLinkage),
+                    entry("fatty_linkage_number_pre_event", this::setFattyLinkageNumber),
+                    entry("fatty_acyl_linkage_sign_pre_event", this::setLinkageType),
+                    entry("hydrocarbon_chain_pre_event", this::setHydrocarbonChain),
+                    entry("hydrocarbon_chain_post_event", this::addHydrocarbonChain),
+                    entry("hydrocarbon_number_pre_event", this::setFattyLinkageNumber),
+                    // set remaining events
+                    entry("ring_stereo_pre_event", this::setRingStereo),
+                    entry("pl_hg_fa_pre_event", this::setHgAcyl),
+                    entry("pl_hg_fa_post_event", this::addHgAcyl),
+                    entry("pl_hg_alk_pre_event", this::setHgAlkyl),
+                    entry("pl_hg_alk_post_event", this::addHgAlkyl),
+                    entry("pl_hg_species_pre_event", this::addPlSpeciesData),
+                    entry("hg_pip_m_pre_event", this::suffixDecoratorMolecular),
+                    entry("hg_pip_d_pre_event", this::suffixDecoratorMolecular),
+                    entry("hg_pip_t_pre_event", this::suffixDecoratorMolecular),
+                    entry("hg_PE_PS_type_pre_event", this::suffixDecoratorSpecies),
+                    entry("acer_hg_post_event", this::setAcer),
+                    entry("acer_species_post_event", this::setAcerSpecies),
+                    entry("sterol_definition_post_event", this::setSterolDefinition)
             );
 
         } catch (Exception e) {
@@ -183,11 +183,11 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         acerSpecies = false;
     }
 
-    public String faI() {
+    private String faI() {
         return "fa" + Integer.toString(currentFas.size());
     }
 
-    public void buildLipid(TreeNode node) {
+    private void buildLipid(TreeNode node) {
         if (acerSpecies) {
             faList.get(0).setNumCarbon(faList.get(0).getNumCarbon() - 2);
         }
@@ -207,41 +207,40 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
         content = lipid;
     }
-    
-    
-    public void setSterolDefinition(TreeNode node){
+
+    private void setSterolDefinition(TreeNode node) {
         headGroup += " " + node.getText();
         faList.remove(0);
-        
+
     }
 
-    public void preSphingolipid(TreeNode node) {
+    private void preSphingolipid(TreeNode node) {
         tmp.put("sl_hydroxyl", 0);
     }
 
-    public void postSphingolipid(TreeNode node) {
+    private void postSphingolipid(TreeNode node) {
         if (((int) tmp.get("sl_hydroxyl")) == 0 && !headGroup.equals("Cer") && !headGroup.equals("SPB")) {
             setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }
     }
 
-    public void setHydroxyl(TreeNode node) {
+    private void setHydroxyl(TreeNode node) {
         tmp.put("sl_hydroxyl", 1);
     }
 
-    public void newAdduct(TreeNode node) {
+    private void newAdduct(TreeNode node) {
         adduct = new Adduct("", "", 0, 0);
     }
 
-    public void addAdduct(TreeNode node) {
+    private void addAdduct(TreeNode node) {
         adduct.setAdductString(node.getText());
     }
 
-    public void addCharge(TreeNode node) {
+    private void addCharge(TreeNode node) {
         adduct.setCharge(Integer.valueOf(node.getText()));
     }
 
-    public void addChargeSign(TreeNode node) {
+    private void addChargeSign(TreeNode node) {
         String sign = node.getText();
         if (sign.equals("+")) {
             adduct.setChargeSign(1);
@@ -250,15 +249,15 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void setSpeciesLevel(TreeNode node) {
+    private void setSpeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.SPECIES);
     }
 
-    public void setMolecularLevel(TreeNode node) {
+    private void setMolecularLevel(TreeNode node) {
         setLipidLevel(LipidLevel.MOLECULAR_SPECIES);
     }
 
-    public void setEtherNum(TreeNode node) {
+    private void setEtherNum(TreeNode node) {
         int num_ethers = 0;
         String ether = node.getText();
         switch (ether) {
@@ -277,13 +276,13 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         tmp.put("num_ethers", num_ethers);
     }
 
-    public void setHeadgroupName(TreeNode node) {
+    private void setHeadgroupName(TreeNode node) {
         if (headGroup.length() == 0) {
             headGroup = node.getText();
         }
     }
 
-    public void setCarbohydrate(TreeNode node) {
+    private void setCarbohydrate(TreeNode node) {
         String carbohydrate = node.getText();
         FunctionalGroup functional_group = null;
         try {
@@ -303,27 +302,27 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void setCarbohydrateStructural(TreeNode node) {
+    private void setCarbohydrateStructural(TreeNode node) {
         setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         tmp.put("func_group_head", 1);
     }
 
-    public void setCarbohydrateIsomeric(TreeNode node) {
+    private void setCarbohydrateIsomeric(TreeNode node) {
         tmp.put("func_group_head", 1);
     }
 
-    public void setLcb(TreeNode node) {
+    private void setLcb(TreeNode node) {
         FattyAcid fa = faList.get(faList.size() - 1);
         fa.setName("LCB");
         fa.setType(LipidFaBondType.LCB_REGULAR);
     }
 
-    public void newFattyAcylChain(TreeNode node) {
+    private void newFattyAcylChain(TreeNode node) {
         currentFas.add(new FattyAcid("FA", knownFunctionalGroups));
         tmp.put(faI(), new Dictionary());
     }
 
-    public void addFattyAcylChain(TreeNode node) {
+    private void addFattyAcylChain(TreeNode node) {
         String fg_i = "fa" + Integer.toString(currentFas.size() - 2);
         String special_type = "";
         if (currentFas.size() >= 2 && tmp.containsKey(fg_i) && ((Dictionary) tmp.get(fg_i)).containsKey("fg_name")) {
@@ -353,27 +352,27 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void setCarbon(TreeNode node) {
+    private void setCarbon(TreeNode node) {
         ((FattyAcid) currentFas.peekLast()).setNumCarbon(Integer.valueOf(node.getText()));
     }
 
-    public void setDoubleBondCount(TreeNode node) {
+    private void setDoubleBondCount(TreeNode node) {
         int db_cnt = Integer.valueOf(node.getText());
         ((Dictionary) tmp.get(faI())).put("db_count", db_cnt);
         ((FattyAcid) currentFas.peekLast()).getDoubleBonds().setNumDoubleBonds(db_cnt);
     }
 
-    public void setDoubleBondPosition(TreeNode node) {
+    private void setDoubleBondPosition(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("db_position", Integer.valueOf(node.getText()));
     }
 
-    public void setDoubleBondInformation(TreeNode node) {
+    private void setDoubleBondInformation(TreeNode node) {
         String fa_i = faI();
         ((Dictionary) tmp.get(fa_i)).put("db_position", 0);
         ((Dictionary) tmp.get(fa_i)).put("db_cistrans", "");
     }
 
-    public void addDoubleBondInformation(TreeNode node) {
+    private void addDoubleBondInformation(TreeNode node) {
         String fa_i = faI();
         Dictionary d = (Dictionary) tmp.get(fa_i);
         int pos = (int) d.get("db_position");
@@ -388,11 +387,11 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         currentFas.peekLast().getDoubleBonds().getDoubleBondPositions().put(pos, cistrans);
     }
 
-    public void setCisTrans(TreeNode node) {
+    private void setCisTrans(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("db_cistrans", node.getText());
     }
 
-    public void setEtherType(TreeNode node) {
+    private void setEtherType(TreeNode node) {
         String ether_type = node.getText();
         if (ether_type.equals("O-")) {
             ((FattyAcid) currentFas.peekLast()).setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
@@ -401,7 +400,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void setFunctionalGroup(TreeNode node) {
+    private void setFunctionalGroup(TreeNode node) {
         String fa_i = faI();
         Dictionary gd = (Dictionary) tmp.get(fa_i);
         gd.put("fg_pos", -1);
@@ -411,7 +410,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         gd.put("fg_ring_stereo", "");
     }
 
-    public void addFunctionalGroup(TreeNode node) {
+    private void addFunctionalGroup(TreeNode node) {
         Dictionary gd = (Dictionary) tmp.get(faI());
         String fg_name = (String) gd.get("fg_name");
 
@@ -452,27 +451,27 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         currentFas.peekLast().getFunctionalGroups().get(fg_name).add(functional_group);
     }
 
-    public void setFunctionalGroupPosition(TreeNode node) {
+    private void setFunctionalGroupPosition(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_pos", Integer.valueOf(node.getText()));
     }
 
-    public void setFunctionalGroupName(TreeNode node) {
+    private void setFunctionalGroupName(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", node.getText());
     }
 
-    public void setFunctionalGroupCount(TreeNode node) {
+    private void setFunctionalGroupCount(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_cnt", Integer.valueOf(node.getText()));
     }
 
-    public void setFunctionalGroupStereo(TreeNode node) {
+    private void setFunctionalGroupStereo(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_stereo", node.getText());
     }
 
-    public void setMolecularFuncGroup(TreeNode node) {
+    private void setMolecularFuncGroup(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", node.getText());
     }
 
-    public void setCycle(TreeNode node) {
+    private void setCycle(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", "cy");
         currentFas.add(new Cycle(0, knownFunctionalGroups));
 
@@ -481,7 +480,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         ((Dictionary) tmp.get(fa_i)).put("cycle_elements", new GenericList());
     }
 
-    public void addCycle(TreeNode node) {
+    private void addCycle(TreeNode node) {
         String fa_i = faI();
         GenericList cycle_elements = (GenericList) ((Dictionary) tmp.get(fa_i)).get("cycle_elements");
         Cycle cycle = (Cycle) currentFas.pollLast();
@@ -499,44 +498,44 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         currentFas.peekLast().getFunctionalGroups().get("cy").add(cycle);
     }
 
-    public void setCycleStart(TreeNode node) {
+    private void setCycleStart(TreeNode node) {
         ((Cycle) currentFas.peekLast()).setStart(Integer.valueOf(node.getText()));
     }
 
-    public void setCycleEnd(TreeNode node) {
+    private void setCycleEnd(TreeNode node) {
         ((Cycle) currentFas.peekLast()).setEnd(Integer.valueOf(node.getText()));
     }
 
-    public void setCycleNumber(TreeNode node) {
+    private void setCycleNumber(TreeNode node) {
         ((Cycle) currentFas.peekLast()).setCycle(Integer.valueOf(node.getText()));
     }
 
-    public void setCycleDbCount(TreeNode node) {
+    private void setCycleDbCount(TreeNode node) {
         ((Cycle) currentFas.peekLast()).getDoubleBonds().setNumDoubleBonds(Integer.valueOf(node.getText()));
     }
 
-    public void setCycleDbPositions(TreeNode node) {
+    private void setCycleDbPositions(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("cycle_db", ((Cycle) currentFas.peekLast()).getDoubleBonds().getNumDoubleBonds());
     }
 
-    public void checkCycleDbPositions(TreeNode node) {
+    private void checkCycleDbPositions(TreeNode node) {
         if (((Cycle) currentFas.peekLast()).getDoubleBonds().getNumDoubleBonds() != (int) ((Dictionary) tmp.get(faI())).get("cycle_db")) {
             throw new LipidException("Double bond number in cycle does not correspond to number of double bond positions.");
         }
     }
 
-    public void setCycleDbPosition(TreeNode node) {
+    private void setCycleDbPosition(TreeNode node) {
         int pos = Integer.valueOf(node.getText());
         ((Cycle) currentFas.peekLast()).getDoubleBonds().getDoubleBondPositions().put(pos, "");
         ((Dictionary) tmp.get(faI())).put("last_db_pos", pos);
     }
 
-    public void setCycleDbPositionCistrans(TreeNode node) {
+    private void setCycleDbPositionCistrans(TreeNode node) {
         int pos = (int) ((Dictionary) tmp.get(faI())).get("last_db_pos");
         ((Cycle) currentFas.peekLast()).getDoubleBonds().getDoubleBondPositions().put(pos, node.getText());
     }
 
-    public void addCycleElement(TreeNode node) {
+    private void addCycleElement(TreeNode node) {
         String element = node.getText();
 
         if (!Elements.ELEMENT_POSITIONS.containsKey(element)) {
@@ -546,14 +545,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         ((GenericList) ((Dictionary) tmp.get(faI())).get("cycle_elements")).add(Elements.ELEMENT_POSITIONS.get(element));
     }
 
-    public void setAcylLinkage(TreeNode node) {
+    private void setAcylLinkage(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", "acyl");
         currentFas.add(new AcylAlkylGroup((FattyAcid) null, knownFunctionalGroups));
         tmp.put(faI(), new Dictionary());
         ((Dictionary) tmp.get(faI())).put("linkage_pos", -1);
     }
 
-    public void addAcylLinkage(TreeNode node) {
+    private void addAcylLinkage(TreeNode node) {
         boolean linkage_type = (int) ((Dictionary) tmp.get(faI())).get("linkage_type") == 1;
         int linkage_pos = (int) ((Dictionary) tmp.get(faI())).get("linkage_pos");
 
@@ -572,14 +571,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         currentFas.peekLast().getFunctionalGroups().get("acyl").add(acyl);
     }
 
-    public void setAlkylLinkage(TreeNode node) {
+    private void setAlkylLinkage(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", "alkyl");
         currentFas.add(new AcylAlkylGroup(null, -1, 1, true, knownFunctionalGroups));
         tmp.put(faI(), new Dictionary());
         ((Dictionary) tmp.get(faI())).put("linkage_pos", -1);
     }
 
-    public void addAlkylLinkage(TreeNode node) {
+    private void addAlkylLinkage(TreeNode node) {
         int linkage_pos = (int) ((Dictionary) tmp.get(faI())).get("linkage_pos");
         tmp.remove(faI());
         AcylAlkylGroup alkyl = (AcylAlkylGroup) currentFas.pollLast();
@@ -595,22 +594,22 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         currentFas.peekLast().getFunctionalGroups().get("alkyl").add(alkyl);
     }
 
-    public void setFattyLinkageNumber(TreeNode node) {
+    private void setFattyLinkageNumber(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("linkage_pos", Integer.valueOf(node.getText()));
     }
 
-    public void setLinkageType(TreeNode node) {
+    private void setLinkageType(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("linkage_type", node.getText().equals("N") ? 1 : 0);
     }
 
-    public void setHydrocarbonChain(TreeNode node) {
+    private void setHydrocarbonChain(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", "cc");
         currentFas.add(new CarbonChain((FattyAcid) null, knownFunctionalGroups));
         tmp.put(faI(), new Dictionary());
         ((Dictionary) tmp.get(faI())).put("linkage_pos", -1);
     }
 
-    public void addHydrocarbonChain(TreeNode node) {
+    private void addHydrocarbonChain(TreeNode node) {
         int linkage_pos = (int) ((Dictionary) tmp.get(faI())).get("linkage_pos");
         tmp.remove(faI());
         CarbonChain cc = (CarbonChain) currentFas.pollLast();
@@ -625,11 +624,11 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         currentFas.peekLast().getFunctionalGroups().get("cc").add(cc);
     }
 
-    public void setRingStereo(TreeNode node) {
+    private void setRingStereo(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_ring_stereo", node.getText());
     }
 
-    public void setHgAcyl(TreeNode node) {
+    private void setHgAcyl(TreeNode node) {
         String fa_i = faI();
         tmp.put(fa_i, new Dictionary());
         ((Dictionary) tmp.get(fa_i)).put("fg_name", "decorator_acyl");
@@ -637,26 +636,26 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         tmp.put(faI(), new Dictionary());
     }
 
-    public void addHgAcyl(TreeNode node) {
+    private void addHgAcyl(TreeNode node) {
         tmp.remove(faI());
         headgroupDecorators.add((HeadgroupDecorator) currentFas.pollLast());
         tmp.remove(faI());
     }
 
-    public void setHgAlkyl(TreeNode node) {
+    private void setHgAlkyl(TreeNode node) {
         tmp.put(faI(), new Dictionary());
         ((Dictionary) tmp.get(faI())).put("fg_name", "decorator_alkyl");
         currentFas.add(new HeadgroupDecorator("decorator_alkyl", -1, 1, null, true, knownFunctionalGroups));
         tmp.put(faI(), new Dictionary());
     }
 
-    public void addHgAlkyl(TreeNode node) {
+    private void addHgAlkyl(TreeNode node) {
         tmp.remove(faI());
         headgroupDecorators.add((HeadgroupDecorator) currentFas.pollLast());
         tmp.remove(faI());
     }
 
-    public void addPlSpeciesData(TreeNode node) {
+    private void addPlSpeciesData(TreeNode node) {
         setLipidLevel(LipidLevel.SPECIES);
         HeadgroupDecorator hgd = new HeadgroupDecorator("", knownFunctionalGroups);
         hgd.getElements().put(Element.O, hgd.getElements().get(Element.O) + 1);
@@ -664,15 +663,15 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         headgroupDecorators.add(hgd);
     }
 
-    public void suffixDecoratorMolecular(TreeNode node) {
+    private void suffixDecoratorMolecular(TreeNode node) {
         headgroupDecorators.add(new HeadgroupDecorator(node.getText(), -1, 1, null, true, LipidLevel.MOLECULAR_SPECIES, knownFunctionalGroups));
     }
 
-    public void suffixDecoratorSpecies(TreeNode node) {
+    private void suffixDecoratorSpecies(TreeNode node) {
         headgroupDecorators.add(new HeadgroupDecorator(node.getText(), -1, 1, null, true, LipidLevel.SPECIES, knownFunctionalGroups));
     }
 
-    public void setAcer(TreeNode node) {
+    private void setAcer(TreeNode node) {
         headGroup = "ACer";
         HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);
         hgd.getFunctionalGroups().put("decorator_acyl", new ArrayList<>());
@@ -681,7 +680,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         headgroupDecorators.add(hgd);
     }
 
-    public void setAcerSpecies(TreeNode node) {
+    private void setAcerSpecies(TreeNode node) {
         headGroup = "ACer";
         setLipidLevel(LipidLevel.SPECIES);
         HeadgroupDecorator hgd = new HeadgroupDecorator("decorator_acyl", -1, 1, null, true, knownFunctionalGroups);

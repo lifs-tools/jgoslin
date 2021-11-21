@@ -20,6 +20,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 
 /**
+ * Parser implementation for IUPAC Fatty acids nomenclature.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -35,14 +36,30 @@ public final class FattyAcidParser extends Parser<LipidAdduct> {
         this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
+    /**
+     * Create a new instance of a {@link FattyAcidParser}.
+     * @param knownFunctionalGroups the known functional groups
+     * @param grammarResourcePath the resource path to the grammar file
+     * @param quote the quotation character used in the grammar
+     * @return a new parser instance
+     */
     public static FattyAcidParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
         return new FattyAcidParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
-    
+
+    /**
+     * Create a new instance of a {@link FattyAcidParser}.
+     * @param knownFunctionalGroups the known functional groups
+     * @return a new parser instance
+     */
     public static FattyAcidParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
         return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
 
+    /**
+     * Create a new instance of a {@link FattyAcidParser}.
+     * @return a new parser instance
+     */
     public static FattyAcidParser newInstance() {
         return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
@@ -56,7 +73,7 @@ public final class FattyAcidParser extends Parser<LipidAdduct> {
     public LipidAdduct parse(String text, BaseParserEventHandler eventHandler, boolean with_exception) {
         return super.parse(text.toLowerCase(), eventHandler, with_exception);
     }
-    
+
     @Override
     public FattyAcidParserEventHandler newEventHandler() {
         return new FattyAcidParserEventHandler(knownFunctionalGroups);

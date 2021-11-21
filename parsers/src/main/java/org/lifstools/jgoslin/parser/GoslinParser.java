@@ -20,7 +20,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 
 /**
- *
+ * Parser implementation for the Goslin lipid shorthand nomenclature.
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
@@ -29,24 +29,43 @@ public final class GoslinParser extends Parser<LipidAdduct> {
     private static final String DEFAULT_GRAMMAR_CONTENT = "Goslin.g4";
 
     private final KnownFunctionalGroups knownFunctionalGroups;
-    
+
     private GoslinParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
         this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
+    /**
+     * Create a new instance of a {@link GoslinParser}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @param grammarResourcePath the resource path to the grammar file
+     * @param quote the quotation character used in the grammar
+     * @return a new parser instance
+     */
     public static GoslinParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
         return new GoslinParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
-    
+
+    /**
+     * Create a new instance of a {@link GoslinParser}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @return a new parser instance
+     */
     public static GoslinParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
         return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
-    }    
+    }
 
+    /**
+     * Create a new instance of a {@link GoslinParser}.
+     *
+     * @return a new parser instance
+     */
     public static GoslinParser newInstance() {
         return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
-    
+
     @Override
     public GoslinParserEventHandler newEventHandler() {
         return new GoslinParserEventHandler(knownFunctionalGroups);

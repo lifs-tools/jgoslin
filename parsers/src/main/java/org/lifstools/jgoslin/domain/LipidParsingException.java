@@ -16,6 +16,8 @@
 package org.lifstools.jgoslin.domain;
 
 /**
+ * Specific exception that is thrown when errors are encountered in a lipid
+ * name.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

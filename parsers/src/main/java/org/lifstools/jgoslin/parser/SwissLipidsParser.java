@@ -20,6 +20,8 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.StringFunctions;
 
 /**
+ * Parser implementation for the updated 2020 Liebisch lipid shorthand
+ * nomenclature.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -27,7 +29,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 public class SwissLipidsParser extends Parser<LipidAdduct> {
 
     private static final String DEFAULT_GRAMMAR_CONTENT = "SwissLipids.g4";
-    
+
     private final KnownFunctionalGroups knownFunctionalGroups;
 
     private SwissLipidsParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
@@ -35,14 +37,33 @@ public class SwissLipidsParser extends Parser<LipidAdduct> {
         this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
+    /**
+     * Create a new instance of a {@link SwissLipidsParser}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @param grammarResourcePath the resource path to the grammar file
+     * @param quote the quotation character used in the grammar
+     * @return a new parser instance
+     */
     public static SwissLipidsParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
         return new SwissLipidsParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
 
+    /**
+     * Create a new instance of a {@link SwissLipidsParser}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @return a new parser instance
+     */
     public static SwissLipidsParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
         return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }
-    
+
+    /**
+     * Create a new instance of a {@link SwissLipidsParser}.
+     *
+     * @return a new parser instance
+     */
     public static SwissLipidsParser newInstance() {
         return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
     }

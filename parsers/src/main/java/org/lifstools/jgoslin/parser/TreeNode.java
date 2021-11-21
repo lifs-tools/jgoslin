@@ -16,11 +16,12 @@
 package org.lifstools.jgoslin.parser;
 
 /**
+ * A node representing an element in the parse tree.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
-public final class TreeNode {
+final class TreeNode {
 
     long rule_index;
     TreeNode left;

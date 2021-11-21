@@ -18,9 +18,12 @@ package org.lifstools.jgoslin.domain;
 import java.util.Collection;
 
 /**
+ * Full structure level according to the 2020 update of the Liebisch shorthand
+ * nomenclature.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
+ * @see LipidLevel
  */
 public class LipidFullStructure extends LipidStructureDefined {
 
@@ -53,7 +56,8 @@ public class LipidFullStructure extends LipidStructureDefined {
                 return super.getLipidString(level);
             }
 
-            default -> throw new IllegalArgumentException("LipidFullStructure does not know how to create a lipid string for level " + level.toString());
+            default ->
+                throw new IllegalArgumentException("LipidFullStructure does not know how to create a lipid string for level " + level.toString());
         }
     }
 

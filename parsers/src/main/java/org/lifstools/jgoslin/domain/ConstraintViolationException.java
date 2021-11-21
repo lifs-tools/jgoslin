@@ -16,6 +16,8 @@
 package org.lifstools.jgoslin.domain;
 
 /**
+ * An exception that is thrown to indicate that preconditions have been
+ * violated.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

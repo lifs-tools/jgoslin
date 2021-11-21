@@ -25,6 +25,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
+ * Utility methods for strings and grammars.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -32,6 +33,7 @@ import org.springframework.core.io.Resource;
 public final class StringFunctions {
 
     public static char DEFAULT_QUOTE = '\'';
+    public static char DEFAULT_SPLIT = ',';
 
     public static String strip(String s, char c) {
         if (s.length() > 0) {
@@ -52,15 +54,42 @@ public final class StringFunctions {
         return s;
     }
 
+    /**
+     * Split the provided text at {@link #DEFAULT_SPLIT} as separator, using
+     * {@link #DEFAULT_QUOTE} as the default quotation char.
+     *
+     * @param text the text to split
+     * @return the split string as a list
+     */
     public static ArrayList<String> splitString(String text) {
-        return splitString(text, ',', DEFAULT_QUOTE, false);
+        return splitString(text, DEFAULT_SPLIT, DEFAULT_QUOTE, false);
     }
 
-    public static ArrayList<String> splitString(String text, char _sep, char _quote) {
-        return splitString(text, _sep, _quote, false);
+    /**
+     * Split the provided text at separator, respecting the quote char to not
+     * split in between quoted parts.
+     *
+     * @param text the text to split
+     * @param separator the separator to split at
+     * @param quote the quotation character
+     * @return the split string as a list
+     */
+    public static ArrayList<String> splitString(String text, char separator, char quote) {
+        return splitString(text, separator, quote, false);
     }
 
-    public static ArrayList<String> splitString(String text, char separator, char _quote, boolean with_empty) {
+    /**
+     * Split the provided text at separator, respecting the quote char to not
+     * split in between quoted parts. Optionally allow empty / whitespace at the
+     * end.
+     *
+     * @param text the text to split
+     * @param separator the separator to split at
+     * @param quote the quotation character
+     * @param withEmpty if true, allow empty parts
+     * @return the split string as a list
+     */
+    public static ArrayList<String> splitString(String text, char separator, char quote, boolean withEmpty) {
         boolean in_quote = false;
         ArrayList<String> tokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -73,12 +102,12 @@ public final class StringFunctions {
             if (!in_quote) {
                 if (c == separator) {
                     String sb_string = sb.toString();
-                    if (sb_string.length() > 0 || with_empty) {
+                    if (sb_string.length() > 0 || withEmpty) {
                         tokens.add(sb_string);
                     }
                     sb = new StringBuilder();
                 } else {
-                    if (c == _quote) {
+                    if (c == quote) {
                         in_quote = !in_quote;
                     }
                     sb.append(c);
@@ -86,7 +115,7 @@ public final class StringFunctions {
             } else {
                 if (c == '\\' && last_char == '\\' && !last_escaped_backslash) {
                     escaped_backslash = true;
-                } else if (c == _quote && !(last_char == '\\' && !last_escaped_backslash)) {
+                } else if (c == quote && !(last_char == '\\' && !last_escaped_backslash)) {
                     in_quote = !in_quote;
                 }
                 sb.append(c);
@@ -98,7 +127,7 @@ public final class StringFunctions {
 
         String sb_string_end = sb.toString();
 
-        if (sb_string_end.length() > 0 || (last_char == ',' && with_empty)) {
+        if (sb_string_end.length() > 0 || (last_char == ',' && withEmpty)) {
             tokens.add(sb_string_end);
         }
         if (in_quote) {
@@ -107,6 +136,13 @@ public final class StringFunctions {
         return tokens;
     }
 
+    /**
+     * Read the provided resource and split it at default new line characters
+     * into a list for each line.
+     *
+     * @param resource the resource to read
+     * @return a list of line strings
+     */
     public static List<String> getResourceAsStringList(Resource resource) {
         ArrayList<String> lines;
         // read resource from classpath and current thread's context class loader
@@ -119,10 +155,24 @@ public final class StringFunctions {
         return lines;
     }
 
+    /**
+     * Read the provided resource path, which is converted to a
+     * {@link ClassPathResource} and split it at default new line characters
+     * into a list for each line.
+     *
+     * @param resourcePath the resource path to read from
+     * @return a list of line strings
+     */
     public static List<String> getResourceAsStringList(String resourcePath) {
         return getResourceAsStringList(new ClassPathResource(resourcePath));
     }
 
+    /**
+     * Read the provided resource and return it as a string.
+     *
+     * @param resource the resource to read
+     * @return the resource content as a string
+     */
     public static String getResourceAsString(Resource resource) {
         StringBuilder sb = new StringBuilder();
         // read resource from classpath and current thread's context class loader
@@ -137,6 +187,12 @@ public final class StringFunctions {
         }
     }
 
+    /**
+     * Read the provided resource path and return it as a string.
+     *
+     * @param resourcePath the resource path to read from
+     * @return the resource content as a string
+     */
     public static String getResourceAsString(String resourcePath) {
         return getResourceAsString(new ClassPathResource(resourcePath));
     }

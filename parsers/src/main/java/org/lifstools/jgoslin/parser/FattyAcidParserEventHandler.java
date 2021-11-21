@@ -48,6 +48,7 @@ import java.util.Set;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
+ * Event handler implementation for the {@link FattyAcidParser}.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -61,234 +62,225 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     private Dictionary tmp;
 
     private static final Map<String, Integer> LAST_NUMBERS = Map.ofEntries(
-        entry("un", 1),
-        entry("hen", 1),
-        entry("do", 2),
-        entry("di", 2),
-        entry("tri", 3),
-        entry("buta", 4),
-        entry("but", 4),
-        entry("tetra", 4),
-        entry("penta", 5),
-        entry("pent", 5),
-        entry("hexa", 6),
-        entry("hex", 6),
-        entry("hepta", 7),
-        entry("hept", 7),
-        entry("octa", 8),
-        entry("oct", 8),
-        entry("nona", 9),
-        entry("non", 9)
+            entry("un", 1),
+            entry("hen", 1),
+            entry("do", 2),
+            entry("di", 2),
+            entry("tri", 3),
+            entry("buta", 4),
+            entry("but", 4),
+            entry("tetra", 4),
+            entry("penta", 5),
+            entry("pent", 5),
+            entry("hexa", 6),
+            entry("hex", 6),
+            entry("hepta", 7),
+            entry("hept", 7),
+            entry("octa", 8),
+            entry("oct", 8),
+            entry("nona", 9),
+            entry("non", 9)
     );
 
     private static final Map<String, Integer> SECOND_NUMBERS = Map.ofEntries(
-        entry("deca", 10),
-        entry("dec", 10),
-        entry("eicosa", 20),
-        entry("eicos", 20),
-        entry("cosa", 20),
-        entry("cos", 20),
-        entry("triaconta", 30),
-        entry("triacont", 30),
-        entry("tetraconta", 40),
-        entry("tetracont", 40),
-        entry("pentaconta", 50),
-        entry("pentacont", 50),
-        entry("hexaconta", 60),
-        entry("hexacont", 60),
-        entry("heptaconta", 70),
-        entry("heptacont", 70),
-        entry("octaconta", 80),
-        entry("octacont", 80),
-        entry("nonaconta", 90),
-        entry("nonacont", 90)
+            entry("deca", 10),
+            entry("dec", 10),
+            entry("eicosa", 20),
+            entry("eicos", 20),
+            entry("cosa", 20),
+            entry("cos", 20),
+            entry("triaconta", 30),
+            entry("triacont", 30),
+            entry("tetraconta", 40),
+            entry("tetracont", 40),
+            entry("pentaconta", 50),
+            entry("pentacont", 50),
+            entry("hexaconta", 60),
+            entry("hexacont", 60),
+            entry("heptaconta", 70),
+            entry("heptacont", 70),
+            entry("octaconta", 80),
+            entry("octacont", 80),
+            entry("nonaconta", 90),
+            entry("nonacont", 90)
     );
 
     private static final Map<String, String> FUNC_GROUPS = Map.ofEntries(
-        entry("keto", "oxo"),
-        entry("ethyl", "Et"),
-        entry("hydroxy", "OH"),
-        entry("phospho", "Ph"),
-        entry("oxo", "oxo"),
-        entry("bromo", "Br"),
-        entry("methyl", "Me"),
-        entry("hydroperoxy", "OOH"),
-        entry("homo", ""),
-        entry("Epoxy", "Ep"),
-        entry("fluro", "F"),
-        entry("fluoro", "F"),
-        entry("chloro", "Cl"),
-        entry("methylene", "My"),
-        entry("sulfooxy", "Su"),
-        entry("amino", "NH2"),
-        entry("sulfanyl", "SH"),
-        entry("methoxy", "OMe"),
-        entry("iodo", "I"),
-        entry("cyano", "CN"),
-        entry("nitro", "NO2"),
-        entry("OH", "OH"),
-        entry("thio", "SH"),
-        entry("mercapto", "SH"),
-        entry("carboxy", "COOH"),
-        entry("acetoxy", "Ac"),
-        entry("cysteinyl", "Cys"),
-        entry("phenyl", "Phe"),
-        entry("s-glutathionyl", "SGlu"),
-        entry("s-cysteinyl", "SCys"),
-        entry("butylperoxy", "BOO"),
-        entry("dimethylarsinoyl", "MMAs"),
-        entry("methylsulfanyl", "SMe"),
-        entry("imino", "NH"),
-        entry("s-cysteinylglycinyl", "SCG")
+            entry("keto", "oxo"),
+            entry("ethyl", "Et"),
+            entry("hydroxy", "OH"),
+            entry("phospho", "Ph"),
+            entry("oxo", "oxo"),
+            entry("bromo", "Br"),
+            entry("methyl", "Me"),
+            entry("hydroperoxy", "OOH"),
+            entry("homo", ""),
+            entry("Epoxy", "Ep"),
+            entry("fluro", "F"),
+            entry("fluoro", "F"),
+            entry("chloro", "Cl"),
+            entry("methylene", "My"),
+            entry("sulfooxy", "Su"),
+            entry("amino", "NH2"),
+            entry("sulfanyl", "SH"),
+            entry("methoxy", "OMe"),
+            entry("iodo", "I"),
+            entry("cyano", "CN"),
+            entry("nitro", "NO2"),
+            entry("OH", "OH"),
+            entry("thio", "SH"),
+            entry("mercapto", "SH"),
+            entry("carboxy", "COOH"),
+            entry("acetoxy", "Ac"),
+            entry("cysteinyl", "Cys"),
+            entry("phenyl", "Phe"),
+            entry("s-glutathionyl", "SGlu"),
+            entry("s-cysteinyl", "SCys"),
+            entry("butylperoxy", "BOO"),
+            entry("dimethylarsinoyl", "MMAs"),
+            entry("methylsulfanyl", "SMe"),
+            entry("imino", "NH"),
+            entry("s-cysteinylglycinyl", "SCG")
     );
 
     private static final Map<String, Integer> ATE = Map.ofEntries(
-        entry("formate", 1),
-        entry("acetate", 2),
-        entry("butyrate", 4),
-        entry("propionate", 3),
-        entry("valerate", 5),
-        entry("isobutyrate", 4)
+            entry("formate", 1),
+            entry("acetate", 2),
+            entry("butyrate", 4),
+            entry("propionate", 3),
+            entry("valerate", 5),
+            entry("isobutyrate", 4)
     );
 
     private static final Map<String, Integer> SPECIAL_NUMBERS = Map.ofEntries(
-        entry("meth", 1),
-        entry("etha", 2),
-        entry("eth", 2),
-        entry("propa", 3),
-        entry("isoprop", 3),
-        entry("prop", 3),
-        entry("propi", 3),
-        entry("propio", 3),
-        entry("buta", 4),
-        entry("but", 4),
-        entry("butr", 4),
-        entry("furan", 5),
-        entry("valer", 5),
-        entry("eicosa", 20),
-        entry("eicos", 20),
-        entry("icosa", 20),
-        entry("icos", 20),
-        entry("prosta", 20),
-        entry("prost", 20),
-        entry("prostan", 20)
+            entry("meth", 1),
+            entry("etha", 2),
+            entry("eth", 2),
+            entry("propa", 3),
+            entry("isoprop", 3),
+            entry("prop", 3),
+            entry("propi", 3),
+            entry("propio", 3),
+            entry("buta", 4),
+            entry("but", 4),
+            entry("butr", 4),
+            entry("furan", 5),
+            entry("valer", 5),
+            entry("eicosa", 20),
+            entry("eicos", 20),
+            entry("icosa", 20),
+            entry("icos", 20),
+            entry("prosta", 20),
+            entry("prost", 20),
+            entry("prostan", 20)
     );
 
     private static final Set<String> NOIC_SET = Set.of("noic acid", "nic acid", "dioic_acid");
     private static final Set<String> NAL_SET = Set.of("nal", "dial");
     private static final Set<String> ACETATE_SET = Set.of("acetate", "noate", "nate");
 
+    /**
+     * Create a new {@code FattyAcidParserEventHandler}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
     public FattyAcidParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;
         try {
             registeredEvents = Map.ofEntries(
-                entry("lipid_pre_event", this::resetParser),
-                entry("lipid_post_event", this::build_lipid),
-                entry("fatty_acid_post_event", this::set_fatty_acid),
-                entry("fatty_acid_recursion_post_event", this::set_fatty_acid),
-
-                entry("acid_single_type_pre_event", this::set_fatty_acyl_type),
-                entry("ol_ending_pre_event", this::set_fatty_acyl_type),
-                entry("double_bond_position_pre_event", this::set_double_bond_information),
-                entry("double_bond_position_post_event", this::add_double_bond_information),
-                entry("db_number_post_event", this::set_double_bond_position),
-                entry("cistrans_post_event", this::set_cistrans),
-                entry("acid_type_double_post_event", this::check_db),
-                entry("db_length_pre_event", this::open_db_length),
-                entry("db_length_post_event", this::close_db_length),
-
-                // lengths
-                entry("functional_length_pre_event", this::reset_length),
-                entry("fatty_length_pre_event", this::reset_length),
-                entry("functional_length_post_event", this::set_functional_length),
-                entry("fatty_length_post_event", this::set_fatty_length),
-
-                // numbers
-                entry("notation_specials_pre_event", this::special_number),
-                entry("notation_last_digit_pre_event", this::last_number),
-                entry("notation_second_digit_pre_event", this::second_number),
-
-                // functional groups
-                entry("functional_group_pre_event", this::set_functional_group),
-                entry("functional_group_post_event", this::add_functional_group),
-                entry("functional_pos_pre_event", this::set_functional_pos),
-                entry("functional_position_pre_event", this::set_functional_position),
-                entry("functional_group_type_pre_event", this::set_functional_type),
-
-                // cyclo / epoxy
-                entry("cyclo_position_pre_event", this::set_functional_group),
-                entry("cyclo_position_post_event", this::rearrange_cycle),
-                entry("epoxy_pre_event", this::set_functional_group),
-                entry("epoxy_post_event", this::add_epoxy),
-                entry("cycle_pre_event", this::set_cycle),
-                entry("methylene_post_event", this::set_methylene),
-
-                // dioic
-                entry("dioic_pre_event", this::set_functional_group),
-                entry("dioic_post_event", this::set_dioic),
-                entry("dioic_acid_pre_event", this::set_fatty_acyl_type),
-                entry("dial_post_event", this::set_dial),
-
-                // prosta
-                entry("prosta_pre_event", this::set_prosta),
-                entry("prosta_post_event", this::add_cyclo),
-                entry("reduction_pre_event", this::set_functional_group),
-                entry("reduction_post_event", this::reduction),
-                entry("homo_post_event", this::homo),
-
-                // recursion
-                entry("recursion_description_pre_event", this::set_recursion),
-                entry("recursion_description_post_event", this::add_recursion),
-                entry("recursion_pos_pre_event", this::set_recursion_pos),
-                entry("yl_ending_pre_event", this::set_yl_ending),
-                entry("acetic_acid_post_event", this::set_acetic_acid),
-                entry("acetic_recursion_pre_event", this::set_recursion),
-                entry("acetic_recursion_post_event", this::add_recursion),
-                entry("hydroxyl_number_pre_event", this::add_hydroxyl),
-                entry("ol_pre_event", this::setup_hydroxyl),
-                entry("ol_post_event", this::add_hydroxyls),
-                entry("ol_pos_post_event", this::set_yl_ending),
-
-                // wax esters
-                entry("wax_ester_pre_event", this::set_recursion),
-                entry("wax_ester_post_event", this::add_wax_ester),
-                entry("ate_post_event", this::set_ate),
-                entry("isoprop_post_event", this::set_iso),
-                entry("isobut_post_event", this::set_iso),
-
-                // CoA
-                entry("coa_post_event", this::set_coa),
-                entry("methyl_pre_event", this::set_methyl),
-
-                // CAR
-                entry("car_pre_event", this::set_car),
-                entry("car_post_event", this::add_car),
-
-                // furan
-                entry("tetrahydrofuran_pre_event", this::set_tetrahydrofuran),
-                entry("furan_pre_event", this::set_furan),
-
-                // amine
-                entry("ethanolamine_post_event", this::add_ethanolamine),
-                entry("amine_n_pre_event", this::set_recursion),
-                entry("amine_n_post_event", this::add_amine),
-                entry("amine_post_event", this::add_amine_name),
-
-                // functional group position summary
-                entry("fg_pos_summary_pre_event", this::set_functional_group),
-                entry("fg_pos_summary_post_event", this::add_summary),
-                entry("func_stereo_pre_event", this::add_func_stereo)
+                    entry("lipid_pre_event", this::resetParser),
+                    entry("lipid_post_event", this::build_lipid),
+                    entry("fatty_acid_post_event", this::set_fatty_acid),
+                    entry("fatty_acid_recursion_post_event", this::set_fatty_acid),
+                    entry("acid_single_type_pre_event", this::set_fatty_acyl_type),
+                    entry("ol_ending_pre_event", this::set_fatty_acyl_type),
+                    entry("double_bond_position_pre_event", this::set_double_bond_information),
+                    entry("double_bond_position_post_event", this::add_double_bond_information),
+                    entry("db_number_post_event", this::set_double_bond_position),
+                    entry("cistrans_post_event", this::set_cistrans),
+                    entry("acid_type_double_post_event", this::check_db),
+                    entry("db_length_pre_event", this::open_db_length),
+                    entry("db_length_post_event", this::close_db_length),
+                    // lengths
+                    entry("functional_length_pre_event", this::reset_length),
+                    entry("fatty_length_pre_event", this::reset_length),
+                    entry("functional_length_post_event", this::set_functional_length),
+                    entry("fatty_length_post_event", this::set_fatty_length),
+                    // numbers
+                    entry("notation_specials_pre_event", this::special_number),
+                    entry("notation_last_digit_pre_event", this::last_number),
+                    entry("notation_second_digit_pre_event", this::second_number),
+                    // functional groups
+                    entry("functional_group_pre_event", this::set_functional_group),
+                    entry("functional_group_post_event", this::add_functional_group),
+                    entry("functional_pos_pre_event", this::set_functional_pos),
+                    entry("functional_position_pre_event", this::set_functional_position),
+                    entry("functional_group_type_pre_event", this::set_functional_type),
+                    // cyclo / epoxy
+                    entry("cyclo_position_pre_event", this::set_functional_group),
+                    entry("cyclo_position_post_event", this::rearrange_cycle),
+                    entry("epoxy_pre_event", this::set_functional_group),
+                    entry("epoxy_post_event", this::add_epoxy),
+                    entry("cycle_pre_event", this::set_cycle),
+                    entry("methylene_post_event", this::set_methylene),
+                    // dioic
+                    entry("dioic_pre_event", this::set_functional_group),
+                    entry("dioic_post_event", this::set_dioic),
+                    entry("dioic_acid_pre_event", this::set_fatty_acyl_type),
+                    entry("dial_post_event", this::set_dial),
+                    // prosta
+                    entry("prosta_pre_event", this::set_prosta),
+                    entry("prosta_post_event", this::add_cyclo),
+                    entry("reduction_pre_event", this::set_functional_group),
+                    entry("reduction_post_event", this::reduction),
+                    entry("homo_post_event", this::homo),
+                    // recursion
+                    entry("recursion_description_pre_event", this::set_recursion),
+                    entry("recursion_description_post_event", this::add_recursion),
+                    entry("recursion_pos_pre_event", this::set_recursion_pos),
+                    entry("yl_ending_pre_event", this::set_yl_ending),
+                    entry("acetic_acid_post_event", this::set_acetic_acid),
+                    entry("acetic_recursion_pre_event", this::set_recursion),
+                    entry("acetic_recursion_post_event", this::add_recursion),
+                    entry("hydroxyl_number_pre_event", this::add_hydroxyl),
+                    entry("ol_pre_event", this::setup_hydroxyl),
+                    entry("ol_post_event", this::add_hydroxyls),
+                    entry("ol_pos_post_event", this::set_yl_ending),
+                    // wax esters
+                    entry("wax_ester_pre_event", this::set_recursion),
+                    entry("wax_ester_post_event", this::add_wax_ester),
+                    entry("ate_post_event", this::set_ate),
+                    entry("isoprop_post_event", this::set_iso),
+                    entry("isobut_post_event", this::set_iso),
+                    // CoA
+                    entry("coa_post_event", this::set_coa),
+                    entry("methyl_pre_event", this::set_methyl),
+                    // CAR
+                    entry("car_pre_event", this::set_car),
+                    entry("car_post_event", this::add_car),
+                    // furan
+                    entry("tetrahydrofuran_pre_event", this::set_tetrahydrofuran),
+                    entry("furan_pre_event", this::set_furan),
+                    // amine
+                    entry("ethanolamine_post_event", this::add_ethanolamine),
+                    entry("amine_n_pre_event", this::set_recursion),
+                    entry("amine_n_post_event", this::add_amine),
+                    entry("amine_post_event", this::add_amine_name),
+                    // functional group position summary
+                    entry("fg_pos_summary_pre_event", this::set_functional_group),
+                    entry("fg_pos_summary_post_event", this::add_summary),
+                    entry("func_stereo_pre_event", this::add_func_stereo)
             );
         } catch (Exception e) {
             throw new ConstraintViolationException("Cannot initialize FattyAcidParserEventHandler.", e);
         }
     }
 
-    public String FA_I() {
+    private String FA_I() {
         return "fa" + Integer.toString(fattyAcylStack.size());
     }
 
-    public void set_lipid_level(LipidLevel _level) {
+    private void set_lipid_level(LipidLevel _level) {
         level = level.level < _level.level ? level : _level;
     }
 
@@ -354,27 +346,20 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         content = new LipidAdduct();
 
         switch (level) {
-
-            case COMPLETE_STRUCTURE:
+            case COMPLETE_STRUCTURE ->
                 content.setLipid(new LipidCompleteStructure(head_group, fattyAcylStack, knownFunctionalGroups));
-                break;
-            case FULL_STRUCTURE:
+            case FULL_STRUCTURE ->
                 content.setLipid(new LipidFullStructure(head_group, fattyAcylStack, knownFunctionalGroups));
-                break;
-            case STRUCTURE_DEFINED:
+            case STRUCTURE_DEFINED ->
                 content.setLipid(new LipidStructureDefined(head_group, fattyAcylStack, knownFunctionalGroups));
-                break;
-            case SN_POSITION:
+            case SN_POSITION ->
                 content.setLipid(new LipidSnPosition(head_group, fattyAcylStack, knownFunctionalGroups));
-                break;
-            case MOLECULAR_SPECIES:
+            case MOLECULAR_SPECIES ->
                 content.setLipid(new LipidMolecularSpecies(head_group, fattyAcylStack, knownFunctionalGroups));
-                break;
-            case SPECIES:
+            case SPECIES ->
                 content.setLipid(new LipidSpecies(head_group, fattyAcylStack, knownFunctionalGroups));
-                break;
-            default:
-                break;
+            default -> {
+            }
         }
     }
 
@@ -397,7 +382,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void add_amine(TreeNode node) {
+    private void add_amine(TreeNode node) {
         FattyAcid fa = fattyAcylStack.pollLast();
 
         fa.setName(fa.getName() + "1");
@@ -406,7 +391,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         fattyAcylStack.addFirst(fa);
     }
 
-    public void set_fatty_acid(TreeNode node) {
+    private void set_fatty_acid(TreeNode node) {
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         if (tmp.containsKey("length_pattern")) {
 
@@ -661,7 +646,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         tmp.put("add_lengths", 0);
     }
 
-    public void switch_position(FunctionalGroup func_group, int switch_num) {
+    private void switch_position(FunctionalGroup func_group, int switch_num) {
         func_group.setPosition(switch_num - func_group.getPosition());
         for (Entry<String, ArrayList<FunctionalGroup>> kv : func_group.getFunctionalGroups().entrySet()) {
             for (FunctionalGroup fg : kv.getValue()) {
@@ -670,7 +655,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void add_cyclo(TreeNode node) {
+    private void add_cyclo(TreeNode node) {
         int start = (int) ((GenericList) ((GenericList) tmp.get("fg_pos")).get(0)).get(0);
         int end = (int) ((GenericList) ((GenericList) tmp.get("fg_pos")).get(1)).get(0);
 
@@ -755,7 +740,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         fattyAcylStack.peekLast().getFunctionalGroups().get("cy").add(cycle);
     }
 
-    public void add_wax_ester(TreeNode node) {
+    private void add_wax_ester(TreeNode node) {
         FattyAcid fa = fattyAcylStack.pollLast();
         fa.setName(fa.getName() + "1");
         fa.setLipidFaBondType(LipidFaBondType.AMINE);
@@ -763,16 +748,16 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         fattyAcylStack.addFirst(fa);
     }
 
-    public void set_methyl(TreeNode node) {
+    private void set_methyl(TreeNode node) {
         fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + 1);
     }
 
-    public void set_acetic_acid(TreeNode node) {
+    private void set_acetic_acid(TreeNode node) {
         fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + 2);
         headgroup = "FA";
     }
 
-    public void set_methylene(TreeNode node) {
+    private void set_methylene(TreeNode node) {
         tmp.put("fg_type", "methylene");
         GenericList gl = (GenericList) tmp.get("fg_pos");
         if (gl.size() > 1) {
@@ -786,35 +771,35 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_car(TreeNode node) {
+    private void set_car(TreeNode node) {
         tmp.put("fg_pos", new GenericList());
         tmp.put("fg_type", "");
     }
 
-    public void add_car(TreeNode node) {
+    private void add_car(TreeNode node) {
         headgroup = "CAR";
     }
 
-    public void add_ethanolamine(TreeNode node) {
+    private void add_ethanolamine(TreeNode node) {
         headgroup = "NAE";
     }
 
-    public void add_amine_name(TreeNode node) {
+    private void add_amine_name(TreeNode node) {
         headgroup = "NA";
     }
 
-    public void reset_length(TreeNode node) {
+    private void reset_length(TreeNode node) {
         tmp.put("length", 0);
         tmp.put("length_pattern", "");
         tmp.put("length_tokens", new GenericList());
         tmp.put("add_lengths", 1);
     }
 
-    public void set_fatty_length(TreeNode node) {
+    private void set_fatty_length(TreeNode node) {
         tmp.put("add_lengths", 0);
     }
 
-    public void last_number(TreeNode node) {
+    private void last_number(TreeNode node) {
         if ((int) tmp.get("add_lengths") == 1) {
             tmp.put("length", (int) tmp.get("length") + LAST_NUMBERS.get(node.getText()));
             tmp.put("length_pattern", (String) tmp.get("length_pattern") + "L");
@@ -822,7 +807,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void second_number(TreeNode node) {
+    private void second_number(TreeNode node) {
         if ((int) tmp.get("add_lengths") == 1) {
             tmp.put("length", (int) tmp.get("length") + SECOND_NUMBERS.get(node.getText()));
             tmp.put("length_pattern", (String) tmp.get("length_pattern") + "S");
@@ -830,7 +815,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void special_number(TreeNode node) {
+    private void special_number(TreeNode node) {
         if ((int) tmp.get("add_lengths") == 1) {
             tmp.put("length", (int) tmp.get("length") + SPECIAL_NUMBERS.get(node.getText()));
             tmp.put("length_pattern", (String) tmp.get("length_pattern") + "X");
@@ -838,7 +823,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_iso(TreeNode node) {
+    private void set_iso(TreeNode node) {
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         curr_fa.setNumCarbon(curr_fa.getNumCarbon() - 1);
         FunctionalGroup fg = knownFunctionalGroups.get("Me");
@@ -849,7 +834,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         curr_fa.getFunctionalGroups().get("Me").add(fg);
     }
 
-    public void set_prosta(TreeNode node) {
+    private void set_prosta(TreeNode node) {
         int minus_pos = 0;
         if (tmp.containsKey("reduction")) {
             for (Object o : (GenericList) tmp.get("reduction")) {
@@ -872,18 +857,18 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         tmp.put("fg_type", "cy");
     }
 
-    public void set_tetrahydrofuran(TreeNode node) {
+    private void set_tetrahydrofuran(TreeNode node) {
         tmp.put("furan", 1);
         tmp.put("tetrahydrofuran", 1);
         set_cycle(node);
     }
 
-    public void set_furan(TreeNode node) {
+    private void set_furan(TreeNode node) {
         tmp.put("furan", 1);
         set_cycle(node);
     }
 
-    public void check_db(TreeNode node) {
+    private void check_db(TreeNode node) {
         String fa_i = FA_I();
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         if (((Dictionary) tmp.get(fa_i)).containsKey("fg_pos_summary")) {
@@ -898,11 +883,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_coa(TreeNode node) {
+    private void set_coa(TreeNode node) {
         headgroup = "CoA";
     }
 
-    public void set_yl_ending(TreeNode node) {
+    private void set_yl_ending(TreeNode node) {
         int l = Integer.valueOf(node.getText()) - 1;
         if (l == 0) {
             return;
@@ -976,7 +961,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         curr_fa.getFunctionalGroups().get(fname).add(fg);
     }
 
-    public void set_dial(TreeNode node) {
+    private void set_dial(TreeNode node) {
         FattyAcid curr_fa = fattyAcylStack.peekLast();
         int pos = curr_fa.getNumCarbon();
         FunctionalGroup fg = knownFunctionalGroups.get("oxo");
@@ -987,15 +972,15 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         curr_fa.getFunctionalGroups().get("oxo").add(fg);
     }
 
-    public void open_db_length(TreeNode node) {
+    private void open_db_length(TreeNode node) {
         tmp.put("add_lengths", 1);
     }
 
-    public void close_db_length(TreeNode node) {
+    private void close_db_length(TreeNode node) {
         tmp.put("add_lengths", 0);
     }
 
-    public void set_dioic(TreeNode node) {
+    private void set_dioic(TreeNode node) {
         headgroup = "FA";
         int pos = (((GenericList) tmp.get("fg_pos")).size() == 2) ? (int) ((GenericList) ((GenericList) tmp.get("fg_pos")).get(1)).get(0) : fattyAcylStack.peekLast().getNumCarbon();
         if (tmp.containsKey("reduction")) {
@@ -1010,11 +995,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         fattyAcylStack.peekLast().getFunctionalGroups().get("COOH").add(func_group);
     }
 
-    public void setup_hydroxyl(TreeNode node) {
+    private void setup_hydroxyl(TreeNode node) {
         tmp.put("hydroxyl_pos", new GenericList());
     }
 
-    public void add_hydroxyls(TreeNode node) {
+    private void add_hydroxyls(TreeNode node) {
         if (((GenericList) tmp.get("hydroxyl_pos")).size() > 1) {
             FunctionalGroup fg_oh = knownFunctionalGroups.get("OH");
             ArrayList<Integer> sorted_pos = new ArrayList<>();
@@ -1035,22 +1020,22 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_ate(TreeNode node) {
+    private void set_ate(TreeNode node) {
         fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + ATE.get(node.getText()));
         headgroup = "WE";
     }
 
-    public void add_hydroxyl(TreeNode node) {
+    private void add_hydroxyl(TreeNode node) {
         int h = Integer.valueOf(node.getText());
         ((GenericList) tmp.get("hydroxyl_pos")).add(h);
     }
 
-    public void set_functional_group(TreeNode node) {
+    private void set_functional_group(TreeNode node) {
         tmp.put("fg_pos", new GenericList());
         tmp.put("fg_type", "");
     }
 
-    public void add_functional_group(TreeNode node) {
+    private void add_functional_group(TreeNode node) {
         if (tmp.containsKey("added_func_group")) {
             tmp.remove("added_func_group");
             return;
@@ -1098,12 +1083,12 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_double_bond_information(TreeNode node) {
+    private void set_double_bond_information(TreeNode node) {
         ((Dictionary) tmp.get(FA_I())).put("db_position", 0);
         ((Dictionary) tmp.get(FA_I())).put("db_cistrans", "");
     }
 
-    public void add_double_bond_information(TreeNode node) {
+    private void add_double_bond_information(TreeNode node) {
         int pos = (int) ((Dictionary) tmp.get(FA_I())).get("db_position");
         String str_pos = Integer.toString(pos);
         String cistrans = (String) ((Dictionary) tmp.get(FA_I())).get("db_cistrans");
@@ -1128,11 +1113,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_cistrans(TreeNode node) {
+    private void set_cistrans(TreeNode node) {
         ((Dictionary) tmp.get(FA_I())).put("db_cistrans", node.getText());
     }
 
-    public void set_double_bond_position(TreeNode node) {
+    private void set_double_bond_position(TreeNode node) {
         int pos = Integer.valueOf(node.getText());
         int num_db = 0;
         if (tmp.containsKey("reduction")) {
@@ -1146,7 +1131,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         ((Dictionary) tmp.get(FA_I())).put("db_position", pos - num_db);
     }
 
-    public void add_summary(TreeNode node) {
+    private void add_summary(TreeNode node) {
         String fa_i = FA_I();
         ((Dictionary) tmp.get(fa_i)).put("fg_pos_summary", new Dictionary());
         for (Object o : (GenericList) tmp.get("fg_pos")) {
@@ -1157,17 +1142,17 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_functional_length(TreeNode node) {
+    private void set_functional_length(TreeNode node) {
         if ((int) tmp.get("length") != ((GenericList) tmp.get("fg_pos")).size()) {
             throw new LipidException("Length of functional group '" + Integer.toString((int) tmp.get("length")) + "' does not match with number of its positions '" + Integer.toString(((GenericList) tmp.get("fg_pos")).size()) + "'");
         }
     }
 
-    public void set_functional_type(TreeNode node) {
+    private void set_functional_type(TreeNode node) {
         tmp.put("fg_type", node.getText());
     }
 
-    public void add_epoxy(TreeNode node) {
+    private void add_epoxy(TreeNode node) {
         GenericList gl = (GenericList) tmp.get("fg_pos");
         while (gl.size() > 1) {
             gl.remove(gl.size() - 1);
@@ -1175,24 +1160,24 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         tmp.put("fg_type", "Epoxy");
     }
 
-    public void set_functional_position(TreeNode node) {
+    private void set_functional_position(TreeNode node) {
         GenericList gl = new GenericList();
         gl.add(0);
         gl.add("");
         ((GenericList) tmp.get("fg_pos")).add(gl);
     }
 
-    public void set_functional_pos(TreeNode node) {
+    private void set_functional_pos(TreeNode node) {
         GenericList gl = (GenericList) tmp.get("fg_pos");
         ((GenericList) gl.get(gl.size() - 1)).set(0, Integer.valueOf(node.getText()));
     }
 
-    public void add_func_stereo(TreeNode node) {
+    private void add_func_stereo(TreeNode node) {
         int l = ((GenericList) tmp.get("fg_pos")).size();
         ((GenericList) ((GenericList) tmp.get("fg_pos")).get(l - 1)).set(1, node.getText());
     }
 
-    public void reduction(TreeNode node) {
+    private void reduction(TreeNode node) {
         int shift_len = -((GenericList) tmp.get("fg_pos")).size();
         fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + shift_len);
         for (Entry<String, ArrayList<FunctionalGroup>> kv : fattyAcylStack.peekLast().getFunctionalGroups().entrySet()) {
@@ -1208,7 +1193,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void homo(TreeNode node) {
+    private void homo(TreeNode node) {
         tmp.put("post_adding", new GenericList());
         for (Object o : (GenericList) tmp.get("fg_pos")) {
             GenericList lst = (GenericList) o;
@@ -1216,11 +1201,11 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    void set_cycle(TreeNode node) {
+    private void set_cycle(TreeNode node) {
         tmp.put("cyclo", 1);
     }
 
-    public void rearrange_cycle(TreeNode node) {
+    private void rearrange_cycle(TreeNode node) {
         if (tmp.containsKey("post_adding")) {
             fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + ((GenericList) tmp.get("post_adding")).size());
             tmp.remove("post_adding");
@@ -1239,7 +1224,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         }
     }
 
-    public void set_recursion(TreeNode node) {
+    private void set_recursion(TreeNode node) {
         tmp.put("fg_pos", new GenericList());
         tmp.put("fg_type", "");
         fattyAcylStack.add(new FattyAcid("FA", knownFunctionalGroups));
@@ -1247,7 +1232,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         ((Dictionary) tmp.get(FA_I())).put("recursion_pos", 0);
     }
 
-    public void add_recursion(TreeNode node) {
+    private void add_recursion(TreeNode node) {
         int pos = (int) ((Dictionary) tmp.get(FA_I())).get("recursion_pos");
         FattyAcid fa = fattyAcylStack.pollLast();
 
@@ -1268,7 +1253,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         tmp.put("added_func_group", 1);
     }
 
-    public void set_recursion_pos(TreeNode node) {
+    private void set_recursion_pos(TreeNode node) {
         ((Dictionary) tmp.get(FA_I())).put("recursion_pos", Integer.valueOf(node.getText()));
     }
 

@@ -18,12 +18,12 @@ package org.lifstools.jgoslin.parser;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
+ * Bit field implementation. This class is dedicated to have an efficient sorted
+ * set class storing values within 0..n-1 and fast sequential iterator.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
-// this class is dedicated to have an efficient sorted set class storing
-// values within 0..n-1 and fast sequencial iterator
 final class Bitfield {
 
     private final long[] field;

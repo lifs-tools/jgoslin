@@ -18,6 +18,8 @@ package org.lifstools.jgoslin.domain;
 import java.util.HashMap;
 
 /**
+ * A dictionary typing for {@link java.util.HashMap} to align this
+ * implementation with the other language implementations.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

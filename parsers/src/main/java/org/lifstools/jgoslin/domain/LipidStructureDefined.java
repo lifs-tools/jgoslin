@@ -18,9 +18,12 @@ package org.lifstools.jgoslin.domain;
 import java.util.Collection;
 
 /**
+ * Structure defined level according to the 2020 update of the Liebisch
+ * shorthand nomenclature.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
+ * @see LipidLevel
  */
 public class LipidStructureDefined extends LipidSnPosition {
 
@@ -53,7 +56,8 @@ public class LipidStructureDefined extends LipidSnPosition {
                 return super.getLipidString(level);
             }
 
-            default -> throw new ConstraintViolationException("LipidStructureDefined does not know how to create a lipid string for level " + level.toString());
+            default ->
+                throw new ConstraintViolationException("LipidStructureDefined does not know how to create a lipid string for level " + level.toString());
         }
     }
 

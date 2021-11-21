@@ -18,9 +18,11 @@ package org.lifstools.jgoslin.domain;
 import java.util.Collection;
 
 /**
- *
+ * Molecular species level according to the 2020 update of the Liebisch shorthand
+ * nomenclature.
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
+ * @see LipidLevel
  */
 public class LipidMolecularSpecies extends LipidSpecies {
 

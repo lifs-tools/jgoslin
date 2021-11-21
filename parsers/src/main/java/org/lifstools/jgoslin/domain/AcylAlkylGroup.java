@@ -18,6 +18,7 @@ package org.lifstools.jgoslin.domain;
 import java.util.ArrayList;
 
 /**
+ * An acyl alkyl group as a functional group.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

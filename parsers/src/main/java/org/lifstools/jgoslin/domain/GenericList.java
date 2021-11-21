@@ -18,6 +18,8 @@ package org.lifstools.jgoslin.domain;
 import java.util.ArrayList;
 
 /**
+ * A typing for {@link java.util.ArrayList} of objects to align this
+ * implementation with the other language implementations.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

@@ -27,6 +27,8 @@ import org.lifstools.jgoslin.parser.BaseParserEventHandler;
 import org.springframework.core.io.ClassPathResource;
 
 /**
+ * Lookup class for lipid classes, consisting of {@link LipidClassMeta} entries,
+ * derived from lipid-list.csv.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -35,12 +37,12 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
 
     private static final LipidClasses LIPID_CLASSES = new LipidClasses();
     public static final int UNDEFINED_CLASS = 0;
-    
+
     private LipidClasses() {
         super();
-    	loadData(StringFunctions.getResourceAsStringList(new ClassPathResource("lipid-list.csv")), SumFormulaParser.newInstance());
+        loadData(StringFunctions.getResourceAsStringList(new ClassPathResource("lipid-list.csv")), SumFormulaParser.newInstance());
     }
-    
+
     private void loadData(List<String> lines, SumFormulaParser sfp) {
         add(new LipidClassMeta(LipidCategory.NO_CATEGORY,
                 "UNDEFINED",
@@ -58,25 +60,25 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
         HashMap<String, ArrayList<String>> data = new HashMap<>();
         HashSet<String> keys = new HashSet<>();
         Map<String, Integer> enum_names = new HashMap<>(Map.ofEntries(
-            entry("GL", 1),
-            entry("GP", 1),
-            entry("SP", 1),
-            entry("ST", 1),
-            entry("FA", 1),
-            entry("PK", 1),
-            entry("SL", 1),
-            entry("UNDEFINED", 1)
+                entry("GL", 1),
+                entry("GP", 1),
+                entry("SP", 1),
+                entry("ST", 1),
+                entry("FA", 1),
+                entry("PK", 1),
+                entry("SL", 1),
+                entry("UNDEFINED", 1)
         ));
 
         Map<String, LipidCategory> names_to_category = Map.ofEntries(
-            entry("GL", LipidCategory.GL),
-            entry("GP", LipidCategory.GP),
-            entry("SP", LipidCategory.SP),
-            entry("ST", LipidCategory.ST),
-            entry("FA", LipidCategory.FA),
-            entry("PK", LipidCategory.PK),
-            entry("SL", LipidCategory.SL),
-            entry("UNDEFINED", LipidCategory.UNDEFINED)
+                entry("GL", LipidCategory.GL),
+                entry("GP", LipidCategory.GP),
+                entry("SP", LipidCategory.SP),
+                entry("ST", LipidCategory.ST),
+                entry("FA", LipidCategory.FA),
+                entry("PK", LipidCategory.PK),
+                entry("SL", LipidCategory.SL),
+                entry("UNDEFINED", LipidCategory.UNDEFINED)
         );
 
         for (String line : lines) {

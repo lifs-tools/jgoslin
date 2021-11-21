@@ -24,6 +24,8 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 import org.springframework.core.io.ClassPathResource;
 
 /**
+ * Implementation that uses all available parsers to parse a given lipid name.
+ * First successful parser implementation wins.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -36,13 +38,24 @@ public class LipidParser {
     private LipidParser(Parser<LipidAdduct>... parsers) {
         parserList = Arrays.asList(parsers);
     }
-    
+
+    /**
+     * Create a new lipid parser instance.
+     *
+     * @return a new lipid parser instance.
+     */
     public static LipidParser newInstance() {
         SumFormulaParser sfp = SumFormulaParser.newInstance();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), sfp);
         return newInstance(knownFunctionalGroups);
     }
-    
+
+    /**
+     * Create a new lipid parser instance.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @return a new lipid parser instance.
+     */
     public static LipidParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
         return new LipidParser(knownFunctionalGroups);
     }
@@ -63,20 +76,20 @@ public class LipidParser {
      * provided lipid name.If no parser is able to parse the name successfully,
      * an exception is thrown.
      *
-     * @param lipid_name the lipid name to parse.
+     * @param lipidName the lipid name to parse.
      * @return the {@link LipidAdduct} if parsing with at least one parser
      * succeeded.
      * @throws LipidParsingException if now parser was able to parse the
      * provided lipid name.
      */
-    public LipidAdduct parse(String lipid_name) {
+    public LipidAdduct parse(String lipidName) {
         lastSuccessfulParser = null;
         Parser<LipidAdduct> lastParser = null;
         BaseParserEventHandler<LipidAdduct> eventHandler = null;
         for (Parser<LipidAdduct> parser : parserList) {
             lastParser = parser;
             eventHandler = parser.newEventHandler();
-            LipidAdduct lipid = parser.parse(lipid_name, eventHandler, false);
+            LipidAdduct lipid = parser.parse(lipidName, eventHandler, false);
             if (lipid != null) {
                 lastSuccessfulParser = parser;
                 return lipid;
@@ -88,11 +101,11 @@ public class LipidParser {
         } else {
             String errorMessage = eventHandler.errorMessage;
             if (errorMessage == null || errorMessage.isEmpty()) {
-                errorMessage = lipid_name;
+                errorMessage = lipidName;
             }
             message += ("at or after " + errorMessage);
         }
-        throw new LipidParsingException("Could not parse lipid '" + lipid_name + " 'with any parser!" + message);
+        throw new LipidParsingException("Could not parse lipid '" + lipidName + " 'with any parser!" + message);
     }
 
     /**

@@ -25,10 +25,19 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
+/**
+ * Abstract base class for parsers producing a parse result of type T. Uses a
+ * re-implementation of Cocke-Younger-Kasami (CYK) algorithm for context free
+ * grammars.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ * @param <T> the type of a successful parse result.
+ */
 public abstract class Parser<T> {
 
     // DP stands for dynamic programming
-    final class DPNode {
+    protected final class DPNode {
 
         public long rule_index_1;
         public long rule_index_2;
@@ -71,11 +80,9 @@ public abstract class Parser<T> {
     protected final ArrayList<Bitfield> rightPair = new ArrayList<>();
     protected int avgPair;
     protected char quote;
-//    protected boolean wordInGrammar = false;
     protected String grammarName = "";
     protected boolean usedEof = false;
     protected static final char DEFAULT_QUOTE = '\'';
-//    protected String errorMessage = "";
 
     public Parser(String grammarContent) {
         this(grammarContent, (char) '\0');
@@ -85,22 +92,20 @@ public abstract class Parser<T> {
         this.quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;
         readGrammar(grammarContent);
     }
-    
+
     public abstract BaseParserEventHandler<T> newEventHandler();
 
-    long get_next_free_rule_index() {
+    protected long get_next_free_rule_index() {
         if (nextFreeRuleIndex <= MASK) {
             return nextFreeRuleIndex++;
         }
         throw new ConstraintViolationException("Error: grammar is too big.");
     }
 
-    final void readGrammar(String grammar) {
+    protected final void readGrammar(String grammar) {
         nextFreeRuleIndex = START_RULE;
-//        wordInGrammar = false;
         grammarName = "";
         usedEof = false;
-//        ruleToNT = new HashMap<>();
 
         // interpret the rules and create the structure for parsing
         ArrayList<String> rules = extract_text_based_rules(grammar, quote);
@@ -327,7 +332,7 @@ public abstract class Parser<T> {
         }
     }
 
-    ArrayList<String> extract_text_based_rules(String grammar, char _quote) {
+    protected ArrayList<String> extract_text_based_rules(String grammar, char _quote) {
         ArrayList<String> rules = null;
         int grammar_length = grammar.length();
 
@@ -444,16 +449,16 @@ public abstract class Parser<T> {
         return rules;
     }
 
-    long compute_rule_key(long rule_index_1, long rule_index_2) {
+    protected long compute_rule_key(long rule_index_1, long rule_index_2) {
         return (rule_index_1 << SHIFT) | rule_index_2;
     }
 
     // checking if string is terminal
-    boolean is_terminal(String product_token, char _quote) {
+    protected boolean is_terminal(String product_token, char _quote) {
         return product_token.charAt(0) == _quote && product_token.charAt(product_token.length() - 1) == _quote && product_token.length() > 2;
     }
 
-    String de_escape(String text, char _quote) {
+    protected String de_escape(String text, char _quote) {
         // remove the escape chars
         StringBuilder sb = new StringBuilder();
         boolean last_escape_char = false;
@@ -478,7 +483,7 @@ public abstract class Parser<T> {
     }
 
     // splitting the whole terminal in a tree structure where characters of terminal are the leafs and the inner nodes are added non terminal rules
-    long add_terminal(String text) {
+    protected long add_terminal(String text) {
         ArrayDeque<Long> terminal_rules = new ArrayDeque<>();
         for (int i = 1; i < text.length() - 1; ++i) {
             char c = text.charAt(i);
@@ -508,7 +513,7 @@ public abstract class Parser<T> {
         return terminal_rules.pollLast();
     }
 
-    ArrayList<Long> top_nodes(long rule_index) {
+    protected ArrayList<Long> top_nodes(long rule_index) {
         ArrayList<Long> collection = new ArrayList<>();
         ArrayList<Long> collection_top = new ArrayList<>();
         collection.add(rule_index);
@@ -529,7 +534,7 @@ public abstract class Parser<T> {
     }
 
     // expanding singleton rules, e.g. S . A, A . B, B . C
-    ArrayList<Long> collect_one_backwards(Long rule_index) {
+    protected ArrayList<Long> collect_one_backwards(Long rule_index) {
         ArrayList<Long> collection = new ArrayList<>();
         collection.add(rule_index);
         int i = 0;
@@ -546,7 +551,7 @@ public abstract class Parser<T> {
         return collection;
     }
 
-    ArrayList< ArrayList<Long>> collect_backwards(Long child_rule_index, Long parent_rule_index) {
+    protected ArrayList< ArrayList<Long>> collect_backwards(Long child_rule_index, Long parent_rule_index) {
         HashSet<Long> visited = new HashSet<>();
         ArrayList<Long> path = new ArrayList<>();
         ArrayList< ArrayList<Long>> collection = new ArrayList<>();
@@ -554,7 +559,7 @@ public abstract class Parser<T> {
         return collect_backwards(child_rule_index, parent_rule_index, visited, path, collection);
     }
 
-    ArrayList< ArrayList<Long>> collect_backwards(long child_rule_index, long parent_rule_index, HashSet<Long> visited, ArrayList<Long> path, ArrayList< ArrayList<Long>> collection) {
+    protected ArrayList< ArrayList<Long>> collect_backwards(long child_rule_index, long parent_rule_index, HashSet<Long> visited, ArrayList<Long> path, ArrayList< ArrayList<Long>> collection) {
         // provides all single linkage paths from a child rule to a parent rule,
         // and yes, there can be several paths
 
@@ -585,7 +590,7 @@ public abstract class Parser<T> {
         return collection;
     }
 
-    void raise_events(TreeNode node, BaseParserEventHandler parserEventHandler) {
+    protected void raise_events(TreeNode node, BaseParserEventHandler parserEventHandler) {
         if (node != null) {
             String node_rule_name = node.fire_event ? NTtoRule.get(node.rule_index) : "";
             if (node.fire_event) {
@@ -606,7 +611,7 @@ public abstract class Parser<T> {
     }
 
     // filling the syntax tree including events
-    void fill_tree(TreeNode node, DPNode dp_node) {
+    protected void fill_tree(TreeNode node, DPNode dp_node) {
         // checking and extending nodes for single rule chains
 
         long bottom_rule = 0, top_rule = 0;
@@ -639,18 +644,37 @@ public abstract class Parser<T> {
         }
     }
 
-//    public String get_error_message() {
-//        return errorMessage;
-//    }
-    public T parse(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {
-        return parse(text_to_parse, parserEventHandler, true);
+    /**
+     * Parse the given text, constructing the output object of type T using the
+     * provided parser event handler.
+     *
+     * @param textToParse the text to parse.
+     * @param parserEventHandler the parser event handler to process events
+     * created by the parser.
+     * @return the parsed object of type T if successful, otherwise an exception
+     * will be thrown.
+     * @throws LipidParsingException
+     */
+    public T parse(String textToParse, BaseParserEventHandler<T> parserEventHandler) {
+        return parse(textToParse, parserEventHandler, true);
     }
 
-    // re-implementation of Cocke-Younger-Kasami algorithm
-    public T parse(String text_to_parse, BaseParserEventHandler<T> parserEventHandler, boolean throw_error) {
-        String old_text = text_to_parse;
+    /**
+     * Parse the given text, constructing the output object of type T using the
+     * provided parser event handler.Allows the user to specify, if exceptions
+     * should be thrown on errors.
+     *
+     * @param textToParse the text to parse.
+     * @param parserEventHandler the parser event handler to process events
+     * created by the parser.
+     * @param throwError if true, throws exception if parsing was not
+     * successful.
+     * @return the parsed object of type T if successful, otherwise {@code null}, if throwError is {@code false}.
+     */
+    public T parse(String textToParse, BaseParserEventHandler<T> parserEventHandler, boolean throwError) {
+        String old_text = textToParse;
         if (usedEof) {
-            text_to_parse += EOF_SIGN;
+            textToParse += EOF_SIGN;
         }
         parserEventHandler.content = null;
 
@@ -661,16 +685,16 @@ public abstract class Parser<T> {
 
         parserEventHandler.sanityCheck(this);
         try {
-            Optional<ParsingErrors> parsingErrors = parse_regular(text_to_parse, parserEventHandler);
+            Optional<ParsingErrors> parsingErrors = parse_regular(textToParse, parserEventHandler);
             if (parsingErrors.isPresent() && !parsingErrors.get().wordInGrammar) {
-                if (throw_error) {
+                if (throwError) {
                     throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
                 } else {
                     parserEventHandler.errorMessage = parsingErrors.get().errorMessage;
                 }
             }
         } catch (RuntimeException lpe) {
-            if (throw_error) {
+            if (throwError) {
                 throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "': ", lpe);
             } else {
                 parserEventHandler.errorMessage = lpe.getLocalizedMessage();
@@ -679,7 +703,7 @@ public abstract class Parser<T> {
         return parserEventHandler.content;
     }
 
-    private class ParsingErrors {
+    protected class ParsingErrors {
 
         final boolean wordInGrammar;
         final String errorMessage;
@@ -691,7 +715,7 @@ public abstract class Parser<T> {
 
     }
 
-    Optional<ParsingErrors> parse_regular(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {
+    protected Optional<ParsingErrors> parse_regular(String text_to_parse, BaseParserEventHandler<T> parserEventHandler) {
         boolean wordInGrammar = false;
 
         int n = text_to_parse.length();

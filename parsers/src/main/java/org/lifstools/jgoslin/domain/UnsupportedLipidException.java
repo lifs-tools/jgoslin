@@ -16,6 +16,8 @@
 package org.lifstools.jgoslin.domain;
 
 /**
+ * This exception is thrown, if a certain type of lipid is not yet supported by
+ * the grammar implementations.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

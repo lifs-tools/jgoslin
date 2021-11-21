@@ -16,12 +16,14 @@
 package org.lifstools.jgoslin.domain;
 
 /**
+ * Base exception for exceptions that relate to lipid parsing or creation of
+ * lipids.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
 public class LipidException extends RuntimeException {
-    
+
     protected LipidException() {
         super();
     }

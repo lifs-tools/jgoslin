@@ -44,7 +44,7 @@ import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
-public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
+public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
 
     protected LipidLevel level = LipidLevel.FULL_STRUCTURE;
     protected String headGroup = "";
@@ -62,15 +62,15 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
         this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
-    public void setLipidLevel(LipidLevel _level) {
+    protected void setLipidLevel(LipidLevel _level) {
         level = level.level < _level.level ? level : _level;
     }
 
-    public boolean spRegularLcb() {
+    protected boolean spRegularLcb() {
         return Headgroup.getCategory(headGroup) == LipidCategory.SP && (currentFa.getLipidFaBondType() == LipidFaBondType.LCB_REGULAR || currentFa.getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION) && !(SP_EXCEPTION_CLASSES.contains(headGroup) && headgroupDecorators.isEmpty());
     }
 
-    public Headgroup prepareHeadgroupAndChecks() {
+    protected Headgroup prepareHeadgroupAndChecks() {
         Headgroup headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
         if (useHeadGroup) {
             return headgroup;
@@ -121,7 +121,7 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
         return headgroup;
     }
 
-    public LipidSpecies assembleLipid(Headgroup headgroup) {
+    protected LipidSpecies assembleLipid(Headgroup headgroup) {
         LipidSpecies ls = null;
         switch (level) {
             case COMPLETE_STRUCTURE -> ls = new LipidCompleteStructure(headgroup, faList, knownFunctionalGroups);
@@ -136,8 +136,4 @@ public class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdd
         return ls;
     }
 
-    @Override
-    void resetParser(TreeNode node) {
-        //
-    }
 }

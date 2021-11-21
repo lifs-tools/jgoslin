@@ -24,10 +24,11 @@ import java.util.function.Consumer;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 
 /**
+ * Abstract base class for parser event handling.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
- * @param <T>
+ * @param <T> the type of object created from parsers using this event handler.
  */
 public abstract class BaseParserEventHandler<T> {
 
@@ -37,13 +38,13 @@ public abstract class BaseParserEventHandler<T> {
     protected T content = null;
     protected String errorMessage = "";
 
-    public BaseParserEventHandler() {
+    protected BaseParserEventHandler() {
         registeredEvents = new HashMap<>();
         ruleNames = new HashSet<>();
     }
 
     // checking if all registered events are reasonable and orrur as rules in the grammar
-    void sanityCheck(Parser<T> parser) {
+    protected void sanityCheck(Parser<T> parser) {
         for (String event_name : registeredEvents.keySet()) {
             if (!event_name.endsWith("_pre_event") && !event_name.endsWith("_post_event")) {
                 throw new ConstraintViolationException("Parser event handler error: event '" + event_name + "' does not contain the suffix '_pre_event' or '_post_event'");
@@ -55,7 +56,7 @@ public abstract class BaseParserEventHandler<T> {
         }
     }
 
-    void handleEvent(String event_name, TreeNode node) {
+    protected void handleEvent(String event_name, TreeNode node) {
         if (debug.equals("full")) {
             String reg_event = registeredEvents.containsKey(event_name) ? "*" : "";
             System.out.println(event_name + reg_event + ": \"" + node.getText() + "\"");
@@ -72,9 +73,9 @@ public abstract class BaseParserEventHandler<T> {
             }
         }
     }
-    
-    abstract void resetParser(TreeNode node);
-    
+
+    protected abstract void resetParser(TreeNode node);
+
     public String getErrorMessage() {
         return this.errorMessage;
     }

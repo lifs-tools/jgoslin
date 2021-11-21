@@ -19,14 +19,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Metadata information about a lipid on class level.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
+ * @see LipidClasses
+ * @see LipidLevel
  */
 public final class LipidClassMeta {
 
     public final LipidCategory lipidCategory;
-    public final String className;
+    public final String lipidClassName;
     public final String description;
     public final int maxNumFa;
     public final int possibleNumFa;
@@ -34,15 +37,29 @@ public final class LipidClassMeta {
     public final ElementTable elements;
     public final List<String> synonyms;
 
-    public LipidClassMeta(LipidCategory _lipid_category, String _class_name, String _description, int _max_num_fa, int _possible_num_fa, Set<String> _special_cases, ElementTable _elements, List<String> _synonyms) {
-        lipidCategory = _lipid_category;
-        className = _class_name;
-        description = _description;
-        maxNumFa = _max_num_fa;
-        possibleNumFa = _possible_num_fa;
-        specialCases = _special_cases;
-        elements = _elements;
-        synonyms = _synonyms;
+    /**
+     * Create a new lipid class meta instance.
+     *
+     * @param lipidCategory the lipid category
+     * @param lipidClassName the lipid class name
+     * @param description the description
+     * @param maxNumFa the maximum number of fatty acids allowed for this lipid
+     * class
+     * @param possibleNumFa the minimum possible number of fatty acids for this
+     * lipid class
+     * @param specialCases the special cases
+     * @param elements the elements (sum formula) of this class head group
+     * @param synonyms the synonyms of this lipid class head group
+     */
+    public LipidClassMeta(LipidCategory lipidCategory, String lipidClassName, String description, int maxNumFa, int possibleNumFa, Set<String> specialCases, ElementTable elements, List<String> synonyms) {
+        this.lipidCategory = lipidCategory;
+        this.lipidClassName = lipidClassName;
+        this.description = description;
+        this.maxNumFa = maxNumFa;
+        this.possibleNumFa = possibleNumFa;
+        this.specialCases = specialCases;
+        this.elements = elements;
+        this.synonyms = synonyms;
     }
 
     public LipidCategory getLipidCategory() {
@@ -50,7 +67,7 @@ public final class LipidClassMeta {
     }
 
     public String getClassName() {
-        return className;
+        return lipidClassName;
     }
 
     public String getDescription() {

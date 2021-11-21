@@ -33,6 +33,12 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Set;
 
+/**
+ * Event handler implementation for the {@link LipidMapsParser}.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
 public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private boolean omitFa;
@@ -60,6 +66,11 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         entry("1-O-stearoyl-omega-linoleoyloxy", 18)
     );
 
+    /**
+     * Create a new {@code LipidMapsParserEventHandler}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
     public LipidMapsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         super(knownFunctionalGroups);
         try {
@@ -161,7 +172,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         addOmegaLinoleoyloxyCer = false;
     }
 
-    public void addAcer(TreeNode node) {
+    private void addAcer(TreeNode node) {
         String head = node.getText();
         headGroup = "ACer";
 
@@ -180,25 +191,25 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void setMolecularSubspeciesLevel(TreeNode node) {
+    private void setMolecularSubspeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.MOLECULAR_SPECIES);
     }
 
-    public void pureFa(TreeNode node) {
+    private void pureFa(TreeNode node) {
         headGroup = "FA";
     }
 
-    public void mediatorEvent(TreeNode node) {
+    private void mediatorEvent(TreeNode node) {
         useHeadGroup = true;
         headGroup = node.getText();
     }
 
-    public void setIsomericLevel(TreeNode node) {
+    private void setIsomericLevel(TreeNode node) {
         dbPosition = 0;
         dbCistrans = "";
     }
 
-    public void addDbPosition(TreeNode node) {
+    private void addDbPosition(TreeNode node) {
         if (currentFa != null) {
             currentFa.getDoubleBonds().getDoubleBondPositions().put(dbPosition, dbCistrans);
 
@@ -209,12 +220,12 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void setOmegaHeadGroupName(TreeNode node) {
+    private void setOmegaHeadGroupName(TreeNode node) {
         addOmegaLinoleoyloxyCer = true;
         setHeadGroupName(node);
     }
 
-    public void addGlyco(TreeNode node) {
+    private void addGlyco(TreeNode node) {
         String glyco_name = node.getText();
         HeadgroupDecorator functional_group = null;
         try {
@@ -227,45 +238,45 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         headgroupDecorators.add(functional_group);
     }
 
-    public void addDbPositionNumber(TreeNode node) {
+    private void addDbPositionNumber(TreeNode node) {
         dbPosition = Integer.valueOf(node.getText());
     }
 
-    public void addCistrans(TreeNode node) {
+    private void addCistrans(TreeNode node) {
         dbCistrans = node.getText();
     }
 
-    public void setHeadGroupName(TreeNode node) {
+    private void setHeadGroupName(TreeNode node) {
         headGroup = node.getText();
     }
 
-    public void setSpeciesLevel(TreeNode node) {
+    private void setSpeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.SPECIES);
     }
 
-    public void setStructuralSubspeciesLevel(TreeNode node) {
+    private void setStructuralSubspeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
     }
 
-    public void setMod(TreeNode node) {
+    private void setMod(TreeNode node) {
         modText = "";
         modPos = -1;
         modNum = 1;
     }
 
-    public void setModText(TreeNode node) {
+    private void setModText(TreeNode node) {
         modText = node.getText();
     }
 
-    public void setModPos(TreeNode node) {
+    private void setModPos(TreeNode node) {
         modPos = node.getInt();
     }
 
-    public void setModNum(TreeNode node) {
+    private void setModNum(TreeNode node) {
         modNum = node.getInt();
     }
 
-    public void addFunctionalGroup(TreeNode node) {
+    private void addFunctionalGroup(TreeNode node) {
         if (!modText.equals("Cp")) {
             FunctionalGroup functional_group = knownFunctionalGroups.get(modText);
             functional_group.setPosition(modPos);
@@ -285,19 +296,19 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void newFa(TreeNode node) {
+    private void newFa(TreeNode node) {
         dbNumbers = -1;
         currentFa = new FattyAcid("FA" + (faList.size() + 1), knownFunctionalGroups);
     }
 
-    public void newLcb(TreeNode node) {
+    private void newLcb(TreeNode node) {
         lcb = new FattyAcid("LCB", knownFunctionalGroups);
         lcb.setType(LipidFaBondType.LCB_REGULAR);
         setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         currentFa = lcb;
     }
 
-    public void cleanLcb(TreeNode node) {
+    private void cleanLcb(TreeNode node) {
         if (dbNumbers > -1 && dbNumbers != currentFa.getDoubleBonds().getNumDoubleBonds()) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
@@ -307,7 +318,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         currentFa = null;
     }
 
-    public void appendFa(TreeNode node) {
+    private void appendFa(TreeNode node) {
         if (dbNumbers > -1 && dbNumbers != currentFa.getDoubleBonds().getNumDoubleBonds()) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
@@ -326,7 +337,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         currentFa = null;
     }
 
-    public void addEther(TreeNode node) {
+    private void addEther(TreeNode node) {
         String ether = node.getText();
         if (ether.equals("O-")) {
             currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
@@ -335,7 +346,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
-    public void addHydroxyl(TreeNode node) {
+    private void addHydroxyl(TreeNode node) {
         int num_h = node.getInt();
 
         if (spRegularLcb()) {
@@ -350,7 +361,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         currentFa.getFunctionalGroups().get("OH").add(functional_group);
     }
 
-    public void addHydroxylLcb(TreeNode node) {
+    private void addHydroxylLcb(TreeNode node) {
         String hydroxyl = node.getText();
         int num_h = 0;
         if (hydroxyl.equals("m")) {
@@ -373,15 +384,15 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         currentFa.getFunctionalGroups().get("OH").add(functional_group);
     }
 
-    public void addDoubleBonds(TreeNode node) {
+    private void addDoubleBonds(TreeNode node) {
         currentFa.getDoubleBonds().setNumDoubleBonds(currentFa.getDoubleBonds().getNumDoubleBonds() + node.getInt());
     }
 
-    public void addCarbon(TreeNode node) {
+    private void addCarbon(TreeNode node) {
         currentFa.setNumCarbon(node.getInt());
     }
 
-    public void buildLipid(TreeNode node) {
+    private void buildLipid(TreeNode node) {
         if (omitFa && HEAD_GROUP_EXCEPTIONS.contains(headGroup)) {
             headGroup = "L" + headGroup;
         }
@@ -399,19 +410,19 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         content = lipid;
     }
 
-    public void newAdduct(TreeNode node) {
+    private void newAdduct(TreeNode node) {
         adduct = new Adduct("", "");
     }
 
-    public void addAdduct(TreeNode node) {
+    private void addAdduct(TreeNode node) {
         adduct.setAdductString(node.getText());
     }
 
-    public void addCharge(TreeNode node) {
+    private void addCharge(TreeNode node) {
         adduct.setCharge(Integer.valueOf(node.getText()));
     }
 
-    public void addChargeSign(TreeNode node) {
+    private void addChargeSign(TreeNode node) {
         String sign = node.getText();
         if (sign.equals("+")) {
             adduct.setChargeSign(1);

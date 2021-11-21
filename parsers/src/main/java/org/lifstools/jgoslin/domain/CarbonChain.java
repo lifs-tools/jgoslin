@@ -18,6 +18,7 @@ package org.lifstools.jgoslin.domain;
 import java.util.ArrayList;
 
 /**
+ * A linear hydrocarbon chain as a functional group.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -52,5 +53,5 @@ public final class CarbonChain extends FunctionalGroup {
     public String toString(LipidLevel level) {
         return (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) ? Integer.toString(getPosition()) : "") + "(" + ((FattyAcid) functionalGroups.get("cc").get(0)).toString(level) + ")";
     }
-    
+
 }

@@ -24,6 +24,7 @@ import org.lifstools.jgoslin.domain.Elements;
 import org.lifstools.jgoslin.domain.ElementTable;
 
 /**
+ * Event handler implementation for the {@link SumFormulaParser}.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -33,14 +34,17 @@ public class SumFormulaParserEventHandler extends BaseParserEventHandler<Element
     private Element element;
     private int count;
 
+    /**
+     * Create a new {@code SumFormulaParserEventHandler} instance.
+     */
     public SumFormulaParserEventHandler() {
         try {
             registeredEvents = Map.ofEntries(
-                entry("molecule_pre_event", this::resetParser),
-                entry("element_group_post_event", this::elementGroupPostEvent),
-                entry("element_pre_event", this::elementPreEvent),
-                entry("single_element_pre_event", this::singleElementGroupPreEvent),
-                entry("count_pre_event", this::countPreEvent)
+                    entry("molecule_pre_event", this::resetParser),
+                    entry("element_group_post_event", this::elementGroupPostEvent),
+                    entry("element_pre_event", this::elementPreEvent),
+                    entry("single_element_pre_event", this::singleElementGroupPreEvent),
+                    entry("count_pre_event", this::countPreEvent)
             );
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize ShorthandParserEventHandler.");

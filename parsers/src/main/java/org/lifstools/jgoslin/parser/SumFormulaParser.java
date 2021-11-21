@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 import org.lifstools.jgoslin.domain.ElementTable;
 
 /**
+ * Parser implementation for chemical sum formulas.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -29,10 +30,22 @@ public class SumFormulaParser extends Parser<ElementTable> {
         super(grammarContent, quote);
     }
 
+    /**
+     * Create a new instance of a {@link SumFormulaParser}.
+     *
+     * @param grammarResourcePath the resource path to the grammar file
+     * @param quote the quotation character used in the grammar
+     * @return a new parser instance
+     */
     public static SumFormulaParser newInstance(String grammarResourcePath, char quote) {
         return new SumFormulaParser(StringFunctions.getResourceAsString(grammarResourcePath), quote);
     }
 
+    /**
+     * Create a new instance of a {@link SumFormulaParser}.
+     *
+     * @return a new parser instance
+     */
     public static SumFormulaParser newInstance() {
         return newInstance("SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
     }

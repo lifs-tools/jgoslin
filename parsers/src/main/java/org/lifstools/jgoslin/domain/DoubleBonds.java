@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * An abstraction for double bond counts and positions.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -57,7 +58,7 @@ public final class DoubleBonds {
         }
         return numDoubleBonds;
     }
-    
+
     public void setNumDoubleBonds(int numDoubleBonds) {
         this.numDoubleBonds = numDoubleBonds;
     }

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
+ * A functional group of a fatty acid, it can contain nested functional groups.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -83,31 +84,31 @@ public class FunctionalGroup {
         func_group_new.ringStereo = ringStereo;
         return func_group_new;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return this.name;
     }
-    
+
     public void setPosition(int position) {
         this.position = position;
     }
-    
+
     public int getPosition() {
         return this.position;
     }
-    
+
     public void setCount(int count) {
         this.count = count;
     }
-    
+
     public int getCount() {
         return this.count;
     }
-    
+
     public String getStereochemistry() {
         return stereochemistry;
     }
@@ -123,27 +124,27 @@ public class FunctionalGroup {
     public void setRingStereo(String ringStereo) {
         this.ringStereo = ringStereo;
     }
-    
+
     public DoubleBonds getDoubleBonds() {
         return this.doubleBonds;
     }
-    
+
     public void setDoubleBonds(DoubleBonds doubleBonds) {
         this.doubleBonds = doubleBonds;
     }
-    
+
     public void setAtomic(boolean atomic) {
         this.atomic = atomic;
     }
-    
+
     public boolean isAtomic() {
         return this.atomic;
     }
-    
+
     public ElementTable getElements() {
         return this.elements;
     }
-    
+
     public void setElements(ElementTable elements) {
         this.elements = elements;
     }
@@ -163,11 +164,11 @@ public class FunctionalGroup {
             });
         });
     }
-    
+
     public Map<String, ArrayList<FunctionalGroup>> getFunctionalGroups() {
         return functionalGroups;
     }
-    
+
     public void setFunctionalGroups(Map<String, ArrayList<FunctionalGroup>> functionalGroups) {
         this.functionalGroups = functionalGroups;
     }
@@ -231,12 +232,18 @@ public class FunctionalGroup {
         });
     }
 
-    public void add(FunctionalGroup fg) {
-        elements.add(fg.elements);
-    }
+//    public void add(FunctionalGroup fg) {
+//        elements.add(fg.elements);
+//    }
+//
+//    public void addFunctionalGroup(FunctionalGroup fg) {
+//        if (functionalGroups.containsKey(fg.name)) {
+//            functionalGroups.get(fg.name).add(fg);
+//        } else {
+//            ArrayList<FunctionalGroup> al = new ArrayList<>();
+//            al.add(fg);
+//            functionalGroups.put(fg.name, al);
+//        }
+//    }
 
-    public void addFunctionalGroup(FunctionalGroup fg) {
-
-    }
-    
 }

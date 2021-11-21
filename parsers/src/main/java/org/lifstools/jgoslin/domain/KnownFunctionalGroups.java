@@ -24,6 +24,8 @@ import org.lifstools.jgoslin.parser.BaseParserEventHandler;
 import org.springframework.core.io.ClassPathResource;
 
 /**
+ * A lookup class that provides access to known functional groups defined in a
+ * file following the format of functional-groups.csv.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
@@ -79,7 +81,7 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
             }
         }
     }
-    
+
     public KnownFunctionalGroups() {
         this(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), SumFormulaParser.newInstance());
     }
@@ -88,10 +90,6 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
         super();
         loadData(lines, sumFormulaParser);
     }
-    
-//    public static KnownFunctionalGroups getInstance() {
-//        return KNOWN_FUNCTIONAL_GROUPS;
-//    }
 
     public FunctionalGroup get(String s) {
         return super.get(s).copy();

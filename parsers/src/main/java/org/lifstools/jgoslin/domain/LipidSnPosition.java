@@ -18,9 +18,12 @@ package org.lifstools.jgoslin.domain;
 import java.util.Collection;
 
 /**
+ * Sn position level according to the 2020 update of the Liebisch shorthand
+ * nomenclature.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
+ * @see LipidLevel
  */
 public class LipidSnPosition extends LipidMolecularSpecies {
 
@@ -53,7 +56,8 @@ public class LipidSnPosition extends LipidMolecularSpecies {
                 return super.getLipidString(level);
             }
 
-            default -> throw new ConstraintViolationException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
+            default ->
+                throw new ConstraintViolationException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
         }
     }
 

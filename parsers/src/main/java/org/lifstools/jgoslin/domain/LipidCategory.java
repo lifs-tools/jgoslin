@@ -25,8 +25,7 @@ import java.util.List;
  * and Wakelam, M.J.O. (2013). Shorthand notation for lipid structures derived
  * from mass spectrometry. J. Lipid Res. 54, 1523–1530.</pre>
  *
- * We use the associations to either LipidMAPS or SwissLipids (Saccharolipids),
- * where appropriate.
+ * We use the associations to either LIPID MAPS categories where appropriate.
  * 
  * @author Dominik Kopczynski
  * @author Nils Hoffmann

@@ -67,7 +67,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Create a new command line parser for parsing of lipid names.
  *
- * @author nils.hoffmann
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ *
  */
 public class CmdLineParser {
 
@@ -118,6 +120,8 @@ public class CmdLineParser {
     /**
      * <p>
      * Runs the command line parser for jgoslin, including validation.</p>
+     *
+     * Run with the {@code -h} or {@code --help} option to see more options.
      *
      * @param args an array of {@link java.lang.String} lipid names.
      * @throws java.lang.Exception if any unexpected errors occur.
@@ -364,7 +368,7 @@ public class CmdLineParser {
                         la.getLipid().getInfo(),
                         canonicalName,
                         LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).lipidCategory.name(),
-                        getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).className),
+                        getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).lipidClassName),
                         fas
                 );
                 return Pair.of(lipidName, validationResult);
