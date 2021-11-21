@@ -49,25 +49,10 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private final ArrayList<Integer> mediatorFunctionPositions = new ArrayList<>();
     private boolean mediatorSuffix;
 
-    private final static HashMap<String, Integer> MEDIATOR_FA = new HashMap<>() {
-        {
-            put("H", 17);
-            put("O", 18);
-            put("E", 20);
-            put("Do", 22);
-        }
-    };
-    private final static HashMap<String, Integer> MEDIATOR_DB = new HashMap<>() {
-        {
-            put("M", 1);
-            put("D", 2);
-            put("Tr", 3);
-            put("T", 4);
-            put("P", 5);
-            put("H", 6);
-        }
-    };
-    //const map<string, int> GoslinParserEventHandler::mediator_trivial{{"Palmitic acid", 0}, {"Linoleic acid", 1}, {"AA", 2}, {"ALA", 3}, {"EPA", 4}, {"DHA", 5}, {"LTB4", 6}, {"Resolvin D3", 7}, {"Maresin 1", 8},  {"Resolvin D2", 9}, {"Resolvin D5", 10}, {"Resolvin D1", 11}, {"TXB1", 12}, {"TXB2", 13}, {"TXB3", 14}, {"PGF2alpha", 15}, {"PGD2", 16}, {"PGE2", 17}, {"PGB2", 18}, {"15d-PGJ2", 19}};
+    private final static Map<String, Integer> MEDIATOR_FA = Map.of(
+            "H", 17, "O", 18, "E", 20, "Do", 22);
+    private final static Map<String, Integer> MEDIATOR_DB = Map.of(
+            "M", 1, "D", 2, "Tr", 3, "T", 4, "P", 5, "H", 6);
 
     /**
      * Create a new {@code GoslinParserEventHandler}.
