@@ -21,7 +21,7 @@ package org.lifstools.jgoslin.parser;
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
-final class TreeNode {
+public final class TreeNode {
 
     long rule_index;
     TreeNode left;
@@ -31,7 +31,7 @@ final class TreeNode {
     public static final char EOF_SIGN = '\0';
     public static final String ONE_STR = "\0";
 
-    TreeNode(long _rule, boolean _fire_event) {
+    public TreeNode(long _rule, boolean _fire_event) {
         rule_index = _rule;
         left = null;
         right = null;
@@ -39,7 +39,7 @@ final class TreeNode {
         fire_event = _fire_event;
     }
 
-    String getText() {
+    public String getText() {
         if (terminal == '\0') {
             String left_str = left.getText();
             String right_str = right != null ? right.getText() : "";
@@ -48,7 +48,7 @@ final class TreeNode {
         return String.valueOf(terminal);
     }
 
-    int getInt() {
+    public int getInt() {
         return Integer.valueOf(getText());
     }
 }

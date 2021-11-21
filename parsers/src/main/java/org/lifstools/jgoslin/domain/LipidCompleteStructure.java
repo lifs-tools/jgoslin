@@ -33,12 +33,12 @@ public class LipidCompleteStructure extends LipidFullStructure {
 
     public LipidCompleteStructure(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
-        info.setLevel(LipidLevel.FULL_STRUCTURE);
+        info.setLevel(LipidLevel.COMPLETE_STRUCTURE);
     }
 
     @Override
     public LipidLevel getLipidLevel() {
-        return LipidLevel.FULL_STRUCTURE;
+        return LipidLevel.COMPLETE_STRUCTURE;
     }
 
     @Override

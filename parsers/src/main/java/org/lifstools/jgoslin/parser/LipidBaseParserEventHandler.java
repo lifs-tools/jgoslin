@@ -46,7 +46,7 @@ import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
  */
 public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler<LipidAdduct> {
 
-    protected LipidLevel level = LipidLevel.FULL_STRUCTURE;
+    protected LipidLevel level = LipidLevel.COMPLETE_STRUCTURE;
     protected String headGroup = "";
     protected FattyAcid lcb = null;
     protected List<FattyAcid> faList = new LinkedList<>();

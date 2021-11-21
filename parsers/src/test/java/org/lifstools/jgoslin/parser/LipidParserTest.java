@@ -15,13 +15,17 @@
  */
 package org.lifstools.jgoslin.parser;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidParsingException;
 
 /**
  *
@@ -77,5 +81,15 @@ public class LipidParserTest {
     public void testShorthand(String fullStructure, String structureDefined, String snPosition, String molecularSpecies, String species, String sumFormula, String noIdea) {
         LipidAdduct lipid = parser.parse(fullStructure);
         assertTrue(lipid != null);
+    }
+    
+    @Test
+    public void testParsingFailed() {
+        LipidParsingException lpe = assertThrows(LipidParsingException.class, () -> {
+            parser.parse("Cer 189:as7");
+        });
+        assertTrue(lpe.getMessage().contains("Parsing failed"));
+        assertTrue(lpe.getMessage().contains("at or after"));
+        assertNull(parser.getLastSuccessfulParser());
     }
 }

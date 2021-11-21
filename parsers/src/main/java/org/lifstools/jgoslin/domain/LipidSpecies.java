@@ -77,19 +77,12 @@ public class LipidSpecies {
 
     public String getLipidString(LipidLevel level) {
         switch (level) {
-
-            default:
-                throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
-
-            case UNDEFINED_LEVEL:
-                throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
-
-            case CLASS:
-            case CATEGORY:
+            default -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
+            case UNDEFINED_LEVEL -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
+            case CLASS, CATEGORY -> {
                 return headGroup.getLipidString(level);
-
-            case NO_LEVEL:
-            case SPECIES:
+            }
+            case NO_LEVEL, SPECIES -> {
                 StringBuilder lipid_string = new StringBuilder();
                 lipid_string.append(headGroup.getLipidString(level));
 
@@ -105,6 +98,7 @@ public class LipidSpecies {
                     lipid_string.append(headGroup.getLipidCategory() != LipidCategory.ST ? " " : "/").append(lsi.toString());
                 }
                 return lipid_string.toString();
+            }
         }
     }
 

@@ -65,6 +65,13 @@ public class GoslinParserTest {
         assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("HexCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C48H93NO8", l.getSumFormula());
+        
+        l = parser.parse("HexCer d18:1(5Z)/24:0", handler);
+        assertEquals("HexCer 18:1(5);OH/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("HexCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("LSM 17:1(4E);2", handler);
         assertEquals("LSM 17:1(4);OH", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
