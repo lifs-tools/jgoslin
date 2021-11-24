@@ -163,6 +163,12 @@ public class FattyAcid extends FunctionalGroup {
             }
             fa_string.append(")");
         }
+        
+        
+        if (level == LipidLevel.COMPLETE_STRUCTURE && stereochemistry.length() > 0){
+            fa_string.append("[").append(stereochemistry).append("]");
+        }
+        
 
         if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {
             ArrayList<String> fg_names = new ArrayList<>();
@@ -248,14 +254,14 @@ public class FattyAcid extends FunctionalGroup {
 
     @Override
     public ElementTable getFunctionalGroupElements() {
-        ElementTable elements = super.getFunctionalGroupElements();
+        ElementTable fgElements = super.getFunctionalGroupElements();
 
         // subtract the invisible [X] functional group for regular LCBs
         if (lipidFaBondType == LipidFaBondType.LCB_REGULAR && functionalGroups.containsKey("O")) {
-            elements.put(Element.O, elements.get(Element.O) - 1);
+            fgElements.put(Element.O, fgElements.get(Element.O) - 1);
         }
 
-        return elements;
+        return fgElements;
     }
 
     @Override
@@ -274,17 +280,22 @@ public class FattyAcid extends FunctionalGroup {
 
         if (lipidFaBondType != LipidFaBondType.LCB_EXCEPTION && lipidFaBondType != LipidFaBondType.LCB_REGULAR) {
             elements.put(Element.C, numCarbon); // carbon
-            if (lipidFaBondType == LipidFaBondType.ESTER) {
-                elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds)); // hydrogen
-                elements.put(Element.O, 1); // oxygen
-            } else if (lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) {
-                elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds + 2)); // hydrogen
-            } else if (lipidFaBondType == LipidFaBondType.ETHER_PLASMANYL) {
-                elements.put(Element.H, ((numCarbon + 1) * 2 - 1 - 2 * num_double_bonds)); // hydrogen
-            } else if (lipidFaBondType == LipidFaBondType.AMINE) {
-                elements.put(Element.H, (2 * numCarbon + 1 - 2 * num_double_bonds)); // hydrogen
-            } else {
-                throw new LipidException("Mass cannot be computed for fatty acyl chain with this bond type");
+            switch (lipidFaBondType) {
+                case ESTER:
+                    elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds)); // hydrogen
+                    elements.put(Element.O, 1); // oxygen
+                    break;
+                case ETHER_PLASMENYL:
+                    elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds + 2)); // hydrogen
+                    break;
+                case ETHER_PLASMANYL:
+                    elements.put(Element.H, ((numCarbon + 1) * 2 - 1 - 2 * num_double_bonds)); // hydrogen
+                    break;
+                case AMINE:
+                    elements.put(Element.H, (2 * numCarbon + 1 - 2 * num_double_bonds)); // hydrogen
+                    break;
+                default:
+                    throw new LipidException("Mass cannot be computed for fatty acyl chain with this bond type");
             }
         } else {
             // long chain base

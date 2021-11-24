@@ -52,6 +52,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     private Dictionary tmp = new Dictionary();
     private boolean acerSpecies = false;
     private static final Set<String> SPECIAL_TYPES = Set.of("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc");
+    private boolean containsStereoInformation = false;
 
     /**
      * Create a new {@code ShorthandParserEventHandler}.
@@ -83,6 +84,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("pl_single_pre_event", this::setMolecularLevel),
                     entry("unsorted_fa_separator_pre_event", this::setMolecularLevel),
                     entry("ether_num_pre_event", this::setEtherNum),
+                    entry("stereo_type_fa_pre_event", this::setFattyAcylStereo),
                     // set head groups events
                     entry("med_hg_single_pre_event", this::setHeadgroupName),
                     entry("med_hg_double_pre_event", this::setHeadgroupName),
@@ -124,8 +126,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("func_group_pos_number_pre_event", this::setFunctionalGroupPosition),
                     entry("func_group_name_pre_event", this::setFunctionalGroupName),
                     entry("func_group_count_pre_event", this::setFunctionalGroupCount),
-                    entry("stereo_type_pre_event", this::setFunctionalGroupStereo),
-                    entry("molecular_func_group_name_pre_event", this::setMolecularFuncGroup),
+                    entry("stereo_type_fg_pre_event", this::setFunctionalGroupStereo),
+                    entry("molecular_func_group_name_pre_event", this::setSnPositionFuncGroup),
                     // set cycle events
                     entry("func_group_cycle_pre_event", this::setCycle),
                     entry("func_group_cycle_post_event", this::addCycle),
@@ -181,6 +183,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         headgroupDecorators = new ArrayList<>();
         tmp = new Dictionary();
         acerSpecies = false;
+        containsStereoInformation = false;
     }
 
     private String faI() {
@@ -192,6 +195,10 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
             faList.get(0).setNumCarbon(faList.get(0).getNumCarbon() - 2);
         }
         Headgroup headgroup = prepareHeadgroupAndChecks();
+        
+        if (level == LipidLevel.FULL_STRUCTURE && containsStereoInformation){
+            level = LipidLevel.COMPLETE_STRUCTURE;
+        }
 
         // add count numbers for fatty acyl chains
         int fa_it = (faList.size() > 0 && (faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION || faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_REGULAR)) ? 1 : 0;
@@ -301,6 +308,12 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
             currentFas.peekLast().getFunctionalGroups().get(carbohydrate).add(functional_group);
         }
     }
+    
+    private void setFattyAcylStereo(TreeNode node){
+        currentFas.getLast().setStereochemistry(node.getText());
+        containsStereoInformation = true;
+    }
+    
 
     private void setCarbohydrateStructural(TreeNode node) {
         setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
@@ -465,10 +478,12 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setFunctionalGroupStereo(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_stereo", node.getText());
+        containsStereoInformation = true;
     }
 
-    private void setMolecularFuncGroup(TreeNode node) {
+    private void setSnPositionFuncGroup(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_name", node.getText());
+        setLipidLevel(LipidLevel.SN_POSITION);
     }
 
     private void setCycle(TreeNode node) {

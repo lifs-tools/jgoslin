@@ -42,6 +42,11 @@ public abstract class BaseParserEventHandler<T> {
         registeredEvents = new HashMap<>();
         ruleNames = new HashSet<>();
     }
+    
+    
+    public void setDebug(String debug){
+        this.debug = debug;
+    }
 
     // checking if all registered events are reasonable and orrur as rules in the grammar
     protected void sanityCheck(Parser<T> parser) {
