@@ -77,6 +77,8 @@ public class CmdLineParser {
 
     public static final String LIPIDMAPS_CLASS_REGEXP = ".+\\[([A-Z0-9]+)\\]";
     private static final LipidClasses LIPID_CLASSES = LipidClasses.getInstance();
+    
+    private static final Map<Grammar, Parser<LipidAdduct>> parsers = new LinkedHashMap<>();
 
     private static String getAppInfo() throws IOException {
         Properties p = new Properties();
@@ -476,27 +478,28 @@ public class CmdLineParser {
     }
 
     protected static Map<Grammar, Parser<LipidAdduct>> loadParsers() {
-        Map<Grammar, Parser<LipidAdduct>> parsers = new LinkedHashMap<>();
-        for (Grammar grammar : Grammar.values()) {
-            switch (grammar) {
-                case FATTY_ACID ->
-                    parsers.put(grammar, FattyAcidParser.newInstance());
-                case GOSLIN ->
-                    parsers.put(grammar, GoslinParser.newInstance());
-                case HMDB ->
-                    parsers.put(grammar, HmdbParser.newInstance());
-                case LIPIDMAPS ->
-                    parsers.put(grammar, LipidMapsParser.newInstance());
-                case SHORTHAND2020 ->
-                    parsers.put(grammar, ShorthandParser.newInstance());
-                case SWISSLIPIDS ->
-                    parsers.put(grammar, SwissLipidsParser.newInstance());
-                case GOSLIN_FRAGMENTS -> {
+        if(parsers.isEmpty()) {
+            for (Grammar grammar : Grammar.values()) {
+                switch (grammar) {
+                    case FATTY_ACID ->
+                        parsers.put(grammar, FattyAcidParser.newInstance());
+                    case GOSLIN ->
+                        parsers.put(grammar, GoslinParser.newInstance());
+                    case HMDB ->
+                        parsers.put(grammar, HmdbParser.newInstance());
+                    case LIPIDMAPS ->
+                        parsers.put(grammar, LipidMapsParser.newInstance());
+                    case SHORTHAND2020 ->
+                        parsers.put(grammar, ShorthandParser.newInstance());
+                    case SWISSLIPIDS ->
+                        parsers.put(grammar, SwissLipidsParser.newInstance());
+                    case GOSLIN_FRAGMENTS -> {
+                    }
+                    case NONE -> {
+                    }
                 }
-                case NONE -> {
-                }
+                //FIXME skipping for now
             }
-            //FIXME skipping for now
         }
         return parsers;
     }
