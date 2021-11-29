@@ -182,7 +182,7 @@ The following snippet shows how to parse a shorthand lipid name with the differe
 	GoslinParser goslinParser = GoslinParser.newInstance();
 	GoslinParserEventHandler goslinHandler = goslinParser.newEventHandler();
 	LipidAdduct golipid = goslinParser.parse(ref, goslinHandler);
-	// use the shorthand notation parser with support for fragments GOSLIN_FRAGMENTS
+	// use the updated shorthand notation of 2020
 	ShorthandParser shorthandParser = ShorthandParser.newInstance();
 	ShorthandParserEventHandler shorthandHandler = shorthandParser.newEventHandler();
 	// calling parse with the optional argument false suppresses any exceptions, if errors are encountered, the returned LipidAdduct will be null
