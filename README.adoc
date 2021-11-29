@@ -3,9 +3,9 @@ Nils Hoffmann <nils.hoffmann@cebitec-uni-bielefeld.de>
 :toc: macro
 
 //image::https://api.bintray.com/packages/lifs/maven/jgoslin-cli/images/download.svg[link="https://bintray.com/lifs/maven/jgoslin-cli/_latestVersion"] 
-image:https://img.shields.io/github/release/lifs-tools/jg.svg["Latest Release", link="https://github.com/lifs-tools/jg/releases/latest"] 
+image:https://img.shields.io/github/release/lifs-tools/jgoslin.svg["Latest Release", link="https://github.com/lifs-tools/jgoslin/releases/latest"] 
 image:https://zenodo.org/badge/DOI/10.5281/zenodo.3826474.svg["DOI", link="https://doi.org/10.5281/zenodo.3826474"]
-image:https://github.com/lifs-tools/jg/actions/workflows/maven.yml/badge.svg["Build Status", link="https://github.com/lifs-tools/jg/actions/workflows/maven.yml"]
+image:https://github.com/lifs-tools/jgoslin/actions/workflows/maven.yml/badge.svg["Build Status", link="https://github.com/lifs-tools/jgoslin/actions/workflows/maven.yml"]
 image:https://sonarcloud.io/api/project_badges/measure?branch=master&project=lifs-tools_jg&metric=alert_status["Quality Gate", link=https://sonarcloud.io/dashboard?id=lifs-tools_jg]
 
 //NOTE: If you use the jGoslin library or the web application, please cite the following paper: +
