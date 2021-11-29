@@ -77,7 +77,6 @@ public class LipidSpecies {
 
     public String getLipidString(LipidLevel level) {
         switch (level) {
-            default -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
             case UNDEFINED_LEVEL -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
             case CLASS, CATEGORY -> {
                 return headGroup.getLipidString(level);
@@ -99,6 +98,7 @@ public class LipidSpecies {
                 }
                 return lipid_string.toString();
             }
+            default -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.parser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.lifstools.jgoslin.domain.LipidAdduct;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 
 /**
@@ -91,5 +93,12 @@ public class LipidParserTest {
         assertTrue(lpe.getMessage().contains("Parsing failed"));
         assertTrue(lpe.getMessage().contains("at or after"));
         assertNull(parser.getLastSuccessfulParser());
+    }
+    
+    @Test
+    public void testLipidParser() {
+        LipidParser lp = LipidParser.newInstance();
+        LipidAdduct la = lp.parse("PE 16:1(6)/16:0;oxo;(OH)2");
+        assertEquals(LipidLevel.STRUCTURE_DEFINED, la.getLipidLevel());
     }
 }

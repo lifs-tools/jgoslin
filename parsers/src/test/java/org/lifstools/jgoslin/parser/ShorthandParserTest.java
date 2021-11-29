@@ -145,6 +145,7 @@ public class ShorthandParserTest {
         l = parser.parse("LSM 17:1;O2", handler);
         assertEquals("LSM 17:1;O2", l.getLipidString());
         assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("LSM", l.getExtendedClass());
         assertEquals("C22H47N2O5P", l.getSumFormula());
 
         l = parser.parse("EPC(1) 14:1(4E);3OH/20:1(11Z)", handler);
@@ -184,6 +185,12 @@ public class ShorthandParserTest {
     public void testManuscriptExamples() {
         LipidAdduct l = parser.parse("PE 16:1(6Z)/16:0;3oxo;5OH[R],8OH", handler);
         assertEquals(LipidLevel.COMPLETE_STRUCTURE, l.getLipidLevel());
+        assertEquals("PE 16:1(6Z)/16:0;5OH[R],8OH;3oxo", l.getLipidString());
+        assertEquals("PE 16:1(6Z)/16:0;5OH,8OH;3oxo", l.getLipidString(LipidLevel.FULL_STRUCTURE));
+        assertEquals("PE 16:1(6)/16:0;(OH)2;oxo", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("PE 16:1/16:0;O3", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("PE 16:1_16:0;O3", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("PE 32:1;O3", l.getLipidString(LipidLevel.SPECIES));
         
         l = parser.parse("PE 16:1(6Z)/16:0;3oxo;5OH,8OH", handler);
         assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());

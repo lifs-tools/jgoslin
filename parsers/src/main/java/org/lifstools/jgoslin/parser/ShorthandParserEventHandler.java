@@ -179,7 +179,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         headGroup = "";
         faList.clear();
         currentFas.clear();
-        // FIXME
         headgroupDecorators = new ArrayList<>();
         tmp = new Dictionary();
         acerSpecies = false;
@@ -442,7 +441,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
         FunctionalGroup functional_group = null;
         try {
-            // FIXME please do not use static singletons, this usually does not pay off in Java and introduces memory leaks
             functional_group = knownFunctionalGroups.get(fg_name);
         } catch (Exception e) {
             throw new LipidParsingException("'" + fg_name + "' unknown");
