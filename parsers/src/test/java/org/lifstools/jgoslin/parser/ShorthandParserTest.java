@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidException;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
@@ -179,6 +180,16 @@ public class ShorthandParserTest {
         assertEquals("Hex2Cer(1) 17:1(5E);15Me;3OH,4OH/22:0;2OH", l.getLipidString());
         assertEquals("Hex2Cer 17:1(5);Me;(OH)2/22:0;OH", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("Hex2Cer 18:1;O3/22:0;O", l.getLipidString(LipidLevel.SN_POSITION));
+        
+        
+        try {
+            l = parser.parse("SM 21:1(4Z);2O/14:0", handler);
+            assertTrue(false);
+        }
+        catch(LipidException e){
+            
+        }
+        
     }
     
     @Test
@@ -188,9 +199,9 @@ public class ShorthandParserTest {
         assertEquals("PE 16:1(6Z)/16:0;5OH[R],8OH;3oxo", l.getLipidString());
         assertEquals("PE 16:1(6Z)/16:0;5OH,8OH;3oxo", l.getLipidString(LipidLevel.FULL_STRUCTURE));
         assertEquals("PE 16:1(6)/16:0;(OH)2;oxo", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("PE 16:1/16:0;O3", l.getLipidString(LipidLevel.SN_POSITION));
-        assertEquals("PE 16:1_16:0;O3", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("PE 32:1;O3", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("PE 16:1/16:1;O3", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("PE 16:1_16:1;O3", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("PE 32:2;O3", l.getLipidString(LipidLevel.SPECIES));
         
         l = parser.parse("PE 16:1(6Z)/16:0;3oxo;5OH,8OH", handler);
         assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
