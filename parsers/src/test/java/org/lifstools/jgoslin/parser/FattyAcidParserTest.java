@@ -62,6 +62,22 @@ public class FattyAcidParserTest {
         String lipid_formula2 = lipid2.getSumFormula();
         assertEquals(computed_formula, lipid_formula2);
     }
+    
+    @Test 
+    public void testManuscriptExamples() {
+        String LMFA01020216 =  "5-methyl-octadecanoic acid";
+        LipidAdduct l = fatty_acid_parser.parse(LMFA01020216, faHandler);
+        assertEquals("FA 18:0;5Me", l.getLipidString());
+        String LMFA01160100 =  "2-docosyl-3-hydroxy-28,29-epoxy-30-methyl-pentacontanoic acid";
+        l = fatty_acid_parser.parse(LMFA01160100, faHandler);
+        assertEquals("FA 50:0;2(22:0);28Ep;30Me;3OH", l.getLipidString());
+        String LMFA03010032 =  "11R-hydroxy-9,15-dioxo-2,3,4,5-tetranor-prostan-1,20-dioic acid";
+        l = fatty_acid_parser.parse(LMFA03010032, faHandler);
+        assertEquals("FA 15:0;15COOH;[4-8cy5:0;7OH;5oxo];11oxo", l.getLipidString());
+        String LMFA08040030 = "N-((+/-)-8,9-dihydroxy-5Z,11Z,14Z-eicosatrienoyl)-ethanolamine";
+        l = fatty_acid_parser.parse(LMFA08040030, faHandler);
+        assertEquals("NAE 20:3(5Z,11Z,14Z);8OH,9OH", l.getLipidString());
+    }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/fatty-acids-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")

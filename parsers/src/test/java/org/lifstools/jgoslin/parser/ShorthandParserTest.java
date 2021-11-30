@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -181,15 +182,9 @@ public class ShorthandParserTest {
         assertEquals("Hex2Cer 17:1(5);Me;(OH)2/22:0;OH", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("Hex2Cer 18:1;O3/22:0;O", l.getLipidString(LipidLevel.SN_POSITION));
         
-        
-        try {
-            l = parser.parse("SM 21:1(4Z);2O/14:0", handler);
-            assertTrue(false);
-        }
-        catch(LipidException e){
-            
-        }
-        
+        assertThrows(LipidException.class, () -> {
+            parser.parse("SM 21:1(4Z);2O/14:0", handler);
+        });
     }
     
     @Test
@@ -217,6 +212,12 @@ public class ShorthandParserTest {
         
         l = parser.parse("PE 32:1;O3", handler);
         assertEquals(LipidLevel.SPECIES, l.getLipidLevel());
+        
+        l = parser.parse("TG 16:0;5O(FA 16:0)/18:1(9Z)/18:1(9Z)", handler);
+        assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
+        
+        l = parser.parse("FA 35:1(18Z);2(24:0);3OH", handler);
+        assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
     }
 
     @ParameterizedTest(name = "{index}: {0}")
