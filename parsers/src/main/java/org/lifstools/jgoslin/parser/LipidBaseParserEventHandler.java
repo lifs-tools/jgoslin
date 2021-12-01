@@ -57,7 +57,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     protected KnownFunctionalGroups knownFunctionalGroups;
 
     protected static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
-    
+
     public LipidBaseParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;
     }
@@ -124,12 +124,18 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     protected LipidSpecies assembleLipid(Headgroup headgroup) {
         LipidSpecies ls = null;
         switch (level) {
-            case COMPLETE_STRUCTURE -> ls = new LipidCompleteStructure(headgroup, faList, knownFunctionalGroups);
-            case FULL_STRUCTURE -> ls = new LipidFullStructure(headgroup, faList, knownFunctionalGroups);
-            case STRUCTURE_DEFINED -> ls = new LipidStructureDefined(headgroup, faList, knownFunctionalGroups);
-            case SN_POSITION -> ls = new LipidSnPosition(headgroup, faList, knownFunctionalGroups);
-            case MOLECULAR_SPECIES -> ls = new LipidMolecularSpecies(headgroup, faList, knownFunctionalGroups);
-            case SPECIES -> ls = new LipidSpecies(headgroup, faList, knownFunctionalGroups);
+            case COMPLETE_STRUCTURE ->
+                ls = new LipidCompleteStructure(headgroup, faList, knownFunctionalGroups);
+            case FULL_STRUCTURE ->
+                ls = new LipidFullStructure(headgroup, faList, knownFunctionalGroups);
+            case STRUCTURE_DEFINED ->
+                ls = new LipidStructureDefined(headgroup, faList, knownFunctionalGroups);
+            case SN_POSITION ->
+                ls = new LipidSnPosition(headgroup, faList, knownFunctionalGroups);
+            case MOLECULAR_SPECIES ->
+                ls = new LipidMolecularSpecies(headgroup, faList, knownFunctionalGroups);
+            case SPECIES ->
+                ls = new LipidSpecies(headgroup, faList, knownFunctionalGroups);
             default -> {
             }
         }

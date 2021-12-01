@@ -169,13 +169,13 @@ public class CmdLineParser {
                 System.exit(1);
             }
             if (toFile) {
-                log.info("Saving output to 'goslin-out.tsv'.");
+                log.debug("Saving output to 'goslin-out.tsv'.");
                 boolean successful = writeToFile(new File("goslin-out.tsv"), results);
                 if (!successful) {
                     System.exit(1);
                 }
             } else {
-                log.info("Echoing output to stdout.");
+                log.debug("Echoing output to stdout.");
                 boolean successful = writeToStdOut(results);
                 if (!successful) {
                     System.exit(1);
@@ -266,14 +266,15 @@ public class CmdLineParser {
                     m.put("Total #" + functionalGroupKey, fgCounts);
                 }
                 for (FattyAcid fa : t.fattyAcids()) {
-                    m.put(fa.getName() + " SN Position", fa.getPosition() + "");
-                    m.put(fa.getName() + " #C", fa.getNumCarbon() + "");
-                    m.put(fa.getName() + " #DB", fa.getDoubleBonds().getNumDoubleBonds() + "");
-                    m.put(fa.getName() + " Bond Type", fa.getLipidFaBondType().name() + "");
+                    String faName = fa.getName();
+                    m.put(faName + " SN Position", fa.getPosition() + "");
+                    m.put(faName + " #C", fa.getNumCarbon() + "");
+                    m.put(faName + " #DB", fa.getDoubleBonds().getNumDoubleBonds() + "");
+                    m.put(faName + " Bond Type", fa.getLipidFaBondType().name() + "");
                     String dbPositions = fa.getDoubleBonds().getDoubleBondPositions().entrySet().stream().map((entry) -> {
                         return entry.getKey() + "" + entry.getValue();
                     }).collect(Collectors.joining("|"));
-                    m.put(fa.getName() + " DB Positions", dbPositions + "");
+                    m.put(faName + " DB Positions", dbPositions + "");
                     for (String functionalGroupKey : fa.getFunctionalGroups().keySet()) {
                         ArrayList<FunctionalGroup> fg = fa.getFunctionalGroups().get(functionalGroupKey);
                         String fgCounts = fg.stream().map((sfg) -> {
@@ -477,7 +478,7 @@ public class CmdLineParser {
         return grammarOpt;
     }
 
-    protected static Map<Grammar, Parser<LipidAdduct>> loadParsers() {
+    private static Map<Grammar, Parser<LipidAdduct>> loadParsers() {
         if(parsers.isEmpty()) {
             for (Grammar grammar : Grammar.values()) {
                 switch (grammar) {
@@ -498,7 +499,6 @@ public class CmdLineParser {
                     case NONE -> {
                     }
                 }
-                //FIXME skipping for now
             }
         }
         return parsers;
