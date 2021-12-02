@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collection;
 
 /**
@@ -111,6 +112,7 @@ public class LipidMolecularSpecies extends LipidSpecies {
         return LipidLevel.MOLECULAR_SPECIES;
     }
 
+    @JsonIgnore
     @Override
     public ElementTable getElements() {
         ElementTable elements = headGroup.getElements();

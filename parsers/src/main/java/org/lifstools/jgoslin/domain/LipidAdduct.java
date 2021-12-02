@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map.Entry;
 
 /**
@@ -69,22 +70,27 @@ public final class LipidAdduct {
         return (lipid != null) ? lipid.headGroup.getClassName() : "";
     }
 
+    @JsonIgnore
     public boolean isLyso() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Lyso") : false;
     }
 
+    @JsonIgnore
     public boolean isCardioLipin() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Cardio") : false;
     }
 
+    @JsonIgnore
     public boolean isContainsSugar() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Sugar") : false;
     }
 
+    @JsonIgnore
     public boolean isContainsEster() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("Ester") : false;
     }
 
+    @JsonIgnore
     public boolean isSpException() {
         return (LipidClasses.getInstance().size() > lipid.headGroup.getLipidClass()) ? LipidClasses.getInstance().get(lipid.headGroup.getLipidClass()).specialCases.contains("SP_Exception") : false;
     }
@@ -117,6 +123,7 @@ public final class LipidAdduct {
         return mass;
     }
 
+    @JsonIgnore
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
 

@@ -271,10 +271,10 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
         FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.setCount(num_h);
-        if (!currentFa.getFunctionalGroups().containsKey("OH")) {
-            currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
+        if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+            currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
         }
-        currentFa.getFunctionalGroups().get("OH").add(functional_group);
+        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
     }
 
     private void addDoubleBonds(TreeNode node) {
@@ -294,10 +294,10 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
         FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.setCount(num_h);
-        if (!currentFa.getFunctionalGroups().containsKey("OH")) {
-            currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
+        if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+            currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
         }
-        currentFa.getFunctionalGroups().get("OH").add(functional_group);
+        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
         setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
     }
 
@@ -383,15 +383,15 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                 functionalGroup.setPosition(mediatorFunctionPositions.get(0));
                 FunctionalGroup functionalGroup2 = knownFunctionalGroups.get("OH");
                 functionalGroup2.setPosition(mediatorFunctionPositions.get(1));
-                currentFa.getFunctionalGroups().put("OH", new ArrayList<>());
-                currentFa.getFunctionalGroups().get("OH").add(functionalGroup2);
+                currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
+                currentFa.getFunctionalGroupsInternal().get("OH").add(functionalGroup2);
             }
         }
 
-        if (!currentFa.getFunctionalGroups().containsKey(fg)) {
-            currentFa.getFunctionalGroups().put(fg, new ArrayList<>());
+        if (!currentFa.getFunctionalGroupsInternal().containsKey(fg)) {
+            currentFa.getFunctionalGroupsInternal().put(fg, new ArrayList<>());
         }
-        currentFa.getFunctionalGroups().get(fg).add(functionalGroup);
+        currentFa.getFunctionalGroupsInternal().get(fg).add(functionalGroup);
     }
 
     private void setTrivialMediator(TreeNode node) {

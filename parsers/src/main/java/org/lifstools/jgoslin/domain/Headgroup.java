@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,6 +166,7 @@ public final class Headgroup {
         return headgoup_string.toString();
     }
 
+    @JsonIgnore
     public ElementTable getElements() {
 
         if (useHeadgroup || LipidClasses.getInstance().size() <= lipidClass) {
@@ -203,6 +205,7 @@ public final class Headgroup {
         this.lipidClass = lipidClass;
     }
 
+    @JsonIgnore
     public boolean isUseHeadgroup() {
         return useHeadgroup;
     }
@@ -211,6 +214,7 @@ public final class Headgroup {
         this.useHeadgroup = useHeadgroup;
     }
 
+    @JsonIgnore
     public boolean isSpException() {
         return spException;
     }
@@ -219,6 +223,7 @@ public final class Headgroup {
         this.spException = spException;
     }
 
+    @JsonIgnore
     public ArrayList<HeadgroupDecorator> getDecorators() {
         return decorators;
     }

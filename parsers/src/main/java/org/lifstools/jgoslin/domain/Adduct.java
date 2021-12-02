@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
 import static java.util.Map.entry;
 
@@ -124,6 +125,7 @@ public final class Adduct {
         return sb.toString();
     }
 
+    @JsonIgnore
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
 //        String adduct_name = adductString.substring(1);

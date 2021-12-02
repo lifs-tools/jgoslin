@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class FunctionalGroup {
         return this.count;
     }
 
+    @JsonIgnore
     public String getStereochemistry() {
         return stereochemistry;
     }
@@ -117,6 +119,7 @@ public class FunctionalGroup {
         this.stereochemistry = stereochemistry;
     }
 
+    @JsonIgnore
     public String getRingStereo() {
         return ringStereo;
     }
@@ -137,10 +140,12 @@ public class FunctionalGroup {
         this.atomic = atomic;
     }
 
+    @JsonIgnore
     public boolean isAtomic() {
         return this.atomic;
     }
 
+    @JsonIgnore
     public ElementTable getElements() {
         return this.elements;
     }
@@ -149,6 +154,7 @@ public class FunctionalGroup {
         this.elements = elements;
     }
 
+    @JsonIgnore
     public ElementTable computeAndCopyElements() {
         computeElements();
         ElementTable _elements = elements.copy();
@@ -171,21 +177,44 @@ public class FunctionalGroup {
      * @return the total count
      */
     public Integer getTotalFunctionalGroupCount(String functionalGroup) {
-        if (functionalGroups.containsKey(functionalGroup)) {
+        if ("[X]".equals(functionalGroup)) {
+            return 0;
+        } else if (functionalGroups.containsKey(functionalGroup)) {
             return functionalGroups.get(functionalGroup).stream().map(fg -> fg.getCount()).reduce(0, Integer::sum);
         } else {
             return 0;
         }
     }
 
+    /**
+     * Returns a copy of the internally used functional groups map, with the virtual [X] group for regular LCBs removed.
+     * @return a copy of the internal functional groups
+     * @see #getFunctionalGroupsInternal() to obtain the internal datastructure by reference.
+     */
     public Map<String, ArrayList<FunctionalGroup>> getFunctionalGroups() {
+        Map<String, ArrayList<FunctionalGroup>> mapCopy = new HashMap<>(functionalGroups);
+        mapCopy.remove("[X]");
+        return mapCopy;
+    }
+    
+    /**
+     * Returns the internal representation of the functional groups, including the virtual [X] group for regular LCBs.
+     * @return the internal datastructure by reference.
+     */
+    @JsonIgnore
+    public Map<String, ArrayList<FunctionalGroup>> getFunctionalGroupsInternal() {
         return functionalGroups;
     }
 
+    /**
+     * Set the internal functional groups.
+     * @param functionalGroups the functional groups to set
+     */
     public void setFunctionalGroups(Map<String, ArrayList<FunctionalGroup>> functionalGroups) {
         this.functionalGroups = functionalGroups;
     }
 
+    @JsonIgnore
     public ElementTable getFunctionalGroupElements() {
         ElementTable _elements = new ElementTable();
 

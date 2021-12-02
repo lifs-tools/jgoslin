@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
@@ -72,6 +73,7 @@ public final class LipidSpeciesInfo extends FattyAcid {
         return lsi;
     }
 
+    @JsonIgnore
     @Override
     public ElementTable getElements() {
         ElementTable elements = super.computeAndCopyElements();

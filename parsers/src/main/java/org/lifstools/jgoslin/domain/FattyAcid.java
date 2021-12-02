@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -252,6 +253,7 @@ public class FattyAcid extends FunctionalGroup {
         return fa_string.toString();
     }
 
+    @JsonIgnore
     @Override
     public ElementTable getFunctionalGroupElements() {
         ElementTable fgElements = super.getFunctionalGroupElements();

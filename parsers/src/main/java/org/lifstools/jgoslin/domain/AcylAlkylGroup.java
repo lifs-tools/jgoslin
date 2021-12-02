@@ -59,7 +59,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
         this.alkyl = alkyl;
     }
 
-    public boolean getAlkyl() {
+    public boolean isAlkyl() {
         return this.alkyl;
     }
 
@@ -76,7 +76,7 @@ public final class AcylAlkylGroup extends FunctionalGroup {
         }
     }
 
-    public boolean getNitrogenBond() {
+    public boolean isNitrogenBond() {
         return this.nitrogenBond;
     }
 

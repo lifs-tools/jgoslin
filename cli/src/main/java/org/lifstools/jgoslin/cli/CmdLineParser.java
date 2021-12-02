@@ -258,8 +258,9 @@ public class CmdLineParser {
                 m.put("Level", t.level.name());
                 m.put("Total #C", t.lipidSpeciesInfo.getNumCarbon() + "");
                 m.put("Total #DB", t.lipidSpeciesInfo.getDoubleBonds().getNumDoubleBonds() + "");
-                for (String functionalGroupKey : t.lipidSpeciesInfo.getFunctionalGroups().keySet()) {
-                    ArrayList<FunctionalGroup> fg = t.lipidSpeciesInfo.getFunctionalGroups().get(functionalGroupKey);
+                Map<String, ArrayList<FunctionalGroup>> functionalGroups = t.lipidSpeciesInfo.getFunctionalGroups();
+                for (String functionalGroupKey : functionalGroups.keySet()) {
+                    ArrayList<FunctionalGroup> fg = functionalGroups.get(functionalGroupKey);
                     String fgCounts = fg.stream().map((sfg) -> {
                         return "" + sfg.getCount();
                     }).collect(Collectors.joining("|"));

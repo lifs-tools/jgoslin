@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -118,6 +119,7 @@ public class LipidSpecies {
         return faList;
     }
 
+    @JsonIgnore
     public ElementTable getElements() {
 
         switch (info.getLevel()) {
