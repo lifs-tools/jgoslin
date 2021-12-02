@@ -101,4 +101,26 @@ public class LipidParserTest {
         LipidAdduct la = lp.parse("PE 16:1(6)/16:0;oxo;(OH)2");
         assertEquals(LipidLevel.STRUCTURE_DEFINED, la.getLipidLevel());
     }
+    
+        
+    @Test
+    public void testHydroxyls() {
+        LipidAdduct l = parser.parse("Cer 36:1;2");
+        Integer ohCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("OH");
+        assertEquals(2, ohCount);
+        Integer asdCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("ASD");
+        assertEquals(0, asdCount);
+        l = parser.parse("Cer d36:1");
+        ohCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("OH");
+        assertEquals(2, ohCount);
+        l = parser.parse("Cer 18:1;2/18:0");
+        ohCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("OH");
+        assertEquals(2, ohCount);
+        l = parser.parse("Cer d18:1/18:0");
+        ohCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("OH");
+        assertEquals(2, ohCount);
+        l = parser.parse("Cer 18:1;(OH)2/18:0");
+        ohCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("OH");
+        assertEquals(2, ohCount);
+    }
 }

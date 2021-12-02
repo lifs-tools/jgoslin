@@ -165,6 +165,19 @@ public class FunctionalGroup {
         });
     }
 
+    /**
+     * Return the total count for the given functional group name, or 0.
+     * @param functionalGroup the functional group name.
+     * @return the total count
+     */
+    public Integer getTotalFunctionalGroupCount(String functionalGroup) {
+        if (functionalGroups.containsKey(functionalGroup)) {
+            return functionalGroups.get(functionalGroup).stream().map(fg -> fg.getCount()).reduce(0, Integer::sum);
+        } else {
+            return 0;
+        }
+    }
+
     public Map<String, ArrayList<FunctionalGroup>> getFunctionalGroups() {
         return functionalGroups;
     }
@@ -245,5 +258,4 @@ public class FunctionalGroup {
 //            functionalGroups.put(fg.name, al);
 //        }
 //    }
-
 }
