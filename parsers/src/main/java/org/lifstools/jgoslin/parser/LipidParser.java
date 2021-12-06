@@ -105,7 +105,7 @@ public class LipidParser {
             }
             message += ("at or after " + errorMessage);
         }
-        throw new LipidParsingException("Could not parse lipid '" + lipidName + " 'with any parser!" + message);
+        throw new LipidParsingException("Could not parse lipid '" + lipidName + "' with any parser!" + message);
     }
 
     /**
