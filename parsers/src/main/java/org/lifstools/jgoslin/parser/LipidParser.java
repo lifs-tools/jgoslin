@@ -45,7 +45,7 @@ public class LipidParser {
      * @return a new lipid parser instance.
      */
     public static LipidParser newInstance() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), sfp);
         return newInstance(knownFunctionalGroups);
     }
@@ -62,12 +62,12 @@ public class LipidParser {
 
     private LipidParser(KnownFunctionalGroups knownFunctionalGroups) {
         this(
-                ShorthandParser.newInstance(knownFunctionalGroups, "Shorthand2020.g4", StringFunctions.DEFAULT_QUOTE),
-                FattyAcidParser.newInstance(knownFunctionalGroups, "FattyAcids.g4", StringFunctions.DEFAULT_QUOTE),
-                GoslinParser.newInstance(knownFunctionalGroups, "Goslin.g4", StringFunctions.DEFAULT_QUOTE),
-                LipidMapsParser.newInstance(knownFunctionalGroups, "LipidMaps.g4", StringFunctions.DEFAULT_QUOTE),
-                SwissLipidsParser.newInstance(knownFunctionalGroups, "SwissLipids.g4", StringFunctions.DEFAULT_QUOTE),
-                HmdbParser.newInstance(knownFunctionalGroups, "HMDB.g4", StringFunctions.DEFAULT_QUOTE)
+                new ShorthandParser(knownFunctionalGroups),
+                new FattyAcidParser(knownFunctionalGroups),
+                new GoslinParser(knownFunctionalGroups),
+                new LipidMapsParser(knownFunctionalGroups),
+                new SwissLipidsParser(knownFunctionalGroups),
+                new HmdbParser(knownFunctionalGroups)
         );
     }
 

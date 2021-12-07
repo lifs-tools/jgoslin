@@ -79,7 +79,7 @@ To write output to the tab-separated output file 'goslin-out.tsv', run
 
 == Running the Web Application for Validation
 
-The goslin web application is available at: https://lifs-tools.org/goslin
+The goslin web application is available at: https://apps.lifs-tools.org/goslin
 
 == Building the Docker Image
 
@@ -126,7 +126,7 @@ If you want to use them, add the following lines to your own Maven pom file :
     </repositories>
   </profile>
 
-To compile jgoslin against the LIFS Bintray repository, please add the following entry to you ~/.m2/settings.xml file:
+To compile jgoslin against the LIFS JFrog repository, please add the following entry to you ~/.m2/settings.xml file:
 
   <activeProfiles>
     <activeProfile>lifs-repos</activeProfile>
@@ -163,7 +163,7 @@ The following snippet shows how to parse a shorthand lipid name with the differe
 	String ref = "Cer(d18:1/20:2)";
 	try {
 		// use the SwissLipids parser
-		SwissLipidsParser slParser = SwissLipidsParser.newInstance();
+		SwissLipidsParser slParser = new SwissLipidsParser();
 		// multiple eventhandlers can be used with one parser, e.g. in parallel processing
 		SwissLipidsParserEventHandler slHandler = slParser.newEventHandler();
 		LipidAdduct sllipid = slParser.parse(ref, slHandler);
@@ -175,15 +175,15 @@ The following snippet shows how to parse a shorthand lipid name with the differe
 
 	//alternatively, use the other parsers. Don't forget to place try catch blocks around the following lines, as for the SwissLipids parser example
 	// use the LipidMAPS parser
-	LipidMapsParser lmParser = LipidMapsParser.newInstance();
+	LipidMapsParser lmParser = new LipidMapsParser();
 	LipidMapsParserEventHandler lmHandler = lmParser.newEventHandler();
 	LipidAdduct lmlipid = lmParser.parse(ref, lmHandler);
 	// use the shorthand notation parser GOSLIN
-	GoslinParser goslinParser = GoslinParser.newInstance();
+	GoslinParser goslinParser = new GoslinParser();
 	GoslinParserEventHandler goslinHandler = goslinParser.newEventHandler();
 	LipidAdduct golipid = goslinParser.parse(ref, goslinHandler);
 	// use the updated shorthand notation of 2020
-	ShorthandParser shorthandParser = ShorthandParser.newInstance();
+	ShorthandParser shorthandParser = new ShorthandParser();
 	ShorthandParserEventHandler shorthandHandler = shorthandParser.newEventHandler();
 	// calling parse with the optional argument false suppresses any exceptions, if errors are encountered, the returned LipidAdduct will be null
 	LipidAdduct shlipid = shorthandParser.parse(ref, shorthandHandler, false);

@@ -39,9 +39,9 @@ public class HmdbParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
-        parser = HmdbParser.newInstance(knownFunctionalGroups, "HMDB.g4", DEFAULT_QUOTE);
+        parser = new HmdbParser(knownFunctionalGroups, StringFunctions.getResourceAsString("HMDB.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 

@@ -47,6 +47,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 import org.lifstools.jgoslin.domain.FattyAcid;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidClassMeta;
 import org.lifstools.jgoslin.domain.LipidClasses;
@@ -481,20 +482,21 @@ public class CmdLineParser {
 
     private static Map<Grammar, Parser<LipidAdduct>> loadParsers() {
         if(parsers.isEmpty()) {
+            KnownFunctionalGroups kfg = new KnownFunctionalGroups();
             for (Grammar grammar : Grammar.values()) {
                 switch (grammar) {
                     case FATTY_ACID ->
-                        parsers.put(grammar, FattyAcidParser.newInstance());
+                        parsers.put(grammar, new FattyAcidParser(kfg));
                     case GOSLIN ->
-                        parsers.put(grammar, GoslinParser.newInstance());
+                        parsers.put(grammar, new GoslinParser(kfg));
                     case HMDB ->
-                        parsers.put(grammar, HmdbParser.newInstance());
+                        parsers.put(grammar, new HmdbParser(kfg));
                     case LIPIDMAPS ->
-                        parsers.put(grammar, LipidMapsParser.newInstance());
+                        parsers.put(grammar, new LipidMapsParser(kfg));
                     case SHORTHAND2020 ->
-                        parsers.put(grammar, ShorthandParser.newInstance());
+                        parsers.put(grammar, new ShorthandParser(kfg));
                     case SWISSLIPIDS ->
-                        parsers.put(grammar, SwissLipidsParser.newInstance());
+                        parsers.put(grammar, new SwissLipidsParser(kfg));
                     case GOSLIN_FRAGMENTS -> {
                     }
                     case NONE -> {

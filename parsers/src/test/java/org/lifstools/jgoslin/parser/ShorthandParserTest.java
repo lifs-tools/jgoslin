@@ -45,9 +45,9 @@ public class ShorthandParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
-        parser = ShorthandParser.newInstance(knownFunctionalGroups, "Shorthand2020.g4", DEFAULT_QUOTE);
+        parser = new ShorthandParser(knownFunctionalGroups, StringFunctions.getResourceAsString("Shorthand2020.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
     

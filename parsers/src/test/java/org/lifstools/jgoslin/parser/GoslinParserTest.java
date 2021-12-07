@@ -40,9 +40,9 @@ public class GoslinParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
-        parser = GoslinParser.newInstance(knownFunctionalGroups, "Goslin.g4", DEFAULT_QUOTE);
+        parser = new GoslinParser(knownFunctionalGroups, StringFunctions.getResourceAsString("Goslin.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 

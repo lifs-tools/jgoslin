@@ -41,9 +41,9 @@ public class LipidMapsParserTest {
 
     @BeforeAll
     public static void setupParser() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
-        parser = LipidMapsParser.newInstance(knownFunctionalGroups, "LipidMaps.g4", DEFAULT_QUOTE);
+        parser = new LipidMapsParser(knownFunctionalGroups, StringFunctions.getResourceAsString("LipidMaps.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
     }
 

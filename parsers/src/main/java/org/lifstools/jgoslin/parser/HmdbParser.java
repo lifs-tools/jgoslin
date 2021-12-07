@@ -21,49 +21,47 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 
 /**
  * Parser implementation for the HMDB lipid shorthand nomenclature.
+ *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
 public class HmdbParser extends Parser<LipidAdduct> {
 
-    private static final String DEFAULT_GRAMMAR_CONTENT = "HMDB.g4";
+    private static final String DEFAULT_GRAMMAR = "HMDB.g4";
 
     private final KnownFunctionalGroups knownFunctionalGroups;
 
-    private HmdbParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
+    /**
+     * Create a new instance of a {@link HmdbParser}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @param grammarContent the grammar text content
+     * @param quote the quotation character used in the grammar
+     */
+    public HmdbParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
         super(grammarContent, quote);
         this.knownFunctionalGroups = knownFunctionalGroups;
     }
 
     /**
-     * Create a new instance of a {@link HmdbParser}.
+     * Create a new instance of a {@link HmdbParser} with default grammar
+     * {@link HmdbParser#DEFAULT_GRAMMAR} and default quote
+     * {@link StringFunctions#DEFAULT_QUOTE}.
      *
      * @param knownFunctionalGroups the known functional groups
-     * @param grammarResourcePath the resource path to the grammar file
-     * @param quote the quotation character used in the grammar
-     * @return a new parser instance
      */
-    public static HmdbParser newInstance(KnownFunctionalGroups knownFunctionalGroups, String grammarResourcePath, char quote) {
-        return new HmdbParser(knownFunctionalGroups, StringFunctions.getResourceAsString(grammarResourcePath), quote);
+    public HmdbParser(KnownFunctionalGroups knownFunctionalGroups) {
+        this(knownFunctionalGroups, StringFunctions.getResourceAsString(DEFAULT_GRAMMAR), StringFunctions.DEFAULT_QUOTE);
     }
 
     /**
-     * Create a new instance of a {@link HmdbParser}.
-     *
-     * @param knownFunctionalGroups the known functional groups
-     * @return a new parser instance
+     * Create a new instance of a {@link HmdbParser} with default grammar
+     * {@link HmdbParser#DEFAULT_GRAMMAR} and default quote
+     * {@link StringFunctions#DEFAULT_QUOTE} and default
+     * {@link KnownFunctionalGroups}.
      */
-    public static HmdbParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
-        return newInstance(knownFunctionalGroups, DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
-    }
-
-    /**
-     * Create a new instance of a {@link HmdbParser}.
-     *
-     * @return a new parser instance
-     */
-    public static HmdbParser newInstance() {
-        return newInstance(new KnownFunctionalGroups(), DEFAULT_GRAMMAR_CONTENT, StringFunctions.DEFAULT_QUOTE);
+    public HmdbParser() {
+        this(new KnownFunctionalGroups(), StringFunctions.getResourceAsString(DEFAULT_GRAMMAR), StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class LipidParserTest {
 
     @BeforeAll
     public static void setupParsers() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         parser = LipidParser.newInstance(knownFunctionalGroups);
     }

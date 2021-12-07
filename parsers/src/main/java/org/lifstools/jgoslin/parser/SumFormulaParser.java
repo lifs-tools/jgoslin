@@ -26,28 +26,25 @@ import org.lifstools.jgoslin.domain.ElementTable;
  */
 public class SumFormulaParser extends Parser<ElementTable> {
 
-    private SumFormulaParser(String grammarContent, char quote) {
+    private static final String DEFAULT_GRAMMAR = "SumFormula.g4";
+
+    /**
+     * Create a new instance of a {@link SumFormulaParser}.
+     *
+     * @param grammarContent the grammar text content
+     * @param quote the quotation character used in the grammar
+     */
+    public SumFormulaParser(String grammarContent, char quote) {
         super(grammarContent, quote);
     }
 
     /**
-     * Create a new instance of a {@link SumFormulaParser}.
-     *
-     * @param grammarResourcePath the resource path to the grammar file
-     * @param quote the quotation character used in the grammar
-     * @return a new parser instance
+     * Create a new instance of a {@link SumFormulaParser} with default grammar
+     * {@link SumFormulaParser#DEFAULT_GRAMMAR} and default quote
+     * {@link StringFunctions#DEFAULT_QUOTE}.
      */
-    public static SumFormulaParser newInstance(String grammarResourcePath, char quote) {
-        return new SumFormulaParser(StringFunctions.getResourceAsString(grammarResourcePath), quote);
-    }
-
-    /**
-     * Create a new instance of a {@link SumFormulaParser}.
-     *
-     * @return a new parser instance
-     */
-    public static SumFormulaParser newInstance() {
-        return newInstance("SumFormula.g4", StringFunctions.DEFAULT_QUOTE);
+    public SumFormulaParser() {
+        this(StringFunctions.getResourceAsString(DEFAULT_GRAMMAR), StringFunctions.DEFAULT_QUOTE);
     }
 
     @Override

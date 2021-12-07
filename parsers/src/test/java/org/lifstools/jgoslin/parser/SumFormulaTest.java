@@ -42,13 +42,13 @@ public class SumFormulaTest {
 
     @BeforeAll
     public static void setupParsers() {
-        SumFormulaParser sfp = SumFormulaParser.newInstance();
+        SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
-        lipid_maps_parser = LipidMapsParser.newInstance(knownFunctionalGroups, "LipidMaps.g4", DEFAULT_QUOTE);
+        lipid_maps_parser = new LipidMapsParser(knownFunctionalGroups, StringFunctions.getResourceAsString("LipidMaps.g4"), DEFAULT_QUOTE);
         lmHandler = lipid_maps_parser.newEventHandler();
-        swiss_lipids_parser = SwissLipidsParser.newInstance(knownFunctionalGroups, "SwissLipids.g4", DEFAULT_QUOTE);
+        swiss_lipids_parser = new SwissLipidsParser(knownFunctionalGroups, StringFunctions.getResourceAsString("SwissLipids.g4"), DEFAULT_QUOTE);
         slHandler = swiss_lipids_parser.newEventHandler();
-        goslin_parser = GoslinParser.newInstance(knownFunctionalGroups, "Goslin.g4", DEFAULT_QUOTE);
+        goslin_parser = new GoslinParser(knownFunctionalGroups, StringFunctions.getResourceAsString("Goslin.g4"), DEFAULT_QUOTE);
         gHandler = goslin_parser.newEventHandler();
     }
 

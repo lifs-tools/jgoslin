@@ -40,7 +40,7 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
 
     private LipidClasses() {
         super();
-        loadData(StringFunctions.getResourceAsStringList(new ClassPathResource("lipid-list.csv")), SumFormulaParser.newInstance());
+        loadData(StringFunctions.getResourceAsStringList(new ClassPathResource("lipid-list.csv")), new SumFormulaParser());
     }
 
     private void loadData(List<String> lines, SumFormulaParser sfp) {

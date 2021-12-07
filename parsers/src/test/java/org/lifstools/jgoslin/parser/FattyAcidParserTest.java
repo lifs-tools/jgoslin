@@ -42,12 +42,12 @@ public class FattyAcidParserTest {
 
     @BeforeAll
     public static void setupParsers() {
-        sfp = SumFormulaParser.newInstance();
+        sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         sfpHandler = sfp.newEventHandler();
-        fatty_acid_parser = FattyAcidParser.newInstance(knownFunctionalGroups, "FattyAcids.g4", DEFAULT_QUOTE);
+        fatty_acid_parser = new FattyAcidParser(knownFunctionalGroups, StringFunctions.getResourceAsString("FattyAcids.g4"), DEFAULT_QUOTE);
         faHandler = fatty_acid_parser.newEventHandler();
-        shorthand_parser = ShorthandParser.newInstance(knownFunctionalGroups, "Shorthand2020.g4", DEFAULT_QUOTE);
+        shorthand_parser = new ShorthandParser(knownFunctionalGroups, StringFunctions.getResourceAsString("Shorthand2020.g4"), DEFAULT_QUOTE);
         shHandler = shorthand_parser.newEventHandler();
     }
 
