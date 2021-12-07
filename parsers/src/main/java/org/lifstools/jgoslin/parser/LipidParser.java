@@ -42,25 +42,17 @@ public class LipidParser {
     /**
      * Create a new lipid parser instance.
      *
-     * @return a new lipid parser instance.
      */
-    public static LipidParser newInstance() {
-        SumFormulaParser sfp = new SumFormulaParser();
-        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), sfp);
-        return newInstance(knownFunctionalGroups);
+    public LipidParser() {
+        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList(new ClassPathResource("functional-groups.csv")), new SumFormulaParser()));
     }
 
     /**
      * Create a new lipid parser instance.
      *
      * @param knownFunctionalGroups the known functional groups
-     * @return a new lipid parser instance.
      */
-    public static LipidParser newInstance(KnownFunctionalGroups knownFunctionalGroups) {
-        return new LipidParser(knownFunctionalGroups);
-    }
-
-    private LipidParser(KnownFunctionalGroups knownFunctionalGroups) {
+    public LipidParser(KnownFunctionalGroups knownFunctionalGroups) {
         this(
                 new ShorthandParser(knownFunctionalGroups),
                 new FattyAcidParser(knownFunctionalGroups),

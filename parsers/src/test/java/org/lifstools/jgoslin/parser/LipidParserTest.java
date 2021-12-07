@@ -42,7 +42,7 @@ public class LipidParserTest {
     public static void setupParsers() {
         SumFormulaParser sfp = new SumFormulaParser();
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
-        parser = LipidParser.newInstance(knownFunctionalGroups);
+        parser = new LipidParser(knownFunctionalGroups);
     }
 
     @ParameterizedTest(name = "{index}: {0}")
@@ -97,7 +97,7 @@ public class LipidParserTest {
     
     @Test
     public void testLipidParser() {
-        LipidParser lp = LipidParser.newInstance();
+        LipidParser lp = new LipidParser();
         LipidAdduct la = lp.parse("PE 16:1(6)/16:0;oxo;(OH)2");
         assertEquals(LipidLevel.STRUCTURE_DEFINED, la.getLipidLevel());
     }
