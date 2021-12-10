@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.lifstools</groupId>
+    <groupId>org.lifs-tools</groupId>
     <artifactId>jgoslin</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <name>jgoslin</name>
     <url>https://github.com/lifs-tools/jgoslin</url>	
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
     <description>
@@ -22,6 +24,7 @@
             <email>dominik.kopczynski@univie.ac.at</email>
             <organization>Department of Analytical Chemistry, University of Vienna, Vienna, Austria</organization>
             <organizationUrl>https://anchem.univie.ac.at/</organizationUrl>
+            <timezone>Europe/Berlin</timezone>
         </developer>
         <developer>
             <name>Nils Hoffmann</name>
@@ -31,6 +34,7 @@
             <roles>
                 <role>developer</role>
             </roles>
+            <timezone>Europe/Berlin</timezone>
         </developer>
     </developers>
     <scm>
@@ -44,7 +48,15 @@
             <name>JGoslin Website</name>
             <url>https://lifs-tools.github.io/jgoslin/${project.version}</url>
         </site>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <!--        <repository>
             <id>lifstools-jfrog</id>
             <name>lifstools-release</name>
             <url>https://lifstools.jfrog.io/artifactory/lifs-libs-release-local</url>
@@ -53,7 +65,7 @@
             <id>lifstools-jfrog</id>
             <name>lifstools-snapshot</name>
             <url>https://lifstools.jfrog.io/artifactory/lifs-libs-snapshot-local</url>
-        </snapshotRepository>
+        </snapshotRepository>-->
     </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -64,7 +76,7 @@
         <junit.vintage.version>5.8.1</junit.vintage.version>
         <dockerfile.plugin.version>1.4.13</dockerfile.plugin.version>
         <slf4j.version>1.7.32</slf4j.version>
-	<jacoco.version>0.8.7</jacoco.version>
+        <jacoco.version>0.8.7</jacoco.version>
         <sonar.organization>lifs-tools</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>		
     </properties>
@@ -128,7 +140,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -156,7 +168,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.1</version>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -188,6 +200,8 @@
                     <version>3.0.0-M5</version>
                     <configuration>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <parallel>classes</parallel>
+                        <threadCount>2</threadCount>
                         <trimStackTrace>false</trimStackTrace>
                         <workingDirectory>${project.build.directory}/surefire-files</workingDirectory>
                     </configuration>
@@ -199,6 +213,8 @@
                         <execution>
                             <configuration>
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                                <parallel>classes</parallel>
+                                <threadCount>2</threadCount>
                                 <trimStackTrace>true</trimStackTrace>
                                 <workingDirectory>${project.build.directory}/failsafe-files</workingDirectory>
                             </configuration>
@@ -264,30 +280,6 @@
                             <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
                         </systemPropertyVariables>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>com.spotify</groupId>
-                    <artifactId>dockerfile-maven-plugin</artifactId>
-                    <version>${dockerfile.plugin.version}</version>
-                    <configuration>
-                        <repository>${docker.image.prefix}/${project.artifactId}</repository>
-                        <tag>${project.version}</tag>
-                        <buildArgs>
-                            <APP_NAME>${project.artifactId}</APP_NAME>
-                            <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-                            <APP_VERSION>${project.version}</APP_VERSION>
-                        </buildArgs>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>default</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>build</goal>
-                                <goal>tag</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -430,7 +422,70 @@
     </reporting>
     <profiles>
         <profile>
-            <id>goslin-release</id>
+            <id>jfrog</id>
+            <distributionManagement>
+                <repository>
+                    <id>lifstools-jfrog</id>
+                    <name>lifstools-release</name>
+                    <url>https://lifstools.jfrog.io/artifactory/lifs-libs-release-local</url>
+                </repository>
+                <snapshotRepository>
+                    <id>lifstools-jfrog</id>
+                    <name>lifstools-snapshot</name>
+                    <url>https://lifstools.jfrog.io/artifactory/lifs-libs-snapshot-local</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>ossrh-snapshot</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <detectJavaApiLink>false</detectJavaApiLink>
+                                    <additionalparam>-Xdoclint:none</additionalparam>
+                                    <docfilessubdirs>true</docfilessubdirs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>ossrh-release</id>
+            <properties>
+                <gpg.executable>${gpg.executable}</gpg.executable>
+                <gpg.keyname>${gpg.keyname}</gpg.keyname>
+                <gpg.passphrase>${gpg.passphrase}</gpg.passphrase>
+                <gpg.defaultKeyring>true</gpg.defaultKeyring>
+                <gpg.publicKeyring>${gpg.dir}/pubring.gpg</gpg.publicKeyring>
+                <gpg.secretKeyring>${gpg.dir}/secring.gpg</gpg.secretKeyring>
+            </properties>
             <activation>
                 <property>
                     <name>performRelease</name>
@@ -438,35 +493,65 @@
                 </property>
             </activation>
             <build>
-                <resources>
-                    <resource>
-                        <directory>.</directory>
-                        <includes>
-                            <include>src/main/goslin/lipid-list.csv</include>
-                            <include>src/main/goslin/functional-groups.csv</include>
-                            <include>src/main/goslin/*.g4</include>
-                        </includes>
-                    </resource>
-                </resources>
-        
                 <plugins>
                     <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
                         <executions>
                             <execution>
-                                <phase>package</phase>
+                                <id>attach-sources</id>
                                 <goals>
-                                    <goal>single</goal>
+                                    <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <detectJavaApiLink>false</detectJavaApiLink>
+                                    <additionalparam>-Xdoclint:none</additionalparam>
+                                    <docfilessubdirs>true</docfilessubdirs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
                         <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
@@ -475,5 +560,4 @@
         <module>parsers</module>
         <module>cli</module>
     </modules>
-    <name>jgoslin</name>
 </project>
