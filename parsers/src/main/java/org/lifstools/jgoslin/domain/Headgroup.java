@@ -26,7 +26,7 @@ import static java.util.Map.entry;
 
 /**
  * This class represents functional head groups of lipids. This is where the
- * association to {@link LipidClass} and {@link LipidCategory} is maintained.
+ * association to {@link LipidClasses} and {@link LipidCategory} is maintained.
  *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
