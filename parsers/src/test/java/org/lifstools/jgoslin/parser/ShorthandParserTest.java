@@ -219,6 +219,13 @@ public class ShorthandParserTest {
         l = parser.parse("FA 35:1(18Z);2(24:0);3OH", handler);
         assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
     }
+    
+    @Test
+    public void testSnPosition() {
+        LipidAdduct l = parser.parse("NA 2:0/20:4(5Z,8Z,11Z,14Z)", handler);
+        assertEquals(1, l.getLipid().getFaList().get(0).getPosition());
+        assertEquals(2, l.getLipid().getFaList().get(1).getPosition());
+    }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/shorthand-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
