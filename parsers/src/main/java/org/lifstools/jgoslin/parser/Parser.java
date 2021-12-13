@@ -673,6 +673,7 @@ public abstract class Parser<T> {
      */
     public T parse(String textToParse, BaseParserEventHandler<T> parserEventHandler, boolean throwError) {
         String old_text = textToParse;
+        
         if (usedEof) {
             textToParse += EOF_SIGN;
         }

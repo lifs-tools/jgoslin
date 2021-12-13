@@ -298,7 +298,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void newFa(TreeNode node) {
         dbNumbers = -1;
-        currentFa = new FattyAcid("FA" + (faList.size() + 1), knownFunctionalGroups);
+        currentFa = new FattyAcid("FA", knownFunctionalGroups);
     }
 
     private void newLcb(TreeNode node) {
@@ -324,10 +324,6 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
         if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
-        }
-
-        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level | LipidLevel.SN_POSITION.level)) {
-            currentFa.setPosition(faList.size() + 1);
         }
 
         if (currentFa.getNumCarbon() == 0) {
@@ -398,16 +394,11 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         if (lcb != null) {
-            for (FattyAcid fa : faList) {
-                fa.setPosition(fa.getPosition() + 1);
-            }
             faList.add(0, lcb);
         }
-
+       
         Headgroup headgroup = prepareHeadgroupAndChecks();
-
-        LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);
-        content = lipid;
+        content = new LipidAdduct(assembleLipid(headgroup), adduct);
     }
 
     private void newAdduct(TreeNode node) {

@@ -34,6 +34,11 @@ public class LipidSnPosition extends LipidMolecularSpecies {
     public LipidSnPosition(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
         info.setLevel(LipidLevel.SN_POSITION);
+        
+        int pos = 1;
+        for (FattyAcid fatty_acid : faList){
+            fatty_acid.position = pos++;
+        }
     }
 
     @Override

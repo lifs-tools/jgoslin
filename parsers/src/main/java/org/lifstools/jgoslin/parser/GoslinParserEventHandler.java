@@ -187,7 +187,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     private void newFa(TreeNode node) {
         LipidFaBondType lipid_FA_bond_type = LipidFaBondType.ESTER;
-        currentFa = new FattyAcid("FA" + (faList.size() + 1), 2, null, null, lipid_FA_bond_type, knownFunctionalGroups);
+        currentFa = new FattyAcid("FA", 2, null, null, lipid_FA_bond_type, knownFunctionalGroups);
     }
 
     private void newLcb(TreeNode node) {
@@ -216,19 +216,12 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
 
-        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level | LipidLevel.SN_POSITION.level)) {
-            currentFa.setPosition(faList.size() + 1);
-        }
-
         faList.add(currentFa);
         currentFa = null;
     }
 
     private void buildLipid(TreeNode node) {
         if (lcb != null) {
-            for (FattyAcid fa : faList) {
-                fa.setPosition(fa.getPosition() + 1);
-            }
             faList.add(0, lcb);
             lcb = null;
             currentFa = null;

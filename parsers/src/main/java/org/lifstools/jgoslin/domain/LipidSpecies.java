@@ -52,10 +52,16 @@ public class LipidSpecies {
         info.setLevel(LipidLevel.SPECIES);
 
         // add fatty acids
-        if (_fa != null) {
+        if (_fa != null && !_fa.isEmpty()) {
+            int i = 0;
+            FattyAcid fattyAcid = _fa.iterator().next();
+            boolean fa_it = (_fa.size() > 0) && (fattyAcid.lipidFaBondType == LipidFaBondType.LCB_EXCEPTION || fattyAcid.lipidFaBondType == LipidFaBondType.LCB_REGULAR);
             for (FattyAcid fatty_acid : _fa) {
+                fatty_acid.name = (fa_it && i == 0) ? "LCB" : "FA" + String.valueOf(i + 1 - (fa_it ? 1 : 0));
+                fatty_acid.position = -1;
                 info.add(fatty_acid);
                 faList.add(fatty_acid);
+                ++i;
             }
         }
     }

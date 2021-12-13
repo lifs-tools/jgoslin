@@ -55,7 +55,7 @@ public class GoslinParserTest {
         assertEquals("Cer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C42H83NO3", l.getSumFormula());
         assertEquals("LCB", l.getLipid().getFaList().get(0).getName());
-        assertEquals(0, l.getLipid().getFaList().get(0).getPosition());
+        assertEquals(1, l.getLipid().getFaList().get(0).getPosition());
         assertEquals("FA1", l.getLipid().getFaList().get(1).getName());
         assertEquals(2, l.getLipid().getFaList().get(1).getPosition());
 
@@ -112,27 +112,27 @@ public class GoslinParserTest {
         assertEquals("C42H79O10P", l.getSumFormula());
         assertEquals(4, l.getLipid().getFaList().size());
         assertEquals("FA1", l.getLipid().getFaList().get(0).getName());
-        assertEquals(0, l.getLipid().getFaList().get(0).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(0).getPosition());
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
-        assertEquals(0, l.getLipid().getFaList().get(1).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(1).getPosition());
 
         l = parser.parse("PC O-18:1-18:1", handler);
         assertEquals("C44H86NO7P", l.getSumFormula());
         assertEquals(2, l.getLipid().getFaList().size());
         assertEquals("FA1", l.getLipid().getFaList().get(0).getName());
-        assertEquals(0, l.getLipid().getFaList().get(0).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(0).getPosition());
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.getLipid().getFaList().get(0).getLipidFaBondType());
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
-        assertEquals(0, l.getLipid().getFaList().get(1).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(1).getPosition());
 
         l = parser.parse("PC-O 18:1_18:1", handler);
         assertEquals("C44H86NO7P", l.getSumFormula());
         assertEquals(2, l.getLipid().getFaList().size());
         assertEquals("FA1", l.getLipid().getFaList().get(0).getName());
-        assertEquals(0, l.getLipid().getFaList().get(0).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(0).getPosition());
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, l.getLipid().getFaList().get(0).getLipidFaBondType());
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
-        assertEquals(0, l.getLipid().getFaList().get(1).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(1).getPosition());
     }
     
     @Test
@@ -141,19 +141,19 @@ public class GoslinParserTest {
         assertEquals("C42H79O10P", l.getSumFormula());
         assertEquals(4, l.getLipid().getFaList().size());
         assertEquals("FA1", l.getLipid().getFaList().get(0).getName());
-        assertEquals(0, l.getLipid().getFaList().get(0).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(0).getPosition());
         assertEquals(18, l.getLipid().getFaList().get(0).getNumCarbon());
         assertEquals(1, l.getLipid().getFaList().get(0).getNDoubleBonds());
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
-        assertEquals(0, l.getLipid().getFaList().get(1).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(1).getPosition());
         assertEquals(18, l.getLipid().getFaList().get(1).getNumCarbon());
         assertEquals(1, l.getLipid().getFaList().get(1).getNDoubleBonds());
         assertEquals("FA3", l.getLipid().getFaList().get(2).getName());
-        assertEquals(0, l.getLipid().getFaList().get(2).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(2).getPosition());
         assertEquals(0, l.getLipid().getFaList().get(2).getNumCarbon());
         assertEquals(0, l.getLipid().getFaList().get(2).getNDoubleBonds());
         assertEquals("FA4", l.getLipid().getFaList().get(3).getName());
-        assertEquals(0, l.getLipid().getFaList().get(3).getPosition());
+        assertEquals(-1, l.getLipid().getFaList().get(3).getPosition());
         assertEquals(0, l.getLipid().getFaList().get(3).getNumCarbon());
         assertEquals(0, l.getLipid().getFaList().get(3).getNDoubleBonds());
         
