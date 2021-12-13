@@ -67,7 +67,7 @@ jobs:
         BUILD_ENV: 'github-actions'
         DEFAULT_BRANCH: master
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./mvnw -B deploy -DskipTests --file pom.xml
+      run: ./mvnw -B deploy -DskipTests -Pjfrog --file pom.xml
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
