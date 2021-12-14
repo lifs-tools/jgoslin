@@ -60,7 +60,6 @@ public class LipidSpecies {
                 fatty_acid.name = (fa_it && i == 0) ? "LCB" : "FA" + String.valueOf(i + 1 - (fa_it ? 1 : 0));
                 fatty_acid.position = -1;
                 info.add(fatty_acid);
-                faList.add(fatty_acid);
                 ++i;
             }
         }

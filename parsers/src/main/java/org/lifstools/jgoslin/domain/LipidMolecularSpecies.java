@@ -34,14 +34,14 @@ public class LipidMolecularSpecies extends LipidSpecies {
     public LipidMolecularSpecies(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
         super(_headgroup, _fa, knownFunctionalGroups);
         info.setLevel(LipidLevel.MOLECULAR_SPECIES);
-        faList.stream().map(fatty_acid -> {
+        for (FattyAcid fatty_acid : _fa){
             if (fa.containsKey(fatty_acid.getName())) {
                 throw new ConstraintViolationException("FA names must be unique! FA with name " + fatty_acid.getName() + " was already added!");
             }
-            return fatty_acid;
-        }).forEachOrdered(fatty_acid -> {
             fa.put(fatty_acid.getName(), fatty_acid);
-        });
+            faList.add(fatty_acid);
+        }
+        
 
         // add 0:0 dummys
         for (int i = _fa.size(); i < info.totalFa; ++i) {
