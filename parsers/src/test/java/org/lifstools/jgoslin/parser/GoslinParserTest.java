@@ -169,6 +169,12 @@ public class GoslinParserTest {
         
         LipidAdduct l3 = parser.parse("Cer d18:1/24:0", parser.newEventHandler());
     }
+    
+    @Test
+    public void testHete() {
+        LipidAdduct la = parser.parse("12-HETE", parser.newEventHandler());
+        assertEquals("FA1", la.getLipid().getFaList().get(0).getName());
+    }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/goslin-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
