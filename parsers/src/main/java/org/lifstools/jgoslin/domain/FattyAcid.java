@@ -290,11 +290,12 @@ public class FattyAcid extends FunctionalGroup {
                 case ETHER_PLASMENYL:
                     elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds + 2)); // hydrogen
                     break;
+                case ETHER:
                 case ETHER_PLASMANYL:
                     elements.put(Element.H, ((numCarbon + 1) * 2 - 1 - 2 * num_double_bonds)); // hydrogen
                     break;
-                case AMINE:
-                    elements.put(Element.H, (2 * numCarbon + 1 - 2 * num_double_bonds)); // hydrogen
+                case AMIDE:
+                    elements.put(Element.H, (2 * numCarbon + 1 - 2 * num_double_bonds) - 1); // hydrogen
                     break;
                 default:
                     throw new LipidException("Mass cannot be computed for fatty acyl chain with this bond type");

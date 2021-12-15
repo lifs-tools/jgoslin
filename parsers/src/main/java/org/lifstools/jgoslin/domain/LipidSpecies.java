@@ -151,6 +151,10 @@ public class LipidSpecies {
         elements.put(Element.O, elements.get(Element.O) - (-additional_fa + info.numEthers + (headGroup.isSpException() ? 1 : 0) + hydrochain));
         elements.put(Element.H, elements.get(Element.H) + (-additional_fa + remaining_H + 2 * info.numEthers + 2 * hydrochain));
 
+        if (meta.specialCases.contains("Amide")){
+            elements.put(Element.O, elements.get(Element.O) - meta.maxNumFa);
+            elements.put(Element.H, elements.get(Element.H) + meta.maxNumFa);
+        }
         return elements;
     }
 

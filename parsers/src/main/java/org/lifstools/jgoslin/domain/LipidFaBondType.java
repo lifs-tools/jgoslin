@@ -26,10 +26,11 @@ public enum LipidFaBondType {
     NO_FA,
     UNDEFINED_FA,
     ESTER,
+    ETHER,
     ETHER_PLASMANYL,
     ETHER_PLASMENYL,
     ETHER_UNSPECIFIED,
     LCB_EXCEPTION,
     LCB_REGULAR,
-    AMINE
+    AMIDE
 };

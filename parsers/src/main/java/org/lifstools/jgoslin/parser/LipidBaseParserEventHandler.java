@@ -106,7 +106,13 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
         }
 
         if (LipidClasses.getInstance().get(headgroup.getLipidClass()).specialCases.contains("HC")) {
-            faList.get(0).setLipidFaBondType(LipidFaBondType.AMINE);
+            faList.get(0).setLipidFaBondType(LipidFaBondType.ETHER);
+        }
+
+        if (LipidClasses.getInstance().get(headgroup.getLipidClass()).specialCases.contains("Amide")) {
+            for (FattyAcid fatty : faList){
+                fatty.setLipidFaBondType(LipidFaBondType.AMIDE);
+            }
         }
 
         int max_num_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).maxNumFa : 0;

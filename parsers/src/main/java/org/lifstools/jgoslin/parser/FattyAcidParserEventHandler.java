@@ -376,7 +376,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             headgroup = "WE";
         } else if (t.equals("ne")) {
             headgroup = "HC";
-            fattyAcylStack.peekLast().setLipidFaBondType(LipidFaBondType.AMINE);
+            fattyAcylStack.peekLast().setLipidFaBondType(LipidFaBondType.ETHER);
         } else {
             headgroup = t;
         }
@@ -385,9 +385,8 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     private void add_amine(TreeNode node) {
         FattyAcid fa = fattyAcylStack.pollLast();
 
-        fa.setName(fa.getName() + "1");
-        fattyAcylStack.peekLast().setName(fa.getName() + "2");
-        fa.setLipidFaBondType(LipidFaBondType.AMINE);
+        fa.setLipidFaBondType(LipidFaBondType.AMIDE);
+        fattyAcylStack.getLast().setLipidFaBondType(LipidFaBondType.AMIDE);
         fattyAcylStack.addFirst(fa);
     }
 
@@ -742,9 +741,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
 
     private void add_wax_ester(TreeNode node) {
         FattyAcid fa = fattyAcylStack.pollLast();
-        fa.setName(fa.getName() + "1");
-        fa.setLipidFaBondType(LipidFaBondType.AMINE);
-        fattyAcylStack.peekLast().setName(fa.getName() + "2");
+        fa.setLipidFaBondType(LipidFaBondType.ETHER);
         fattyAcylStack.addFirst(fa);
     }
 
