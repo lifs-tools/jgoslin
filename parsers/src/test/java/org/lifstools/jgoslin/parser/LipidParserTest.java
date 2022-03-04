@@ -123,4 +123,10 @@ public class LipidParserTest {
         ohCount = l.getLipid().getInfo().getTotalFunctionalGroupCount("OH");
         assertEquals(2, ohCount);
     }
+    
+    @Test
+    public void testSMs() {
+        LipidAdduct l = parser.parse("SM 31:1");
+    }
+
 }
