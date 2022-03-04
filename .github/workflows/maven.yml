@@ -41,7 +41,7 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2        
     - name: Setup Maven settings.xml
-      uses: whelk-io/maven-settings-xml-action@v14
+      uses: whelk-io/maven-settings-xml-action@v20
       with:
         servers: '[{ "id": "lifstools-jfrog", "username": "github-deployer", "password": "${env.ARTIFACTORY_TOKEN_REF}" }]'
     - name: Set Release version env variable
