@@ -127,6 +127,10 @@ public class LipidParserTest {
     @Test
     public void testSMs() {
         LipidAdduct l = parser.parse("SM 31:1");
+        Integer cCount = l.getLipid().getInfo().getNumCarbon();
+        assertEquals(31, cCount);
+        Integer dbCount = l.getLipid().getInfo().getNDoubleBonds();
+        assertEquals(1, dbCount);
     }
 
 }

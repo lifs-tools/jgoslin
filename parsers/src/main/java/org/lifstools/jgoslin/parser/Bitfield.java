@@ -16,6 +16,8 @@
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bit field implementation. This class is dedicated to have an efficient sorted
@@ -25,6 +27,8 @@ import org.lifstools.jgoslin.domain.ConstraintViolationException;
  * @author Nils Hoffmann
  */
 final class Bitfield {
+
+    private static final Logger log = LoggerFactory.getLogger(Bitfield.class);
 
     private final long[] field;
     private final int length;
@@ -59,10 +63,11 @@ final class Bitfield {
     }
 
     static void printBitfield(long l) {
+        StringBuilder sb = new StringBuilder();
         for (int i = 63; i >= 0; --i) {
-            System.out.print(((l >>> i) & 1L));
+            sb.append(((l >>> i) & 1L));
         }
-        System.out.println();
+        log.debug("{}", sb.toString());
     }
 
     void resetIterator() {

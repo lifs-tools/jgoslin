@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for parser event handling.
@@ -32,20 +34,16 @@ import org.lifstools.jgoslin.domain.ConstraintViolationException;
  */
 public abstract class BaseParserEventHandler<T> {
 
+    private static final Logger log = LoggerFactory.getLogger(BaseParserEventHandler.class);
+
     protected Map<String, Consumer<TreeNode>> registeredEvents = new HashMap<>();
     protected Set<String> ruleNames = new HashSet<>();
-    protected String debug = "";
     protected T content = null;
     protected String errorMessage = "";
 
     protected BaseParserEventHandler() {
         registeredEvents = new HashMap<>();
         ruleNames = new HashSet<>();
-    }
-    
-    
-    public void setDebug(String debug){
-        this.debug = debug;
     }
 
     // checking if all registered events are reasonable and orrur as rules in the grammar
@@ -62,14 +60,14 @@ public abstract class BaseParserEventHandler<T> {
     }
 
     protected void handleEvent(String event_name, TreeNode node) {
-        if (debug.equals("full")) {
+        if (log.isDebugEnabled()) {
             String reg_event = registeredEvents.containsKey(event_name) ? "*" : "";
-            System.out.println(event_name + reg_event + ": \"" + node.getText() + "\"");
+            log.debug(event_name + reg_event + ": \"" + node.getText() + "\"");
         }
 
         if (registeredEvents.containsKey(event_name)) {
-            if (!debug.equals("") && !debug.equals("full")) {
-                System.out.println(event_name + ": \"" + node.getText() + "\"");
+            if (log.isDebugEnabled()) {
+                log.debug(event_name + ": \"" + node.getText() + "\"");
             }
             try {
                 registeredEvents.get(event_name).accept(node);
