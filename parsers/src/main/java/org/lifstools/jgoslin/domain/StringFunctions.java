@@ -35,6 +35,8 @@ public final class StringFunctions {
     public static char DEFAULT_QUOTE = '\'';
     public static char DEFAULT_SPLIT = ',';
 
+    private StringFunctions(){};
+
     public static String strip(String s, char c) {
         if (s.length() > 0) {
             int st = 0;
@@ -131,7 +133,7 @@ public final class StringFunctions {
             tokens.add(sb_string_end);
         }
         if (in_quote) {
-            throw new ConstraintViolationException("Error: corrupted token in grammar: " + sb_string_end);
+            throw new ConstraintViolationException("Error: corrupt token in grammar: '" + sb_string_end+"'");
         }
         return tokens;
     }
@@ -150,7 +152,7 @@ public final class StringFunctions {
             lines = br.lines().collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
             //always pass on the original exception
-            throw new ConstraintViolationException("Error: Resource " + resource.getDescription() + " cannot be read.", e);
+            throw new ConstraintViolationException("Error: Resource '" + resource.getDescription() + "' does not exist.", e);
         }
         return lines;
     }
@@ -183,7 +185,7 @@ public final class StringFunctions {
             return sb.toString();
         } catch (IOException e) {
             //always pass on the original exception
-            throw new ConstraintViolationException("Error: resource '" + resource.getDescription() + "' does not exist.", e);
+            throw new ConstraintViolationException("Error: Resource '" + resource.getDescription() + "' does not exist.", e);
         }
     }
 
