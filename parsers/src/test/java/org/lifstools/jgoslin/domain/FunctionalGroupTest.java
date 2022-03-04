@@ -15,8 +15,13 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import java.util.ArrayList;
+import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.lifstools.jgoslin.parser.SumFormulaParser;
 
 /**
  *
@@ -24,28 +29,48 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class FunctionalGroupTest {
 
+    private static KnownFunctionalGroups knownFunctionalGroups;
+
+    @BeforeAll
+    public static void init() {
+        SumFormulaParser sfp = new SumFormulaParser();
+        knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+    }
+
     @Test
     public void testGetRingStereo() {
-
+        FunctionalGroup fg = knownFunctionalGroups.get("Me").copy();
+        assertEquals("", fg.getRingStereo());
     }
 
     @Test
     public void testSetGetAtomic() {
-
+        FunctionalGroup fg = knownFunctionalGroups.get("Me").copy();
+        assertEquals(false, fg.isAtomic());
+        fg.setAtomic(true);
+        assertEquals(true, fg.isAtomic());
     }
 
     @Test
     public void testSetElements() {
-
+        FunctionalGroup fg = knownFunctionalGroups.get("Me").copy();
+        ElementTable et = new ElementTable();
+        et.put(Element.C, 5);
+        fg.setElements(et);
+        assertEquals(5, fg.getElements().get(Element.C));
     }
 
     @Test
     public void testGetTotalFunctionalGroupCountX() {
-
+        FunctionalGroup fg = knownFunctionalGroups.get("Me").copy();
+        assertEquals(0, fg.getTotalFunctionalGroupCount("[X]"));
     }
 
     @Test
     public void testGetFunctionalGroups() {
-
+        FunctionalGroup fg = knownFunctionalGroups.get("Me").copy();
+        Map<String, ArrayList<FunctionalGroup>> functionalGroups = fg.getFunctionalGroups();
+        assertFalse(functionalGroups.containsKey("[X]"));
+        assertEquals(0, functionalGroups.size());
     }
 }
