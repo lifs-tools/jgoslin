@@ -274,17 +274,4 @@ public class FunctionalGroup {
         });
     }
 
-//    public void add(FunctionalGroup fg) {
-//        elements.add(fg.elements);
-//    }
-//
-//    public void addFunctionalGroup(FunctionalGroup fg) {
-//        if (functionalGroups.containsKey(fg.name)) {
-//            functionalGroups.get(fg.name).add(fg);
-//        } else {
-//            ArrayList<FunctionalGroup> al = new ArrayList<>();
-//            al.add(fg);
-//            functionalGroups.put(fg.name, al);
-//        }
-//    }
 }

@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 final class Bitfield {
 
-    private static final Logger log = LoggerFactory.getLogger(Bitfield.class);
-
     private final long[] field;
     private final int length;
     private final int field_len;
@@ -62,12 +60,12 @@ final class Bitfield {
         return ((field[pos >>> 6] >>> (pos & 63)) & 1L) == 0L;
     }
 
-    static void printBitfield(long l) {
+    static String printBitfield(long l) {
         StringBuilder sb = new StringBuilder();
         for (int i = 63; i >= 0; --i) {
             sb.append(((l >>> i) & 1L));
         }
-        log.debug("{}", sb.toString());
+        return sb.toString();
     }
 
     void resetIterator() {
