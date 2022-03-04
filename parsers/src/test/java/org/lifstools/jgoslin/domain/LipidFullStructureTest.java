@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.lifstools.jgoslin.parser.SumFormulaParser;
@@ -33,7 +34,7 @@ public class LipidFullStructureTest {
         LipidFullStructure lfs = new LipidFullStructure(head_group, knownFunctionalGroups);
         assertEquals(LipidLevel.FULL_STRUCTURE, lfs.getLipidLevel());
     }
-    
+
     @Test
     public void testGetLipidString() {
         Headgroup head_group = new Headgroup("FA");
@@ -41,6 +42,18 @@ public class LipidFullStructureTest {
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         LipidFullStructure lfs = new LipidFullStructure(head_group, knownFunctionalGroups);
         assertEquals("FA 0:0", lfs.getLipidString());
+    }
+
+    @Test
+    public void testGetLipidStringThrowsException() {
+        Headgroup head_group = new Headgroup("FA");
+        SumFormulaParser sfp = new SumFormulaParser();
+        KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
+        LipidFullStructure lfs = new LipidFullStructure(head_group, knownFunctionalGroups);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            lfs.getLipidString(LipidLevel.UNDEFINED_LEVEL);
+        });
+        Assertions.assertEquals("LipidFullStructure does not know how to create a lipid string for level " + LipidLevel.UNDEFINED_LEVEL.toString(), exception.getMessage());
     }
 
 }
