@@ -6,7 +6,7 @@ Nils Hoffmann <nils.hoffmann@cebitec-uni-bielefeld.de>
 image:https://img.shields.io/github/release/lifs-tools/jgoslin.svg["Latest Release", link="https://github.com/lifs-tools/jgoslin/releases/latest"] 
 image:https://zenodo.org/badge/DOI/10.5281/zenodo.3826474.svg["DOI", link="https://doi.org/10.5281/zenodo.3826474"]
 image:https://github.com/lifs-tools/jgoslin/actions/workflows/maven.yml/badge.svg["Build Status", link="https://github.com/lifs-tools/jgoslin/actions/workflows/maven.yml"]
-image:https://sonarcloud.io/api/project_badges/measure?branch=master&project=lifs-tools_jg&metric=alert_status["Quality Gate", link=https://sonarcloud.io/dashboard?id=lifs-tools_jg]
+image:https://sonarcloud.io/api/project_badges/measure?project=lifs-tools_jg&metric=alert_status["Quality Gate", link=https://sonarcloud.io/project/overview?id=lifs-tools_jg]
 
 //NOTE: If you use the jGoslin library or the web application, please cite the following paper: +
 //https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[ et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
