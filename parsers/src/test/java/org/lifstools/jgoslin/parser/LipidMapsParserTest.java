@@ -93,7 +93,7 @@ public class LipidMapsParserTest {
 
         lipid = parser.parse("PE-Cer(d16:2(4E,6E)/22:1(13Z)(2OH))", handler);
         final LipidAdduct tl = lipid;
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             tl.getLipidString(LipidLevel.COMPLETE_STRUCTURE);
         });
         assertEquals(LipidLevel.STRUCTURE_DEFINED, lipid.getLipidLevel());
