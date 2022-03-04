@@ -18,6 +18,7 @@ package org.lifstools.jgoslin.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -42,7 +43,7 @@ public class LipidSpecies {
     protected ArrayList<FattyAcid> faList = new ArrayList<>();
 
     public LipidSpecies(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_headgroup, null, knownFunctionalGroups);
+        this(_headgroup, Collections.emptyList(), knownFunctionalGroups);
     }
 
     public LipidSpecies(Headgroup _headGroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {

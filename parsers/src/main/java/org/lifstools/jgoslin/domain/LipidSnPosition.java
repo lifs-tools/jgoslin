@@ -16,6 +16,7 @@
 package org.lifstools.jgoslin.domain;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Sn position level according to the 2020 update of the Liebisch shorthand
@@ -28,7 +29,7 @@ import java.util.Collection;
 public class LipidSnPosition extends LipidMolecularSpecies {
 
     public LipidSnPosition(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_headgroup, null, knownFunctionalGroups);
+        this(_headgroup, Collections.emptyList(), knownFunctionalGroups);
     }
 
     public LipidSnPosition(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {

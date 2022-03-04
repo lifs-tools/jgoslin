@@ -16,6 +16,7 @@
 package org.lifstools.jgoslin.domain;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Structure defined level according to the 2020 update of the Liebisch
@@ -28,7 +29,7 @@ import java.util.Collection;
 public class LipidStructureDefined extends LipidSnPosition {
 
     public LipidStructureDefined(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_headgroup, null, knownFunctionalGroups);
+        this(_headgroup, Collections.emptyList(), knownFunctionalGroups);
     }
 
     public LipidStructureDefined(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {
