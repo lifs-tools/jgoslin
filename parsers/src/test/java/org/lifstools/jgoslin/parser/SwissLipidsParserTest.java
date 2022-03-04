@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +44,12 @@ public class SwissLipidsParserTest {
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         parser = new SwissLipidsParser(knownFunctionalGroups, StringFunctions.getResourceAsString("SwissLipids.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
+    }
+
+    @Test
+    public void testDefaultConstructorTest() {
+        SwissLipidsParser gp = new SwissLipidsParser();
+        assertNotNull(gp);
     }
 
     @Test

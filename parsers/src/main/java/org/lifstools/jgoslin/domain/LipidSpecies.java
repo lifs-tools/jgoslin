@@ -30,7 +30,7 @@ import java.util.HashMap;
  * head group is defined as PC (Glycerophosphocholines), with fatty acyl chains
  * of unknown individual composition, but known total composition (32 carbon
  * atoms, zero double bonds, no hydroxylations or other functions).
- * 
+ *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
@@ -69,22 +69,37 @@ public class LipidSpecies {
     public LipidLevel getLipidLevel() {
         return LipidLevel.SPECIES;
     }
-    
+
     public LipidSpeciesInfo getInfo() {
         return info;
     }
-    
+
     public Headgroup getHeadGroup() {
         return headGroup;
     }
 
+    /**
+     * Returns the normalized lipid string on the native level.
+     *
+     * @return the normalized lipid string.
+     */
     public String getLipidString() {
         return getLipidString(LipidLevel.NO_LEVEL);
     }
 
+    /**
+     * Returns the normalized lipid string on the provided level.
+     *
+     * @param level the lipid level at which the lipid string should be
+     * generated.
+     * @return the normalized lipid string.
+     * @throws IllegalArgumentException when the provided level is not
+     * supported.
+     */
     public String getLipidString(LipidLevel level) {
         switch (level) {
-            case UNDEFINED_LEVEL -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
+            case UNDEFINED_LEVEL ->
+                throw new IllegalArgumentException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
             case CLASS, CATEGORY -> {
                 return headGroup.getLipidString(level);
             }
@@ -98,14 +113,15 @@ public class LipidSpecies {
                         if (decorator.getName().equals("decorator_alkyl") || decorator.getName().equals("decorator_acyl")) {
                             ElementTable e = decorator.computeAndCopyElements();
                             lsi.numCarbon += e.get(Element.C);
-                            lsi.doubleBonds.setNumDoubleBonds(lsi.doubleBonds.getNumDoubleBonds()+ decorator.getNDoubleBonds());
+                            lsi.doubleBonds.setNumDoubleBonds(lsi.doubleBonds.getNumDoubleBonds() + decorator.getNDoubleBonds());
                         }
                     }
                     lipid_string.append(headGroup.getLipidCategory() != LipidCategory.ST ? " " : "/").append(lsi.toString());
                 }
                 return lipid_string.toString();
             }
-            default -> throw new ConstraintViolationException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
+            default ->
+                throw new IllegalArgumentException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
         }
     }
 
@@ -131,7 +147,8 @@ public class LipidSpecies {
         switch (info.getLevel()) {
             case COMPLETE_STRUCTURE, FULL_STRUCTURE, STRUCTURE_DEFINED, SN_POSITION, MOLECULAR_SPECIES, SPECIES -> {
             }
-            default -> throw new LipidException("Element table cannot be computed for lipid level " + info.getLevel().toString());
+            default ->
+                throw new LipidException("Element table cannot be computed for lipid level " + info.getLevel().toString());
         }
 
         if (headGroup.isUseHeadgroup()) {
@@ -152,7 +169,7 @@ public class LipidSpecies {
         elements.put(Element.O, elements.get(Element.O) - (-additional_fa + info.numEthers + (headGroup.isSpException() ? 1 : 0) + hydrochain));
         elements.put(Element.H, elements.get(Element.H) + (-additional_fa + remaining_H + 2 * info.numEthers + 2 * hydrochain));
 
-        if (meta.specialCases.contains("Amide")){
+        if (meta.specialCases.contains("Amide")) {
             elements.put(Element.O, elements.get(Element.O) - meta.maxNumFa);
             elements.put(Element.H, elements.get(Element.H) + meta.maxNumFa);
         }

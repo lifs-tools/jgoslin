@@ -16,6 +16,7 @@
 package org.lifstools.jgoslin.domain;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Complete structure level according to the 2020 update of the Liebisch
@@ -28,7 +29,7 @@ import java.util.Collection;
 public class LipidCompleteStructure extends LipidFullStructure {
 
     public LipidCompleteStructure(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_headgroup, null, knownFunctionalGroups);
+        this(_headgroup, Collections.emptyList(), knownFunctionalGroups);
     }
 
     public LipidCompleteStructure(Headgroup _headgroup, Collection<FattyAcid> _fa, KnownFunctionalGroups knownFunctionalGroups) {

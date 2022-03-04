@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,6 +50,12 @@ public class FattyAcidParserTest {
         faHandler = fatty_acid_parser.newEventHandler();
         shorthand_parser = new ShorthandParser(knownFunctionalGroups, StringFunctions.getResourceAsString("Shorthand2020.g4"), DEFAULT_QUOTE);
         shHandler = shorthand_parser.newEventHandler();
+    }
+
+    @Test
+    public void testDefaultConstructorTest() {
+        FattyAcidParser gp = new FattyAcidParser();
+        assertNotNull(gp);
     }
 
     @Test

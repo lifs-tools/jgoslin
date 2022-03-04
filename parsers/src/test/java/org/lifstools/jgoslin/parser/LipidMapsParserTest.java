@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,6 +46,12 @@ public class LipidMapsParserTest {
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         parser = new LipidMapsParser(knownFunctionalGroups, StringFunctions.getResourceAsString("LipidMaps.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
+    }
+
+    @Test
+    public void testDefaultConstructorTest() {
+        LipidMapsParser gp = new LipidMapsParser();
+        assertNotNull(gp);
     }
 
     @Test

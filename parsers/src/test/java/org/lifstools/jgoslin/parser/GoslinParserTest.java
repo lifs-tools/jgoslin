@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,6 +48,12 @@ public class GoslinParserTest {
     }
 
     @Test
+    public void testDefaultConstructorTest() {
+        GoslinParser gp = new GoslinParser();
+        assertNotNull(gp);
+    }
+
+    @Test
     public void testGoslinParserTest() {
         LipidAdduct l = parser.parse("Cer 18:1(8Z);2/24:0", handler);
         assertEquals("Cer 18:1(8);(OH)2/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
@@ -65,7 +72,7 @@ public class GoslinParserTest {
         assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("HexCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C48H93NO8", l.getSumFormula());
-        
+
         l = parser.parse("HexCer d18:1(5Z)/24:0", handler);
         assertEquals("HexCer 18:1(5);OH/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
@@ -134,7 +141,7 @@ public class GoslinParserTest {
         assertEquals("FA2", l.getLipid().getFaList().get(1).getName());
         assertEquals(-1, l.getLipid().getFaList().get(1).getPosition());
     }
-    
+
     @Test
     public void testMultipleFas() {
         LipidAdduct l = parser.parse("BMP 18:1-18:1", handler);
@@ -156,7 +163,7 @@ public class GoslinParserTest {
         assertEquals(-1, l.getLipid().getFaList().get(3).getPosition());
         assertEquals(0, l.getLipid().getFaList().get(3).getNumCarbon());
         assertEquals(0, l.getLipid().getFaList().get(3).getNDoubleBonds());
-        
+
         LipidAdduct l2 = parser.parse("TAG 18:1/0:0/16:0", parser.newEventHandler());
         assertEquals("C37H70O5", l2.getSumFormula());
         assertEquals(3, l2.getLipid().getFaList().size());
@@ -166,10 +173,10 @@ public class GoslinParserTest {
         assertEquals(2, l2.getLipid().getFaList().get(1).getPosition());
         assertEquals("FA3", l2.getLipid().getFaList().get(2).getName());
         assertEquals(3, l2.getLipid().getFaList().get(2).getPosition());
-        
+
         LipidAdduct l3 = parser.parse("Cer d18:1/24:0", parser.newEventHandler());
     }
-    
+
     @Test
     public void testHete() {
         LipidAdduct la = parser.parse("12-HETE", parser.newEventHandler());

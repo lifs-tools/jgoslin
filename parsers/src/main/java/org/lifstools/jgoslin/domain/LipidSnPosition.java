@@ -63,7 +63,7 @@ public class LipidSnPosition extends LipidMolecularSpecies {
             }
 
             default ->
-                throw new ConstraintViolationException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
+                throw new IllegalArgumentException("LipidSnPosition does not know how to create a lipid string for level " + level.toString());
         }
     }
 

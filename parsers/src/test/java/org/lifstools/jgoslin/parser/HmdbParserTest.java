@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +44,12 @@ public class HmdbParserTest {
         KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups(StringFunctions.getResourceAsStringList("functional-groups.csv"), sfp);
         parser = new HmdbParser(knownFunctionalGroups, StringFunctions.getResourceAsString("HMDB.g4"), DEFAULT_QUOTE);
         handler = parser.newEventHandler();
+    }
+
+    @Test
+    public void testDefaultConstructorTest() {
+        HmdbParser gp = new HmdbParser();
+        assertNotNull(gp);
     }
 
     @Test
@@ -88,7 +95,7 @@ public class HmdbParserTest {
         assertEquals("EPC 16:2;O2/22:1;O", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("EPC 38:3;O3", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C40H77N2O7P", l.getSumFormula());
-        
+
         l = parser.parse("CL(i-12:0/i-13:0/18:2(9Z,11Z)/a-13:0)[rac]", handler);
         assertTrue(l != null);
     }
