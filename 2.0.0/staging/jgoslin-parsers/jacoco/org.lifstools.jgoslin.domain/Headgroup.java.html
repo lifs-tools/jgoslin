@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Headgroup.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">Headgroup.java</span></div><h1>Headgroup.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import static java.util.Map.entry;
+
+/**
+ * This class represents functional head groups of lipids. This is where the
+ * association to {@link LipidClasses} and {@link LipidCategory} is maintained.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class Headgroup {
+
+<span class="fc" id="L36">    public static HashMap&lt;String, LipidCategory&gt; StringCategory = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L37">    public static HashMap&lt;String, Integer&gt; StringClass = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L38">    public static HashMap&lt;Integer, String&gt; ClassString = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L39">    public static HashSet&lt;String&gt; exceptionHeadgroups = new HashSet&lt;&gt;(Arrays.asList(&quot;Cer&quot;, &quot;SPB&quot;));</span>
+
+    private String headgroup;
+    private LipidCategory lipidCategory;
+    private int lipidClass;
+    private boolean useHeadgroup;
+    private ArrayList&lt;HeadgroupDecorator&gt; decorators;
+    private boolean spException;
+
+<span class="fc" id="L48">    public static final Map&lt;LipidCategory, String&gt; CategoryString = Map.ofEntries(</span>
+<span class="fc" id="L49">            entry(LipidCategory.NO_CATEGORY, &quot;NO_CATEGORY&quot;),</span>
+<span class="fc" id="L50">            entry(LipidCategory.UNDEFINED, &quot;UNDEFINED&quot;),</span>
+<span class="fc" id="L51">            entry(LipidCategory.GL, &quot;GL&quot;),</span>
+<span class="fc" id="L52">            entry(LipidCategory.GP, &quot;GP&quot;),</span>
+<span class="fc" id="L53">            entry(LipidCategory.SP, &quot;SP&quot;),</span>
+<span class="fc" id="L54">            entry(LipidCategory.ST, &quot;ST&quot;),</span>
+<span class="fc" id="L55">            entry(LipidCategory.FA, &quot;FA&quot;),</span>
+<span class="fc" id="L56">            entry(LipidCategory.SL, &quot;SL&quot;)</span>
+    );
+
+    public Headgroup(String _headgroup) {
+<span class="fc" id="L60">        this(_headgroup, null, false);</span>
+<span class="fc" id="L61">    }</span>
+
+<span class="fc" id="L63">    public Headgroup(String _headgroup, ArrayList&lt;HeadgroupDecorator&gt; _decorators, boolean _use_headgroup) {</span>
+<span class="fc" id="L64">        headgroup = _headgroup;</span>
+<span class="fc" id="L65">        lipidCategory = getCategory(_headgroup);</span>
+<span class="fc" id="L66">        lipidClass = getClass(headgroup);</span>
+<span class="fc" id="L67">        useHeadgroup = _use_headgroup;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        decorators = (_decorators != null) ? _decorators : new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L69" title="All 6 branches covered.">        spException = (lipidCategory == LipidCategory.SP) &amp;&amp; exceptionHeadgroups.contains(LipidClasses.getInstance().get(lipidClass).lipidClassName) &amp;&amp; (decorators.isEmpty());</span>
+<span class="fc" id="L70">    }</span>
+
+    public static LipidCategory getCategory(String _headgroup) {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (StringCategory.isEmpty()) {</span>
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            for (LipidClassMeta lipid_class : LipidClasses.getInstance()) {</span>
+<span class="fc" id="L76">                LipidCategory category = lipid_class.lipidCategory;</span>
+<span class="fc" id="L77">                lipid_class.synonyms.forEach(hg -&gt; {</span>
+<span class="fc" id="L78">                    StringCategory.put(hg, category);</span>
+<span class="fc" id="L79">                });</span>
+<span class="fc" id="L80">            }</span>
+        }
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        return StringCategory.containsKey(_headgroup) ? StringCategory.get(_headgroup) : LipidCategory.UNDEFINED;</span>
+    }
+
+    public static int getClass(String _headgroup) {
+
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (StringClass.isEmpty()) {</span>
+<span class="fc" id="L89">            int l_class = 0;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            for (LipidClassMeta lipid_class : LipidClasses.getInstance()) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">                for (String hg : lipid_class.synonyms) {</span>
+<span class="fc" id="L92">                    StringClass.put(hg, l_class);</span>
+<span class="fc" id="L93">                }</span>
+<span class="fc" id="L94">                l_class += 1;</span>
+<span class="fc" id="L95">            }</span>
+        }
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        return StringClass.containsKey(_headgroup) ? (int) StringClass.get(_headgroup) : LipidClasses.UNDEFINED_CLASS;</span>
+    }
+
+    public static String getClassString(int _lipid_class) {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (ClassString.isEmpty()) {</span>
+<span class="fc" id="L103">            int l_class = 0;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            for (LipidClassMeta lipid_class : LipidClasses.getInstance()) {</span>
+<span class="fc" id="L105">                ClassString.put(l_class++, lipid_class.synonyms.get(0));</span>
+<span class="fc" id="L106">            }</span>
+        }
+
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        return ClassString.containsKey(_lipid_class) ? ClassString.get(_lipid_class) : &quot;UNDEFINED&quot;;</span>
+    }
+
+    public String getClassName() {
+<span class="fc" id="L113">        return LipidClasses.getInstance().get(lipidClass).lipidClassName;</span>
+    }
+
+    public static String getCategoryString(LipidCategory _lipid_category) {
+<span class="nc" id="L117">        return CategoryString.get(_lipid_category);</span>
+    }
+
+    public String getLipidString(LipidLevel level) {
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (level == LipidLevel.CATEGORY) {</span>
+<span class="nc" id="L122">            return getCategoryString(lipidCategory);</span>
+        }
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        String hgs = useHeadgroup ? headgroup : getClassString(lipidClass);</span>
+
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (level == LipidLevel.CLASS) {</span>
+<span class="fc" id="L128">            return hgs;</span>
+        }
+
+<span class="fc" id="L131">        StringBuilder headgoup_string = new StringBuilder();</span>
+
+        // adding prefixes to the headgroup
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (!LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {</span>
+<span class="fc" id="L135">            ArrayList&lt;String&gt; prefixes = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">            for (HeadgroupDecorator hgd : decorators) {</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">                if (!hgd.isSuffix()) {</span>
+<span class="fc" id="L138">                    prefixes.add(hgd.toString(level));</span>
+                }
+<span class="fc" id="L140">            }</span>
+<span class="fc" id="L141">            Collections.sort(prefixes);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">            for (String prefix : prefixes) {</span>
+<span class="fc" id="L143">                headgoup_string.append(prefix);</span>
+<span class="fc" id="L144">            }</span>
+<span class="fc" id="L145">        } else {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            for (HeadgroupDecorator hgd : decorators) {</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">                if (!hgd.isSuffix()) {</span>
+<span class="fc" id="L148">                    headgoup_string.append(hgd.toString(level)).append(&quot;-&quot;);</span>
+                }
+<span class="fc" id="L150">            }</span>
+        }
+
+        // adding headgroup
+<span class="fc" id="L154">        headgoup_string.append(hgs);</span>
+
+        // ading suffixes to the headgroup
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        for (HeadgroupDecorator hgd : decorators) {</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (hgd.isSuffix()) {</span>
+<span class="fc" id="L159">                headgoup_string.append(hgd.toString(level));</span>
+            }
+<span class="fc" id="L161">        }</span>
+<span class="fc bfc" id="L162" title="All 6 branches covered.">        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level) &amp;&amp; lipidCategory == LipidCategory.SP &amp;&amp; !spException) {</span>
+<span class="fc" id="L163">            headgoup_string.append(&quot;(1)&quot;);</span>
+        }
+
+<span class="fc" id="L166">        return headgoup_string.toString();</span>
+    }
+
+    @JsonIgnore
+    public ElementTable getElements() {
+
+<span class="pc bpc" id="L172" title="2 of 4 branches missed.">        if (useHeadgroup || LipidClasses.getInstance().size() &lt;= lipidClass) {</span>
+<span class="nc" id="L173">            throw new ConstraintViolationException(&quot;Element table cannot be computed for lipid '&quot; + headgroup + &quot;'&quot;);</span>
+        }
+
+<span class="fc" id="L176">        ElementTable elements = LipidClasses.getInstance().get(lipidClass).elements.copy();</span>
+<span class="fc" id="L177">        decorators.forEach(hgd -&gt; {</span>
+<span class="fc" id="L178">            elements.add(hgd.computeAndCopyElements());</span>
+<span class="fc" id="L179">        });</span>
+
+<span class="fc" id="L181">        return elements;</span>
+    }
+
+    public String getHeadgroup() {
+<span class="fc" id="L185">        return headgroup;</span>
+    }
+
+    public void setHeadgroup(String headgroup) {
+<span class="nc" id="L189">        this.headgroup = headgroup;</span>
+<span class="nc" id="L190">    }</span>
+
+    public LipidCategory getLipidCategory() {
+<span class="fc" id="L193">        return lipidCategory;</span>
+    }
+
+    public void setLipidCategory(LipidCategory lipidCategory) {
+<span class="nc" id="L197">        this.lipidCategory = lipidCategory;</span>
+<span class="nc" id="L198">    }</span>
+
+    public int getLipidClass() {
+<span class="fc" id="L201">        return lipidClass;</span>
+    }
+
+    public void setLipidClass(int lipidClass) {
+<span class="nc" id="L205">        this.lipidClass = lipidClass;</span>
+<span class="nc" id="L206">    }</span>
+
+    @JsonIgnore
+    public boolean isUseHeadgroup() {
+<span class="fc" id="L210">        return useHeadgroup;</span>
+    }
+
+    public void setUseHeadgroup(boolean useHeadgroup) {
+<span class="nc" id="L214">        this.useHeadgroup = useHeadgroup;</span>
+<span class="nc" id="L215">    }</span>
+
+    @JsonIgnore
+    public boolean isSpException() {
+<span class="fc" id="L219">        return spException;</span>
+    }
+
+    public void setSpException(boolean spException) {
+<span class="nc" id="L223">        this.spException = spException;</span>
+<span class="nc" id="L224">    }</span>
+
+    @JsonIgnore
+    public ArrayList&lt;HeadgroupDecorator&gt; getDecorators() {
+<span class="fc" id="L228">        return decorators;</span>
+    }
+
+    public void setDecorators(ArrayList&lt;HeadgroupDecorator&gt; decorators) {
+<span class="nc" id="L232">        this.decorators = decorators;</span>
+<span class="nc" id="L233">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

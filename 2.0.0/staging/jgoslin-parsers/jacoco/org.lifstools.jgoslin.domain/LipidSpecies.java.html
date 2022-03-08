@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidSpecies.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">LipidSpecies.java</span></div><h1>LipidSpecies.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+
+/**
+ * A lipid species is the factual root of the object hierarchy. Lipid category
+ * and class are used as taxonomic roots of a lipid species. Partial structural
+ * knowledge, apart from the head group, is first encoded in the lipid species.
+ *
+ * A typical lipid species is PC 32:0 (SwissLipids SLM:000056493), where the
+ * head group is defined as PC (Glycerophosphocholines), with fatty acyl chains
+ * of unknown individual composition, but known total composition (32 carbon
+ * atoms, zero double bonds, no hydroxylations or other functions).
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class LipidSpecies {
+
+    protected Headgroup headGroup;
+    protected LipidSpeciesInfo info;
+
+<span class="fc" id="L42">    protected HashMap&lt;String, FattyAcid&gt; fa = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L43">    protected ArrayList&lt;FattyAcid&gt; faList = new ArrayList&lt;&gt;();</span>
+
+    public LipidSpecies(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L46">        this(_headgroup, Collections.emptyList(), knownFunctionalGroups);</span>
+<span class="fc" id="L47">    }</span>
+
+<span class="fc" id="L49">    public LipidSpecies(Headgroup _headGroup, Collection&lt;FattyAcid&gt; _fa, KnownFunctionalGroups knownFunctionalGroups) {</span>
+<span class="fc" id="L50">        headGroup = _headGroup;</span>
+
+<span class="fc" id="L52">        info = new LipidSpeciesInfo(headGroup.getLipidClass(), knownFunctionalGroups);</span>
+<span class="fc" id="L53">        info.setLevel(LipidLevel.SPECIES);</span>
+
+        // add fatty acids
+<span class="pc bpc" id="L56" title="1 of 4 branches missed.">        if (_fa != null &amp;&amp; !_fa.isEmpty()) {</span>
+<span class="fc" id="L57">            int i = 0;</span>
+<span class="fc" id="L58">            FattyAcid fattyAcid = _fa.iterator().next();</span>
+<span class="pc bpc" id="L59" title="1 of 6 branches missed.">            boolean fa_it = (_fa.size() &gt; 0) &amp;&amp; (fattyAcid.lipidFaBondType == LipidFaBondType.LCB_EXCEPTION || fattyAcid.lipidFaBondType == LipidFaBondType.LCB_REGULAR);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            for (FattyAcid fatty_acid : _fa) {</span>
+<span class="fc bfc" id="L61" title="All 6 branches covered.">                fatty_acid.name = (fa_it &amp;&amp; i == 0) ? &quot;LCB&quot; : &quot;FA&quot; + String.valueOf(i + 1 - (fa_it ? 1 : 0));</span>
+<span class="fc" id="L62">                fatty_acid.position = -1;</span>
+<span class="fc" id="L63">                info.add(fatty_acid);</span>
+<span class="fc" id="L64">                ++i;</span>
+<span class="fc" id="L65">            }</span>
+        }
+<span class="fc" id="L67">    }</span>
+
+    public LipidLevel getLipidLevel() {
+<span class="fc" id="L70">        return LipidLevel.SPECIES;</span>
+    }
+
+    public LipidSpeciesInfo getInfo() {
+<span class="fc" id="L74">        return info;</span>
+    }
+
+    public Headgroup getHeadGroup() {
+<span class="nc" id="L78">        return headGroup;</span>
+    }
+
+    /**
+     * Returns the normalized lipid string on the native level.
+     *
+     * @return the normalized lipid string.
+     */
+    public String getLipidString() {
+<span class="fc" id="L87">        return getLipidString(LipidLevel.NO_LEVEL);</span>
+    }
+
+    /**
+     * Returns the normalized lipid string on the provided level.
+     *
+     * @param level the lipid level at which the lipid string should be
+     * generated.
+     * @return the normalized lipid string.
+     * @throws IllegalArgumentException when the provided level is not
+     * supported.
+     */
+    public String getLipidString(LipidLevel level) {
+<span class="pc bpc" id="L100" title="1 of 4 branches missed.">        switch (level) {</span>
+            case UNDEFINED_LEVEL -&gt;
+<span class="fc" id="L102">                throw new IllegalArgumentException(&quot;LipidSpecies does not know how to create a lipid string for level &quot; + level.toString());</span>
+            case CLASS, CATEGORY -&gt; {
+<span class="fc" id="L104">                return headGroup.getLipidString(level);</span>
+            }
+            case NO_LEVEL, SPECIES -&gt; {
+<span class="fc" id="L107">                StringBuilder lipid_string = new StringBuilder();</span>
+<span class="fc" id="L108">                lipid_string.append(headGroup.getLipidString(level));</span>
+
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">                if (info.getElements().get(Element.C) &gt; 0 || info.numCarbon &gt; 0) {</span>
+<span class="fc" id="L111">                    LipidSpeciesInfo lsi = info.copy();</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">                    for (HeadgroupDecorator decorator : headGroup.getDecorators()) {</span>
+<span class="fc bfc" id="L113" title="All 4 branches covered.">                        if (decorator.getName().equals(&quot;decorator_alkyl&quot;) || decorator.getName().equals(&quot;decorator_acyl&quot;)) {</span>
+<span class="fc" id="L114">                            ElementTable e = decorator.computeAndCopyElements();</span>
+<span class="fc" id="L115">                            lsi.numCarbon += e.get(Element.C);</span>
+<span class="fc" id="L116">                            lsi.doubleBonds.setNumDoubleBonds(lsi.doubleBonds.getNumDoubleBonds() + decorator.getNDoubleBonds());</span>
+                        }
+<span class="fc" id="L118">                    }</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">                    lipid_string.append(headGroup.getLipidCategory() != LipidCategory.ST ? &quot; &quot; : &quot;/&quot;).append(lsi.toString());</span>
+                }
+<span class="fc" id="L121">                return lipid_string.toString();</span>
+            }
+            default -&gt;
+<span class="nc" id="L124">                throw new IllegalArgumentException(&quot;LipidSpecies does not know how to create a lipid string for level &quot; + level.toString());</span>
+        }
+    }
+
+    public String getExtendedClass() {
+<span class="pc bpc" id="L129" title="2 of 4 branches missed.">        boolean special_case = (info.numCarbon &gt; 0) ? (headGroup.getLipidCategory() == LipidCategory.GP) : false;</span>
+<span class="fc" id="L130">        String class_name = headGroup.getClassName();</span>
+<span class="pc bpc" id="L131" title="5 of 6 branches missed.">        if (special_case &amp;&amp; (info.extendedClass == LipidFaBondType.ETHER_PLASMANYL || info.extendedClass == LipidFaBondType.ETHER_UNSPECIFIED)) {</span>
+<span class="nc" id="L132">            return class_name + &quot;-O&quot;;</span>
+<span class="pc bpc" id="L133" title="3 of 4 branches missed.">        } else if (special_case &amp;&amp; info.extendedClass == LipidFaBondType.ETHER_PLASMENYL) {</span>
+<span class="nc" id="L134">            return class_name + &quot;-P&quot;;</span>
+        }
+
+<span class="fc" id="L137">        return class_name;</span>
+    }
+
+    public ArrayList&lt;FattyAcid&gt; getFaList() {
+<span class="fc" id="L141">        return faList;</span>
+    }
+
+    @JsonIgnore
+    public ElementTable getElements() {
+
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        switch (info.getLevel()) {</span>
+            case COMPLETE_STRUCTURE, FULL_STRUCTURE, STRUCTURE_DEFINED, SN_POSITION, MOLECULAR_SPECIES, SPECIES -&gt; {
+<span class="fc" id="L149">            }</span>
+            default -&gt;
+<span class="nc" id="L151">                throw new LipidException(&quot;Element table cannot be computed for lipid level &quot; + info.getLevel().toString());</span>
+        }
+
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (headGroup.isUseHeadgroup()) {</span>
+<span class="nc" id="L155">            throw new LipidException(&quot;Element table cannot be computed for lipid level &quot; + info.getLevel().toString());</span>
+        }
+
+<span class="fc" id="L158">        ElementTable elements = headGroup.getElements();</span>
+<span class="fc" id="L159">        elements.add(info.getElements());</span>
+
+        // since only one FA info is provided, we have to treat this single information as
+        // if we would have the complete information about all possible FAs in that lipid
+<span class="fc" id="L163">        LipidClassMeta meta = LipidClasses.getInstance().get(headGroup.getLipidClass());</span>
+
+<span class="fc" id="L165">        int additional_fa = meta.possibleNumFa;</span>
+<span class="fc" id="L166">        int remaining_H = meta.maxNumFa - additional_fa;</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        int hydrochain = meta.specialCases.contains(&quot;HC&quot;) ? 1 : 0;</span>
+
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        elements.put(Element.O, elements.get(Element.O) - (-additional_fa + info.numEthers + (headGroup.isSpException() ? 1 : 0) + hydrochain));</span>
+<span class="fc" id="L170">        elements.put(Element.H, elements.get(Element.H) + (-additional_fa + remaining_H + 2 * info.numEthers + 2 * hydrochain));</span>
+
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        if (meta.specialCases.contains(&quot;Amide&quot;)) {</span>
+<span class="fc" id="L173">            elements.put(Element.O, elements.get(Element.O) - meta.maxNumFa);</span>
+<span class="fc" id="L174">            elements.put(Element.H, elements.get(Element.H) + meta.maxNumFa);</span>
+        }
+<span class="fc" id="L176">        return elements;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

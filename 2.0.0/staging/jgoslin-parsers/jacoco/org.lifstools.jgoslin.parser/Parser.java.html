@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Parser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">Parser.java</span></div><h1>Parser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.LipidParsingException;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Optional;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
+
+/**
+ * Abstract base class for parsers producing a parse result of type T. Uses a
+ * re-implementation of Cocke-Younger-Kasami (CYK) algorithm for context free
+ * grammars.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ * @param &lt;T&gt; the type of a successful parse result.
+ */
+public abstract class Parser&lt;T&gt; {
+
+    // DP stands for dynamic programming
+    protected final class DPNode {
+
+        public long rule_index_1;
+        public long rule_index_2;
+<span class="fc" id="L44">        public DPNode left = null;</span>
+<span class="fc" id="L45">        public DPNode right = null;</span>
+
+<span class="fc" id="L47">        public DPNode(long _rule1, long _rule2, DPNode _left, DPNode _right) {</span>
+<span class="fc" id="L48">            rule_index_1 = _rule1;</span>
+<span class="fc" id="L49">            rule_index_2 = _rule2;</span>
+<span class="fc" id="L50">            left = _left;</span>
+<span class="fc" id="L51">            right = _right;</span>
+<span class="fc" id="L52">        }</span>
+    }
+
+<span class="fc" id="L55">    enum Context {</span>
+<span class="fc" id="L56">        NoContext, InLineComment, InLongComment, InQuote</span>
+    };
+
+<span class="fc" id="L59">    enum MatchWords {</span>
+<span class="fc" id="L60">        NoMatch, LineCommentStart, LineCommentEnd, LongCommentStart, LongCommentEnd, Quote</span>
+    };
+
+    protected static final int SHIFT = 32;
+    protected static final long MASK = (1L &lt;&lt; SHIFT) - 1;
+    protected static final char RULE_ASSIGNMENT = ':';
+    protected static final char RULE_SEPARATOR = '|';
+    protected static final char RULE_TERMINAL = ';';
+    protected static final char EOF_SIGN = (char) 1;
+    protected static final long EOF_RULE = 1L;
+    protected static final long START_RULE = 2L;
+    protected static final String EOF_RULE_NAME = &quot;EOF&quot;;
+
+    protected long nextFreeRuleIndex;
+<span class="fc" id="L74">    protected final HashMap&lt;Character, HashSet&lt;Long&gt;&gt; TtoNT = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L75">    protected final HashMap&lt;Character, Long&gt; originalTtoNT = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L76">    protected final HashMap&lt;String, Long&gt; ruleToNT = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L77">    protected final HashMap&lt;Long, HashSet&lt;Long&gt;&gt; NTtoNT = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L78">    protected final HashMap&lt;Long, String&gt; NTtoRule = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L79">    protected final HashMap&lt;Long, ArrayList&lt;Long&gt;&gt; substitution = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L80">    protected final ArrayList&lt;Bitfield&gt; rightPair = new ArrayList&lt;&gt;();</span>
+    protected int avgPair;
+    protected char quote;
+<span class="fc" id="L83">    protected String grammarName = &quot;&quot;;</span>
+<span class="fc" id="L84">    protected boolean usedEof = false;</span>
+    protected static final char DEFAULT_QUOTE = '\'';
+
+    public Parser(String grammarContent) {
+<span class="nc" id="L88">        this(grammarContent, (char) '\0');</span>
+<span class="nc" id="L89">    }</span>
+
+<span class="fc" id="L91">    public Parser(String grammarContent, char _quote) {</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        this.quote = (_quote != 0) ? _quote : DEFAULT_QUOTE;</span>
+<span class="fc" id="L93">        readGrammar(grammarContent);</span>
+<span class="fc" id="L94">    }</span>
+
+    public abstract BaseParserEventHandler&lt;T&gt; newEventHandler();
+
+    protected long get_next_free_rule_index() {
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        if (nextFreeRuleIndex &lt;= MASK) {</span>
+<span class="fc" id="L100">            return nextFreeRuleIndex++;</span>
+        }
+<span class="nc" id="L102">        throw new ConstraintViolationException(&quot;Error: grammar is too big.&quot;);</span>
+    }
+
+    protected final void readGrammar(String grammar) {
+<span class="fc" id="L106">        nextFreeRuleIndex = START_RULE;</span>
+<span class="fc" id="L107">        grammarName = &quot;&quot;;</span>
+<span class="fc" id="L108">        usedEof = false;</span>
+
+        // interpret the rules and create the structure for parsing
+<span class="fc" id="L111">        ArrayList&lt;String&gt; rules = extract_text_based_rules(grammar, quote);</span>
+<span class="fc" id="L112">        ArrayList&lt;String&gt; tokens = StringFunctions.splitString(rules.get(0), ' ', quote);</span>
+<span class="fc" id="L113">        grammarName = tokens.get(1);</span>
+
+<span class="fc" id="L115">        rules.remove(0);</span>
+<span class="fc" id="L116">        ruleToNT.put(EOF_RULE_NAME, EOF_RULE);</span>
+<span class="fc" id="L117">        TtoNT.put(EOF_SIGN, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L118">        TtoNT.get(EOF_SIGN).add(EOF_RULE);</span>
+
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (String rule_line : rules) {</span>
+<span class="fc" id="L121">            ArrayList&lt;String&gt; tokens_level_1 = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L122">            ArrayList&lt;String&gt; line_tokens = StringFunctions.splitString(rule_line, RULE_ASSIGNMENT, quote);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            for (String t : line_tokens) {</span>
+<span class="fc" id="L124">                tokens_level_1.add(StringFunctions.strip(t, ' '));</span>
+<span class="fc" id="L125">            }</span>
+
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">            if (tokens_level_1.size() != 2) {</span>
+<span class="nc" id="L128">                throw new ConstraintViolationException(&quot;Error: corrupted token in grammar rule: '&quot; + rule_line + &quot;'&quot;);</span>
+            }
+
+<span class="fc" id="L131">            ArrayList&lt;String&gt; rule_tokens = StringFunctions.splitString(tokens_level_1.get(0), ' ', quote);</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">            if (rule_tokens.size() &gt; 1) {</span>
+<span class="nc" id="L133">                throw new ConstraintViolationException(&quot;Error: several rule names on left hand side in grammar rule: '&quot; + rule_line + &quot;'&quot;);</span>
+            }
+<span class="fc" id="L135">            String rule = tokens_level_1.get(0);</span>
+
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">            if (rule.equals(EOF_RULE_NAME)) {</span>
+<span class="nc" id="L138">                throw new ConstraintViolationException(&quot;Error: rule name is not allowed to be called EOF&quot;);</span>
+            }
+
+<span class="fc" id="L141">            ArrayList&lt;String&gt; products = StringFunctions.splitString(tokens_level_1.get(1), RULE_SEPARATOR, quote);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">            for (int i = 0; i &lt; products.size(); ++i) {</span>
+<span class="fc" id="L143">                products.set(i, StringFunctions.strip(products.get(i), ' '));</span>
+            }
+
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            if (!ruleToNT.containsKey(rule)) {</span>
+<span class="fc" id="L147">                ruleToNT.put(rule, get_next_free_rule_index());</span>
+            }
+<span class="fc" id="L149">            long new_rule_index = ruleToNT.get(rule);</span>
+
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">            if (!NTtoRule.containsKey(new_rule_index)) {</span>
+<span class="fc" id="L152">                NTtoRule.put(new_rule_index, rule);</span>
+            }
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            for (String product : products) {</span>
+<span class="fc" id="L156">                ArrayList&lt;String&gt; non_terminals = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L157">                ArrayDeque&lt;Long&gt; non_terminal_rules = new ArrayDeque&lt;&gt;();</span>
+<span class="fc" id="L158">                ArrayList&lt;String&gt; product_rules = StringFunctions.splitString(product, ' ', quote);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">                for (String NT : product_rules) {</span>
+<span class="fc" id="L160">                    String stripedNT = StringFunctions.strip(NT, ' ');</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">                    if (is_terminal(stripedNT, quote)) {</span>
+<span class="fc" id="L162">                        stripedNT = de_escape(stripedNT, quote);</span>
+                    }
+<span class="fc" id="L164">                    non_terminals.add(stripedNT);</span>
+<span class="fc" id="L165">                    usedEof |= (stripedNT.equals(EOF_RULE_NAME));</span>
+<span class="fc" id="L166">                }</span>
+
+<span class="fc" id="L168">                String NTFirst = non_terminals.get(0);</span>
+<span class="fc bfc" id="L169" title="All 6 branches covered.">                if (non_terminals.size() &gt; 1 || !is_terminal(NTFirst, quote) || NTFirst.length() != 3) {</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">                    for (String non_terminal : non_terminals) {</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">                        if (is_terminal(non_terminal, quote)) {</span>
+<span class="fc" id="L172">                            non_terminal_rules.add(add_terminal(non_terminal));</span>
+                        } else {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                            if (!ruleToNT.containsKey(non_terminal)) {</span>
+<span class="fc" id="L175">                                ruleToNT.put(non_terminal, get_next_free_rule_index());</span>
+                            }
+<span class="fc" id="L177">                            non_terminal_rules.add(ruleToNT.get(non_terminal));</span>
+                        }
+<span class="fc" id="L179">                    }</span>
+                } else {
+<span class="fc" id="L181">                    char c = NTFirst.charAt(1);</span>
+<span class="fc" id="L182">                    long tRule = 0;</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">                    if (!TtoNT.containsKey(c)) {</span>
+<span class="fc" id="L184">                        tRule = get_next_free_rule_index();</span>
+<span class="fc" id="L185">                        TtoNT.put(c, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L186">                        TtoNT.get(c).add(tRule);</span>
+
+                    } else {
+<span class="fc" id="L189">                        tRule = (new ArrayList&lt;&gt;(TtoNT.get(c))).get(0);</span>
+                    }
+
+<span class="fc bfc" id="L192" title="All 2 branches covered.">                    if (!NTtoNT.containsKey(tRule)) {</span>
+<span class="fc" id="L193">                        NTtoNT.put(tRule, new HashSet&lt;&gt;());</span>
+                    }
+<span class="fc" id="L195">                    NTtoNT.get(tRule).add(new_rule_index);</span>
+                }
+
+                // more than two rules, insert intermediate rule indexes
+<span class="fc bfc" id="L199" title="All 2 branches covered.">                while (non_terminal_rules.size() &gt; 2) {</span>
+<span class="fc" id="L200">                    long rule_index_2 = non_terminal_rules.pollLast();</span>
+<span class="fc" id="L201">                    long rule_index_1 = non_terminal_rules.pollLast();</span>
+
+<span class="fc" id="L203">                    long key = compute_rule_key(rule_index_1, rule_index_2);</span>
+<span class="fc" id="L204">                    long next_index = get_next_free_rule_index();</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">                    if (!NTtoNT.containsKey(key)) {</span>
+<span class="fc" id="L206">                        NTtoNT.put(key, new HashSet&lt;&gt;());</span>
+                    }
+<span class="fc" id="L208">                    NTtoNT.get(key).add(next_index);</span>
+<span class="fc" id="L209">                    non_terminal_rules.add(next_index);</span>
+<span class="fc" id="L210">                }</span>
+
+                // two product rules
+<span class="fc bfc" id="L213" title="All 2 branches covered.">                if (non_terminal_rules.size() == 2) {</span>
+<span class="fc" id="L214">                    long rule_index_2 = non_terminal_rules.pollLast();</span>
+<span class="fc" id="L215">                    long rule_index_1 = non_terminal_rules.pollLast();</span>
+<span class="fc" id="L216">                    long key = compute_rule_key(rule_index_1, rule_index_2);</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">                    if (!NTtoNT.containsKey(key)) {</span>
+<span class="fc" id="L218">                        NTtoNT.put(key, new HashSet&lt;&gt;());</span>
+                    }
+<span class="fc" id="L220">                    NTtoNT.get(key).add(new_rule_index);</span>
+<span class="fc" id="L221">                } // only one product rule</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">                else if (non_terminal_rules.size() == 1) {</span>
+<span class="fc" id="L223">                    long rule_index_1 = non_terminal_rules.pollLast();</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">                    if (rule_index_1 == new_rule_index) {</span>
+<span class="nc" id="L225">                        throw new ConstraintViolationException(&quot;Error: corrupted token in grammar: rule '&quot; + rule + &quot;' is not allowed to refer soleley to itself.&quot;);</span>
+                    }
+
+<span class="fc bfc" id="L228" title="All 2 branches covered.">                    if (!NTtoNT.containsKey(rule_index_1)) {</span>
+<span class="fc" id="L229">                        NTtoNT.put(rule_index_1, new HashSet&lt;&gt;());</span>
+                    }
+<span class="fc" id="L231">                    NTtoNT.get(rule_index_1).add(new_rule_index);</span>
+                }
+<span class="fc" id="L233">            }</span>
+<span class="fc" id="L234">        }</span>
+
+        // keeping the original terminal dictionary
+<span class="fc bfc" id="L237" title="All 2 branches covered.">        for (Entry&lt;Character, HashSet&lt;Long&gt;&gt; kv : TtoNT.entrySet()) {</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">            for (long rule : kv.getValue()) {</span>
+<span class="fc" id="L239">                originalTtoNT.put(kv.getKey(), rule);</span>
+<span class="fc" id="L240">                break;</span>
+            }
+<span class="fc" id="L242">        }</span>
+
+        // creating substitution dictionary for adding single rule chains into the parsing tree
+<span class="fc" id="L245">        HashSet&lt;Long&gt; visited = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        for (Entry&lt;Long, HashSet&lt;Long&gt;&gt; kv : NTtoNT.entrySet()) {</span>
+<span class="fc" id="L247">            HashSet&lt;Long&gt; values = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L248">            values.add(kv.getKey());</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">            for (long rule : values) {</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">                if (visited.contains(rule)) {</span>
+<span class="nc" id="L251">                    continue;</span>
+                }
+<span class="fc" id="L253">                visited.add(rule);</span>
+
+<span class="fc" id="L255">                ArrayList&lt;Long&gt; topnodes = collect_one_backwards(rule);</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">                for (long rule_top : topnodes) {</span>
+<span class="fc" id="L257">                    ArrayList&lt; ArrayList&lt;Long&gt;&gt; chains = collect_backwards(rule, rule_top);</span>
+
+<span class="fc bfc" id="L259" title="All 2 branches covered.">                    for (ArrayList&lt;Long&gt; cchain : chains) {</span>
+<span class="fc" id="L260">                        ArrayList&lt;Long&gt; chain = cchain;</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">                        while (chain.size() &gt; 1) {</span>
+<span class="fc" id="L262">                            long top = chain.get(0);</span>
+<span class="fc" id="L263">                            chain.remove(0);</span>
+<span class="fc" id="L264">                            long key = kv.getKey() + (top &lt;&lt; 16);</span>
+<span class="fc bfc" id="L265" title="All 2 branches covered.">                            if (!substitution.containsKey(key)) {</span>
+<span class="fc" id="L266">                                substitution.put(key, chain);</span>
+
+<span class="fc bfc" id="L268" title="All 2 branches covered.">                                if (chain.size() &gt; 1) {</span>
+<span class="fc" id="L269">                                    ArrayList&lt;Long&gt; new_chain = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">                                    for (long e : chain) {</span>
+<span class="fc" id="L271">                                        new_chain.add(e);</span>
+<span class="fc" id="L272">                                    }</span>
+<span class="fc" id="L273">                                    chain = new_chain;</span>
+                                }
+                            } else {
+                                break;
+                            }
+<span class="fc" id="L278">                        }</span>
+<span class="fc" id="L279">                    }</span>
+<span class="fc" id="L280">                }</span>
+<span class="fc" id="L281">            }</span>
+<span class="fc" id="L282">        }</span>
+
+        // expanding terminal dictionary for single rule chains
+<span class="fc" id="L285">        HashSet&lt;Character&gt; keys = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">        for (Entry&lt;Character, HashSet&lt;Long&gt;&gt; key : TtoNT.entrySet()) {</span>
+<span class="fc" id="L287">            keys.add(key.getKey());</span>
+<span class="fc" id="L288">        }</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        for (char c : keys) {</span>
+<span class="fc" id="L290">            HashSet&lt;Long&gt; k_rules = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">            for (long rule : TtoNT.get(c)) {</span>
+<span class="fc" id="L292">                k_rules.add(rule);</span>
+<span class="fc" id="L293">            }</span>
+
+<span class="fc bfc" id="L295" title="All 2 branches covered.">            for (long rule : k_rules) {</span>
+<span class="fc" id="L296">                ArrayList&lt;Long&gt; backward_rules = collect_one_backwards(rule);</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">                for (long p : backward_rules) {</span>
+<span class="fc" id="L298">                    TtoNT.get(c).add(p);</span>
+<span class="fc" id="L299">                }</span>
+<span class="fc" id="L300">            }</span>
+<span class="fc" id="L301">        }</span>
+
+        // expanding non-terminal dictionary for single rule chains
+<span class="fc" id="L304">        HashSet&lt;Long&gt; keysNT = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L305" title="All 2 branches covered.">        for (Entry&lt;Long, HashSet&lt;Long&gt;&gt; k : NTtoNT.entrySet()) {</span>
+<span class="fc" id="L306">            keysNT.add(k.getKey());</span>
+<span class="fc" id="L307">        }</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">        for (long r : keysNT) {</span>
+<span class="fc" id="L309">            HashSet&lt;Long&gt; k_rules = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L310" title="All 2 branches covered.">            for (long rr : NTtoNT.get(r)) {</span>
+<span class="fc" id="L311">                k_rules.add(rr);</span>
+<span class="fc" id="L312">            }</span>
+
+<span class="fc bfc" id="L314" title="All 2 branches covered.">            for (long rule : k_rules) {</span>
+<span class="fc" id="L315">                ArrayList&lt;Long&gt; backward_rules = collect_one_backwards(rule);</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">                for (long p : backward_rules) {</span>
+<span class="fc" id="L317">                    NTtoNT.get(r).add(p);</span>
+<span class="fc" id="L318">                }</span>
+<span class="fc" id="L319">            }</span>
+<span class="fc" id="L320">        }</span>
+
+        // creating lookup table for right index pairs to a given left index
+<span class="fc bfc" id="L323" title="All 2 branches covered.">        for (long i = 0; i &lt; nextFreeRuleIndex; ++i) {</span>
+<span class="fc" id="L324">            rightPair.add(new Bitfield((int) nextFreeRuleIndex));</span>
+        }
+
+<span class="fc bfc" id="L327" title="All 2 branches covered.">        for (Entry&lt;Long, HashSet&lt;Long&gt;&gt; kv : NTtoNT.entrySet()) {</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">            if (kv.getKey() &lt;= MASK) {</span>
+<span class="fc" id="L329">                continue;</span>
+            }
+<span class="fc" id="L331">            rightPair.get((int) ((kv.getKey() &gt;&gt;&gt; SHIFT))).add((int) (kv.getKey() &amp; MASK));</span>
+<span class="fc" id="L332">        }</span>
+<span class="fc" id="L333">    }</span>
+
+    protected ArrayList&lt;String&gt; extract_text_based_rules(String grammar, char _quote) {
+<span class="fc" id="L336">        ArrayList&lt;String&gt; rules = null;</span>
+<span class="fc" id="L337">        int grammar_length = grammar.length();</span>
+
+        /*
+        deleting comments to prepare for splitting the grammar in rules.
+        Therefore, we have to consider three different contexts, namely
+        within a quote, within a line comment, within a long comment.
+        As long as we are in one context, key words for starting / ending
+        the other contexts have to be ignored.
+         */
+<span class="fc" id="L346">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L347">        Context current_context = Context.NoContext;</span>
+<span class="fc" id="L348">        int current_position = 0;</span>
+<span class="fc" id="L349">        int last_escaped_backslash = -1;</span>
+
+<span class="fc bfc" id="L351" title="All 2 branches covered.">        for (int i = 0; i &lt; grammar_length - 1; ++i) {</span>
+<span class="fc" id="L352">            MatchWords match = MatchWords.NoMatch;</span>
+
+<span class="pc bpc" id="L354" title="1 of 8 branches missed.">            if (i &gt; 0 &amp;&amp; grammar.charAt(i) == '\\' &amp;&amp; grammar.charAt(i - 1) == '\\' &amp;&amp; last_escaped_backslash != i - 1) {</span>
+<span class="fc" id="L355">                last_escaped_backslash = i;</span>
+<span class="fc" id="L356">                continue;</span>
+            }
+
+<span class="fc bfc" id="L359" title="All 4 branches covered.">            if (grammar.charAt(i) == '/' &amp;&amp; grammar.charAt(i + 1) == '/') {</span>
+<span class="fc" id="L360">                match = MatchWords.LineCommentStart;</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">            } else if (grammar.charAt(i) == '\n') {</span>
+<span class="fc" id="L362">                match = MatchWords.LineCommentEnd;</span>
+<span class="fc bfc" id="L363" title="All 4 branches covered.">            } else if (grammar.charAt(i) == '/' &amp;&amp; grammar.charAt(i + 1) == '*') {</span>
+<span class="fc" id="L364">                match = MatchWords.LongCommentStart;</span>
+<span class="fc bfc" id="L365" title="All 4 branches covered.">            } else if (grammar.charAt(i) == '*' &amp;&amp; grammar.charAt(i + 1) == '/') {</span>
+<span class="fc" id="L366">                match = MatchWords.LongCommentEnd;</span>
+<span class="pc bpc" id="L367" title="1 of 8 branches missed.">            } else if (grammar.charAt(i) == _quote &amp;&amp; !(i &gt;= 1 &amp;&amp; grammar.charAt(i - 1) == '\\' &amp;&amp; i - 1 != last_escaped_backslash)) {</span>
+<span class="fc" id="L368">                match = MatchWords.Quote;</span>
+            }
+
+<span class="fc bfc" id="L371" title="All 2 branches covered.">            if (match != MatchWords.NoMatch) {</span>
+<span class="pc bpc" id="L372" title="1 of 5 branches missed.">                switch (current_context) {</span>
+                    case NoContext:
+<span class="fc bfc" id="L374" title="All 4 branches covered.">                        switch (match) {</span>
+                            case LongCommentStart:
+<span class="fc" id="L376">                                sb.append(grammar.substring(current_position, i));</span>
+<span class="fc" id="L377">                                current_context = Context.InLongComment;</span>
+<span class="fc" id="L378">                                break;</span>
+
+                            case LineCommentStart:
+<span class="fc" id="L381">                                sb.append(grammar.substring(current_position, i));</span>
+<span class="fc" id="L382">                                current_context = Context.InLineComment;</span>
+<span class="fc" id="L383">                                break;</span>
+
+                            case Quote:
+<span class="fc" id="L386">                                current_context = Context.InQuote;</span>
+<span class="fc" id="L387">                                break;</span>
+
+                            default:
+<span class="fc" id="L390">                                break;</span>
+                        }
+                        break;
+
+                    case InQuote:
+<span class="pc bpc" id="L395" title="1 of 2 branches missed.">                        if (match == MatchWords.Quote) {</span>
+<span class="fc" id="L396">                            current_context = Context.NoContext;</span>
+                        }
+                        break;
+
+                    case InLineComment:
+<span class="fc bfc" id="L401" title="All 2 branches covered.">                        if (match == MatchWords.LineCommentEnd) {</span>
+<span class="fc" id="L402">                            current_context = Context.NoContext;</span>
+<span class="fc" id="L403">                            current_position = i + 1;</span>
+                        }
+                        break;
+
+                    case InLongComment:
+<span class="fc bfc" id="L408" title="All 2 branches covered.">                        if (match == MatchWords.LongCommentEnd) {</span>
+<span class="fc" id="L409">                            current_context = Context.NoContext;</span>
+<span class="fc" id="L410">                            current_position = i + 2;</span>
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">        if (current_context == Context.NoContext) {</span>
+<span class="fc" id="L421">            sb.append(grammar.substring(current_position, grammar_length));</span>
+        } else {
+<span class="nc" id="L423">            throw new ConstraintViolationException(&quot;Error: corrupted grammar, ends either in comment or quote&quot;);</span>
+        }
+
+<span class="fc" id="L426">        grammar = sb.toString();</span>
+<span class="fc" id="L427">        grammar = grammar.replace(&quot;\r\n&quot;, &quot;&quot;);</span>
+<span class="fc" id="L428">        grammar = grammar.replace(&quot;\n&quot;, &quot;&quot;);</span>
+<span class="fc" id="L429">        grammar = grammar.replace(&quot;\r&quot;, &quot;&quot;);</span>
+<span class="fc" id="L430">        grammar = StringFunctions.strip(grammar, ' ');</span>
+
+<span class="pc bpc" id="L432" title="1 of 2 branches missed.">        if (grammar.charAt(grammar.length() - 1) != RULE_TERMINAL) {</span>
+<span class="nc" id="L433">            throw new ConstraintViolationException(&quot;Error: corrupted grammar, last rule has no termininating sign, was: '&quot; + grammar.substring(grammar.length() - 1) + &quot;'&quot;);</span>
+        }
+
+<span class="fc" id="L436">        rules = StringFunctions.splitString(grammar, RULE_TERMINAL, _quote);</span>
+
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">        if (rules.size() &lt; 1) {</span>
+<span class="nc" id="L439">            throw new ConstraintViolationException(&quot;Error: corrupted grammar, grammar is empty&quot;);</span>
+        }
+<span class="fc" id="L441">        ArrayList&lt;String&gt; grammar_name_rule = StringFunctions.splitString(rules.get(0), ' ', _quote);</span>
+
+<span class="pc bpc" id="L443" title="2 of 4 branches missed.">        if (grammar_name_rule.size() &gt; 0 &amp;&amp; !grammar_name_rule.get(0).equals(&quot;grammar&quot;)) {</span>
+<span class="nc" id="L444">            throw new ConstraintViolationException(&quot;Error: first rule must start with the keyword 'grammar'&quot;);</span>
+<span class="pc bpc" id="L445" title="1 of 2 branches missed.">        } else if (grammar_name_rule.size() != 2) {</span>
+<span class="nc" id="L446">            throw new ConstraintViolationException(&quot;Error: incorrect first rule&quot;);</span>
+        }
+
+<span class="fc" id="L449">        return rules;</span>
+    }
+
+    protected long compute_rule_key(long rule_index_1, long rule_index_2) {
+<span class="fc" id="L453">        return (rule_index_1 &lt;&lt; SHIFT) | rule_index_2;</span>
+    }
+
+    // checking if string is terminal
+    protected boolean is_terminal(String product_token, char _quote) {
+<span class="pc bpc" id="L458" title="2 of 6 branches missed.">        return product_token.charAt(0) == _quote &amp;&amp; product_token.charAt(product_token.length() - 1) == _quote &amp;&amp; product_token.length() &gt; 2;</span>
+    }
+
+    protected String de_escape(String text, char _quote) {
+        // remove the escape chars
+<span class="fc" id="L463">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L464">        boolean last_escape_char = false;</span>
+<span class="fc bfc" id="L465" title="All 2 branches covered.">        for (int i = 0; i &lt; text.length(); ++i) {</span>
+<span class="fc" id="L466">            char c = text.charAt(i);</span>
+<span class="fc" id="L467">            boolean escape_char = false;</span>
+
+<span class="fc bfc" id="L469" title="All 2 branches covered.">            if (c != '\\') {</span>
+<span class="fc" id="L470">                sb.append(c);</span>
+            } else {
+<span class="fc bfc" id="L472" title="All 2 branches covered.">                if (!last_escape_char) {</span>
+<span class="fc" id="L473">                    escape_char = true;</span>
+                } else {
+<span class="fc" id="L475">                    sb.append(c);</span>
+                }
+            }
+
+<span class="fc" id="L479">            last_escape_char = escape_char;</span>
+
+        }
+<span class="fc" id="L482">        return sb.toString();</span>
+    }
+
+    // splitting the whole terminal in a tree structure where characters of terminal are the leafs and the inner nodes are added non terminal rules
+    protected long add_terminal(String text) {
+<span class="fc" id="L487">        ArrayDeque&lt;Long&gt; terminal_rules = new ArrayDeque&lt;&gt;();</span>
+<span class="fc bfc" id="L488" title="All 2 branches covered.">        for (int i = 1; i &lt; text.length() - 1; ++i) {</span>
+<span class="fc" id="L489">            char c = text.charAt(i);</span>
+<span class="fc" id="L490">            long tRule = 0;</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">            if (!TtoNT.containsKey(c)) {</span>
+<span class="fc" id="L492">                tRule = get_next_free_rule_index();</span>
+<span class="fc" id="L493">                TtoNT.put(c, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L494">                TtoNT.get(c).add(tRule);</span>
+            } else {
+<span class="fc" id="L496">                tRule = (new ArrayList&lt;&gt;(TtoNT.get(c))).get(0);</span>
+            }
+<span class="fc" id="L498">            terminal_rules.add(tRule);</span>
+        }
+
+<span class="fc bfc" id="L501" title="All 2 branches covered.">        while (terminal_rules.size() &gt; 1) {</span>
+<span class="fc" id="L502">            long rule_index_2 = terminal_rules.pollLast();</span>
+<span class="fc" id="L503">            long rule_index_1 = terminal_rules.pollLast();</span>
+<span class="fc" id="L504">            long next_index = get_next_free_rule_index();</span>
+
+<span class="fc" id="L506">            long key = compute_rule_key(rule_index_1, rule_index_2);</span>
+<span class="fc bfc" id="L507" title="All 2 branches covered.">            if (!NTtoNT.containsKey(key)) {</span>
+<span class="fc" id="L508">                NTtoNT.put(key, new HashSet&lt;&gt;());</span>
+            }
+<span class="fc" id="L510">            NTtoNT.get(key).add(next_index);</span>
+<span class="fc" id="L511">            terminal_rules.add(next_index);</span>
+<span class="fc" id="L512">        }</span>
+<span class="fc" id="L513">        return terminal_rules.pollLast();</span>
+    }
+
+    protected ArrayList&lt;Long&gt; top_nodes(long rule_index) {
+<span class="nc" id="L517">        ArrayList&lt;Long&gt; collection = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L518">        ArrayList&lt;Long&gt; collection_top = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L519">        collection.add(rule_index);</span>
+<span class="nc" id="L520">        int i = 0;</span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">        while (i &lt; collection.size()) {</span>
+<span class="nc" id="L522">            long current_index = collection.get(i);</span>
+<span class="nc bnc" id="L523" title="All 2 branches missed.">            if (!NTtoNT.containsKey(current_index)) {</span>
+<span class="nc bnc" id="L524" title="All 2 branches missed.">                for (long previous_index : NTtoNT.get(current_index)) {</span>
+<span class="nc" id="L525">                    collection.add(previous_index);</span>
+<span class="nc" id="L526">                }</span>
+            } else {
+<span class="nc" id="L528">                collection_top.add(current_index);</span>
+            }
+<span class="nc" id="L530">            ++i;</span>
+<span class="nc" id="L531">        }</span>
+
+<span class="nc" id="L533">        return collection_top;</span>
+    }
+
+    // expanding singleton rules, e.g. S . A, A . B, B . C
+    protected ArrayList&lt;Long&gt; collect_one_backwards(Long rule_index) {
+<span class="fc" id="L538">        ArrayList&lt;Long&gt; collection = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L539">        collection.add(rule_index);</span>
+<span class="fc" id="L540">        int i = 0;</span>
+<span class="fc bfc" id="L541" title="All 2 branches covered.">        while (i &lt; collection.size()) {</span>
+<span class="fc" id="L542">            long current_index = collection.get(i);</span>
+<span class="fc bfc" id="L543" title="All 2 branches covered.">            if (NTtoNT.containsKey(current_index)) {</span>
+<span class="fc bfc" id="L544" title="All 2 branches covered.">                for (long previous_index : NTtoNT.get(current_index)) {</span>
+<span class="fc" id="L545">                    collection.add(previous_index);</span>
+<span class="fc" id="L546">                }</span>
+            }
+<span class="fc" id="L548">            ++i;</span>
+<span class="fc" id="L549">        }</span>
+
+<span class="fc" id="L551">        return collection;</span>
+    }
+
+    protected ArrayList&lt; ArrayList&lt;Long&gt;&gt; collect_backwards(Long child_rule_index, Long parent_rule_index) {
+<span class="fc" id="L555">        HashSet&lt;Long&gt; visited = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L556">        ArrayList&lt;Long&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L557">        ArrayList&lt; ArrayList&lt;Long&gt;&gt; collection = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L559">        return collect_backwards(child_rule_index, parent_rule_index, visited, path, collection);</span>
+    }
+
+    protected ArrayList&lt; ArrayList&lt;Long&gt;&gt; collect_backwards(long child_rule_index, long parent_rule_index, HashSet&lt;Long&gt; visited, ArrayList&lt;Long&gt; path, ArrayList&lt; ArrayList&lt;Long&gt;&gt; collection) {
+        // provides all single linkage paths from a child rule to a parent rule,
+        // and yes, there can be several paths
+
+<span class="fc bfc" id="L566" title="All 2 branches covered.">        if (!NTtoNT.containsKey(child_rule_index)) {</span>
+<span class="fc" id="L567">            return collection;</span>
+        }
+
+<span class="fc" id="L570">        visited.add(child_rule_index);</span>
+<span class="fc" id="L571">        path.add(child_rule_index);</span>
+
+<span class="fc bfc" id="L573" title="All 2 branches covered.">        for (long previous_rule : NTtoNT.get(child_rule_index)) {</span>
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">            if (!visited.contains(previous_rule)) {</span>
+<span class="fc bfc" id="L575" title="All 2 branches covered.">                if (previous_rule == parent_rule_index) {</span>
+<span class="fc" id="L576">                    ArrayList&lt;Long&gt; found_path = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L577">                    found_path.add(parent_rule_index);</span>
+<span class="fc bfc" id="L578" title="All 2 branches covered.">                    for (int i = path.size() - 1; i &gt;= 0; --i) {</span>
+<span class="fc" id="L579">                        found_path.add(path.get(i));</span>
+                    }
+<span class="fc" id="L581">                    collection.add(found_path);</span>
+<span class="fc" id="L582">                } else {</span>
+<span class="fc" id="L583">                    collection = collect_backwards(previous_rule, parent_rule_index, visited, path, collection);</span>
+                }
+            }
+<span class="fc" id="L586">        }</span>
+<span class="fc" id="L587">        path.remove(path.size() - 1);</span>
+<span class="fc" id="L588">        visited.remove(child_rule_index);</span>
+
+<span class="fc" id="L590">        return collection;</span>
+    }
+
+    protected void raise_events(TreeNode node, BaseParserEventHandler parserEventHandler) {
+<span class="pc bpc" id="L594" title="1 of 2 branches missed.">        if (node != null) {</span>
+<span class="fc bfc" id="L595" title="All 2 branches covered.">            String node_rule_name = node.fire_event ? NTtoRule.get(node.rule_index) : &quot;&quot;;</span>
+<span class="fc bfc" id="L596" title="All 2 branches covered.">            if (node.fire_event) {</span>
+<span class="fc" id="L597">                parserEventHandler.handleEvent(node_rule_name + &quot;_pre_event&quot;, node);</span>
+            }
+
+<span class="fc bfc" id="L600" title="All 2 branches covered.">            if (node.left != null) { // node.terminal is != None when node is leaf</span>
+<span class="fc" id="L601">                raise_events(node.left, parserEventHandler);</span>
+<span class="fc bfc" id="L602" title="All 2 branches covered.">                if (node.right != null) {</span>
+<span class="fc" id="L603">                    raise_events(node.right, parserEventHandler);</span>
+                }
+            }
+
+<span class="fc bfc" id="L607" title="All 2 branches covered.">            if (node.fire_event) {</span>
+<span class="fc" id="L608">                parserEventHandler.handleEvent(node_rule_name + &quot;_post_event&quot;, node);</span>
+            }
+        }
+<span class="fc" id="L611">    }</span>
+
+    // filling the syntax tree including events
+    protected void fill_tree(TreeNode node, DPNode dp_node) {
+        // checking and extending nodes for single rule chains
+
+<span class="fc" id="L617">        long bottom_rule = 0, top_rule = 0;</span>
+<span class="fc bfc" id="L618" title="All 2 branches covered.">        if (dp_node.left != null) {</span>
+<span class="fc" id="L619">            bottom_rule = compute_rule_key(dp_node.rule_index_1, dp_node.rule_index_2);</span>
+<span class="fc" id="L620">            top_rule = node.rule_index;</span>
+        } else {
+<span class="fc" id="L622">            top_rule = dp_node.rule_index_2;</span>
+<span class="fc" id="L623">            bottom_rule = originalTtoNT.get((char) dp_node.rule_index_1);</span>
+        }
+
+<span class="fc" id="L626">        long subst_key = bottom_rule + (top_rule &lt;&lt; 16);</span>
+
+<span class="pc bpc" id="L628" title="1 of 4 branches missed.">        if ((bottom_rule != top_rule) &amp;&amp; (substitution.containsKey(subst_key))) {</span>
+<span class="fc bfc" id="L629" title="All 2 branches covered.">            for (long rule_index : substitution.get(subst_key)) {</span>
+<span class="fc" id="L630">                node.left = new TreeNode(rule_index, NTtoRule.containsKey(rule_index));</span>
+<span class="fc" id="L631">                node = node.left;</span>
+<span class="fc" id="L632">            }</span>
+        }
+
+<span class="fc bfc" id="L635" title="All 2 branches covered.">        if (dp_node.left != null) { // None =&gt; leaf</span>
+<span class="fc" id="L636">            node.left = new TreeNode(dp_node.rule_index_1, NTtoRule.containsKey(dp_node.rule_index_1));</span>
+<span class="fc" id="L637">            node.right = new TreeNode(dp_node.rule_index_2, NTtoRule.containsKey(dp_node.rule_index_2));</span>
+<span class="fc" id="L638">            fill_tree(node.left, dp_node.left);</span>
+<span class="fc" id="L639">            fill_tree(node.right, dp_node.right);</span>
+        } else {
+            // I know, it is not 100% clean to store the character in an integer
+            // especially when it is not the dedicated attribute for, but the heck with it!
+<span class="fc" id="L643">            node.terminal = (char) dp_node.rule_index_1;</span>
+        }
+<span class="fc" id="L645">    }</span>
+
+    /**
+     * Parse the given text, constructing the output object of type T using the
+     * provided parser event handler.
+     *
+     * @param textToParse the text to parse.
+     * @param parserEventHandler the parser event handler to process events
+     * created by the parser.
+     * @return the parsed object of type T if successful, otherwise an exception
+     * will be thrown.
+     * @throws LipidParsingException
+     */
+    public T parse(String textToParse, BaseParserEventHandler&lt;T&gt; parserEventHandler) {
+<span class="fc" id="L659">        return parse(textToParse, parserEventHandler, true);</span>
+    }
+
+    /**
+     * Parse the given text, constructing the output object of type T using the
+     * provided parser event handler.Allows the user to specify, if exceptions
+     * should be thrown on errors.
+     *
+     * @param textToParse the text to parse.
+     * @param parserEventHandler the parser event handler to process events
+     * created by the parser.
+     * @param throwError if true, throws exception if parsing was not
+     * successful.
+     * @return the parsed object of type T if successful, otherwise {@code null}, if throwError is {@code false}.
+     */
+    public T parse(String textToParse, BaseParserEventHandler&lt;T&gt; parserEventHandler, boolean throwError) {
+<span class="fc" id="L675">        String old_text = textToParse;</span>
+        
+<span class="pc bpc" id="L677" title="1 of 2 branches missed.">        if (usedEof) {</span>
+<span class="fc" id="L678">            textToParse += EOF_SIGN;</span>
+        }
+<span class="fc" id="L680">        parserEventHandler.content = null;</span>
+
+        // adding all rule names into the event handler
+<span class="fc bfc" id="L683" title="All 2 branches covered.">        for (Entry&lt;String, Long&gt; rule_name : ruleToNT.entrySet()) {</span>
+<span class="fc" id="L684">            parserEventHandler.ruleNames.add(rule_name.getKey());</span>
+<span class="fc" id="L685">        }</span>
+
+<span class="fc" id="L687">        parserEventHandler.sanityCheck(this);</span>
+        try {
+<span class="fc" id="L689">            Optional&lt;ParsingErrors&gt; parsingErrors = parse_regular(textToParse, parserEventHandler);</span>
+<span class="pc bpc" id="L690" title="1 of 4 branches missed.">            if (parsingErrors.isPresent() &amp;&amp; !parsingErrors.get().wordInGrammar) {</span>
+<span class="fc bfc" id="L691" title="All 2 branches covered.">                if (throwError) {</span>
+<span class="fc" id="L692">                    throw new LipidParsingException(&quot;Lipid '&quot; + old_text + &quot;' can not be parsed by grammar '&quot; + grammarName + &quot;'&quot;);</span>
+                } else {
+<span class="fc" id="L694">                    parserEventHandler.errorMessage = parsingErrors.get().errorMessage;</span>
+                }
+            }
+<span class="fc" id="L697">        } catch (RuntimeException lpe) {</span>
+<span class="fc bfc" id="L698" title="All 2 branches covered.">            if (throwError) {</span>
+<span class="fc" id="L699">                throw new LipidParsingException(&quot;Lipid '&quot; + old_text + &quot;' can not be parsed by grammar '&quot; + grammarName + &quot;': &quot;, lpe);</span>
+            } else {
+<span class="fc" id="L701">                parserEventHandler.errorMessage = lpe.getLocalizedMessage();</span>
+            }
+<span class="fc" id="L703">        }</span>
+<span class="fc" id="L704">        return parserEventHandler.content;</span>
+    }
+
+    protected class ParsingErrors {
+
+        final boolean wordInGrammar;
+        final String errorMessage;
+
+<span class="fc" id="L712">        ParsingErrors(boolean wordInGrammar, String errorMessage) {</span>
+<span class="fc" id="L713">            this.wordInGrammar = wordInGrammar;</span>
+<span class="fc" id="L714">            this.errorMessage = errorMessage;</span>
+<span class="fc" id="L715">        }</span>
+
+    }
+
+    protected Optional&lt;ParsingErrors&gt; parse_regular(String text_to_parse, BaseParserEventHandler&lt;T&gt; parserEventHandler) {
+<span class="fc" id="L720">        boolean wordInGrammar = false;</span>
+
+<span class="fc" id="L722">        int n = text_to_parse.length();</span>
+        // dp stands for dynamic programming, nothing else
+<span class="fc" id="L724">        ArrayList&lt; ArrayList&lt; HashMap&lt;Long, DPNode&gt;&gt;&gt; DP = new ArrayList&lt;&gt;();</span>
+
+        // Ks is a lookup, which fields in the DP are filled
+<span class="fc" id="L727">        Bitfield[] Ks = new Bitfield[n];</span>
+
+        // init the tables
+<span class="fc bfc" id="L730" title="All 2 branches covered.">        for (int i = 0; i &lt; n; ++i) {</span>
+<span class="fc" id="L731">            ArrayList&lt; HashMap&lt;Long, DPNode&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L732" title="All 2 branches covered.">            for (int j = 0; j &lt; n - i; ++j) {</span>
+<span class="fc" id="L733">                list.add(new HashMap&lt;&gt;());</span>
+            }
+<span class="fc" id="L735">            DP.add(list);</span>
+<span class="fc" id="L736">            Ks[i] = new Bitfield(n);</span>
+        }
+
+<span class="fc" id="L739">        boolean requirement_fulfilled = true;</span>
+<span class="fc bfc" id="L740" title="All 2 branches covered.">        for (int i = 0; i &lt; n; ++i) {</span>
+<span class="fc" id="L741">            char c = text_to_parse.charAt(i);</span>
+<span class="fc bfc" id="L742" title="All 2 branches covered.">            if (!TtoNT.containsKey(c)) {</span>
+<span class="fc" id="L743">                requirement_fulfilled = false;</span>
+<span class="fc" id="L744">                break;</span>
+            }
+
+<span class="fc bfc" id="L747" title="All 2 branches covered.">            for (long T_rule_index : TtoNT.get(c)) {</span>
+<span class="fc" id="L748">                DPNode dp_node = new DPNode(c, T_rule_index, null, null);</span>
+<span class="fc" id="L749">                DP.get(i).get(0).put(T_rule_index, dp_node);</span>
+<span class="fc" id="L750">            }</span>
+<span class="fc" id="L751">            Ks[i].add(0);</span>
+        }
+
+<span class="fc bfc" id="L754" title="All 2 branches covered.">        if (requirement_fulfilled) {</span>
+<span class="fc bfc" id="L755" title="All 2 branches covered.">            for (int i = 1; i &lt; n; ++i) {</span>
+<span class="fc" id="L756">                int im1 = i - 1;</span>
+
+<span class="fc bfc" id="L758" title="All 2 branches covered.">                for (int j = 0; j &lt; n - i; ++j) {</span>
+
+<span class="fc" id="L760">                    ArrayList&lt; HashMap&lt;Long, DPNode&gt;&gt; DPj = DP.get(j);</span>
+<span class="fc" id="L761">                    HashMap&lt;Long, DPNode&gt; DPji = DPj.get(i);</span>
+<span class="fc" id="L762">                    int jp1 = j + 1;</span>
+
+<span class="fc" id="L764">                    Ks[j].resetIterator();</span>
+<span class="fc bfc" id="L765" title="All 2 branches covered.">                    while (Ks[j].hasNext()) {</span>
+<span class="fc" id="L766">                        int k = Ks[j].next();</span>
+<span class="fc" id="L767">                        int jpok = jp1 + k;</span>
+<span class="fc" id="L768">                        int im1mk = im1 - k;</span>
+<span class="fc bfc" id="L769" title="All 2 branches covered.">                        if (Ks[jpok].find(im1mk)) {</span>
+<span class="fc bfc" id="L770" title="All 2 branches covered.">                            for (Entry&lt;Long, DPNode&gt; index_pair_1 : DP.get(j).get(k).entrySet()) {</span>
+<span class="fc" id="L771">                                Bitfield b = rightPair.get((int) (long) index_pair_1.getKey());</span>
+<span class="fc bfc" id="L772" title="All 2 branches covered.">                                for (Entry&lt;Long, DPNode&gt; index_pair_2 : DP.get(jpok).get(im1mk).entrySet()) {</span>
+<span class="fc bfc" id="L773" title="All 2 branches covered.">                                    if (b.find((int) (long) index_pair_2.getKey())) {</span>
+<span class="fc" id="L774">                                        long key = compute_rule_key(index_pair_1.getKey(), index_pair_2.getKey());</span>
+
+<span class="fc" id="L776">                                        DPNode content = new DPNode(index_pair_1.getKey(), index_pair_2.getKey(), index_pair_1.getValue(), index_pair_2.getValue());</span>
+<span class="fc bfc" id="L777" title="All 2 branches covered.">                                        for (long rule_index : NTtoNT.get(key)) {</span>
+<span class="fc bfc" id="L778" title="All 2 branches covered.">                                            if (!DPji.containsKey(rule_index)) {</span>
+<span class="fc" id="L779">                                                DPji.put(rule_index, content);</span>
+                                            }
+<span class="fc" id="L781">                                        }</span>
+                                    }
+<span class="fc" id="L783">                                }</span>
+<span class="fc" id="L784">                            }</span>
+                        }
+
+<span class="fc" id="L787">                    }</span>
+<span class="fc bfc" id="L788" title="All 2 branches covered.">                    if (DPji.size() &gt; 0) {</span>
+<span class="fc" id="L789">                        Ks[j].add(i);</span>
+                    }
+                }
+            }
+
+<span class="fc bfc" id="L794" title="All 2 branches covered.">            for (int i = n - 1; i &gt; 0; --i) {</span>
+<span class="fc bfc" id="L795" title="All 2 branches covered.">                if (DP.get(0).get(i).containsKey(START_RULE)) {</span>
+<span class="fc" id="L796">                    wordInGrammar = true;</span>
+<span class="fc" id="L797">                    TreeNode parse_tree = new TreeNode(START_RULE, NTtoRule.containsKey(START_RULE));</span>
+<span class="fc" id="L798">                    fill_tree(parse_tree, DP.get(0).get(i).get(START_RULE));</span>
+<span class="fc" id="L799">                    raise_events(parse_tree, parserEventHandler);</span>
+<span class="fc" id="L800">                    break;</span>
+                }
+            }
+
+<span class="fc bfc" id="L804" title="All 2 branches covered.">            if (!wordInGrammar) {</span>
+<span class="fc bfc" id="L805" title="All 2 branches covered.">                for (int i = n - 1; i &gt; 0; --i) {</span>
+<span class="fc bfc" id="L806" title="All 2 branches covered.">                    if (DP.get(0).get(i).size() &gt; 0) {</span>
+<span class="fc" id="L807">                        long first_rule = DP.get(0).get(i).keySet().iterator().next();</span>
+
+<span class="fc" id="L809">                        TreeNode parse_tree = new TreeNode(first_rule, NTtoRule.containsKey(first_rule));</span>
+<span class="fc" id="L810">                        fill_tree(parse_tree, DP.get(0).get(i).get(first_rule));</span>
+<span class="fc" id="L811">                        return Optional.of(new ParsingErrors(wordInGrammar, parse_tree.getText()));</span>
+//                        break;
+                    }
+                }
+            }
+        }
+<span class="fc" id="L817">        return Optional.empty();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

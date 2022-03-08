@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwissLipidsParserEventHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">SwissLipidsParserEventHandler.java</span></div><h1>SwissLipidsParserEventHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.Adduct;
+import org.lifstools.jgoslin.domain.FattyAcid;
+import org.lifstools.jgoslin.domain.FunctionalGroup;
+import org.lifstools.jgoslin.domain.Headgroup;
+import org.lifstools.jgoslin.domain.HeadgroupDecorator;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.lifstools.jgoslin.domain.LipidException;
+import org.lifstools.jgoslin.domain.LipidFaBondType;
+import org.lifstools.jgoslin.domain.LipidLevel;
+import org.lifstools.jgoslin.domain.LipidParsingException;
+import java.util.ArrayList;
+import java.util.Map;
+import static java.util.Map.entry;
+
+/**
+ * Event handler implementation for the {@link SwissLipidsParser}.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
+
+    public int dbPosition;
+    public String dbCistrans;
+    public int suffixNumber;
+
+    /**
+     * Create a new {@code SwissLipidsParserEventHandler}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
+    public SwissLipidsParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L51">        super(knownFunctionalGroups);</span>
+        try {
+<span class="fc" id="L53">            registeredEvents = Map.ofEntries(</span>
+<span class="fc" id="L54">                    entry(&quot;lipid_pre_event&quot;, this::resetParser),</span>
+<span class="fc" id="L55">                    entry(&quot;lipid_post_event&quot;, this::buildLipid),</span>
+                    // set adduct events
+<span class="fc" id="L57">                    entry(&quot;adduct_info_pre_event&quot;, this::newAdduct),</span>
+<span class="fc" id="L58">                    entry(&quot;adduct_pre_event&quot;, this::addAdduct),</span>
+<span class="fc" id="L59">                    entry(&quot;charge_pre_event&quot;, this::addCharge),</span>
+<span class="fc" id="L60">                    entry(&quot;charge_sign_pre_event&quot;, this::addChargeSign),</span>
+<span class="fc" id="L61">                    entry(&quot;fa_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L62">                    entry(&quot;gl_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L63">                    entry(&quot;gl_molecular_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L64">                    entry(&quot;mediator_pre_event&quot;, this::mediatorEvent),</span>
+<span class="fc" id="L65">                    entry(&quot;gl_mono_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L66">                    entry(&quot;pl_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L67">                    entry(&quot;pl_three_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L68">                    entry(&quot;pl_four_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L69">                    entry(&quot;sl_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L70">                    entry(&quot;st_species_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L71">                    entry(&quot;st_sub1_hg_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L72">                    entry(&quot;st_sub2_hg_pre_event&quot;, this::setHeadGroupNameSe),</span>
+<span class="fc" id="L73">                    entry(&quot;fa_species_pre_event&quot;, this::setSpeciesLevel),</span>
+<span class="fc" id="L74">                    entry(&quot;gl_molecular_pre_event&quot;, this::setMolecularLevel),</span>
+<span class="fc" id="L75">                    entry(&quot;unsorted_fa_separator_pre_event&quot;, this::setMolecularLevel),</span>
+<span class="fc" id="L76">                    entry(&quot;fa2_unsorted_pre_event&quot;, this::setMolecularLevel),</span>
+<span class="fc" id="L77">                    entry(&quot;fa3_unsorted_pre_event&quot;, this::setMolecularLevel),</span>
+<span class="fc" id="L78">                    entry(&quot;fa4_unsorted_pre_event&quot;, this::setMolecularLevel),</span>
+<span class="fc" id="L79">                    entry(&quot;db_single_position_pre_event&quot;, this::setIsomericLevel),</span>
+<span class="fc" id="L80">                    entry(&quot;db_single_position_post_event&quot;, this::addDbPosition),</span>
+<span class="fc" id="L81">                    entry(&quot;db_position_number_pre_event&quot;, this::addDbPositionNumber),</span>
+<span class="fc" id="L82">                    entry(&quot;cistrans_pre_event&quot;, this::addCistrans),</span>
+<span class="fc" id="L83">                    entry(&quot;lcb_pre_event&quot;, this::newLcb),</span>
+<span class="fc" id="L84">                    entry(&quot;lcb_post_event&quot;, this::cleanLcb),</span>
+<span class="fc" id="L85">                    entry(&quot;fa_pre_event&quot;, this::newFa),</span>
+<span class="fc" id="L86">                    entry(&quot;fa_post_event&quot;, this::appendFa),</span>
+<span class="fc" id="L87">                    entry(&quot;ether_pre_event&quot;, this::addEther),</span>
+<span class="fc" id="L88">                    entry(&quot;hydroxyl_pre_event&quot;, this::addHydroxyl),</span>
+<span class="fc" id="L89">                    entry(&quot;db_count_pre_event&quot;, this::addDoubleBonds),</span>
+<span class="fc" id="L90">                    entry(&quot;carbon_pre_event&quot;, this::addCarbon),</span>
+<span class="fc" id="L91">                    entry(&quot;sl_lcb_species_pre_event&quot;, this::setSpeciesLevel),</span>
+<span class="fc" id="L92">                    entry(&quot;st_species_fa_post_event&quot;, this::setSpeciesFa),</span>
+<span class="fc" id="L93">                    entry(&quot;fa_lcb_suffix_type_pre_event&quot;, this::addFaLcbSuffixType),</span>
+<span class="fc" id="L94">                    entry(&quot;fa_lcb_suffix_number_pre_event&quot;, this::addSuffixNumber),</span>
+<span class="fc" id="L95">                    entry(&quot;pl_three_post_event&quot;, this::setNape)</span>
+            );
+<span class="nc" id="L97">        } catch (Exception e) {</span>
+<span class="nc" id="L98">            throw new LipidParsingException(&quot;Cannot initialize LipidMapsParserEventHandler.&quot;);</span>
+<span class="fc" id="L99">        }</span>
+<span class="fc" id="L100">    }</span>
+
+    @Override
+    protected void resetParser(TreeNode node) {
+<span class="fc" id="L104">        content = null;</span>
+<span class="fc" id="L105">        level = LipidLevel.FULL_STRUCTURE;</span>
+<span class="fc" id="L106">        adduct = null;</span>
+<span class="fc" id="L107">        headGroup = &quot;&quot;;</span>
+<span class="fc" id="L108">        lcb = null;</span>
+<span class="fc" id="L109">        faList.clear();</span>
+<span class="fc" id="L110">        currentFa = null;</span>
+<span class="fc" id="L111">        useHeadGroup = false;</span>
+<span class="fc" id="L112">        dbPosition = 0;</span>
+<span class="fc" id="L113">        dbCistrans = &quot;&quot;;</span>
+<span class="fc" id="L114">        headgroupDecorators.clear();</span>
+<span class="fc" id="L115">        suffixNumber = -1;</span>
+<span class="fc" id="L116">    }</span>
+
+    private void setIsomericLevel(TreeNode node) {
+<span class="fc" id="L119">        dbPosition = 0;</span>
+<span class="fc" id="L120">        dbCistrans = &quot;&quot;;</span>
+<span class="fc" id="L121">    }</span>
+
+    private void addDbPosition(TreeNode node) {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (currentFa != null) {</span>
+<span class="fc" id="L125">            currentFa.getDoubleBonds().getDoubleBondPositions().put(dbPosition, dbCistrans);</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">            if (!dbCistrans.equals(&quot;E&quot;) &amp;&amp; !dbCistrans.equals(&quot;Z&quot;)) {</span>
+<span class="nc" id="L127">                setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+            }
+        }
+<span class="fc" id="L130">    }</span>
+
+    private void setNape(TreeNode node) {
+<span class="fc" id="L133">        headGroup = &quot;PE-N&quot;;</span>
+<span class="fc" id="L134">        HeadgroupDecorator hgd = new HeadgroupDecorator(&quot;decorator_acyl&quot;, -1, 1, null, true, knownFunctionalGroups);</span>
+<span class="fc" id="L135">        headgroupDecorators.add(hgd);</span>
+<span class="fc" id="L136">        hgd.getFunctionalGroupsInternal().put(&quot;decorator_acyl&quot;, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L137">        hgd.getFunctionalGroupsInternal().get(&quot;decorator_acyl&quot;).add(faList.get(faList.size() - 1));</span>
+<span class="fc" id="L138">        faList.remove(faList.size() - 1);</span>
+<span class="fc" id="L139">    }</span>
+
+    private void addDbPositionNumber(TreeNode node) {
+<span class="fc" id="L142">        dbPosition = node.getInt();</span>
+<span class="fc" id="L143">    }</span>
+
+    private void addCistrans(TreeNode node) {
+<span class="fc" id="L146">        dbCistrans = node.getText();</span>
+<span class="fc" id="L147">    }</span>
+
+    private void setHeadGroupName(TreeNode node) {
+<span class="fc" id="L150">        headGroup = node.getText();</span>
+<span class="fc" id="L151">    }</span>
+
+    private void setHeadGroupNameSe(TreeNode node) {
+<span class="fc" id="L154">        headGroup = node.getText().replace(&quot;(&quot;, &quot; &quot;);</span>
+<span class="fc" id="L155">    }</span>
+
+    private void setSpeciesLevel(TreeNode node) {
+<span class="fc" id="L158">        setLipidLevel(LipidLevel.SPECIES);</span>
+<span class="fc" id="L159">    }</span>
+
+    private void setMolecularLevel(TreeNode node) {
+<span class="fc" id="L162">        setLipidLevel(LipidLevel.MOLECULAR_SPECIES);</span>
+<span class="fc" id="L163">    }</span>
+
+    private void mediatorEvent(TreeNode node) {
+<span class="fc" id="L166">        useHeadGroup = true;</span>
+<span class="fc" id="L167">        headGroup = node.getText();</span>
+<span class="fc" id="L168">    }</span>
+
+    private void newFa(TreeNode node) {
+<span class="fc" id="L171">        currentFa = new FattyAcid(&quot;FA&quot;, knownFunctionalGroups);</span>
+<span class="fc" id="L172">    }</span>
+
+    private void newLcb(TreeNode node) {
+<span class="fc" id="L175">        lcb = new FattyAcid(&quot;LCB&quot;, knownFunctionalGroups);</span>
+<span class="fc" id="L176">        lcb.setType(LipidFaBondType.LCB_REGULAR);</span>
+<span class="fc" id="L177">        currentFa = lcb;</span>
+<span class="fc" id="L178">        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+<span class="fc" id="L179">    }</span>
+
+    private void cleanLcb(TreeNode node) {
+<span class="fc bfc" id="L182" title="All 4 branches covered.">        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() &amp;&amp; currentFa.getDoubleBonds().getNumDoubleBonds() &gt; 0) {</span>
+<span class="fc" id="L183">            setLipidLevel(LipidLevel.SN_POSITION);</span>
+        }
+<span class="fc" id="L185">        currentFa = null;</span>
+<span class="fc" id="L186">    }</span>
+
+    private void appendFa(TreeNode node) {
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">        if (currentFa.getDoubleBonds().getNumDoubleBonds() &lt; 0) {</span>
+<span class="nc" id="L190">            throw new LipidException(&quot;Double bond count does not match with number of double bond positions&quot;);</span>
+        }
+
+<span class="fc bfc" id="L193" title="All 4 branches covered.">        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() &amp;&amp; currentFa.getDoubleBonds().getNumDoubleBonds() &gt; 0) {</span>
+<span class="fc" id="L194">            setLipidLevel(LipidLevel.SN_POSITION);</span>
+        }
+
+<span class="fc" id="L197">        faList.add(currentFa);</span>
+<span class="fc" id="L198">        currentFa = null;</span>
+<span class="fc" id="L199">    }</span>
+
+    private void buildLipid(TreeNode node) {
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        if (lcb != null) {</span>
+<span class="fc" id="L203">            faList.add(0, lcb);</span>
+        }
+
+<span class="fc" id="L206">        Headgroup headgroup = prepareHeadgroupAndChecks();</span>
+<span class="fc" id="L207">        LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);</span>
+<span class="fc" id="L208">        content = lipid;</span>
+<span class="fc" id="L209">    }</span>
+
+    private void addEther(TreeNode node) {
+<span class="fc" id="L212">        String ether = node.getText();</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (ether.equals(&quot;O-&quot;)) {</span>
+<span class="fc" id="L214">            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">        } else if (ether.equals(&quot;P-&quot;)) {</span>
+<span class="fc" id="L216">            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);</span>
+        }
+<span class="fc" id="L218">    }</span>
+
+    private void addHydroxyl(TreeNode node) {
+<span class="fc" id="L221">        String old_hydroxyl = node.getText();</span>
+<span class="fc" id="L222">        int num_h = 0;</span>
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">        if (old_hydroxyl.equals(&quot;m&quot;)) {</span>
+<span class="nc" id="L224">            num_h = 1;</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">        } else if (old_hydroxyl.equals(&quot;d&quot;)) {</span>
+<span class="fc" id="L226">            num_h = 2;</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">        } else if (old_hydroxyl.equals(&quot;t&quot;)) {</span>
+<span class="fc" id="L228">            num_h = 3;</span>
+        }
+
+<span class="fc bfc" id="L231" title="All 2 branches covered.">        if (spRegularLcb()) {</span>
+<span class="fc" id="L232">            num_h -= 1;</span>
+        }
+<span class="fc" id="L234">        FunctionalGroup functional_group = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L235">        functional_group.setCount(num_h);</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">        if (!currentFa.getFunctionalGroupsInternal().containsKey(&quot;OH&quot;)) {</span>
+<span class="fc" id="L237">            currentFa.getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L239">        currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).add(functional_group);</span>
+<span class="fc" id="L240">    }</span>
+
+    private void addOneHydroxyl(TreeNode node) {
+<span class="nc bnc" id="L243" title="All 4 branches missed.">        if (!currentFa.getFunctionalGroupsInternal().containsKey(&quot;OH&quot;) &amp;&amp; currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).get(0).getPosition() == -1) {</span>
+<span class="nc" id="L244">            currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).get(0).setCount(currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).get(0).getCount() + 1);</span>
+        } else {
+<span class="nc" id="L246">            FunctionalGroup functional_group = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">            if (!currentFa.getFunctionalGroupsInternal().containsKey(&quot;OH&quot;)) {</span>
+<span class="nc" id="L248">                currentFa.getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+            }
+<span class="nc" id="L250">            currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).add(functional_group);</span>
+        }
+<span class="nc" id="L252">    }</span>
+
+    private void addSuffixNumber(TreeNode node) {
+<span class="fc" id="L255">        suffixNumber = node.getInt();</span>
+<span class="fc" id="L256">    }</span>
+
+    private void addFaLcbSuffixType(TreeNode node) {
+<span class="fc" id="L259">        String suffix_type = node.getText();</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        if (suffix_type.equals(&quot;me&quot;)) {</span>
+<span class="fc" id="L261">            suffix_type = &quot;Me&quot;;</span>
+<span class="fc" id="L262">            currentFa.setNumCarbon(currentFa.getNumCarbon() - 1);</span>
+        }
+
+<span class="fc" id="L265">        FunctionalGroup functional_group = knownFunctionalGroups.get(suffix_type);</span>
+<span class="fc" id="L266">        functional_group.setPosition(suffixNumber);</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">        if (functional_group.getPosition() == -1) {</span>
+<span class="nc" id="L268">            setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+        }
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">        if (!currentFa.getFunctionalGroupsInternal().containsKey(suffix_type)) {</span>
+<span class="fc" id="L271">            currentFa.getFunctionalGroupsInternal().put(suffix_type, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L273">        currentFa.getFunctionalGroupsInternal().get(suffix_type).add(functional_group);</span>
+
+<span class="fc" id="L275">        suffixNumber = -1;</span>
+<span class="fc" id="L276">    }</span>
+
+    private void addDoubleBonds(TreeNode node) {
+<span class="fc" id="L279">        currentFa.getDoubleBonds().setNumDoubleBonds(currentFa.getDoubleBonds().getNumDoubleBonds() + node.getInt());</span>
+<span class="fc" id="L280">    }</span>
+
+    private void addCarbon(TreeNode node) {
+<span class="fc" id="L283">        currentFa.setNumCarbon(node.getInt());</span>
+<span class="fc" id="L284">    }</span>
+
+    private void setSpeciesFa(TreeNode node) {
+<span class="fc" id="L287">        headGroup += &quot; 27:1&quot;;</span>
+<span class="fc" id="L288">        faList.get(faList.size() - 1).setNumCarbon(faList.get(faList.size() - 1).getNumCarbon() - 27);</span>
+<span class="fc" id="L289">        faList.get(faList.size() - 1).getDoubleBonds().setNumDoubleBonds(faList.get(faList.size() - 1).getDoubleBonds().getNumDoubleBonds() - 1);</span>
+<span class="fc" id="L290">    }</span>
+
+    private void newAdduct(TreeNode node) {
+<span class="nc" id="L293">        adduct = new Adduct(&quot;&quot;, &quot;&quot;);</span>
+<span class="nc" id="L294">    }</span>
+
+    private void addAdduct(TreeNode node) {
+<span class="nc" id="L297">        adduct.setAdductString(node.getText());</span>
+<span class="nc" id="L298">    }</span>
+
+    private void addCharge(TreeNode node) {
+<span class="nc" id="L301">        adduct.setCharge(Integer.valueOf(node.getText()));</span>
+<span class="nc" id="L302">    }</span>
+
+    private void addChargeSign(TreeNode node) {
+<span class="nc" id="L305">        String sign = node.getText();</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (sign.equals(&quot;+&quot;)) {</span>
+<span class="nc" id="L307">            adduct.setChargeSign(1);</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        } else if (sign.equals(&quot;-&quot;)) {</span>
+<span class="nc" id="L309">            adduct.setChargeSign(-1);</span>
+        }
+<span class="nc" id="L311">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
