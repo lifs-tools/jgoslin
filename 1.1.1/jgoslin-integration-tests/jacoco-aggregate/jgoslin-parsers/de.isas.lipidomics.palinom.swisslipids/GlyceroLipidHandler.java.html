@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GlyceroLipidHandler.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.swisslipids</a> &gt; <span class="el_source">GlyceroLipidHandler.java</span></div><h1>GlyceroLipidHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.swisslipids;
+
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
+import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Optional;
+
+/**
+ * Handler implementation for Glycerolipids.
+ *
+ * @author  nils.hoffmann
+ */
+class GlyceroLipidHandler implements ParserRuleContextHandler&lt;Lipid_pureContext, LipidSpecies&gt; {
+
+    private final MolecularSubspeciesFasHandler msfh;
+    private final StructuralSubspeciesFasHandler ssfh;
+    private final IsomericSubspeciesFasHandler isfh;
+    private final FattyAcylHandler fhf;
+
+<span class="fc" id="L38">    public GlyceroLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesFasHandler isfh, FattyAcylHandler fhf) {</span>
+<span class="fc" id="L39">        this.msfh = msfh;</span>
+<span class="fc" id="L40">        this.ssfh = ssfh;</span>
+<span class="fc" id="L41">        this.isfh = isfh;</span>
+<span class="fc" id="L42">        this.fhf = fhf;</span>
+<span class="fc" id="L43">    }</span>
+
+    @Override
+    public LipidSpecies handle(Lipid_pureContext t) {
+<span class="fc" id="L47">        return handleGlycerolipid(t).orElse(LipidSpecies.NONE);</span>
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleGlycerolipid(SwissLipidsParser.Lipid_pureContext ctx) throws RuntimeException {
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (ctx.gl() != null) {</span>
+            //glycerophospholipids
+            //cardiolipin
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if (ctx.gl().gl_regular() != null) {</span>
+<span class="fc" id="L55">                return handleGlRegular(ctx.gl().gl_regular());</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            } else if (ctx.gl().gl_mono() != null) {</span>
+<span class="fc" id="L57">                return handleGlMono(ctx.gl().gl_mono());</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">            } else if (ctx.gl().gl_molecular() != null) {</span>
+<span class="fc" id="L59">                return handleGlMolecular(ctx.gl().gl_molecular());</span>
+            } else {
+<span class="nc" id="L61">                throw new ParseTreeVisitorException(&quot;Unhandled context state in GL!&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L64">            throw new ParseTreeVisitorException(&quot;Context for GL was null!&quot;);</span>
+        }
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleGlRegular(SwissLipidsParser.Gl_regularContext dsl) {
+<span class="fc" id="L69">        HeadGroup headGroup = new HeadGroup(dsl.gl_hg().getText());</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (dsl.gl_fa().fa_species() != null) { //species level</span>
+            //process single fa
+<span class="fc" id="L72">            return fhf.visitSpeciesFas(headGroup, dsl.gl_fa().fa_species().fa());</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        } else if (dsl.gl_fa().fa3() != null) {</span>
+            //process triple fa
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (dsl.gl_fa().fa3().fa3_unsorted() != null) {</span>
+<span class="fc" id="L76">                return msfh.visitMolecularSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_unsorted().fa());</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">            } else if (dsl.gl_fa().fa3().fa3_sorted() != null) {</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                if (dsl.gl_fa().fa3().fa3_sorted().fa() != null) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                    if (fhf.isIsomericFa(dsl.gl_fa().fa3().fa3_sorted().fa())) {</span>
+<span class="fc" id="L80">                        return isfh.visitIsomericSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());</span>
+                    } else {
+<span class="fc" id="L82">                        return ssfh.visitStructuralSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());</span>
+                    }
+                } else {
+<span class="nc" id="L85">                    throw new ParseTreeVisitorException(&quot;Unhandled context state in GL regular FA3 sorted&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L88">                throw new ParseTreeVisitorException(&quot;Unhandled context state in GL regular FA3!&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L91">            throw new ParseTreeVisitorException(&quot;Unhandled context state in GL regular!&quot;);</span>
+        }
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleGlMono(SwissLipidsParser.Gl_monoContext lsl) {
+<span class="fc" id="L96">        HeadGroup headGroup = new HeadGroup(lsl.gl_mono_hg().getText());</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (lsl.gl_mono_fa() != null) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            if (lsl.gl_mono_fa().fa_species() != null) {</span>
+<span class="fc" id="L99">                return fhf.visitSpeciesFas(headGroup, lsl.gl_mono_fa().fa_species().fa());</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">            } else if (lsl.gl_mono_fa().fa2() != null) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                if (lsl.gl_mono_fa().fa2().fa2_unsorted() != null) {</span>
+<span class="fc" id="L102">                    return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_unsorted().fa());</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">                } else if (lsl.gl_mono_fa().fa2().fa2_sorted() != null) {</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">                    if (lsl.gl_mono_fa().fa2().fa2_sorted().fa() != null) {</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">                        if (fhf.isIsomericFa(lsl.gl_mono_fa().fa2().fa2_sorted().fa())) {</span>
+<span class="fc" id="L106">                            return isfh.visitIsomericSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());</span>
+                        } else {
+<span class="fc" id="L108">                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());</span>
+                        }
+                    } else {
+<span class="nc" id="L111">                        throw new ParseTreeVisitorException(&quot;Unhandled context state in Gl mono FA2 sorted!&quot;);</span>
+                    }
+                } else {
+<span class="nc" id="L114">                    throw new ParseTreeVisitorException(&quot;Unhandled context state in Gl mono FA2!&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L117">                throw new ParseTreeVisitorException(&quot;Unhandled context state in Gl mono FA!&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L120">            throw new ParseTreeVisitorException(&quot;Unhandled context state in Gl mono!&quot;);</span>
+        }
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleGlMolecular(SwissLipidsParser.Gl_molecularContext lsl) {
+<span class="fc" id="L125">        HeadGroup headGroup = new HeadGroup(lsl.gl_molecular_hg().getText());</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (lsl.gl_molecular_fa() != null) {</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">            if (lsl.gl_molecular_fa().fa2() != null) {</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">                if (lsl.gl_molecular_fa().fa2().fa2_unsorted() != null) {</span>
+<span class="fc" id="L129">                    return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_unsorted().fa());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">                } else if (lsl.gl_molecular_fa().fa2().fa2_sorted() != null) {</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">                    if (lsl.gl_molecular_fa().fa2().fa2_sorted().fa() != null) {</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">                        if (fhf.isIsomericFa(lsl.gl_molecular_fa().fa2().fa2_sorted().fa())) {</span>
+<span class="nc" id="L133">                            return isfh.visitIsomericSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());</span>
+                        } else {
+<span class="nc" id="L135">                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());</span>
+                        }
+                    } else {
+<span class="nc" id="L138">                        throw new ParseTreeVisitorException(&quot;Unhandled context state in GL regular FA2 sorted!&quot;);</span>
+                    }
+                } else {
+<span class="nc" id="L141">                    throw new ParseTreeVisitorException(&quot;Unhandled context state in GL regular FA2!&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L144">                throw new ParseTreeVisitorException(&quot;Unhandled context state in Gl mono FA!&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L147">            throw new ParseTreeVisitorException(&quot;Unhandled context state in Gl mono!&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

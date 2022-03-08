@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SyntaxErrorListener.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom</a> &gt; <span class="el_source">SyntaxErrorListener.java</span></div><h1>SyntaxErrorListener.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
+/**
+ *
+ * @author nils.hoffmann
+ */
+<span class="pc" id="L36">@Value</span>
+<span class="nc bnc" id="L37" title="All 14 branches missed.">@EqualsAndHashCode(callSuper = false)</span>
+public class SyntaxErrorListener extends BaseErrorListener {
+
+<span class="pc" id="L40">    private final List&lt;SyntaxError&gt; syntaxErrors = new ArrayList&lt;&gt;();</span>
+
+    @Override
+    public void syntaxError(Recognizer&lt;?, ?&gt; recognizer,
+            Object offendingSymbol,
+            int line, int charPositionInLine,
+            String msg, RecognitionException e) {
+<span class="fc" id="L47">        syntaxErrors.add(new SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e));</span>
+<span class="fc" id="L48">        throw new ParseCancellationException(getErrorString());</span>
+    }
+
+    public String getErrorString() {
+<span class="fc" id="L52">        return syntaxErrors.stream().map((error) -&gt; {</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (error.getOffendingSymbol() == null) {</span>
+<span class="fc" id="L54">                return String.format(</span>
+                        &quot;Parser %s syntax error at line %d, position %d: %s&quot;,
+<span class="fc" id="L56">                        error.getRecognizer().getGrammarFileName(),</span>
+<span class="fc" id="L57">                        error.getLine(),</span>
+<span class="fc" id="L58">                        error.getCharPositionInLine(),</span>
+<span class="fc" id="L59">                        error.getMessage());</span>
+            } else {
+<span class="fc" id="L61">                return String.format(</span>
+                        &quot;Parser %s syntax error on '%s', at line %d, position %d: %s&quot;,
+<span class="fc" id="L63">                        error.getRecognizer().getGrammarFileName(),</span>
+<span class="fc" id="L64">                        error.getOffendingSymbol(),</span>
+<span class="fc" id="L65">                        error.getLine(),</span>
+<span class="fc" id="L66">                        error.getCharPositionInLine(),</span>
+<span class="fc" id="L67">                        error.getMessage());</span>
+            }
+<span class="fc" id="L69">        }).collect(Collectors.joining(&quot;\n&quot;));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

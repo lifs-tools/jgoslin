@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html lang="de">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">// Generated from de/isas/lipidomics/palinom/SumFormula.g4 by ANTLR 4.7.2</a>
+<span class="sourceLineNo">002</span><a id="line.2">package de.isas.lipidomics.palinom;</a>
+<span class="sourceLineNo">003</span><a id="line.3">import org.antlr.v4.runtime.Lexer;</a>
+<span class="sourceLineNo">004</span><a id="line.4">import org.antlr.v4.runtime.CharStream;</a>
+<span class="sourceLineNo">005</span><a id="line.5">import org.antlr.v4.runtime.Token;</a>
+<span class="sourceLineNo">006</span><a id="line.6">import org.antlr.v4.runtime.TokenStream;</a>
+<span class="sourceLineNo">007</span><a id="line.7">import org.antlr.v4.runtime.*;</a>
+<span class="sourceLineNo">008</span><a id="line.8">import org.antlr.v4.runtime.atn.*;</a>
+<span class="sourceLineNo">009</span><a id="line.9">import org.antlr.v4.runtime.dfa.DFA;</a>
+<span class="sourceLineNo">010</span><a id="line.10">import org.antlr.v4.runtime.misc.*;</a>
+<span class="sourceLineNo">011</span><a id="line.11"></a>
+<span class="sourceLineNo">012</span><a id="line.12">@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})</a>
+<span class="sourceLineNo">013</span><a id="line.13">public class SumFormulaLexer extends Lexer {</a>
+<span class="sourceLineNo">014</span><a id="line.14">        static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }</a>
+<span class="sourceLineNo">015</span><a id="line.15"></a>
+<span class="sourceLineNo">016</span><a id="line.16">        protected static final DFA[] _decisionToDFA;</a>
+<span class="sourceLineNo">017</span><a id="line.17">        protected static final PredictionContextCache _sharedContextCache =</a>
+<span class="sourceLineNo">018</span><a id="line.18">                new PredictionContextCache();</a>
+<span class="sourceLineNo">019</span><a id="line.19">        public static final int</a>
+<span class="sourceLineNo">020</span><a id="line.20">                T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, </a>
+<span class="sourceLineNo">021</span><a id="line.21">                T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16;</a>
+<span class="sourceLineNo">022</span><a id="line.22">        public static String[] channelNames = {</a>
+<span class="sourceLineNo">023</span><a id="line.23">                "DEFAULT_TOKEN_CHANNEL", "HIDDEN"</a>
+<span class="sourceLineNo">024</span><a id="line.24">        };</a>
+<span class="sourceLineNo">025</span><a id="line.25"></a>
+<span class="sourceLineNo">026</span><a id="line.26">        public static String[] modeNames = {</a>
+<span class="sourceLineNo">027</span><a id="line.27">                "DEFAULT_MODE"</a>
+<span class="sourceLineNo">028</span><a id="line.28">        };</a>
+<span class="sourceLineNo">029</span><a id="line.29"></a>
+<span class="sourceLineNo">030</span><a id="line.30">        private static String[] makeRuleNames() {</a>
+<span class="sourceLineNo">031</span><a id="line.31">                return new String[] {</a>
+<span class="sourceLineNo">032</span><a id="line.32">                        "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8", </a>
+<span class="sourceLineNo">033</span><a id="line.33">                        "T__9", "T__10", "T__11", "T__12", "T__13", "T__14", "T__15"</a>
+<span class="sourceLineNo">034</span><a id="line.34">                };</a>
+<span class="sourceLineNo">035</span><a id="line.35">        }</a>
+<span class="sourceLineNo">036</span><a id="line.36">        public static final String[] ruleNames = makeRuleNames();</a>
+<span class="sourceLineNo">037</span><a id="line.37"></a>
+<span class="sourceLineNo">038</span><a id="line.38">        private static String[] makeLiteralNames() {</a>
+<span class="sourceLineNo">039</span><a id="line.39">                return new String[] {</a>
+<span class="sourceLineNo">040</span><a id="line.40">                        null, "'C'", "'H'", "'N'", "'O'", "'P'", "'S'", "'0'", "'1'", "'2'", </a>
+<span class="sourceLineNo">041</span><a id="line.41">                        "'3'", "'4'", "'5'", "'6'", "'7'", "'8'", "'9'"</a>
+<span class="sourceLineNo">042</span><a id="line.42">                };</a>
+<span class="sourceLineNo">043</span><a id="line.43">        }</a>
+<span class="sourceLineNo">044</span><a id="line.44">        private static final String[] _LITERAL_NAMES = makeLiteralNames();</a>
+<span class="sourceLineNo">045</span><a id="line.45">        private static String[] makeSymbolicNames() {</a>
+<span class="sourceLineNo">046</span><a id="line.46">                return new String[] {</a>
+<span class="sourceLineNo">047</span><a id="line.47">                };</a>
+<span class="sourceLineNo">048</span><a id="line.48">        }</a>
+<span class="sourceLineNo">049</span><a id="line.49">        private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();</a>
+<span class="sourceLineNo">050</span><a id="line.50">        public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);</a>
+<span class="sourceLineNo">051</span><a id="line.51"></a>
+<span class="sourceLineNo">052</span><a id="line.52">        /**</a>
+<span class="sourceLineNo">053</span><a id="line.53">         * @deprecated Use {@link #VOCABULARY} instead.</a>
+<span class="sourceLineNo">054</span><a id="line.54">         */</a>
+<span class="sourceLineNo">055</span><a id="line.55">        @Deprecated</a>
+<span class="sourceLineNo">056</span><a id="line.56">        public static final String[] tokenNames;</a>
+<span class="sourceLineNo">057</span><a id="line.57">        static {</a>
+<span class="sourceLineNo">058</span><a id="line.58">                tokenNames = new String[_SYMBOLIC_NAMES.length];</a>
+<span class="sourceLineNo">059</span><a id="line.59">                for (int i = 0; i &lt; tokenNames.length; i++) {</a>
+<span class="sourceLineNo">060</span><a id="line.60">                        tokenNames[i] = VOCABULARY.getLiteralName(i);</a>
+<span class="sourceLineNo">061</span><a id="line.61">                        if (tokenNames[i] == null) {</a>
+<span class="sourceLineNo">062</span><a id="line.62">                                tokenNames[i] = VOCABULARY.getSymbolicName(i);</a>
+<span class="sourceLineNo">063</span><a id="line.63">                        }</a>
+<span class="sourceLineNo">064</span><a id="line.64"></a>
+<span class="sourceLineNo">065</span><a id="line.65">                        if (tokenNames[i] == null) {</a>
+<span class="sourceLineNo">066</span><a id="line.66">                                tokenNames[i] = "&lt;INVALID&gt;";</a>
+<span class="sourceLineNo">067</span><a id="line.67">                        }</a>
+<span class="sourceLineNo">068</span><a id="line.68">                }</a>
+<span class="sourceLineNo">069</span><a id="line.69">        }</a>
+<span class="sourceLineNo">070</span><a id="line.70"></a>
+<span class="sourceLineNo">071</span><a id="line.71">        @Override</a>
+<span class="sourceLineNo">072</span><a id="line.72">        @Deprecated</a>
+<span class="sourceLineNo">073</span><a id="line.73">        public String[] getTokenNames() {</a>
+<span class="sourceLineNo">074</span><a id="line.74">                return tokenNames;</a>
+<span class="sourceLineNo">075</span><a id="line.75">        }</a>
+<span class="sourceLineNo">076</span><a id="line.76"></a>
+<span class="sourceLineNo">077</span><a id="line.77">        @Override</a>
+<span class="sourceLineNo">078</span><a id="line.78"></a>
+<span class="sourceLineNo">079</span><a id="line.79">        public Vocabulary getVocabulary() {</a>
+<span class="sourceLineNo">080</span><a id="line.80">                return VOCABULARY;</a>
+<span class="sourceLineNo">081</span><a id="line.81">        }</a>
+<span class="sourceLineNo">082</span><a id="line.82"></a>
+<span class="sourceLineNo">083</span><a id="line.83"></a>
+<span class="sourceLineNo">084</span><a id="line.84">        public SumFormulaLexer(CharStream input) {</a>
+<span class="sourceLineNo">085</span><a id="line.85">                super(input);</a>
+<span class="sourceLineNo">086</span><a id="line.86">                _interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);</a>
+<span class="sourceLineNo">087</span><a id="line.87">        }</a>
+<span class="sourceLineNo">088</span><a id="line.88"></a>
+<span class="sourceLineNo">089</span><a id="line.89">        @Override</a>
+<span class="sourceLineNo">090</span><a id="line.90">        public String getGrammarFileName() { return "SumFormula.g4"; }</a>
+<span class="sourceLineNo">091</span><a id="line.91"></a>
+<span class="sourceLineNo">092</span><a id="line.92">        @Override</a>
+<span class="sourceLineNo">093</span><a id="line.93">        public String[] getRuleNames() { return ruleNames; }</a>
+<span class="sourceLineNo">094</span><a id="line.94"></a>
+<span class="sourceLineNo">095</span><a id="line.95">        @Override</a>
+<span class="sourceLineNo">096</span><a id="line.96">        public String getSerializedATN() { return _serializedATN; }</a>
+<span class="sourceLineNo">097</span><a id="line.97"></a>
+<span class="sourceLineNo">098</span><a id="line.98">        @Override</a>
+<span class="sourceLineNo">099</span><a id="line.99">        public String[] getChannelNames() { return channelNames; }</a>
+<span class="sourceLineNo">100</span><a id="line.100"></a>
+<span class="sourceLineNo">101</span><a id="line.101">        @Override</a>
+<span class="sourceLineNo">102</span><a id="line.102">        public String[] getModeNames() { return modeNames; }</a>
+<span class="sourceLineNo">103</span><a id="line.103"></a>
+<span class="sourceLineNo">104</span><a id="line.104">        @Override</a>
+<span class="sourceLineNo">105</span><a id="line.105">        public ATN getATN() { return _ATN; }</a>
+<span class="sourceLineNo">106</span><a id="line.106"></a>
+<span class="sourceLineNo">107</span><a id="line.107">        public static final String _serializedATN =</a>
+<span class="sourceLineNo">108</span><a id="line.108">                "\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2\22C\b\1\4\2\t\2\4"+</a>
+<span class="sourceLineNo">109</span><a id="line.109">                "\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+</a>
+<span class="sourceLineNo">110</span><a id="line.110">                "\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\3\2\3\2\3"+</a>
+<span class="sourceLineNo">111</span><a id="line.111">                "\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b\3\t\3\t\3\n\3\n\3\13\3"+</a>
+<span class="sourceLineNo">112</span><a id="line.112">                "\13\3\f\3\f\3\r\3\r\3\16\3\16\3\17\3\17\3\20\3\20\3\21\3\21\2\2\22\3\3"+</a>
+<span class="sourceLineNo">113</span><a id="line.113">                "\5\4\7\5\t\6\13\7\r\b\17\t\21\n\23\13\25\f\27\r\31\16\33\17\35\20\37\21"+</a>
+<span class="sourceLineNo">114</span><a id="line.114">                "!\22\3\2\2\2B\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2"+</a>
+<span class="sourceLineNo">115</span><a id="line.115">                "\2\2\2\r\3\2\2\2\2\17\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2"+</a>
+<span class="sourceLineNo">116</span><a id="line.116">                "\27\3\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2"+</a>
+<span class="sourceLineNo">117</span><a id="line.117">                "\2\2\3#\3\2\2\2\5%\3\2\2\2\7\'\3\2\2\2\t)\3\2\2\2\13+\3\2\2\2\r-\3\2\2"+</a>
+<span class="sourceLineNo">118</span><a id="line.118">                "\2\17/\3\2\2\2\21\61\3\2\2\2\23\63\3\2\2\2\25\65\3\2\2\2\27\67\3\2\2\2"+</a>
+<span class="sourceLineNo">119</span><a id="line.119">                "\319\3\2\2\2\33;\3\2\2\2\35=\3\2\2\2\37?\3\2\2\2!A\3\2\2\2#$\7E\2\2$\4"+</a>
+<span class="sourceLineNo">120</span><a id="line.120">                "\3\2\2\2%&amp;\7J\2\2&amp;\6\3\2\2\2\'(\7P\2\2(\b\3\2\2\2)*\7Q\2\2*\n\3\2\2\2"+</a>
+<span class="sourceLineNo">121</span><a id="line.121">                "+,\7R\2\2,\f\3\2\2\2-.\7U\2\2.\16\3\2\2\2/\60\7\62\2\2\60\20\3\2\2\2\61"+</a>
+<span class="sourceLineNo">122</span><a id="line.122">                "\62\7\63\2\2\62\22\3\2\2\2\63\64\7\64\2\2\64\24\3\2\2\2\65\66\7\65\2\2"+</a>
+<span class="sourceLineNo">123</span><a id="line.123">                "\66\26\3\2\2\2\678\7\66\2\28\30\3\2\2\29:\7\67\2\2:\32\3\2\2\2;&lt;\78\2"+</a>
+<span class="sourceLineNo">124</span><a id="line.124">                "\2&lt;\34\3\2\2\2=&gt;\79\2\2&gt;\36\3\2\2\2?@\7:\2\2@ \3\2\2\2AB\7;\2\2B\"\3\2"+</a>
+<span class="sourceLineNo">125</span><a id="line.125">                "\2\2\3\2\2";</a>
+<span class="sourceLineNo">126</span><a id="line.126">        public static final ATN _ATN =</a>
+<span class="sourceLineNo">127</span><a id="line.127">                new ATNDeserializer().deserialize(_serializedATN.toCharArray());</a>
+<span class="sourceLineNo">128</span><a id="line.128">        static {</a>
+<span class="sourceLineNo">129</span><a id="line.129">                _decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];</a>
+<span class="sourceLineNo">130</span><a id="line.130">                for (int i = 0; i &lt; _ATN.getNumberOfDecisions(); i++) {</a>
+<span class="sourceLineNo">131</span><a id="line.131">                        _decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);</a>
+<span class="sourceLineNo">132</span><a id="line.132">                }</a>
+<span class="sourceLineNo">133</span><a id="line.133">        }</a>
+<span class="sourceLineNo">134</span><a id="line.134">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

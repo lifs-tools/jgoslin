@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GoslinFragmentsVisitorParser.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.goslinfragments</a> &gt; <span class="el_source">GoslinFragmentsVisitorParser.java</span></div><h1>GoslinFragmentsVisitorParser.java</h1><pre class="source lang-java linenums">/*
+ * 
+ */
+package de.isas.lipidomics.palinom.goslinfragments;
+
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.palinom.GoslinFragmentsLexer;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.SyntaxErrorListener;
+import de.isas.lipidomics.palinom.VisitorParser;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
+/**
+ * Parser implementation for the GoslinFragments grammar.
+ *
+ * @author nils.hoffmann
+ */
+<span class="nc" id="L25">@Slf4j</span>
+<span class="nc" id="L26">public class GoslinFragmentsVisitorParser implements VisitorParser&lt;LipidAdduct&gt; {</span>
+
+    @Override
+    public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {
+<span class="nc" id="L30">        return parseWithModernGrammar(lipidString, listener);</span>
+    }
+
+    private LipidAdduct parseWithModernGrammar(String lipidString, SyntaxErrorListener listener) throws ParsingException, RecognitionException {
+<span class="nc" id="L34">        CharStream charStream = CharStreams.fromString(lipidString);</span>
+<span class="nc" id="L35">        GoslinFragmentsLexer lexer = new GoslinFragmentsLexer(charStream);</span>
+<span class="nc" id="L36">        TokenStream tokens = new CommonTokenStream(lexer);</span>
+<span class="nc" id="L37">        log.info(&quot;Parsing lipid identifier: {}&quot;, lipidString);</span>
+<span class="nc" id="L38">        GoslinFragmentsParser parser = new GoslinFragmentsParser(tokens);</span>
+<span class="nc" id="L39">        prepare(parser, lexer, listener);</span>
+        try {
+<span class="nc" id="L41">            GoslinFragmentsParser.LipidContext context = parser.lipid();</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">            if (parser.getNumberOfSyntaxErrors() &gt; 0) {</span>
+<span class="nc" id="L43">                throw new ParsingException(&quot;Parsing of &quot; + lipidString + &quot; failed with &quot; + parser.getNumberOfSyntaxErrors() + &quot; syntax errors!\n&quot; + listener.getErrorString());</span>
+            }
+<span class="nc" id="L45">            GoslinFragmentsVisitorImpl lipidVisitor = new GoslinFragmentsVisitorImpl();</span>
+<span class="nc" id="L46">            return lipidVisitor.visit(context);</span>
+<span class="nc" id="L47">        } catch (ParseCancellationException pce) {</span>
+<span class="nc" id="L48">            throw new ParsingException(&quot;Parsing of &quot; + lipidString + &quot; failed with &quot; + parser.getNumberOfSyntaxErrors() + &quot; syntax errors!\n&quot; + listener.getErrorString());</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

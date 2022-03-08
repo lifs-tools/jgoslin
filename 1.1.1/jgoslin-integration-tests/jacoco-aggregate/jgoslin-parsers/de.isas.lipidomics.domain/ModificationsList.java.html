@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ModificationsList.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">ModificationsList.java</span></div><h1>ModificationsList.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.tuple.Pair;
+
+/**
+ *
+ * @author  nils.hoffmann
+ */
+<span class="nc bnc" id="L38" title="All 14 branches missed.">@EqualsAndHashCode</span>
+public class ModificationsList implements List&lt;Pair&lt;Integer,String&gt;&gt; {
+    
+<span class="fc" id="L41">    protected static final ModificationsList NONE = new ModificationsList(Collections.emptyList());</span>
+    
+<span class="fc" id="L43">    public ModificationsList() {</span>
+<span class="fc" id="L44">        this.al = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L45">    }</span>
+    
+<span class="fc" id="L47">    public ModificationsList(List&lt;Pair&lt;Integer, String&gt;&gt; list) {</span>
+<span class="fc" id="L48">        this.al = list;</span>
+<span class="fc" id="L49">    }</span>
+    
+    private final List&lt;Pair&lt;Integer, String&gt;&gt; al;
+
+    @Override
+    public int size() {
+<span class="nc" id="L55">        return al.size();</span>
+    }
+
+    @Override
+    public boolean isEmpty() {
+<span class="nc" id="L60">        return al.isEmpty();</span>
+    }
+
+    @Override
+    public boolean contains(Object o) {
+<span class="nc" id="L65">        return al.contains(o);</span>
+    }
+
+    @Override
+    public int indexOf(Object o) {
+<span class="nc" id="L70">        return al.indexOf(o);</span>
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+<span class="nc" id="L75">        return al.lastIndexOf(o);</span>
+    }
+
+    @Override
+    public Object[] toArray() {
+<span class="fc" id="L80">        return al.toArray();</span>
+    }
+
+    @Override
+    public &lt;T&gt; T[] toArray(T[] a) {
+<span class="nc" id="L85">        return al.toArray(a);</span>
+    }
+
+    @Override
+    public Pair&lt;Integer, String&gt; get(int index) {
+<span class="nc" id="L90">        return al.get(index);</span>
+    }
+
+    @Override
+    public Pair&lt;Integer, String&gt; set(int index, Pair&lt;Integer, String&gt; element) {
+<span class="nc" id="L95">        return al.set(index, element);</span>
+    }
+
+    @Override
+    public boolean add(Pair&lt;Integer, String&gt; e) {
+<span class="fc" id="L100">        return al.add(e);</span>
+    }
+
+    @Override
+    public void add(int index, Pair&lt;Integer, String&gt; element) {
+<span class="nc" id="L105">        al.add(index, element);</span>
+<span class="nc" id="L106">    }</span>
+
+    @Override
+    public Pair&lt;Integer, String&gt; remove(int index) {
+<span class="nc" id="L110">        return al.remove(index);</span>
+    }
+
+    @Override
+    public boolean remove(Object o) {
+<span class="nc" id="L115">        return al.remove(o);</span>
+    }
+
+    @Override
+    public void clear() {
+<span class="nc" id="L120">        al.clear();</span>
+<span class="nc" id="L121">    }</span>
+
+    @Override
+    public boolean addAll(Collection&lt;? extends Pair&lt;Integer, String&gt;&gt; c) {
+<span class="fc" id="L125">        return al.addAll(c);</span>
+    }
+
+    @Override
+    public boolean addAll(int index, Collection&lt;? extends Pair&lt;Integer, String&gt;&gt; c) {
+<span class="nc" id="L130">        return al.addAll(index, c);</span>
+    }
+
+    @Override
+    public boolean removeAll(Collection&lt;?&gt; c) {
+<span class="nc" id="L135">        return al.removeAll(c);</span>
+    }
+
+    @Override
+    public boolean retainAll(Collection&lt;?&gt; c) {
+<span class="nc" id="L140">        return al.retainAll(c);</span>
+    }
+
+    @Override
+    public ListIterator&lt;Pair&lt;Integer, String&gt;&gt; listIterator(int index) {
+<span class="nc" id="L145">        return al.listIterator(index);</span>
+    }
+
+    @Override
+    public ListIterator&lt;Pair&lt;Integer, String&gt;&gt; listIterator() {
+<span class="nc" id="L150">        return al.listIterator();</span>
+    }
+
+    @Override
+    public Iterator&lt;Pair&lt;Integer, String&gt;&gt; iterator() {
+<span class="nc" id="L155">        return al.iterator();</span>
+    }
+
+    @Override
+    public List&lt;Pair&lt;Integer, String&gt;&gt; subList(int fromIndex, int toIndex) {
+<span class="nc" id="L160">        return al.subList(fromIndex, toIndex);</span>
+    }
+
+    @Override
+    public void forEach(Consumer&lt;? super Pair&lt;Integer, String&gt;&gt; action) {
+<span class="nc" id="L165">        al.forEach(action);</span>
+<span class="nc" id="L166">    }</span>
+
+    @Override
+    public Spliterator&lt;Pair&lt;Integer, String&gt;&gt; spliterator() {
+<span class="nc" id="L170">        return al.spliterator();</span>
+    }
+
+    @Override
+    public boolean removeIf(Predicate&lt;? super Pair&lt;Integer, String&gt;&gt; filter) {
+<span class="nc" id="L175">        return al.removeIf(filter);</span>
+    }
+
+    @Override
+    public void replaceAll(UnaryOperator&lt;Pair&lt;Integer, String&gt;&gt; operator) {
+<span class="nc" id="L180">        al.replaceAll(operator);</span>
+<span class="nc" id="L181">    }</span>
+
+    @Override
+    public void sort(Comparator&lt;? super Pair&lt;Integer, String&gt;&gt; c) {
+<span class="nc" id="L185">        al.sort(c);</span>
+<span class="nc" id="L186">    }</span>
+
+    @Override
+    public boolean containsAll(Collection&lt;?&gt; c) {
+<span class="nc" id="L190">        return al.containsAll(c);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L195">        return al.toString();</span>
+    }
+
+    @Override
+    public &lt;T&gt; T[] toArray(IntFunction&lt;T[]&gt; generator) {
+<span class="nc" id="L200">        return al.toArray(generator);</span>
+    }
+
+    @Override
+    public Stream&lt;Pair&lt;Integer, String&gt;&gt; stream() {
+<span class="fc" id="L205">        return al.stream();</span>
+    }
+
+    @Override
+    public Stream&lt;Pair&lt;Integer, String&gt;&gt; parallelStream() {
+<span class="nc" id="L210">        return al.parallelStream();</span>
+    }
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

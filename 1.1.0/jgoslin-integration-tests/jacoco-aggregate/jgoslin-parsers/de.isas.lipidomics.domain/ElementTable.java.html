@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ElementTable.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">ElementTable.java</span></div><h1>ElementTable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import de.isas.lipidomics.palinom.sumformula.SumFormulaVisitorParser;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Accounting table for chemical element frequency. This is used to calculate
+ * sum formulas and total masses for a given chemical element distribution, e.g.
+ * in a lipid.
+ *
+ * @author  nils.hoffmann
+ */
+public final class ElementTable extends EnumMap&lt;Element, Integer&gt; {
+
+    public ElementTable(Map&lt;Element, ? extends Integer&gt; m) {
+<span class="fc" id="L34">        super(m);</span>
+<span class="fc" id="L35">    }</span>
+
+    /**
+     * Creates an empty element table.
+     */
+    public ElementTable() {
+<span class="fc" id="L41">        super(Element.class);</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Creates the element table from the provided sum formula. If an empty
+     * string is passed in this will create an empty table.
+     *
+     * @param sumFormula the sum formula to parse.
+     * @throws ParsingException if the sum formula does not conform with the
+     * SumFormula grammar.
+     */
+    public ElementTable(String sumFormula) throws ParsingException {
+<span class="fc" id="L53">        this();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (!sumFormula.isEmpty()) {</span>
+<span class="fc" id="L55">            SumFormulaVisitorParser parser = new SumFormulaVisitorParser();</span>
+<span class="fc" id="L56">            add(parser.parse(sumFormula));</span>
+        }
+<span class="fc" id="L58">    }</span>
+
+    /**
+     * Adds the element counts of the provided table to this one.
+     *
+     * @param other the table to add to this one.
+     * @return a new element table.
+     */
+    public ElementTable add(ElementTable other) {
+<span class="fc" id="L67">        other.entrySet().stream().filter((entry) -&gt; {</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            return entry.getValue() != null;</span>
+<span class="fc" id="L69">        }).forEach((entry) -&gt; {</span>
+<span class="fc" id="L70">            incrementBy(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L71">        });</span>
+<span class="fc" id="L72">        return this;</span>
+    }
+
+    /**
+     * Increment the count of the provided element by one.
+     *
+     * @param element the element.
+     */
+    public void increment(Element element) {
+<span class="fc" id="L81">        merge(element, 1, Integer::sum);</span>
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * Increment the count of the provided element by the given number.
+     *
+     * @param element the element.
+     * @param increment the increment for the element.
+     */
+    public void incrementBy(Element element, Integer increment) {
+<span class="fc" id="L91">        merge(element, increment, Integer::sum);</span>
+<span class="fc" id="L92">    }</span>
+
+    /**
+     * Decrements the current count for element by one.
+     *
+     * @param element the element to decrement the counts for.
+     */
+    public void decrement(Element element) {
+<span class="nc" id="L100">        incrementBy(element, -1);</span>
+<span class="nc" id="L101">    }</span>
+
+    /**
+     * Decrement the count of the provided element by the given number.
+     *
+     * @param element the element.
+     * @param decrement the decrement for the element.
+     */
+    public void decrementBy(Element element, Integer decrement) {
+<span class="fc" id="L110">        merge(element, -decrement, Integer::sum);</span>
+<span class="fc" id="L111">    }</span>
+
+    /**
+     * Negates the count stored in the table. E.g. '5' will become '-5', '-5'
+     * would become '5'.
+     *
+     * @param element the element count to negate.
+     */
+    public void negate(Element element) {
+<span class="fc" id="L120">        Integer count = getOrDefault(element, 0);</span>
+<span class="fc" id="L121">        put(element, -1 * count);</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * Subtracts all element counts in the provided element table from this
+     * table.
+     *
+     * @param elementTable the element table to subtract from this.
+     * @return this element table.
+     */
+    public ElementTable subtract(ElementTable elementTable) {
+<span class="fc" id="L132">        elementTable.entrySet().stream().filter((entry) -&gt; {</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">            return entry.getValue() != null;</span>
+<span class="fc" id="L134">        }).forEach((entry) -&gt; {</span>
+<span class="fc" id="L135">            decrementBy(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L136">        });</span>
+<span class="fc" id="L137">        return this;</span>
+    }
+
+    /**
+     * Returns the sum formula for all elements in this table.
+     *
+     * @return the sum formula. Returns an empty string if the table is empty.
+     */
+    public String getSumFormula() {
+<span class="fc" id="L146">        return entrySet().stream().filter((entry) -&gt; {</span>
+<span class="pc bpc" id="L147" title="1 of 4 branches missed.">            return entry.getValue() != null &amp;&amp; entry.getValue() &gt; 0;</span>
+<span class="fc" id="L148">        }).map((entry) -&gt; {</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">            return entry.getKey().getName() + ((entry.getValue() &gt; 1) ? entry.getValue() : &quot;&quot;);</span>
+<span class="fc" id="L150">        }).collect(Collectors.joining());</span>
+    }
+
+    /**
+     * Returns the individual total mass for the provided element.
+     *
+     * @param element the element to calculate the total mass for.
+     * @return the total mass for the given element, or 0.
+     */
+    public Double getMass(Element element) {
+<span class="fc" id="L160">        Integer count = getOrDefault(element, 0);</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if (count &gt; 0) {</span>
+<span class="fc" id="L162">            return count.doubleValue() * element.getMass();</span>
+        }
+<span class="nc" id="L164">        return 0.0d;</span>
+    }
+
+    /**
+     * Returns the total summed mass per number of elements.
+     *
+     * @return the total summed mass for this element table. Returns 0 if the
+     * table is empty.
+     */
+    public Double getMass() {
+<span class="fc" id="L174">        return keySet().stream().map((key) -&gt; {</span>
+<span class="fc" id="L175">            return getMass(key);</span>
+<span class="fc" id="L176">        }).reduce(0.0d, Double::sum);</span>
+    }
+
+    /**
+     * Returns an copy of all mappings in this table.
+     *
+     * @return the element table copy.
+     */
+    public ElementTable copy() {
+<span class="fc" id="L185">        return new ElementTable(this);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

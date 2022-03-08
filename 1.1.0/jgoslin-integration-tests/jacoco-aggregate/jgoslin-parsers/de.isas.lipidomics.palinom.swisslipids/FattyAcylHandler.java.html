@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>FattyAcylHandler.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.swisslipids</a> &gt; <span class="el_source">FattyAcylHandler.java</span></div><h1>FattyAcylHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.swisslipids;
+
+import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
+import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
+import de.isas.lipidomics.domain.LipidLevel;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
+import de.isas.lipidomics.palinom.HandlerUtils;
+import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
+import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.SwissLipidsParser.FaContext;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * ParserRuleContextHandler for FattyAcyls.
+ *
+ * @author  nils.hoffmann
+ */
+class FattyAcylHandler implements ParserRuleContextHandler&lt;SwissLipidsParser.Lipid_pureContext, LipidSpecies&gt; {
+
+<span class="fc" id="L43">    private final FattyAcylHelper faHelper = new FattyAcylHelper();</span>
+    private final StructuralSubspeciesFasHandler ssfh;
+    private final StructuralSubspeciesLcbHandler sslh;
+
+<span class="fc" id="L47">    public FattyAcylHandler(StructuralSubspeciesFasHandler ssfh, StructuralSubspeciesLcbHandler sslh) {</span>
+<span class="fc" id="L48">        this.ssfh = ssfh;</span>
+<span class="fc" id="L49">        this.sslh = sslh;</span>
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    public LipidSpecies handle(SwissLipidsParser.Lipid_pureContext ctx) {
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if (ctx.fatty_acid() != null) {</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            if (ctx.fatty_acid().fa_hg() != null) {</span>
+<span class="fc" id="L56">                HeadGroup headGroup = new HeadGroup(ctx.fatty_acid().fa_hg().getText());</span>
+<span class="fc" id="L57">                FaContext faContext = null;</span>
+<span class="pc bpc" id="L58" title="2 of 4 branches missed.">                if (ctx.fatty_acid().fa_fa() != null &amp;&amp; ctx.fatty_acid().fa_fa().fa() != null) {</span>
+<span class="fc" id="L59">                    faContext = ctx.fatty_acid().fa_fa().fa();</span>
+<span class="fc" id="L60">                    return visitSpeciesFas(headGroup, faContext).orElse(LipidSpecies.NONE);</span>
+                } else {
+<span class="nc" id="L62">                    throw new ParseTreeVisitorException(&quot;Context for FA fa was null!&quot;);</span>
+                }
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            } else if (ctx.fatty_acid().mediator() != null) {</span>
+                // mediator fron positions, e.g 11,12-DiHETrE
+<span class="nc" id="L66">                String mediatorPositions = &quot;&quot;;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">                if (ctx.fatty_acid().mediator().med_positions() != null) {</span>
+<span class="nc" id="L68">                    mediatorPositions = ctx.fatty_acid().mediator().med_positions().getText();</span>
+                }
+                // E + Z positions
+//                    if (ctx.fatty_acid().mediator().mediator_single() != null) {
+//                        ctx.fatty_acid().mediator().mediator_single().db_positions();
+//                    }
+<span class="nc" id="L74">                HeadGroup mediatorsSingleContext = new HeadGroup(ctx.fatty_acid().mediator().mediator_single().getText());</span>
+<span class="nc" id="L75">                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new FattyAcid[0]).build();</span>
+            } else {
+<span class="nc" id="L77">                throw new ParseTreeVisitorException(&quot;Context for FA head group was null!&quot;);</span>
+            }
+
+        } else {
+<span class="nc" id="L81">            throw new ParseTreeVisitorException(&quot;Context for FA was null!&quot;);</span>
+        }
+    }
+
+    public Optional&lt;LipidSpecies&gt; visitSpeciesLcb(HeadGroup headGroup, SwissLipidsParser.LcbContext lcbContext) {
+<span class="fc" id="L86">        Optional&lt;LipidSpeciesInfo&gt; lsi = getSpeciesInfo(headGroup, lcbContext);</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (lsi.isPresent()) {</span>
+<span class="pc bpc" id="L88" title="2 of 3 branches missed.">            switch (lsi.get().getLevel()) {</span>
+                case SPECIES:
+<span class="fc" id="L90">                    return Optional.of(new LipidSpecies(headGroup, lsi));</span>
+                case STRUCTURAL_SUBSPECIES:
+                case ISOMERIC_SUBSPECIES:
+<span class="nc" id="L93">                    return sslh.visitStructuralSubspeciesLcb(headGroup, lcbContext);</span>
+                default:
+<span class="nc" id="L95">                    throw new ParseTreeVisitorException(&quot;Unexpected FA level &quot; + lsi.get().getLevel());</span>
+            }
+        }
+<span class="nc" id="L98">        return Optional.of(new LipidSpecies(headGroup, lsi));</span>
+    }
+
+    public Optional&lt;LipidSpecies&gt; visitSpeciesFas(HeadGroup headGroup, SwissLipidsParser.FaContext faContext) {
+<span class="fc" id="L102">        Optional&lt;LipidSpeciesInfo&gt; lsi = getSpeciesInfo(headGroup, faContext);</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (lsi.isPresent()) {</span>
+<span class="pc bpc" id="L104" title="2 of 3 branches missed.">            switch (lsi.get().getLevel()) {</span>
+                case SPECIES:
+<span class="fc" id="L106">                    return Optional.of(new LipidSpecies(headGroup, lsi));</span>
+                case STRUCTURAL_SUBSPECIES:
+                case ISOMERIC_SUBSPECIES:
+<span class="nc" id="L109">                    return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(faContext));</span>
+                default:
+<span class="nc" id="L111">                    throw new ParseTreeVisitorException(&quot;Unexpected FA level &quot; + lsi.get().getLevel());</span>
+            }
+        }
+<span class="nc" id="L114">        return Optional.of(new LipidSpecies(headGroup, lsi));</span>
+    }
+
+    public Optional&lt;LipidSpeciesInfo&gt; getSpeciesInfo(HeadGroup headGroup, SwissLipidsParser.FaContext faContext) {
+<span class="fc" id="L118">        LipidFaBondType lfbt = faHelper.getLipidFaBondType(faContext);</span>
+<span class="fc" id="L119">        Map&lt;String, Integer&gt; countCorrection = faHelper.getSterolSpeciesCountCorrection(headGroup);</span>
+<span class="fc" id="L120">        int nHydroxyl = 0;</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (faContext.fa_lcb_prefix() != null) {</span>
+<span class="nc" id="L122">            throw new ParseTreeVisitorException(&quot;Unsupported lcb prefix on fa: &quot; + faContext.fa_lcb_prefix().getText());</span>
+        }
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if (faContext.fa_lcb_suffix() != null) {</span>
+<span class="nc" id="L125">            throw new ParseTreeVisitorException(&quot;Unsupported lcb suffix on fa: &quot; + faContext.fa_lcb_suffix().getText());</span>
+        }
+<span class="fc" id="L127">        int nDoubleBonds = 0;</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">        if (faContext.fa_core().db() != null) {</span>
+<span class="fc" id="L129">            nDoubleBonds = asInt(faContext.fa_core().db().db_count(), 0);</span>
+        }
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        if (faContext.fa_core().db().db_positions() != null) {</span>
+<span class="nc" id="L132">            return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().</span>
+<span class="nc" id="L133">                    level(LipidLevel.ISOMERIC_SUBSPECIES).</span>
+<span class="nc" id="L134">                    name(&quot;FA&quot;).</span>
+<span class="nc" id="L135">                    position(-1).</span>
+<span class="nc" id="L136">                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0) - countCorrection.getOrDefault(&quot;carbonCorrection&quot;, 0)).</span>
+<span class="nc" id="L137">                    nHydroxy(nHydroxyl).</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                    nDoubleBonds(nDoubleBonds + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0) - countCorrection.getOrDefault(&quot;doubleBondCorrection&quot;, 0)).</span>
+<span class="nc" id="L139">                    doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, faContext.fa_core().db().db_positions())).</span>
+<span class="nc" id="L140">                    lipidFaBondType(lfbt).</span>
+<span class="nc" id="L141">                    build()</span>
+            );
+        } else {
+<span class="fc" id="L144">            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().</span>
+<span class="fc" id="L145">                    level(LipidLevel.SPECIES).</span>
+<span class="fc" id="L146">                    name(&quot;FA&quot;).</span>
+<span class="fc" id="L147">                    position(-1).</span>
+<span class="fc" id="L148">                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0) - countCorrection.getOrDefault(&quot;carbonCorrection&quot;, 0)).</span>
+<span class="fc" id="L149">                    nHydroxy(nHydroxyl).</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">                    nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0) - countCorrection.getOrDefault(&quot;doubleBondCorrection&quot;, 0)).</span>
+<span class="fc" id="L151">                    lipidFaBondType(lfbt).</span>
+<span class="fc" id="L152">                    build()</span>
+            );
+        }
+    }
+
+    public Optional&lt;LipidSpeciesInfo&gt; getSpeciesInfo(HeadGroup headGroup, SwissLipidsParser.LcbContext lcbContext) {
+<span class="fc" id="L158">        Integer nHydroxyl = 0;</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (lcbContext.lcb_core() != null) {</span>
+<span class="fc" id="L160">            nHydroxyl = faHelper.getNHydroxyl(lcbContext);</span>
+<span class="fc" id="L161">            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().</span>
+<span class="fc" id="L162">                    level(LipidLevel.SPECIES).</span>
+<span class="fc" id="L163">                    name(&quot;LCB&quot;).</span>
+<span class="fc" id="L164">                    lcb(true).</span>
+<span class="fc" id="L165">                    position(-1).</span>
+<span class="fc" id="L166">                    nCarbon(HandlerUtils.asInt(lcbContext.lcb_core().carbon(), 0)).</span>
+<span class="fc" id="L167">                    nHydroxy(nHydroxyl).</span>
+<span class="fc" id="L168">                    nDoubleBonds(HandlerUtils.asInt(lcbContext.lcb_core().db(), 0)).</span>
+<span class="fc" id="L169">                    lipidFaBondType(faHelper.getLipidLcbBondType(headGroup, lcbContext)).</span>
+<span class="fc" id="L170">                    build()</span>
+            );
+        }
+<span class="nc" id="L173">        throw new ParseTreeVisitorException(&quot;Uninitialized lcb_core context!&quot;);</span>
+    }
+
+    public boolean isIsomericFa(List&lt;SwissLipidsParser.FaContext&gt; faContexts) {
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">        for (SwissLipidsParser.FaContext faContext : faContexts) {</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">            if (faContext.fa_core() != null) {</span>
+<span class="fc" id="L179">                SwissLipidsParser.Fa_coreContext coreCtx = faContext.fa_core();</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">                if (coreCtx.db() != null) {</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">                    int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;</span>
+<span class="fc bfc" id="L182" title="All 4 branches covered.">                    return dbCount == 0 || coreCtx.db().db_positions() != null;</span>
+                }
+            }
+<span class="nc" id="L185">        }</span>
+<span class="nc" id="L186">        return false;</span>
+    }
+
+    public boolean isIsomericFa(SwissLipidsParser.FaContext faContext) {
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">        if (faContext.fa_core() != null) {</span>
+<span class="fc" id="L191">            SwissLipidsParser.Fa_coreContext coreCtx = faContext.fa_core();</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">            if (coreCtx.db() != null) {</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">                int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;</span>
+<span class="fc bfc" id="L194" title="All 4 branches covered.">                return dbCount == 0 || coreCtx.db().db_positions() != null;</span>
+            }
+        }
+<span class="nc" id="L197">        return false;</span>
+    }
+
+    public boolean isIsomericLcb(SwissLipidsParser.LcbContext lcbContext) {
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        if (lcbContext.lcb_core() != null) {</span>
+<span class="nc" id="L202">            SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">            if (coreCtx.db() != null) {</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">                int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;</span>
+<span class="nc bnc" id="L205" title="All 4 branches missed.">                return dbCount == 0 || coreCtx.db().db_positions() != null;</span>
+            }
+        }
+<span class="nc" id="L208">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

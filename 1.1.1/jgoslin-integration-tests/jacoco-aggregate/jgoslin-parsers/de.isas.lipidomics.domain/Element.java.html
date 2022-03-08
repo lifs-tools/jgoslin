@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Element.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">Element.java</span></div><h1>Element.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+/**
+ * Enumeration for typical chemical elements in lipids. Also supports heavy
+ * variants, e.g. C' as the heavy C13 isotope.
+ *
+ * @author  nils.hoffmann
+ */
+<span class="fc" id="L27">public enum Element {</span>
+    
+    /**
+     * Carbon 12C
+     */
+<span class="fc" id="L32">    ELEMENT_C(&quot;C&quot;, &quot;12C&quot;, 12.0, 10),</span>
+    /**
+     * Hydrogen 1H
+     */
+<span class="fc" id="L36">    ELEMENT_H(&quot;H&quot;, &quot;1H&quot;, 1.007825035, 20),</span>
+    /**
+     * Nitrogen 14N
+     */
+<span class="fc" id="L40">    ELEMENT_N(&quot;N&quot;, &quot;14N&quot;, 14.0030740, 30),</span>
+    /**
+     * Oxygen 15O
+     */
+<span class="fc" id="L44">    ELEMENT_O(&quot;O&quot;, &quot;15O&quot;, 15.99491463, 40),</span>
+    /**
+     * Phosphorous 30P
+     */
+<span class="fc" id="L48">    ELEMENT_P(&quot;P&quot;, &quot;30P&quot;, 30.973762, 50),</span>
+    /**
+     * Sulfur 31S
+     */
+<span class="fc" id="L52">    ELEMENT_S(&quot;S&quot;, &quot;31S&quot;, 31.9720707, 60),</span>
+    /**
+     * Deuterium 2H
+     */
+<span class="fc" id="L56">    ELEMENT_H2(&quot;2H&quot;, &quot;H'&quot;, 2.014101779, 70),</span>
+    /**
+     * Heavy carbon 13C
+     */
+<span class="fc" id="L60">    ELEMENT_C13(&quot;13C&quot;, &quot;C'&quot;, 13.0033548378, 80),</span>
+    /**
+     * Heavy nitrogen 15N
+     */
+<span class="fc" id="L64">    ELEMENT_N15(&quot;15N&quot;, &quot;N'&quot;, 15.0001088984, 90),</span>
+    /**
+     * Heavy oxygen 17O
+     */
+<span class="fc" id="L68">    ELEMENT_O17(&quot;17O&quot;, &quot;O'&quot;, 16.9991315, 100),</span>
+    /**
+     * Heavy oxygen 18O
+     */
+<span class="fc" id="L72">    ELEMENT_O18(&quot;18O&quot;, &quot;O''&quot;, 17.9991604, 110),</span>
+    /**
+     * Heavy phosphorus 32P
+     */
+<span class="fc" id="L76">    ELEMENT_P32(&quot;32P&quot;, &quot;P'&quot;, 31.973907274, 120),</span>
+    /**
+     * Heavy sulfur 33S
+     */
+<span class="fc" id="L80">    ELEMENT_S33(&quot;33S&quot;, &quot;S'&quot;, 32.97145876, 130),</span>
+    /**
+     * Heavy sulfur 34S
+     */
+<span class="fc" id="L84">    ELEMENT_S34(&quot;34S&quot;, &quot;S''&quot;, 33.96786690, 140);</span>
+
+    private final String alias;
+    private final String name;
+    private final double mass;
+    private final int order;
+
+<span class="fc" id="L91">    private Element(String name, String alias, double mass, int order) {</span>
+<span class="fc" id="L92">        this.name = name;</span>
+<span class="fc" id="L93">        this.alias = alias;</span>
+<span class="fc" id="L94">        this.mass = mass;</span>
+<span class="fc" id="L95">        this.order = order;</span>
+<span class="fc" id="L96">    }</span>
+
+    public String getName() {
+<span class="fc" id="L99">        return this.name;</span>
+    }
+
+    public String getAlias() {
+<span class="fc" id="L103">        return this.alias;</span>
+    }
+
+    public double getMass() {
+<span class="fc" id="L107">        return this.mass;</span>
+    }
+
+    public int getOrder() {
+<span class="nc" id="L111">        return this.order;</span>
+    }
+
+    /**
+     * Tries to find the corresponding element by name, e.g. 'C' would return
+     * carbon, while '13C' would return the corresponding carbon isotope. Note
+     * that 'C'' is an alias for 13C.
+     *
+     * @param name the name of the chemical element.
+     * @return the corresponding element, if it exists. It not, an empty
+     * optional will be returned.
+     */
+    public static Optional&lt;Element&gt; forName(String name) {
+<span class="fc" id="L124">        return Arrays.asList(values()).stream().filter((element) -&gt; {</span>
+<span class="pc bpc" id="L125" title="1 of 4 branches missed.">            return element.getName().equalsIgnoreCase(name.trim()) || element.getAlias().equalsIgnoreCase(name.trim());</span>
+<span class="fc" id="L126">        }).findFirst();</span>
+    }
+    
+    public static final double ELECTRON_REST_MASS = 0.00054857990946;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

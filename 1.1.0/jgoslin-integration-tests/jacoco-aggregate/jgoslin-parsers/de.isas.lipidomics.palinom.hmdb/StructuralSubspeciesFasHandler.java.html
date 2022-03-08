@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>StructuralSubspeciesFasHandler.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.hmdb</a> &gt; <span class="el_source">StructuralSubspeciesFasHandler.java</span></div><h1>StructuralSubspeciesFasHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.hmdb;
+
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.palinom.HandlerUtils;
+import de.isas.lipidomics.palinom.HMDBParser;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * Handler for Structural FAs.
+ *
+ * @author  nils.hoffmann
+ */
+class StructuralSubspeciesFasHandler {
+
+    private final IsomericSubspeciesFasHandler isfh;
+    private final FattyAcylHelper faHelper;
+
+<span class="fc" id="L43">    public StructuralSubspeciesFasHandler(IsomericSubspeciesFasHandler isfh, FattyAcylHelper faHelper) {</span>
+<span class="fc" id="L44">        this.isfh = isfh;</span>
+<span class="fc" id="L45">        this.faHelper = faHelper;</span>
+<span class="fc" id="L46">    }</span>
+
+    public Optional&lt;LipidSpecies&gt; visitStructuralSubspeciesFas(HeadGroup headGroup, List&lt;HMDBParser.FaContext&gt; faContexts) {
+<span class="fc" id="L49">        List&lt;FattyAcid&gt; fas = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L50">        int nIsomericFas = 0;</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (int i = 0; i &lt; faContexts.size(); i++) {</span>
+<span class="fc" id="L52">            FattyAcid fa = buildStructuralFa(headGroup, faContexts.get(i), &quot;FA&quot; + (i + 1), i + 1);</span>
+<span class="fc" id="L53">            fas.add(fa);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if (fa.getType() == FattyAcidType.ISOMERIC) {</span>
+<span class="fc" id="L55">                nIsomericFas++;</span>
+            }
+        }
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (nIsomericFas == fas.size()) {</span>
+<span class="nc" id="L59">            FattyAcid[] arrs = new FattyAcid[fas.size()];</span>
+<span class="nc" id="L60">            fas.stream().map((t) -&gt; {</span>
+<span class="nc" id="L61">                return (FattyAcid) t;</span>
+<span class="nc" id="L62">            }).collect(Collectors.toList()).toArray(arrs);</span>
+<span class="nc" id="L63">            return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));</span>
+        } else {
+<span class="fc" id="L65">            FattyAcid[] arrs = new FattyAcid[fas.size()];</span>
+<span class="fc" id="L66">            fas.toArray(arrs);</span>
+<span class="fc" id="L67">            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));</span>
+        }
+    }
+
+    public FattyAcid buildStructuralFa(HeadGroup headGroup, HMDBParser.FaContext ctx, String faName, int position) {
+<span class="fc" id="L72">        FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();</span>
+<span class="fc" id="L73">        LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (ctx.fa_core() != null) {</span>
+<span class="fc" id="L75">            fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if (ctx.fa_core().db() != null) {</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0));</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">                if (ctx.fa_core().db().db_positions() != null) {</span>
+<span class="fc" id="L79">                    return isfh.buildIsomericFa(headGroup, ctx, faName, position);</span>
+                }
+            }
+<span class="fc" id="L82">            fa.lipidFaBondType(lfbt);</span>
+<span class="fc" id="L83">            return fa.name(faName).position(position).build();</span>
+<span class="nc bnc" id="L84" title="All 4 branches missed.">        } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs</span>
+<span class="nc" id="L85">            throw new RuntimeException(&quot;Support for lcbs is implemented in &quot; + StructuralSubspeciesLcbHandler.class.getSimpleName() + &quot;!&quot;);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        } else if (ctx.furan_fa() != null) {</span>
+<span class="nc" id="L87">            throw new ParseTreeVisitorException(&quot;Furan FAs are currently unsupported! Please contact the developers at https://lifs.isas.de/support for assistance.&quot;);</span>
+        } else {
+<span class="nc" id="L89">            throw new ParseTreeVisitorException(&quot;Uninitialized FaContext!&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

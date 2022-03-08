@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LipidAdduct.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">LipidAdduct.java</span></div><h1>LipidAdduct.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import static de.isas.lipidomics.domain.LipidLevel.ISOMERIC_SUBSPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.MOLECULAR_SUBSPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.SPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.STRUCTURAL_SUBSPECIES;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+/**
+ * Base class for lipid names parsed using the different grammars. This can
+ * contain a lipid, an adduct, a sum formula and a fragment.
+ *
+ * @author nils.hoffmann
+ * @see LipidSpecies
+ * @see Adduct
+ * @see Fragment
+ */
+<span class="fc" id="L34">@AllArgsConstructor</span>
+<span class="nc bnc" id="L35" title="All 30 branches missed.">@Data</span>
+public class LipidAdduct {
+
+<span class="fc" id="L38">    private LipidSpecies lipid;</span>
+<span class="nc" id="L39">    private Adduct adduct;</span>
+<span class="nc" id="L40">    private Fragment fragment;</span>
+
+    /**
+     * Calculates the mass based on the elements of this lipid adduct.
+     *
+     * @return the mass (in Dalton).
+     */
+    public Double getMass() {
+<span class="fc" id="L48">        ElementTable elements = getElements();</span>
+<span class="fc" id="L49">        int charge = 0;</span>
+<span class="fc" id="L50">        double mass = 0;</span>
+
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (adduct != null) {</span>
+<span class="fc" id="L53">            charge = adduct.getCharge();</span>
+        }
+
+<span class="fc" id="L56">        mass = elements.getMass();</span>
+
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (charge != 0) {</span>
+<span class="fc" id="L59">            mass = (mass - charge * Element.ELECTRON_REST_MASS) / Math.abs(charge);</span>
+        }
+
+<span class="fc" id="L62">        return mass;</span>
+    }
+
+    /**
+     * Returns the elemental composition table.
+     *
+     * @return the elemental composition table.
+     */
+    public ElementTable getElements() {
+<span class="fc" id="L71">        ElementTable elements = new ElementTable();</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (lipid != null) {</span>
+<span class="fc" id="L73">            elements.add(lipid.getElements());</span>
+        }
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        if (adduct != null) {</span>
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">            if (lipid != null &amp;&amp; lipid.getInfo().isPresent()) {</span>
+<span class="fc" id="L77">                LipidSpeciesInfo info = lipid.getInfo().orElse(LipidSpeciesInfo.NONE);</span>
+                //only add elements on species level or below
+                //higher levels will not return a mass 
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                switch (info.getLevel()) {</span>
+                    case ISOMERIC_SUBSPECIES:
+                    case MOLECULAR_SUBSPECIES:
+                    case STRUCTURAL_SUBSPECIES:
+                    case SPECIES:
+<span class="fc" id="L85">                        elements.add(adduct.getElements());</span>
+                        break;
+                }
+            }
+        }
+<span class="fc" id="L90">        return elements;</span>
+    }
+
+    /**
+     * Returns the sum formula.
+     *
+     * @return the sum formula.
+     */
+    public String getSumFormula() {
+<span class="fc" id="L99">        return getElements().getSumFormula();</span>
+    }
+
+    /**
+     * Returns the non-normalized (original head group) lipid name for the
+     * native level of this lipid.
+     *
+     * @return the non-normalized lipid name with adduct.
+     */
+    public String getLipidString() {
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L110">            return getLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());</span>
+        }
+<span class="nc" id="L112">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Returns the non-normalized (original head group) lipid name for the given
+     * level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the non-normalized lipid name with adduct.
+     */
+    public String getLipidString(LipidLevel level) {
+<span class="nc" id="L123">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L125">            sb.append(lipid.getLipidString(level));</span>
+        } else {
+<span class="nc" id="L127">            return &quot;&quot;;</span>
+        }
+
+<span class="nc bnc" id="L130" title="All 4 branches missed.">        if (adduct != null &amp;&amp; !adduct.getLipidString().isEmpty()) {</span>
+<span class="nc" id="L131">            sb.append(adduct.getLipidString());</span>
+        }
+<span class="nc" id="L133">        return sb.toString();</span>
+    }
+
+    /**
+     * Returns the normalized (class name as head group) lipid name for the
+     * native level of this lipid.
+     *
+     * @return the normalized lipid name with adduct.
+     */
+    public String getNormalizedLipidString() {
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L144">            return getNormalizedLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());</span>
+        }
+<span class="nc" id="L146">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Returns the normalized (class name as head group) lipid name for the
+     * given level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the normalized lipid name with adduct.
+     */
+    public String getNormalizedLipidString(LipidLevel level) {
+<span class="nc" id="L157">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L159">            sb.append(lipid.getLipidString(level, true));</span>
+        } else {
+<span class="nc" id="L161">            return &quot;&quot;;</span>
+        }
+
+<span class="nc bnc" id="L164" title="All 4 branches missed.">        if (adduct != null &amp;&amp; !adduct.getLipidString().isEmpty()) {</span>
+<span class="nc" id="L165">            sb.append(adduct.getLipidString());</span>
+        }
+<span class="nc" id="L167">        return sb.toString();</span>
+    }
+
+    /**
+     * Returns the class name for this lipid adduct.
+     *
+     * @return the class name.
+     */
+    public String getClassName() {
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L177">            return lipid.getLipidClass().orElse(LipidClass.UNDEFINED).getAbbreviation();</span>
+        } else {
+<span class="nc" id="L179">            return &quot;&quot;;</span>
+        }
+    }
+
+    /**
+     * Returns the non-normalized lipid adduct name (original head group) with
+     * fragment, if available, for the given level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the non-normalized lipid name with adduct and fragment.
+     */
+    public String getLipidFragmentString(LipidLevel level) {
+<span class="nc" id="L191">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L193">            sb.append(getLipidString(level));</span>
+        } else {
+<span class="nc" id="L195">            return &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L197" title="All 4 branches missed.">        if (adduct != null &amp;&amp; !adduct.getLipidString().isEmpty()) {</span>
+<span class="nc" id="L198">            sb.append(adduct.getLipidString());</span>
+        }
+<span class="nc bnc" id="L200" title="All 4 branches missed.">        if (fragment != null &amp;&amp; !fragment.getLipidString().isEmpty()) {</span>
+<span class="nc" id="L201">            sb.append(&quot; - &quot;).append(fragment.getLipidString());</span>
+        }
+<span class="nc" id="L203">        return sb.toString();</span>
+    }
+
+    /**
+     * Returns the normalized lipid adduct name (class name as head group) with
+     * fragment for the given level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the normalized lipid name with adduct and fragment.
+     */
+    public String getNormalizedLipidFragmentString(LipidLevel level) {
+<span class="nc" id="L214">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L216">            sb.append(getNormalizedLipidString(level));</span>
+        } else {
+<span class="nc" id="L218">            return &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L220" title="All 4 branches missed.">        if (adduct != null &amp;&amp; !adduct.getLipidString().isEmpty()) {</span>
+<span class="nc" id="L221">            sb.append(adduct.getLipidString());</span>
+        }
+<span class="nc bnc" id="L223" title="All 4 branches missed.">        if (fragment != null &amp;&amp; !fragment.getLipidString().isEmpty()) {</span>
+<span class="nc" id="L224">            sb.append(&quot; - &quot;).append(fragment.getLipidString());</span>
+        }
+<span class="nc" id="L226">        return sb.toString();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (lipid != null) {</span>
+<span class="nc" id="L232">            return getLipidFragmentString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());</span>
+        }
+<span class="nc" id="L234">        return &quot;&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

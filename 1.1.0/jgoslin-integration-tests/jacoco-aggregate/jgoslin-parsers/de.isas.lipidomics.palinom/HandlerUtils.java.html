@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>HandlerUtils.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom</a> &gt; <span class="el_source">HandlerUtils.java</span></div><h1>HandlerUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom;
+
+import java.util.Optional;
+import java.util.function.Function;
+import org.antlr.v4.runtime.tree.RuleNode;
+
+/**
+ * Common functions for ANTLRv4's RuleNode handling.
+ *
+ * @author  nils.hoffmann
+ */
+<span class="nc" id="L27">public class HandlerUtils {</span>
+
+    /**
+     * Parse the provided context's text value as an Integer or use default
+     * value.
+     *
+     * @param &lt;T&gt; the type of the context.
+     * @param context the context.
+     * @param defaultValue the default value.
+     * @return the context's text value as an integer, or the default value.
+     */
+    public static &lt;T extends RuleNode&gt; Integer asInt(T context, Integer defaultValue) {
+<span class="fc" id="L39">        return maybeMapOr(context, (t) -&gt; {</span>
+<span class="fc" id="L40">            return Integer.parseInt(t.getText());</span>
+        }, defaultValue);
+    }
+
+    /**
+     * Wrap t as an optional of nullable.
+     *
+     * @param &lt;T&gt; the type of t.
+     * @param t the argument.
+     * @return an optional.
+     */
+    public static &lt;T&gt; Optional&lt;T&gt; maybe(T t) {
+<span class="fc" id="L52">        return Optional.ofNullable(t);</span>
+    }
+
+    /**
+     * Wrap t as an optional and return r if t is null or empty.
+     *
+     * @param &lt;T&gt; the type of t.
+     * @param &lt;R&gt; the type of the return value r.
+     * @param t the argument to wrap.
+     * @param mapper the mapping function to get from t to r, if t is not null.
+     * @param r the default return value.
+     * @return the mapped value for t of type R, or the default value r.
+     */
+    public static &lt;T, R&gt; R maybeMapOr(T t, Function&lt;? super T, R&gt; mapper, R r) {
+<span class="fc" id="L66">        return maybe(t).map(mapper).orElse(r);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

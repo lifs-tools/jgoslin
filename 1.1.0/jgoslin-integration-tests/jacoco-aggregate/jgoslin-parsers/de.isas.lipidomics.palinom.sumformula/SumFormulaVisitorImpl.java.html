@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SumFormulaVisitorImpl.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.sumformula</a> &gt; <span class="el_source">SumFormulaVisitorImpl.java</span></div><h1>SumFormulaVisitorImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.sumformula;
+
+import de.isas.lipidomics.domain.Element;
+import de.isas.lipidomics.domain.ElementTable;
+import de.isas.lipidomics.palinom.SumFormulaBaseVisitor;
+import de.isas.lipidomics.palinom.SumFormulaParser;
+import java.util.Optional;
+
+/**
+ *
+ * Base visitor implementation for the SumFormula grammar.
+ *
+ * Overriding implementation of {@link SumFormulaBaseVisitor}. Creates
+ * {@link ElementTable} instances from the provided context.
+ *
+ * @see SumFormulaVisitorParser
+ * @author nils.hoffmann
+ */
+<span class="fc" id="L34">public class SumFormulaVisitorImpl extends SumFormulaBaseVisitor&lt;ElementTable&gt; {</span>
+
+    @Override
+    public ElementTable visitMolecule(SumFormulaParser.MoleculeContext ctx) {
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if (ctx.molecule_rule() != null) {</span>
+<span class="fc" id="L39">            SumFormulaParser.Molecule_groupContext moleculeGroup = ctx.molecule_rule().molecule_group();</span>
+<span class="fc" id="L40">            return visitMoleculeGroup(moleculeGroup, new ElementTable());</span>
+        }
+<span class="nc" id="L42">        return new ElementTable();</span>
+    }
+
+    private ElementTable visitMoleculeGroup(SumFormulaParser.Molecule_groupContext moleculeGroup, ElementTable table) {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (moleculeGroup.element_group() != null) {</span>
+<span class="fc" id="L47">            visitElementGroup(moleculeGroup.element_group(), table);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        } else if (moleculeGroup.single_element() != null) {</span>
+<span class="fc" id="L49">            visitSingleElement(moleculeGroup.single_element(), table);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        } else if (moleculeGroup.molecule_group() != null) {</span>
+<span class="fc" id="L51">            moleculeGroup.molecule_group().stream().forEach((moleculeGroupCtx) -&gt; {</span>
+<span class="fc" id="L52">                visitMoleculeGroup(moleculeGroupCtx, table);</span>
+<span class="fc" id="L53">            });</span>
+        }
+<span class="fc" id="L55">        return table;</span>
+    }
+
+    private ElementTable visitSingleElement(SumFormulaParser.Single_elementContext singleElement, ElementTable table) {
+<span class="fc" id="L59">        Optional&lt;Element&gt; element = Element.forName(singleElement.element().getText());</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if (element.isPresent()) {</span>
+<span class="fc" id="L61">            table.increment(element.get());</span>
+        }
+<span class="fc" id="L63">        return table;</span>
+    }
+
+    private ElementTable visitElementGroup(SumFormulaParser.Element_groupContext elementGroup, ElementTable table) {
+<span class="fc" id="L67">        Integer count = 0;</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if (elementGroup.count() == null) {</span>
+<span class="nc" id="L69">            count = 1;</span>
+        } else {
+<span class="fc" id="L71">            count = Integer.parseInt(elementGroup.count().getText());</span>
+        }
+<span class="fc" id="L73">        Optional&lt;Element&gt; element = Element.forName(elementGroup.element().getText());</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (element.isPresent()) {</span>
+<span class="fc" id="L75">            table.incrementBy(element.get(), count);</span>
+        }
+<span class="fc" id="L77">        return table;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

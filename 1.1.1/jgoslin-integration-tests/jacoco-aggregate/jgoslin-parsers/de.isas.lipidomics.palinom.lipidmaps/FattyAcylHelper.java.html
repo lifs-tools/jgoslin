@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>FattyAcylHelper.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.lipidmaps</a> &gt; <span class="el_source">FattyAcylHelper.java</span></div><h1>FattyAcylHelper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.lipidmaps;
+
+import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.ModificationsList;
+import de.isas.lipidomics.palinom.HandlerUtils;
+import de.isas.lipidomics.palinom.LipidMapsParser;
+import de.isas.lipidomics.palinom.LipidMapsParser.ModificationContext;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+import org.apache.commons.lang3.tuple.Pair;
+
+/**
+ * Helper class for FA and LCB handling.
+ *
+ * @author  nils.hoffmann
+ */
+<span class="fc" id="L36">class FattyAcylHelper {</span>
+
+    public LipidFaBondType getLipidLcbBondType(LipidMapsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+<span class="fc" id="L39">        LipidFaBondType lfbt = LipidFaBondType.ESTER;</span>
+<span class="fc" id="L40">        return lfbt;</span>
+    }
+
+    public LipidFaBondType getLipidFaBondType(LipidMapsParser.FaContext faContext) throws ParseTreeVisitorException {
+<span class="fc" id="L44">        LipidFaBondType lfbt = LipidFaBondType.ESTER;</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (faContext.fa_unmod().ether() != null) {</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">            if (null == faContext.fa_unmod().ether().getText()) {</span>
+<span class="nc" id="L47">                throw new ParseTreeVisitorException(&quot;Undefined ether context value!&quot;);</span>
+            } else {
+<span class="pc bpc" id="L49" title="1 of 3 branches missed.">                switch (faContext.fa_unmod().ether().getText()) {</span>
+                    case &quot;O-&quot;:
+<span class="fc" id="L51">                        lfbt = LipidFaBondType.ETHER_PLASMANYL;</span>
+<span class="fc" id="L52">                        break;</span>
+                    case &quot;P-&quot;:
+<span class="fc" id="L54">                        lfbt = LipidFaBondType.ETHER_PLASMENYL;</span>
+<span class="fc" id="L55">                        break;</span>
+                    default:
+<span class="nc" id="L57">                        throw new ParseTreeVisitorException(&quot;Unknown ether context value: &quot; + faContext.fa_unmod().ether());</span>
+                }
+            }
+        }
+<span class="fc" id="L61">        return lfbt;</span>
+    }
+
+    public Integer getHydroxyCount(LipidMapsParser.LcbContext ctx) {
+<span class="fc" id="L65">        Integer nHydroxy = Optional.ofNullable(ctx.hydroxyl_lcb()).map((t) -&gt; {</span>
+<span class="fc" id="L66">            String hydroxy = t.getText();</span>
+<span class="pc bpc" id="L67" title="1 of 4 branches missed.">            switch (hydroxy) {</span>
+                case &quot;m&quot;:
+<span class="fc" id="L69">                    return 1;</span>
+                case &quot;d&quot;:
+<span class="fc" id="L71">                    return 2;</span>
+                case &quot;t&quot;:
+<span class="fc" id="L73">                    return 3;</span>
+            }
+<span class="nc" id="L75">            return Integer.valueOf(0);</span>
+<span class="fc" id="L76">        }).orElse(0);</span>
+<span class="fc" id="L77">        return nHydroxy;</span>
+    }
+
+    public Map&lt;Integer, String&gt; resolveDoubleBondPosition(LipidMapsParser.Db_positionContext dbContext, Map&lt;Integer, String&gt; doubleBondPositions) {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (dbContext.db_single_position() != null) {</span>
+<span class="fc" id="L82">            doubleBondPositions.put(</span>
+<span class="fc" id="L83">                    Integer.parseInt(dbContext.db_single_position().db_position_number().getText()),</span>
+<span class="fc" id="L84">                    Optional.ofNullable(dbContext.db_single_position().cistrans()).map((t) -&gt; {</span>
+<span class="fc" id="L85">                        return t.getText();</span>
+<span class="fc" id="L86">                    }).orElse(&quot;&quot;));</span>
+        } else {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            for (LipidMapsParser.Db_positionContext dbSubContext : dbContext.db_position()) {</span>
+<span class="fc" id="L89">                resolveDoubleBondPosition(dbSubContext, doubleBondPositions);</span>
+<span class="fc" id="L90">            }</span>
+        }
+<span class="fc" id="L92">        return doubleBondPositions;</span>
+    }
+
+    /**
+     * Resolve double bond positions from the given Db_positionsContext.
+     *
+     * @param lfbt the bond type between lipid head group and fatty acyl.
+     * @param context the double bond context.
+     * @return a map of position to double bond configuration mappings.
+     */
+    public Map&lt;Integer, String&gt; resolveDoubleBondPositions(LipidFaBondType lfbt, LipidMapsParser.Db_positionsContext context) {
+<span class="fc" id="L103">        Map&lt;Integer, String&gt; doubleBondPositions = new TreeMap&lt;&gt;();</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (context.db_position() != null) {</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            if (lfbt == LipidFaBondType.ETHER_PLASMENYL) {</span>
+<span class="fc" id="L106">                doubleBondPositions.put(1, &quot;Z&quot;); // add implicit double bond for plasmenyls</span>
+            }
+<span class="fc" id="L108">            return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);</span>
+        } else {
+<span class="nc" id="L110">            throw new ParseTreeVisitorException(&quot;Unhandled state in IsomericFattyAcid - double bond positions!&quot;);</span>
+        }
+    }
+
+    public ModificationsList resolveModification(ModificationContext context, ModificationsList mods) {
+<span class="fc" id="L115">        Integer contextNumber = -1;</span>
+<span class="fc" id="L116">        String modText = &quot;&quot;;</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if (context.number() != null) {</span>
+<span class="fc" id="L118">            contextNumber = HandlerUtils.asInt(context.number(), -1);</span>
+        }
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (context.mod_text() != null) {</span>
+<span class="fc" id="L121">            modText = context.mod_text().getText();</span>
+<span class="fc" id="L122">            mods.add(Pair.of(contextNumber, modText));</span>
+        }
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if (context.modification() != null) {</span>
+<span class="fc" id="L125">            return resolveModificationList(context.modification(), mods);</span>
+        }
+<span class="nc" id="L127">        return mods;</span>
+    }
+
+    public ModificationsList resolveModificationList(List&lt;ModificationContext&gt; modifications, ModificationsList mods) {
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        for (ModificationContext context : modifications) {</span>
+<span class="fc" id="L132">            resolveModification(context, mods);</span>
+<span class="fc" id="L133">        }</span>
+<span class="fc" id="L134">        return mods;</span>
+    }
+
+    public ModificationsList resolveModifications(LipidMapsParser.ModificationContext modifications) {
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (modifications != null) {</span>
+<span class="fc" id="L139">            ModificationsList mods = new ModificationsList();</span>
+<span class="fc" id="L140">            return resolveModificationList(Arrays.asList(modifications), mods);</span>
+        } else {
+<span class="nc" id="L142">            throw new ParseTreeVisitorException(&quot;Unhandled state in FattyAcid Modifications!&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

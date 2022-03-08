@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>FattyAcylHelper.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.goslin</a> &gt; <span class="el_source">FattyAcylHelper.java</span></div><h1>FattyAcylHelper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.goslin;
+
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.palinom.GoslinParser;
+import de.isas.lipidomics.palinom.HandlerUtils;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+
+/**
+ * Helper class for FA and LCB handling.
+ *
+ * @author  nils.hoffmann
+ */
+<span class="fc" id="L32">class FattyAcylHelper {</span>
+
+    /**
+     * Returns the lipid fa bond type for an LcbContext.
+     *
+     * @param headGroup the head group.
+     * @param lcbContext the lcb context.
+     * @return the lipid fa bond type.
+     */
+    public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, GoslinParser.LcbContext lcbContext) {
+<span class="nc" id="L42">        LipidFaBondType lfbt = LipidFaBondType.ESTER;</span>
+<span class="nc" id="L43">        return lfbt;</span>
+    }
+
+    /**
+     * Returns the number of hydroxyls for an LcbContext.
+     *
+     * @param lcbContext the lcb context.
+     * @return the number of hydroxyls.
+     */
+    public Integer getNHydroxyl(GoslinParser.LcbContext lcbContext) {
+<span class="nc" id="L53">        Integer hydroxyl = 0;</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (lcbContext.lcb_pure() != null) {</span>
+<span class="nc" id="L55">            GoslinParser.Lcb_pureContext pureCtx = lcbContext.lcb_pure();</span>
+<span class="nc" id="L56">            return HandlerUtils.asInt(pureCtx, hydroxyl);</span>
+        }
+<span class="nc" id="L58">        throw new ParseTreeVisitorException(&quot;Uninitialized lcb_core context!&quot;);</span>
+    }
+
+    /**
+     * Returns the lipid fa bond type for an FaContext.
+     *
+     * @param headGroup the head group.
+     * @param faContext the fa context.
+     * @return the lipid fa bond type.
+     * @throws ParseTreeVisitorException for unknown ether context values.
+     */
+    public LipidFaBondType getLipidFaBondType(HeadGroup headGroup, GoslinParser.FaContext faContext) throws ParseTreeVisitorException {
+<span class="fc" id="L70">        LipidFaBondType lfbt = LipidFaBondType.ESTER;</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (faContext.ether() != null) {</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if (&quot;a&quot;.equals(faContext.ether().getText())) {</span>
+<span class="fc" id="L73">                lfbt = LipidFaBondType.ETHER_PLASMANYL;</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">            } else if (&quot;p&quot;.equals(faContext.ether().getText())) {</span>
+<span class="fc" id="L75">                lfbt = LipidFaBondType.ETHER_PLASMENYL;</span>
+            } else {
+<span class="nc" id="L77">                throw new ParseTreeVisitorException(&quot;Unknown ether context value: &quot; + faContext.ether());</span>
+            }
+        }
+<span class="fc" id="L80">        return lfbt;</span>
+    }
+
+    /**
+     * Resolve double bond positions from the given Db_positionContext.
+     *
+     * @param dbContext the double bond context.
+     * @param doubleBondPositions a map of position to double bond configuration
+     * mappings.
+     * @return a map of position to double bond configuration mappings.
+     */
+    public Map&lt;Integer, String&gt; resolveDoubleBondPosition(GoslinParser.Db_positionContext dbContext, Map&lt;Integer, String&gt; doubleBondPositions) {
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        if (dbContext.db_single_position() != null) {</span>
+<span class="nc" id="L93">            doubleBondPositions.put(</span>
+<span class="nc" id="L94">                    Integer.parseInt(dbContext.db_single_position().db_position_number().getText()),</span>
+<span class="nc" id="L95">                    Optional.ofNullable(dbContext.db_single_position().cistrans()).map((t) -&gt; {</span>
+<span class="nc" id="L96">                        return t.getText();</span>
+<span class="nc" id="L97">                    }).orElse(&quot;&quot;));</span>
+        } else {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">            for (GoslinParser.Db_positionContext dbSubContext : dbContext.db_position()) {</span>
+<span class="nc" id="L100">                resolveDoubleBondPosition(dbSubContext, doubleBondPositions);</span>
+<span class="nc" id="L101">            }</span>
+        }
+<span class="nc" id="L103">        return doubleBondPositions;</span>
+    }
+
+    /**
+     * Resolve double bond positions from the given Db_positionsContext.
+     *
+     * @param context the double bond context.
+     * @return a map of position to double bond configuration mappings.
+     */
+    public Map&lt;Integer, String&gt; resolveDoubleBondPositions(GoslinParser.Db_positionsContext context) {
+<span class="nc" id="L113">        Map&lt;Integer, String&gt; doubleBondPositions = new TreeMap&lt;&gt;();</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (context.db_position() != null) {</span>
+<span class="nc" id="L115">            return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);</span>
+        } else {
+<span class="nc" id="L117">            throw new ParseTreeVisitorException(&quot;Unhandled state in IsomericFattyAcid - double bond positions!&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

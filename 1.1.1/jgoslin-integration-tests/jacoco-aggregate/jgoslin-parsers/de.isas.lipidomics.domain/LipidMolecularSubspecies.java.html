@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LipidMolecularSubspecies.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">LipidMolecularSubspecies.java</span></div><h1>LipidMolecularSubspecies.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * A molecular subspecies. Child of LipidSpecies. Individual FAs are known, but
+ * neither their sn positions nor double bond positions.
+ *
+ * Example: Phosphatidylinositol (8:0-8:0) or PI(8:0-8:0)
+ *
+ * @author nils.hoffmann
+ * @see LipidSpecies
+ */
+<span class="fc" id="L38">@Slf4j</span>
+@Data
+<span class="nc bnc" id="L40" title="All 16 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
+public class LipidMolecularSubspecies extends LipidSpecies {
+
+<span class="fc" id="L43">    protected final Map&lt;String, FattyAcid&gt; fa = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="nc" id="L45">    @Builder</span>
+    public LipidMolecularSubspecies(HeadGroup headGroup, FattyAcid... fa) {
+<span class="fc" id="L47">        super(headGroup);</span>
+<span class="fc" id="L48">        int nCarbon = 0;</span>
+<span class="fc" id="L49">        int nHydroxyl = 0;</span>
+<span class="fc" id="L50">        int nDoubleBonds = 0;</span>
+<span class="fc" id="L51">        ModificationsList mods = new ModificationsList();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        for (FattyAcid fas : fa) {</span>
+//            if (fas.getPosition() != -1) {
+//                throw new ConstraintViolationException(&quot;MolecularFattyAcid &quot; + fas.getName() + &quot; must have position set to -1! Was: &quot; + fas.getPosition());
+//            }
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">            if (this.fa.containsKey(fas.getName())) {</span>
+<span class="nc" id="L57">                throw new ConstraintViolationException(</span>
+<span class="nc" id="L58">                        &quot;FA names must be unique! FA with name &quot; + fas.getName() + &quot; was already added!&quot;);</span>
+            } else {
+<span class="fc" id="L60">                this.fa.put(fas.getName(), fas);</span>
+<span class="fc" id="L61">                nCarbon += fas.getNCarbon();</span>
+<span class="fc" id="L62">                nHydroxyl += fas.getNHydroxy();</span>
+<span class="fc" id="L63">                nDoubleBonds += fas.getNDoubleBonds();</span>
+<span class="fc" id="L64">                mods.addAll(fas.getModifications());</span>
+            }
+
+        }
+<span class="fc" id="L68">        super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().</span>
+<span class="fc" id="L69">                level(LipidLevel.MOLECULAR_SUBSPECIES).</span>
+<span class="fc" id="L70">                name(headGroup.getName()).</span>
+<span class="fc" id="L71">                position(-1).</span>
+<span class="fc" id="L72">                nCarbon(nCarbon).</span>
+<span class="fc" id="L73">                nHydroxy(nHydroxyl).</span>
+<span class="fc" id="L74">                nDoubleBonds(nDoubleBonds).</span>
+<span class="fc" id="L75">                lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).</span>
+<span class="fc" id="L76">                modifications(mods).</span>
+<span class="fc" id="L77">                build()</span>
+        );
+<span class="fc" id="L79">    }</span>
+
+    @Override
+    public Map&lt;String, FattyAcid&gt; getFa() {
+<span class="fc" id="L83">        return Collections.unmodifiableMap(fa);</span>
+    }
+
+    protected String getHeadGroupSuffix() {
+<span class="nc" id="L87">        String hgToFaSep = &quot; &quot;;</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (isEtherLipid()) {</span>
+<span class="nc" id="L89">            hgToFaSep = &quot; O-&quot;;</span>
+        }
+<span class="nc" id="L91">        return hgToFaSep;</span>
+    }
+
+    protected StringBuilder buildSubspeciesHeadGroupString(String headGroup, boolean normalizeHeadGroup) {
+<span class="nc" id="L95">        StringBuilder lipidString = new StringBuilder();</span>
+<span class="nc" id="L96">        lipidString.append(getHeadGroup().getLipidClass().map((lclass) -&gt; {</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            switch (lclass) {</span>
+//                case SE:
+                case SE_27_1:
+                case SE_27_2:
+                case SE_28_2:
+                case SE_28_3:
+                case SE_29_2:
+                case SE_30_2:
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                    if (!getFa().isEmpty()) {</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                        return (normalizeHeadGroup ? headGroup : getNormalizedHeadGroup()) + getHeadGroupSuffix().trim() + &quot;/&quot;;</span>
+                    }
+            }
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            return headGroup + (getFa().isEmpty() ? &quot;&quot; : getHeadGroupSuffix());</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        }).orElse(headGroup + (getFa().isEmpty() ? &quot;&quot; : getHeadGroupSuffix())));</span>
+<span class="nc" id="L111">        return lipidString;</span>
+    }
+
+    protected String buildLipidSubspeciesName(LipidLevel level, String faSeparator, String headGroup, boolean isNormalized) {
+<span class="nc" id="L115">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L116">        String faStrings = getFa().values().stream().map((fa) -&gt; {</span>
+<span class="nc" id="L117">            return fa.buildSubstructureName(level);</span>
+<span class="nc" id="L118">        }).collect(Collectors.joining(faSeparator));</span>
+<span class="nc" id="L119">        return sb.append(buildSubspeciesHeadGroupString(headGroup, isNormalized)</span>
+<span class="nc" id="L120">        ).append(faStrings).toString();</span>
+    }
+
+    @Override
+    public String getLipidString(LipidLevel level) {
+<span class="nc" id="L125">        return this.getLipidString(level, false);</span>
+    }
+
+    @Override
+    public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();</span>
+<span class="nc bnc" id="L131" title="All 3 branches missed.">        switch (level) {</span>
+            case MOLECULAR_SUBSPECIES:
+<span class="nc" id="L133">                return buildLipidSubspeciesName(level, &quot;-&quot;, headGroup, normalizeHeadGroup);</span>
+            case CATEGORY:
+            case CLASS:
+            case SPECIES:
+<span class="nc" id="L137">                return super.getLipidString(level, normalizeHeadGroup);</span>
+            default:
+<span class="nc" id="L139">                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();</span>
+<span class="nc" id="L140">                throw new ConstraintViolationException(getClass().getSimpleName() + &quot; can not create a string for lipid with level &quot; + thisLevel + &quot; for level &quot; + level + &quot;: target level is more specific than this lipid's level!&quot;);</span>
+        }
+    }
+
+    @Override
+    public String getNormalizedLipidString() {
+<span class="nc" id="L146">        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);</span>
+    }
+
+    @Override
+    public boolean validate() {
+<span class="nc" id="L151">        return true;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L156">        return getLipidString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

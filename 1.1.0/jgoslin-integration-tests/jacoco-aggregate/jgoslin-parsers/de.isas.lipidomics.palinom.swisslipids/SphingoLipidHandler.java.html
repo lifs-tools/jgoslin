@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SphingoLipidHandler.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.swisslipids</a> &gt; <span class="el_source">SphingoLipidHandler.java</span></div><h1>SphingoLipidHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.swisslipids;
+
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
+import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Handler implementation for Sphingolipids.
+ *
+ * @author  nils.hoffmann
+ */
+class SphingoLipidHandler implements ParserRuleContextHandler&lt;Lipid_pureContext, LipidSpecies&gt; {
+
+    private final StructuralSubspeciesLcbHandler sslh;
+    private final IsomericSubspeciesLcbHandler isfh;
+    private final FattyAcylHandler fhf;
+
+<span class="fc" id="L39">    public SphingoLipidHandler(StructuralSubspeciesLcbHandler sslh, IsomericSubspeciesLcbHandler isfh, FattyAcylHandler fhf) {</span>
+<span class="fc" id="L40">        this.sslh = sslh;</span>
+<span class="fc" id="L41">        this.isfh = isfh;</span>
+<span class="fc" id="L42">        this.fhf = fhf;</span>
+<span class="fc" id="L43">    }</span>
+
+    @Override
+    public LipidSpecies handle(Lipid_pureContext t) {
+<span class="fc" id="L47">        return handleSphingolipid(t).orElse(LipidSpecies.NONE);</span>
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleSphingolipid(SwissLipidsParser.Lipid_pureContext ctx) throws RuntimeException {
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (ctx.sl() != null) {</span>
+<span class="fc" id="L52">            return handleSphingoLcb(ctx.sl());</span>
+        } else {
+<span class="nc" id="L54">            throw new ParseTreeVisitorException(&quot;Context for SL was null!&quot;);</span>
+        }
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleSphingoLcb(SwissLipidsParser.SlContext slc) {
+<span class="fc" id="L59">        HeadGroup headGroup = new HeadGroup(slc.sl_hg().getText());</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">        if (slc.sl_lcb() != null &amp;&amp; slc.sl_lcb().sl_lcb_species() != null) { //species level</span>
+<span class="fc" id="L61">            return fhf.visitSpeciesLcb(headGroup, slc.sl_lcb().sl_lcb_species().lcb());</span>
+<span class="pc bpc" id="L62" title="2 of 4 branches missed.">        } else if (slc.sl_lcb() != null &amp;&amp; slc.sl_lcb().sl_lcb_subspecies() != null) { // subspecies level</span>
+<span class="fc" id="L63">            SwissLipidsParser.Sl_lcb_subspeciesContext slsc = slc.sl_lcb().sl_lcb_subspecies();</span>
+<span class="fc" id="L64">            List&lt;SwissLipidsParser.FaContext&gt; faContexts = Arrays.asList(slsc.fa());</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (fhf.isIsomericFa(slsc.fa())) {</span>
+<span class="fc" id="L66">                return isfh.visitIsomericSubspeciesLcb(headGroup, slsc.lcb(), faContexts);</span>
+            } else {
+<span class="fc" id="L68">                return sslh.visitStructuralSubspeciesLcb(headGroup, slsc.lcb(), faContexts);</span>
+            }
+        } else {
+<span class="nc" id="L71">            throw new ParseTreeVisitorException(&quot;Unhandled context state in SL!&quot;);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

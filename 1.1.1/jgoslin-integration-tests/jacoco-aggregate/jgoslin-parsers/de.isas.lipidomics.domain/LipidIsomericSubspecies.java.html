@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LipidIsomericSubspecies.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">LipidIsomericSubspecies.java</span></div><h1>LipidIsomericSubspecies.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * An isomeric subspecies. Child of LipidStructuralSubspecies. Individual FAs,
+ * their sn positions, and the double bond positions are known.
+ *
+ * Example: PE(P-18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z))
+ *
+ * @author nils.hoffmann
+ * @see LipidStructuralSubspecies
+ */
+@Data
+<span class="nc bnc" id="L35" title="All 8 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
+public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
+
+    /**
+     * Creates a new LipidIsomericSubspecies.
+     *
+     * @param headGroup the head group for this lipid.
+     * @param fa the FattyAcids attached to this lipid.
+     */
+<span class="pc" id="L44">    @Builder(builderMethodName = &quot;lipidIsomericSubspeciesBuilder&quot;)</span>
+    public LipidIsomericSubspecies(HeadGroup headGroup, FattyAcid... fa) {
+<span class="fc" id="L46">        super(headGroup);</span>
+<span class="fc" id="L47">        int nCarbon = 0;</span>
+<span class="fc" id="L48">        int nHydroxyl = 0;</span>
+<span class="fc" id="L49">        int nDoubleBonds = 0;</span>
+<span class="fc" id="L50">        ModificationsList mods = new ModificationsList();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (FattyAcid fas : fa) {</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            if (super.fa.containsKey(fas.getName())) {</span>
+<span class="nc" id="L53">                throw new ConstraintViolationException(</span>
+<span class="nc" id="L54">                        &quot;FA names must be unique! FA with name &quot; + fas.getName() + &quot; was already added!&quot;);</span>
+            } else {
+<span class="fc" id="L56">                super.fa.put(fas.getName(), fas);</span>
+<span class="fc" id="L57">                nCarbon += fas.getNCarbon();</span>
+<span class="fc" id="L58">                nHydroxyl += fas.getNHydroxy();</span>
+<span class="fc" id="L59">                nDoubleBonds += fas.getNDoubleBonds();</span>
+<span class="fc" id="L60">                mods.addAll(fas.getModifications());</span>
+            }
+        }
+<span class="fc" id="L63">        super.info = Optional.of(</span>
+<span class="fc" id="L64">                LipidSpeciesInfo.lipidSpeciesInfoBuilder().</span>
+<span class="fc" id="L65">                        level(LipidLevel.ISOMERIC_SUBSPECIES).</span>
+<span class="fc" id="L66">                        name(headGroup.getName()).</span>
+<span class="fc" id="L67">                        position(-1).</span>
+<span class="fc" id="L68">                        nCarbon(nCarbon).</span>
+<span class="fc" id="L69">                        nHydroxy(nHydroxyl).</span>
+<span class="fc" id="L70">                        nDoubleBonds(nDoubleBonds).</span>
+<span class="fc" id="L71">                        lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).</span>
+<span class="fc" id="L72">                        modifications(mods).</span>
+<span class="fc" id="L73">                        build()</span>
+        );
+<span class="fc" id="L75">    }</span>
+
+    private String buildLipidIsomericSubstructureName(LipidLevel level, String headGroup, boolean isNormalized) {
+<span class="nc" id="L78">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L79">        String faStrings = getFa().values().stream().map((fa) -&gt; {</span>
+<span class="nc" id="L80">            return fa.buildSubstructureName(level);</span>
+<span class="nc" id="L81">        }).collect(Collectors.joining(&quot;/&quot;));</span>
+<span class="nc" id="L82">        return sb.append(</span>
+<span class="nc" id="L83">                buildSubspeciesHeadGroupString(headGroup, isNormalized)</span>
+<span class="nc" id="L84">        ).append(faStrings).toString();</span>
+    }
+
+    @Override
+    public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();</span>
+<span class="nc bnc" id="L90" title="All 3 branches missed.">        switch (level) {</span>
+            case ISOMERIC_SUBSPECIES:
+<span class="nc" id="L92">                return buildLipidIsomericSubstructureName(level, headGroup, normalizeHeadGroup);</span>
+            case STRUCTURAL_SUBSPECIES:
+            case MOLECULAR_SUBSPECIES:
+            case CATEGORY:
+            case CLASS:
+            case SPECIES:
+<span class="nc" id="L98">                return super.getLipidString(level, normalizeHeadGroup);</span>
+            default:
+<span class="nc" id="L100">                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();</span>
+<span class="nc" id="L101">                throw new ConstraintViolationException(getClass().getSimpleName() + &quot; can not create a string for lipid with level &quot; + thisLevel + &quot; for level &quot; + level + &quot;: target level is more specific than this lipid's level!&quot;);</span>
+        }
+    }
+
+    @Override
+    public String getLipidString(LipidLevel level) {
+<span class="nc" id="L107">        return this.getLipidString(level, false);</span>
+    }
+
+    @Override
+    public String getNormalizedLipidString() {
+<span class="nc" id="L112">        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L117">        return getLipidString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

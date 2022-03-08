@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LipidFaBondType.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">LipidFaBondType.java</span></div><h1>LipidFaBondType.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+
+/**
+ * The lipid fatty acyl bond types define how the FA is connected to the head
+ * group or which variant of a particular bond type it is.
+ *
+ * @author nils.hoffmann
+ */
+<span class="fc" id="L26">public enum LipidFaBondType {</span>
+<span class="fc" id="L27">    UNDEFINED, ESTER, ETHER_PLASMANYL, ETHER_PLASMENYL, ETHER_UNSPECIFIED;</span>
+
+    public String suffix() {
+<span class="nc bnc" id="L30" title="All 4 branches missed.">        switch (this) {</span>
+            case ETHER_UNSPECIFIED:
+<span class="nc" id="L32">                return &quot;&quot;;</span>
+            case ETHER_PLASMANYL:
+<span class="nc" id="L34">                return &quot;a&quot;;</span>
+            case ETHER_PLASMENYL:
+<span class="nc" id="L36">                return &quot;p&quot;;</span>
+            case ESTER:
+            default:
+<span class="nc" id="L39">                return &quot;&quot;;</span>
+        }
+    }
+
+    public static LipidFaBondType getLipidFaBondType(HeadGroup headGroup, FattyAcid... fa) {
+<span class="fc" id="L44">        LipidFaBondType speciesFaBondType = LipidFaBondType.UNDEFINED;</span>
+<span class="pc bpc" id="L45" title="1 of 4 branches missed.">        if (headGroup.getRawName().endsWith(&quot; O&quot;) || headGroup.getRawName().endsWith(&quot;-O&quot;)) {</span>
+<span class="fc" id="L46">            speciesFaBondType = LipidFaBondType.ETHER_UNSPECIFIED;</span>
+        }
+<span class="fc" id="L48">        LipidFaBondType mostSpecificFaBondType = LipidFaBondType.UNDEFINED;</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (FattyAcid fas : fa) {</span>
+<span class="fc" id="L50">            LipidFaBondType faBondType = fas.getLipidFaBondType();</span>
+<span class="pc bpc" id="L51" title="1 of 4 branches missed.">            switch (mostSpecificFaBondType) {</span>
+                case UNDEFINED:
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">                    switch (faBondType) {</span>
+                        case ETHER_UNSPECIFIED:
+                        case ETHER_PLASMANYL:
+                        case ETHER_PLASMENYL:
+                        case ESTER:
+<span class="fc" id="L58">                            mostSpecificFaBondType = faBondType;</span>
+<span class="fc" id="L59">                            break;</span>
+                        default:
+<span class="nc" id="L61">                            throw new ConstraintViolationException(&quot;Did not except &quot; + faBondType + &quot; in context of FA: &quot; + fas);</span>
+                    }
+                    break;
+                case ESTER:
+                case ETHER_UNSPECIFIED:
+<span class="pc bpc" id="L66" title="1 of 3 branches missed.">                    switch (faBondType) {</span>
+                        case ETHER_PLASMANYL:
+                        case ETHER_PLASMENYL:
+<span class="fc" id="L69">                            mostSpecificFaBondType = faBondType;</span>
+<span class="fc" id="L70">                            break;</span>
+                        case UNDEFINED:
+<span class="nc" id="L72">                            throw new ConstraintViolationException(&quot;Did not except &quot; + faBondType + &quot; in context of FA: &quot; + fas);</span>
+                    }
+<span class="fc" id="L74">                    break;</span>
+                case ETHER_PLASMANYL:
+                case ETHER_PLASMENYL:
+<span class="pc bpc" id="L77" title="2 of 3 branches missed.">                    switch (faBondType) {</span>
+                        case ETHER_PLASMANYL:
+                        case ETHER_PLASMENYL:
+<span class="nc" id="L80">                            throw new ConstraintViolationException(&quot;Only one FA can define an ether bond to the head group! Tried to add &quot; + fas.getLipidFaBondType() + &quot; over existing &quot; + mostSpecificFaBondType + &quot; for &quot; + headGroup + &quot; with  bond type &quot; + speciesFaBondType + &quot; and FA: &quot; + fas);</span>
+                        case ESTER:
+                            //leave as is, ETHER overrules ESTER
+<span class="fc" id="L83">                            break;</span>
+                        default:
+<span class="nc" id="L85">                            throw new ConstraintViolationException(&quot;Did not except &quot; + faBondType + &quot; in context of FA: &quot; + fas);</span>
+                    }
+                    break;
+                default:
+<span class="nc" id="L89">                    throw new ConstraintViolationException(&quot;Unhandled case for&quot; + faBondType + &quot; in context of FA: &quot; + fas);</span>
+            }
+        }
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (speciesFaBondType == UNDEFINED) {</span>
+<span class="fc" id="L93">            return mostSpecificFaBondType;</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        } else if (speciesFaBondType == ETHER_UNSPECIFIED) {</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">            switch (mostSpecificFaBondType) {</span>
+                case ETHER_PLASMANYL:
+                case ETHER_PLASMENYL:
+                case ETHER_UNSPECIFIED:
+<span class="fc" id="L99">                    return mostSpecificFaBondType;</span>
+                default:
+<span class="fc" id="L101">                    return speciesFaBondType;</span>
+            }
+        }
+<span class="nc" id="L104">        return speciesFaBondType;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

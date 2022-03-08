@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>FattyAcylHandler.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.goslin</a> &gt; <span class="el_source">FattyAcylHandler.java</span></div><h1>FattyAcylHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.goslin;
+
+import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
+import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
+import de.isas.lipidomics.domain.LipidLevel;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
+import de.isas.lipidomics.palinom.GoslinParser;
+import de.isas.lipidomics.palinom.HandlerUtils;
+import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * ParserRuleContextHandler for FattyAcyls.
+ *
+ * @author  nils.hoffmann
+ */
+<span class="fc" id="L38">class FattyAcylHandler implements ParserRuleContextHandler&lt;GoslinParser.Lipid_pureContext, LipidSpecies&gt; {</span>
+
+<span class="fc" id="L40">    private final FattyAcylHelper helper = new FattyAcylHelper();</span>
+
+    @Override
+    public LipidSpecies handle(GoslinParser.Lipid_pureContext ctx) {
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (ctx.mediatorc() != null) {</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (ctx.mediatorc().mediator() != null) {</span>
+                // mediator fron positions, e.g 11,12-DiHETrE
+//                String mediatorPositions = &quot;&quot;;
+                // E + Z positions
+//                    if (ctx.fatty_acid().mediator().mediator_single() != null) {
+//                        ctx.fatty_acid().mediator().mediator_single().db_positions();
+//                    }
+<span class="nc" id="L52">                String mediatorsSingleContext = ctx.mediatorc().mediator().getText();</span>
+<span class="nc" id="L53">                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(new HeadGroup(mediatorsSingleContext)).fa(new FattyAcid[0]).build();</span>
+            } else {
+<span class="nc" id="L55">                throw new ParseTreeVisitorException(&quot;Context for FA head group was null!&quot;);</span>
+            }
+
+        } else {
+<span class="nc" id="L59">            throw new ParseTreeVisitorException(&quot;Context for FA was null!&quot;);</span>
+        }
+    }
+
+    public Optional&lt;LipidSpecies&gt; visitSpeciesLcb(HeadGroup headGroup, GoslinParser.LcbContext lcbContext) {
+<span class="nc" id="L64">        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(lcbContext)));</span>
+    }
+
+    public Optional&lt;LipidSpecies&gt; visitSpeciesFas(HeadGroup headGroup, GoslinParser.FaContext faContext) {
+<span class="nc" id="L68">        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));</span>
+    }
+
+    public Optional&lt;LipidSpeciesInfo&gt; getSpeciesInfo(HeadGroup headGroup, GoslinParser.FaContext faContext) {
+        //fa_pure, ether, heavy
+<span class="nc bnc" id="L73" title="All 4 branches missed.">        if (faContext.fa_pure() != null &amp;&amp; faContext.heavy_fa() != null) {</span>
+<span class="nc" id="L74">            throw new RuntimeException(&quot;Heavy label in FA_pure context not implemented yet!&quot;);</span>
+        }
+
+<span class="nc" id="L77">        LipidSpeciesInfo lsi = new LipidSpeciesInfo(</span>
+                LipidLevel.SPECIES,
+<span class="nc" id="L79">                asInt(faContext.fa_pure().carbon(), 0),</span>
+<span class="nc" id="L80">                asInt(faContext.fa_pure().hydroxyl(), 0),</span>
+<span class="nc" id="L81">                asInt(faContext.fa_pure().db(), 0),</span>
+<span class="nc" id="L82">                helper.getLipidFaBondType(headGroup, faContext));</span>
+<span class="nc" id="L83">        LipidFaBondType consensusBondType = LipidFaBondType.getLipidFaBondType(headGroup, lsi);</span>
+<span class="nc" id="L84">        return Optional.of(new LipidSpeciesInfo(</span>
+                LipidLevel.SPECIES,
+<span class="nc" id="L86">                asInt(faContext.fa_pure().carbon(), 0),</span>
+<span class="nc" id="L87">                asInt(faContext.fa_pure().hydroxyl(), 0),</span>
+<span class="nc" id="L88">                asInt(faContext.fa_pure().db(), 0),</span>
+                consensusBondType)
+        );
+    }
+
+    public Optional&lt;LipidSpeciesInfo&gt; getSpeciesInfo(GoslinParser.LcbContext lcbContext) {
+<span class="nc" id="L94">        Integer hydroxyl = 0;</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">        if (lcbContext.lcb_pure() != null &amp;&amp; lcbContext.heavy_lcb() != null) {</span>
+<span class="nc" id="L96">            throw new RuntimeException(&quot;Heavy label in lcb_pure context not implemented yet!&quot;);</span>
+        }
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (lcbContext.lcb_pure() != null) {</span>
+<span class="nc" id="L99">            GoslinParser.Lcb_pureContext pureCtx = lcbContext.lcb_pure();</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (pureCtx.old_hydroxyl() != null) {</span>
+<span class="nc bnc" id="L101" title="All 3 branches missed.">                switch (pureCtx.old_hydroxyl().getText()) {</span>
+                    case &quot;t&quot;:
+<span class="nc" id="L103">                        hydroxyl = 3;</span>
+<span class="nc" id="L104">                        break;</span>
+                    case &quot;d&quot;:
+<span class="nc" id="L106">                        hydroxyl = 2;</span>
+<span class="nc" id="L107">                        break;</span>
+                    default:
+<span class="nc" id="L109">                        throw new ParseTreeVisitorException(&quot;Unsupported old hydroxyl prefix: &quot; + pureCtx.old_hydroxyl().getText());</span>
+                }
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            } else if (pureCtx.hydroxyl() != null) {</span>
+<span class="nc" id="L112">                hydroxyl = asInt(pureCtx.hydroxyl(), 0);</span>
+            }
+<span class="nc" id="L114">            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().</span>
+<span class="nc" id="L115">                    level(LipidLevel.SPECIES).</span>
+<span class="nc" id="L116">                    name(&quot;LCB&quot;).</span>
+<span class="nc" id="L117">                    lcb(true).</span>
+<span class="nc" id="L118">                    nCarbon(asInt(pureCtx.carbon(), 0)).</span>
+<span class="nc" id="L119">                    nHydroxy(hydroxyl).</span>
+<span class="nc" id="L120">                    nDoubleBonds(asInt(pureCtx.db(), 0)).</span>
+<span class="nc" id="L121">                    lipidFaBondType(LipidFaBondType.ESTER).</span>
+<span class="nc" id="L122">                    build()</span>
+            );
+        }
+<span class="nc" id="L125">        throw new ParseTreeVisitorException(&quot;Uninitialized lcb_pure context!&quot;);</span>
+    }
+
+    public boolean isIsomericFa(List&lt;GoslinParser.FaContext&gt; faContexts) {
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        for (GoslinParser.FaContext faContext : faContexts) {</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if (faContext.fa_pure() != null) {</span>
+<span class="nc" id="L131">                GoslinParser.Fa_pureContext coreCtx = faContext.fa_pure();</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">                if (coreCtx.db() != null) {</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">                    int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;</span>
+<span class="nc bnc" id="L134" title="All 4 branches missed.">                    return dbCount == 0 || coreCtx.db().db_positions() != null;</span>
+                }
+            }
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">        return false;</span>
+    }
+
+    public boolean isIsomericFa(GoslinParser.FaContext faContext) {
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (faContext.fa_pure() != null) {</span>
+<span class="nc" id="L143">            GoslinParser.Fa_pureContext coreCtx = faContext.fa_pure();</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            if (coreCtx.db() != null) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">                int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;</span>
+<span class="nc bnc" id="L146" title="All 4 branches missed.">                return dbCount == 0 || coreCtx.db().db_positions() != null;</span>
+            }
+        }
+<span class="nc" id="L149">        return false;</span>
+    }
+
+    public boolean isIsomericLcb(GoslinParser.LcbContext lcbContext) {
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        if (lcbContext.lcb_pure() != null) {</span>
+<span class="nc" id="L154">            GoslinParser.Lcb_pureContext coreCtx = lcbContext.lcb_pure();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">            if (coreCtx.db() != null) {</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">                int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;</span>
+<span class="nc bnc" id="L157" title="All 4 branches missed.">                return dbCount == 0 || coreCtx.db().db_positions() != null;</span>
+            }
+        }
+<span class="nc" id="L160">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

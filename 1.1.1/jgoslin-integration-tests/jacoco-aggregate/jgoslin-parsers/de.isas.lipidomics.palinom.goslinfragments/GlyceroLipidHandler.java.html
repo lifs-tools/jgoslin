@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GlyceroLipidHandler.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.goslinfragments</a> &gt; <span class="el_source">GlyceroLipidHandler.java</span></div><h1>GlyceroLipidHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.goslinfragments;
+
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser.Lipid_pureContext;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Handler implementation for Glycerolipids.
+ * @author  nils.hoffmann
+ */
+<span class="nc" id="L32">@Slf4j</span>
+class GlyceroLipidHandler implements ParserRuleContextHandler&lt;Lipid_pureContext, LipidSpecies&gt; {
+
+    private final MolecularSubspeciesFasHandler msfh;
+    private final StructuralSubspeciesFasHandler ssfh;
+    private final FattyAcylHandler fah;
+
+<span class="nc" id="L39">    public GlyceroLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, FattyAcylHandler fah) {</span>
+<span class="nc" id="L40">        this.msfh = msfh;</span>
+<span class="nc" id="L41">        this.ssfh = ssfh;</span>
+<span class="nc" id="L42">        this.fah = fah;</span>
+<span class="nc" id="L43">    }</span>
+
+    @Override
+    public LipidSpecies handle(Lipid_pureContext t) {
+<span class="nc" id="L47">        return handleGlycerolipid(t).orElse(LipidSpecies.NONE);</span>
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleGlycerolipid(Lipid_pureContext ctx) throws RuntimeException {
+        //glycerophospholipids
+        //cardiolipin
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (ctx.gl().dgl() != null) {</span>
+<span class="nc" id="L54">            return handleDgl(ctx.gl().dgl());</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        } else if (ctx.gl().mgl() != null) {</span>
+<span class="nc" id="L56">            return handleMgl(ctx.gl().mgl());</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        } else if (ctx.gl().sgl() != null) {</span>
+<span class="nc" id="L58">            return handleSgl(ctx.gl().sgl());</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        } else if (ctx.gl().tgl() != null) {</span>
+<span class="nc" id="L60">            return handleTgl(ctx.gl().tgl());</span>
+        } else {
+<span class="nc" id="L62">            throw new ParseTreeVisitorException(&quot;Unhandled context state in GL!&quot;);</span>
+        }
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleTgl(GoslinFragmentsParser.TglContext tgl) {
+<span class="nc" id="L67">        HeadGroup headGroup = new HeadGroup(tgl.hg_tgl_full().getText());</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (tgl.gl_species() != null) { //species level</span>
+            //process species level
+<span class="nc" id="L70">            return fah.visitSpeciesFas(headGroup, tgl.gl_species().fa());</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        } else if (tgl.tgl_subspecies() != null) {</span>
+            //process subspecies
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            if (tgl.tgl_subspecies().fa3().fa3_sorted() != null) {</span>
+                //sorted =&gt; StructuralSubspecies
+<span class="nc" id="L75">                log.info(&quot;Building structural subspecies&quot;);</span>
+<span class="nc" id="L76">                return ssfh.visitStructuralSubspeciesFas(headGroup, tgl.tgl_subspecies().fa3().fa3_sorted().fa());</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            } else if (tgl.tgl_subspecies().fa3().fa3_unsorted() != null) {</span>
+                //unsorted =&gt; MolecularSubspecies
+<span class="nc" id="L79">                log.info(&quot;Building molecular subspecies&quot;);</span>
+<span class="nc" id="L80">                return msfh.visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa3().fa3_unsorted().fa());</span>
+            }
+        } else {
+<span class="nc" id="L83">            throw new ParseTreeVisitorException(&quot;Unhandled context state in TGL!&quot;);</span>
+        }
+<span class="nc" id="L85">        return Optional.empty();</span>
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleSgl(GoslinFragmentsParser.SglContext sgl) {
+<span class="nc" id="L89">        HeadGroup headGroup = new HeadGroup(sgl.hg_sgl_full().getText());</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (sgl.gl_species() != null) { //species level</span>
+            //process species level
+<span class="nc" id="L92">            return fah.visitSpeciesFas(headGroup, sgl.gl_species().fa());</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        } else if (sgl.dgl_subspecies() != null) {</span>
+            //process subspecies
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            if (sgl.dgl_subspecies().fa2().fa2_sorted() != null) {</span>
+                //sorted =&gt; StructuralSubspecies
+<span class="nc" id="L97">                return ssfh.visitStructuralSubspeciesFas(headGroup, sgl.dgl_subspecies().fa2().fa2_sorted().fa());</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            } else if (sgl.dgl_subspecies().fa2().fa2_unsorted() != null) {</span>
+                //unsorted =&gt; MolecularSubspecies
+<span class="nc" id="L100">                return msfh.visitMolecularSubspeciesFas(headGroup, sgl.dgl_subspecies().fa2().fa2_unsorted().fa());</span>
+            }
+        } else {
+<span class="nc" id="L103">            throw new ParseTreeVisitorException(&quot;Unhandled context state in SGL!&quot;);</span>
+        }
+<span class="nc" id="L105">        return Optional.empty();</span>
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleMgl(GoslinFragmentsParser.MglContext mgl) {
+<span class="nc" id="L109">        HeadGroup headGroup = new HeadGroup(mgl.hg_mgl_full().getText());</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (mgl.fa() != null) {</span>
+<span class="nc" id="L111">            return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(mgl.fa()));</span>
+        } else {
+<span class="nc" id="L113">            throw new ParseTreeVisitorException(&quot;Unhandled context state in MGL!&quot;);</span>
+        }
+    }
+
+    private Optional&lt;LipidSpecies&gt; handleDgl(GoslinFragmentsParser.DglContext dgl) {
+<span class="nc" id="L118">        HeadGroup headGroup = new HeadGroup(dgl.hg_dgl_full().getText());</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (dgl.gl_species() != null) { //species level</span>
+            //process species level
+<span class="nc" id="L121">            return fah.visitSpeciesFas(headGroup, dgl.gl_species().fa());</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        } else if (dgl.dgl_subspecies() != null) {</span>
+            //process subspecies
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (dgl.dgl_subspecies().fa2().fa2_sorted() != null) {</span>
+                //sorted =&gt; StructuralSubspecies
+<span class="nc" id="L126">                return ssfh.visitStructuralSubspeciesFas(headGroup, dgl.dgl_subspecies().fa2().fa2_sorted().fa());</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            } else if (dgl.dgl_subspecies().fa2().fa2_unsorted() != null) {</span>
+                //unsorted =&gt; MolecularSubspecies
+<span class="nc" id="L129">                return msfh.visitMolecularSubspeciesFas(headGroup, dgl.dgl_subspecies().fa2().fa2_unsorted().fa());</span>
+            }
+        } else {
+<span class="nc" id="L132">            throw new ParseTreeVisitorException(&quot;Unhandled context state in DGL!&quot;);</span>
+        }
+<span class="nc" id="L134">        return Optional.empty();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

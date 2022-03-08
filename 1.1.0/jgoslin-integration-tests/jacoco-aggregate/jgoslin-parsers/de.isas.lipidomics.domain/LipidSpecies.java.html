@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LipidSpecies.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">LipidSpecies.java</span></div><h1>LipidSpecies.java</h1><pre class="source lang-java linenums">/*
+ * 
+ */
+package de.isas.lipidomics.domain;
+
+import static de.isas.lipidomics.domain.Element.ELEMENT_C;
+import static de.isas.lipidomics.domain.Element.ELEMENT_H;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+
+/**
+ * A lipid species is the factual root of the object hierarchy. Lipid category
+ * and class are used as taxonomic roots of a lipid species. Partial structural
+ * knowledge, apart from the head group, is first encoded in the lipid species.
+ *
+ * A typical lipid species is PC 32:0 (SwissLipids SLM:000056493), where the
+ * head group is defined as PC (Glycerophosphocholines), with fatty acyl chains
+ * of unknown individual composition, but known total composition (32 carbon
+ * atoms, zero double bonds, no hydroxylations).
+ *
+ * @author nils.hoffmann
+ * @see LipidCategory
+ * @see LipidClass
+ * @see LipidMolecularSubspecies
+ * @see LipidStructuralSubspecies
+ * @see LipidIsomericSubspecies
+ */
+<span class="nc bnc" id="L36" title="All 22 branches missed.">@Data</span>
+public class LipidSpecies {
+
+    private static final class None extends LipidSpecies {
+
+        private None() {
+<span class="fc" id="L42">            super(new HeadGroup(&quot;&quot;), Optional.of(LipidSpeciesInfo.NONE));</span>
+<span class="fc" id="L43">        }</span>
+    }
+
+<span class="fc" id="L46">    public static final LipidSpecies NONE = new None();</span>
+<span class="nc" id="L47">    private final HeadGroup headGroup;</span>
+    @Setter(AccessLevel.NONE)
+    protected Optional&lt;LipidSpeciesInfo&gt; info;
+
+    /**
+     * Create a lipid species using the provided head group and a lipid species
+     * info {@link LipidSpeciesInfo#NONE}.
+     *
+     * @param headGroup the lipid species head group.
+     */
+    public LipidSpecies(HeadGroup headGroup) {
+<span class="fc" id="L58">        this(headGroup, Optional.of(LipidSpeciesInfo.NONE));</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * Create a lipid species from a head group and an optional
+     * {@link LipidSpeciesInfo}. This constructor will infer the lipid class
+     * from the head group automatically. It then uses the lipid class to
+     * retrieve the category of this lipid automatically, or sets the category
+     * to {@link LipidCategory#UNDEFINED}. The lipid species info, which
+     * contains details about the total no. of carbons in FA chains, no. of
+     * double bonds etc., is used as provided.
+     *
+     * @param headGroup the lipid species head group.
+     * @param lipidSpeciesInfo the lipid species info object.
+     */
+<span class="fc" id="L73">    public LipidSpecies(HeadGroup headGroup, Optional&lt;LipidSpeciesInfo&gt; lipidSpeciesInfo) {</span>
+<span class="fc" id="L74">        this.headGroup = headGroup;</span>
+<span class="fc" id="L75">        this.info = lipidSpeciesInfo;</span>
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Returns the {@link LipidSpeciesInfo} for this lipid.
+     *
+     * @return the lipid species info.
+     */
+    public Optional&lt;LipidSpeciesInfo&gt; getInfo() {
+<span class="fc" id="L84">        return this.info;</span>
+    }
+
+    /**
+     * Returns true, if the head group ends with ' O' or if the lipid fa bond
+     * type is either {@link LipidFaBondType#ETHER_UNSPECIFIED},
+     * {@link LipidFaBondType#ETHER_PLASMANYL} or
+     * {@link LipidFaBondType#ETHER_PLASMENYL}.
+     *
+     * @return whether this is an 'ether' lipid, e.g. a unspecified ether
+     * species, a Plasmanyl or Plasmenyl species.
+     */
+    public boolean isEtherLipid() {
+<span class="nc" id="L97">        LipidSpeciesInfo info = this.info.orElse(LipidSpeciesInfo.NONE);</span>
+<span class="nc" id="L98">        LipidFaBondType bondType = info.getLipidFaBondType();</span>
+<span class="nc bnc" id="L99" title="All 6 branches missed.">        return bondType == LipidFaBondType.ETHER_PLASMANYL</span>
+                || bondType == LipidFaBondType.ETHER_PLASMENYL
+                || bondType == LipidFaBondType.ETHER_UNSPECIFIED
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                || getFa().values().stream().anyMatch((t) -&gt; {</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">                    return t.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                            || t.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                            || t.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;</span>
+                });
+    }
+
+    /**
+     * Returns a lipid string representation for the {@link LipidLevel}, e.g.
+     * Category, Species, etc, as returned by {@link #getInfo()}.
+     *
+     * Will return the head group name if the level is
+     * {@link LipidSpeciesInfo#NONE}.
+     *
+     * @return the lipid name for the native level.
+     */
+    public String getLipidString() {
+<span class="nc" id="L119">        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());</span>
+    }
+
+    /**
+     * Returns a lipid string representation for the given {@link LipidLevel},
+     * e.g. Category, Species, etc. Please note that this method is overridden
+     * by specific implementations for molecular, structural and isomeric
+     * subspecies levels. This method does not normalize the head group.
+     *
+     * @param level the lipid level to report the name of this lipid on.
+     * @return the lipid name.
+     */
+    public String getLipidString(LipidLevel level) {
+<span class="nc" id="L132">        return this.buildLipidString(level, headGroup.getName(), false);</span>
+    }
+
+    /**
+     * Returns a lipid string representation for the given {@link LipidLevel},
+     * e.g. Category, Species, etc. Please note that this method is overridden
+     * by specific implementations for molecular, structural and isomeric
+     * subspecies levels. This method normalizes the head group to the primary
+     * class-specific synonym. E.g. TG would be normalized to TAG.
+     *
+     * @param level the lipid level to report the name of this lipid on.
+     * @param normalizeHeadGroup if true, use class specific synonym for
+     * headGroup, if false, use head group as parsed.
+     * @return the lipid name.
+     */
+    public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        return this.buildLipidString(level, normalizeHeadGroup ? getNormalizedHeadGroup() : headGroup.getName(), normalizeHeadGroup);</span>
+    }
+
+    protected StringBuilder buildSpeciesHeadGroupString(String headGroup, boolean normalizeHeadGroup) {
+<span class="nc" id="L152">        StringBuilder lipidString = new StringBuilder();</span>
+<span class="nc" id="L153">        lipidString.append(this.headGroup.getLipidClass().map((lclass) -&gt; {</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">            switch (lclass) {</span>
+//                case SE:
+                case SE_27_1:
+                case SE_27_2:
+                case SE_28_2:
+                case SE_28_3:
+                case SE_29_2:
+                case SE_30_2:
+<span class="nc" id="L162">                    return getNormalizedHeadGroup() + &quot;/&quot;; // use this for disambiguation to avoid SE 16:1 to be similar to SE 43:2 because of expansion to SE 27:1/16:1</span>
+            }
+<span class="nc" id="L164">            return headGroup + &quot; &quot;;</span>
+<span class="nc" id="L165">        }).orElse(headGroup + &quot; &quot;));</span>
+<span class="nc" id="L166">        return lipidString;</span>
+    }
+
+    protected String buildLipidString(LipidLevel level, String headGroup, boolean isNormalized) throws ConstraintViolationException {
+<span class="nc bnc" id="L170" title="All 5 branches missed.">        switch (level) {</span>
+            case CATEGORY:
+<span class="nc" id="L172">                return this.headGroup.getLipidCategory().name();</span>
+            case CLASS:
+<span class="nc" id="L174">                return this.headGroup.getLipidClass().orElse(LipidClass.UNDEFINED).name();</span>
+            case SPECIES:
+<span class="nc" id="L176">                StringBuilder lipidString = new StringBuilder();</span>
+<span class="nc" id="L177">                lipidString.append(buildSpeciesHeadGroupString(headGroup, isNormalized));</span>
+<span class="nc" id="L178">                LipidSpeciesInfo info = this.info.orElse(LipidSpeciesInfo.NONE);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                if (info.getNCarbon() &gt; 0) {</span>
+<span class="nc" id="L180">                    int nCarbon = info.getNCarbon();</span>
+<span class="nc" id="L181">                    String hgToFaSep = &quot;&quot;;</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">                    if (isEtherLipid()) {</span>
+<span class="nc" id="L183">                        hgToFaSep = &quot;O-&quot;;</span>
+                    }
+<span class="nc" id="L185">                    lipidString.append(hgToFaSep).append(nCarbon);</span>
+<span class="nc" id="L186">                    int nDB = info.getNDoubleBonds();</span>
+<span class="nc" id="L187">                    lipidString.append(&quot;:&quot;).append(nDB);</span>
+<span class="nc" id="L188">                    int nHydroxy = info.getNHydroxy();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">                    lipidString.append(nHydroxy &gt; 0 ? &quot;;&quot; + nHydroxy : &quot;&quot;);</span>
+<span class="nc" id="L190">                    lipidString.append(info.getLipidFaBondType().suffix());</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">                    if (!info.getModifications().isEmpty()) {</span>
+<span class="nc" id="L192">                        lipidString.append(&quot;(&quot;);</span>
+<span class="nc" id="L193">                        lipidString.append(info.getModifications().stream().map((t) -&gt; {</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">                            return (t.getLeft() == -1 ? &quot;&quot; : t.getLeft()) + &quot;&quot; + t.getRight();</span>
+<span class="nc" id="L195">                        }).collect(Collectors.joining(&quot;,&quot;)));</span>
+<span class="nc" id="L196">                        lipidString.append(&quot;)&quot;);</span>
+                    }
+                }
+<span class="nc" id="L199">                return lipidString.toString().trim();</span>
+            case UNDEFINED:
+<span class="nc" id="L201">                return this.headGroup.getName();</span>
+            default:
+<span class="nc" id="L203">                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();</span>
+<span class="nc" id="L204">                throw new ConstraintViolationException(getClass().getSimpleName() + &quot; can not create a string for lipid with level &quot; + thisLevel + &quot; for level &quot; + level + &quot;: target level is more specific than this lipid's level!&quot;);</span>
+        }
+    }
+
+    /**
+     * Returns a lipid string representation for the head group of this lipid.
+     * This method normalizes the original head group name to the class specific
+     * primary alias, if the level and class are known. E.g. TG is normalized to
+     * TAG.
+     *
+     * @return the normalized lipid head group.
+     */
+    public String getNormalizedHeadGroup() {
+<span class="nc" id="L217">        return headGroup.getNormalizedName();</span>
+    }
+
+    /**
+     * Returns a lipid string representation for the native {@link LipidLevel},
+     * e.g. Category, Species, etc, as returned by {@link #getInfo()} of this
+     * lipid. This method normalizes the head group to the primary
+     * class-specific synonym. E.g. TG would be normalized to TAG.
+     *
+     * @return the normalized lipid name.
+     */
+    public String getNormalizedLipidString() {
+<span class="nc" id="L229">        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);</span>
+    }
+
+    /**
+     * Validate this lipid against the class-specific available FA types and
+     * slots.
+     *
+     * @return true if this lipid's FA types and their number match the class
+     * definition, false otherwise.
+     */
+    public boolean validate() {
+<span class="nc" id="L240">        return true;</span>
+    }
+
+    /**
+     * Returns the fatty acyls registered for this lipid.
+     *
+     * @return the fatty acyls.
+     */
+    public Map&lt;String, FattyAcid&gt; getFa() {
+<span class="nc" id="L249">        return Collections.emptyMap();</span>
+    }
+
+    /**
+     * Returns the element count table for this lipid.
+     *
+     * @return the element count table.
+     */
+    public ElementTable getElements() {
+<span class="fc" id="L258">        ElementTable elements = new ElementTable();</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">        if (info.isPresent()) {</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">            switch (info.get().getLevel()) {</span>
+                case CATEGORY:
+                case CLASS:
+                case UNDEFINED:
+<span class="nc" id="L264">                    return elements;</span>
+            }
+        }
+
+<span class="fc" id="L268">        headGroup.getLipidClass().ifPresent((lclass) -&gt; {</span>
+<span class="fc" id="L269">            elements.add(lclass.getElements());</span>
+<span class="fc" id="L270">        });</span>
+
+<span class="fc" id="L272">        info.ifPresent((t) -&gt; {</span>
+<span class="pc bpc" id="L273" title="1 of 3 branches missed.">            switch (t.getLevel()) {</span>
+                case MOLECULAR_SUBSPECIES:
+                case STRUCTURAL_SUBSPECIES:
+                case ISOMERIC_SUBSPECIES:
+<span class="fc" id="L277">                    int nTrueFa = 0;</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">                    for (FattyAcid fa : getFa().values()) {</span>
+<span class="fc" id="L279">                        ElementTable faElements = fa.getElements();</span>
+<span class="pc bpc" id="L280" title="1 of 4 branches missed.">                        if (fa.getNCarbon() != 0 || fa.getNDoubleBonds() != 0) {</span>
+<span class="fc" id="L281">                            nTrueFa += 1;</span>
+                        }
+<span class="fc" id="L283">                        elements.add(faElements);</span>
+<span class="fc" id="L284">                    }</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">                    if (headGroup.getLipidClass().isPresent()) {</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">                        if (headGroup.getLipidClass().get().getMaxNumFa() &lt; nTrueFa) {</span>
+<span class="nc" id="L287">                            throw new ConstraintViolationException(&quot;Inconsistency in number of fatty acyl chains for lipid '&quot; + headGroup.getName() + &quot;'. Expected at most: &quot; + headGroup.getLipidClass().get().getMaxNumFa() + &quot;; received: &quot; + nTrueFa);</span>
+                        }
+<span class="fc" id="L289">                        elements.incrementBy(Element.ELEMENT_H, headGroup.getLipidClass().get().getMaxNumFa() - nTrueFa); // adding hydrogens for absent fatty acyl chains</span>
+                    }
+                    break;
+                case SPECIES:
+<span class="fc" id="L293">                    int maxNumFa = 0;</span>
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">                    if (headGroup.getLipidClass().isPresent()) {</span>
+<span class="fc" id="L295">                        LipidClass lclass = headGroup.getLipidClass().get();</span>
+<span class="fc" id="L296">                        maxNumFa = lclass.getMaxNumFa();</span>
+                    }
+
+<span class="pc bpc" id="L299" title="1 of 2 branches missed.">                    if (info.isPresent()) {</span>
+<span class="fc" id="L300">                        int maxPossNumFa = headGroup.getLipidClass().get().getAllowedNumFa().stream().max(Integer::compareTo).orElse(0);</span>
+<span class="fc" id="L301">                        ElementTable faElements = info.get().getElements(maxPossNumFa);</span>
+<span class="fc" id="L302">                        elements.add(faElements);</span>
+<span class="fc" id="L303">                        elements.incrementBy(ELEMENT_H, maxNumFa - maxPossNumFa); // adding hydrogens for absent fatty acyl chains</span>
+<span class="fc" id="L304">                    }</span>
+                    break;
+                default:
+                    break;
+            }
+<span class="fc" id="L309">        });</span>
+
+<span class="fc" id="L311">        return elements;</span>
+    }
+
+    public Optional&lt;LipidClass&gt; getLipidClass() {
+<span class="nc" id="L315">        return headGroup.getLipidClass();</span>
+    }
+
+    public LipidCategory getLipidCategory() {
+<span class="nc" id="L319">        return headGroup.getLipidCategory();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L324">        return getLipidString(info.orElse(LipidSpeciesInfo.NONE).getLevel());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

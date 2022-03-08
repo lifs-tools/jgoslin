@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GoslinFragmentsVisitorImpl.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.goslinfragments</a> &gt; <span class="el_source">GoslinFragmentsVisitorImpl.java</span></div><h1>GoslinFragmentsVisitorImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.goslinfragments;
+
+import de.isas.lipidomics.domain.Adduct;
+import de.isas.lipidomics.domain.Fragment;
+import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.GoslinFragmentsBaseVisitor;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Base visitor implementation for the GoslinFragments grammar.
+ *
+ * Overriding implementation of {@link GoslinFragmentsBaseVisitor}. Creates
+ * {@link LipidAdduct} instances from the provided context.
+ *
+ * @author nils.hoffmann
+ */
+<span class="nc" id="L39">@Slf4j</span>
+<span class="nc" id="L40">public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor&lt;LipidAdduct&gt; {</span>
+
+    /**
+     * Produces a LipidAdduct given the LipidContext.
+     *
+     * @throws ParseTreeVisitorException for structural or state-related issues
+     * while trying to process a parsing context.
+     * @throws RuntimeException
+     * @param ctx
+     * @return a LipidAdduct.
+     */
+    @Override
+    public LipidAdduct visitLipid(GoslinFragmentsParser.LipidContext ctx) {
+<span class="nc" id="L53">        GoslinFragmentsParser.Lipid_eofContext lipid = ctx.lipid_eof();</span>
+<span class="nc" id="L54">        Optional&lt;GoslinFragmentsParser.Fragment_nameContext&gt; fragmentContext = Optional.ofNullable(lipid.fragment_name());</span>
+<span class="nc" id="L55">        Optional&lt;GoslinFragmentsParser.Lipid_pureContext&gt; lipidContext = Optional.ofNullable(lipid.just_lipid().lipid_pure());</span>
+<span class="nc" id="L56">        Optional&lt;GoslinFragmentsParser.Adduct_infoContext&gt; adductTermContext = Optional.ofNullable(lipid.just_lipid().adduct_info());</span>
+<span class="nc" id="L57">        LipidAdduct la = new LipidAdduct(lipidContext.map((cc) -&gt; {</span>
+<span class="nc" id="L58">            return new GoslinFragmentsVisitorImpl.LipidVisitor().visitLipid_pure(cc);</span>
+<span class="nc" id="L59">        }).orElse(LipidSpecies.NONE), adductTermContext.map((t) -&gt; {</span>
+<span class="nc" id="L60">            return new GoslinFragmentsVisitorImpl.AdductVisitor().visitAdduct_info(t);</span>
+<span class="nc" id="L61">        }).orElse(Adduct.NONE), fragmentContext.map((t) -&gt; {</span>
+<span class="nc" id="L62">            return new Fragment(t.frag_char().getText());</span>
+<span class="nc" id="L63">        }).orElse(Fragment.NONE));</span>
+<span class="nc" id="L64">        return la;</span>
+    }
+
+    private static class LipidVisitor extends GoslinFragmentsBaseVisitor&lt;LipidSpecies&gt; {
+
+        @Override
+        public LipidSpecies visitLipid_pure(GoslinFragmentsParser.Lipid_pureContext ctx) {
+<span class="nc" id="L71">            LipidSpecies lipid = null;</span>
+<span class="nc" id="L72">            BitSet bs = new BitSet(5);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            bs.set(LipidCategory.ST.ordinal(), ctx.sterol() != null);</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            bs.set(LipidCategory.GL.ordinal(), ctx.gl() != null);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">            bs.set(LipidCategory.FA.ordinal(), ctx.mediatorc() != null);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            bs.set(LipidCategory.SP.ordinal(), ctx.sl() != null);</span>
+<span class="nc" id="L78">            final FattyAcylHelper faHelper = new FattyAcylHelper();</span>
+<span class="nc" id="L79">            final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(faHelper);</span>
+<span class="nc" id="L80">            final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);</span>
+<span class="nc" id="L81">            final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);</span>
+<span class="nc" id="L82">            final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);</span>
+<span class="nc" id="L83">            final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh);</span>
+<span class="nc" id="L84">            final FattyAcylHandler faHandler = new FattyAcylHandler();</span>
+<span class="nc" id="L85">            LipidCategory contextCategory = LipidCategory.UNDEFINED;</span>
+<span class="nc bnc" id="L86" title="All 3 branches missed.">            switch (bs.cardinality()) {</span>
+                case 0:
+<span class="nc" id="L88">                    throw new ParseTreeVisitorException(&quot;Parsing context did not contain content for any lipid category. Must contain exactly one of &quot; + Arrays.toString(LipidCategory.values()));</span>
+                case 1:
+<span class="nc" id="L90">                    contextCategory = LipidCategory.values()[bs.nextSetBit(0)];</span>
+<span class="nc" id="L91">                    break;</span>
+                default:
+<span class="nc" id="L93">                    throw new ParseTreeVisitorException(&quot;Parsing context contained content for more than one lipid category. Must contain exactly one of &quot; + Arrays.toString(LipidCategory.values()));</span>
+            }
+<span class="nc bnc" id="L95" title="All 6 branches missed.">            switch (contextCategory) {</span>
+                case ST:
+<span class="nc" id="L97">                    lipid = new SterolLipidHandler(</span>
+                            ssfh
+<span class="nc" id="L99">                    ).handle(ctx);</span>
+<span class="nc" id="L100">                    break;</span>
+                case GL:
+<span class="nc" id="L102">                    lipid = new GlyceroLipidHandler(</span>
+                            msfh,
+                            ssfh,
+                            faHandler
+<span class="nc" id="L106">                    ).handle(ctx);</span>
+<span class="nc" id="L107">                    break;</span>
+                case FA:
+<span class="nc" id="L109">                    lipid = new FattyAcylHandler().handle(ctx);</span>
+<span class="nc" id="L110">                    break;</span>
+                case GP:
+<span class="nc" id="L112">                    lipid = new GlycerophosphoLipidHandler(</span>
+                            msfh,
+                            ssfh,
+                            faHandler
+<span class="nc" id="L116">                    ).handle(ctx);</span>
+<span class="nc" id="L117">                    break;</span>
+                case SP:
+<span class="nc" id="L119">                    lipid = new SphingoLipidHandler(</span>
+                            sslh,
+                            faHandler
+<span class="nc" id="L122">                    ).handle(ctx);</span>
+<span class="nc" id="L123">                    break;</span>
+                default:
+<span class="nc" id="L125">                    throw new ParseTreeVisitorException(&quot;Unhandled contextCategory: &quot; + contextCategory);</span>
+            }
+<span class="nc" id="L127">            return lipid;</span>
+        }
+
+    }
+
+    private static class AdductVisitor extends GoslinFragmentsBaseVisitor&lt;Adduct&gt; {
+
+        @Override
+        public Adduct visitAdduct_info(GoslinFragmentsParser.Adduct_infoContext ctx) {
+<span class="nc" id="L136">            String chargeSign = ctx.charge_sign().getText();</span>
+<span class="nc" id="L137">            Integer chargeSignValue = 0;</span>
+<span class="nc bnc" id="L138" title="All 3 branches missed.">            switch (chargeSign) {</span>
+                case &quot;+&quot;:
+<span class="nc" id="L140">                    chargeSignValue = 1;</span>
+<span class="nc" id="L141">                    break;</span>
+                case &quot;-&quot;:
+<span class="nc" id="L143">                    chargeSignValue = -1;</span>
+<span class="nc" id="L144">                    break;</span>
+                default:
+<span class="nc" id="L146">                    chargeSignValue = 0;</span>
+            }
+<span class="nc" id="L148">            String adductText = ctx.adduct().getText();</span>
+<span class="nc" id="L149">            Adduct adduct = new Adduct(&quot;&quot;, adductText, Integer.parseInt(ctx.charge().getText()), chargeSignValue);</span>
+<span class="nc" id="L150">            return adduct;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

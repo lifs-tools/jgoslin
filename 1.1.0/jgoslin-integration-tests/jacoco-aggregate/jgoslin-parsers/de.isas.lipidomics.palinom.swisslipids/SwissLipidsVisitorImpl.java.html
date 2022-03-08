@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SwissLipidsVisitorImpl.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom.swisslipids</a> &gt; <span class="el_source">SwissLipidsVisitorImpl.java</span></div><h1>SwissLipidsVisitorImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.palinom.swisslipids;
+
+import de.isas.lipidomics.domain.Adduct;
+import de.isas.lipidomics.domain.Fragment;
+import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.SwissLipidsBaseVisitor;
+import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Optional;
+
+/**
+ * 
+ * Base visitor implementation for the SwissLipids grammar.
+ * 
+ * Overriding implementation of {@link SwissLipidsBaseVisitor}. Creates
+ * {@link LipidAdduct} instances from the provided context.
+ *
+ * @see SwissLipidsVisitorParser
+ * @author nils.hoffmann
+ */
+<span class="fc" id="L40">public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor&lt;LipidAdduct&gt; {</span>
+
+    /**
+     * Produces a LipidAdduct given the LipidContext.
+     * @throws ParseTreeVisitorException for structural or state-related issues
+     * while trying to process a parsing context.
+     * @throws RuntimeException
+     * @param ctx
+     * @return a LipidAdduct.
+     */
+    @Override
+    public LipidAdduct visitLipid(SwissLipidsParser.LipidContext ctx) {
+<span class="fc" id="L52">        Optional&lt;SwissLipidsParser.Lipid_pureContext&gt; categoryContext = Optional.ofNullable(ctx.lipid_pure());</span>
+
+<span class="fc" id="L54">        LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -&gt; {</span>
+<span class="fc" id="L55">            return new LipidVisitor().visitLipid_pure(cc);</span>
+<span class="fc" id="L56">        }).orElse(LipidSpecies.NONE), Adduct.NONE, new Fragment(&quot;&quot;));</span>
+<span class="fc" id="L57">        return la;</span>
+    }
+
+    private static class LipidVisitor extends SwissLipidsBaseVisitor&lt;LipidSpecies&gt; {
+
+        @Override
+        public LipidSpecies visitLipid_pure(SwissLipidsParser.Lipid_pureContext ctx) {
+<span class="fc" id="L64">            LipidSpecies lipid = null;</span>
+<span class="fc" id="L65">            BitSet bs = new BitSet(5);</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            bs.set(LipidCategory.ST.ordinal(), ctx.st() != null);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            bs.set(LipidCategory.GL.ordinal(), ctx.gl() != null);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            bs.set(LipidCategory.FA.ordinal(), ctx.fatty_acid() != null);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            bs.set(LipidCategory.SP.ordinal(), ctx.sl() != null);</span>
+<span class="fc" id="L71">            final FattyAcylHelper faHelper = new FattyAcylHelper();</span>
+<span class="fc" id="L72">            final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(faHelper);</span>
+<span class="fc" id="L73">            final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);</span>
+<span class="fc" id="L74">            final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);</span>
+<span class="fc" id="L75">            final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);</span>
+<span class="fc" id="L76">            final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh);</span>
+<span class="fc" id="L77">            final FattyAcylHandler faHandler = new FattyAcylHandler(ssfh, sslh);</span>
+<span class="fc" id="L78">            LipidCategory contextCategory = LipidCategory.UNDEFINED;</span>
+<span class="pc bpc" id="L79" title="2 of 3 branches missed.">            switch (bs.cardinality()) {</span>
+                case 0:
+<span class="nc" id="L81">                    throw new ParseTreeVisitorException(&quot;Parsing context did not contain content for any lipid category. Must contain exactly one of &quot; + Arrays.toString(LipidCategory.values()));</span>
+                case 1:
+<span class="fc" id="L83">                    contextCategory = LipidCategory.values()[bs.nextSetBit(0)];</span>
+<span class="fc" id="L84">                    break;</span>
+                default:
+<span class="nc" id="L86">                    throw new ParseTreeVisitorException(&quot;Parsing context contained content for more than one lipid category. Must contain exactly one of &quot; + Arrays.toString(LipidCategory.values()));</span>
+            }
+<span class="pc bpc" id="L88" title="1 of 6 branches missed.">            switch (contextCategory) {</span>
+                case ST:
+<span class="fc" id="L90">                    lipid = new SterolLipidHandler(</span>
+                            msfh,
+                            ssfh,
+                            isfh,
+                            faHandler
+<span class="fc" id="L95">                    ).handle(ctx);</span>
+<span class="fc" id="L96">                    break;</span>
+                case GL:
+<span class="fc" id="L98">                    lipid = new GlyceroLipidHandler(</span>
+                            msfh,
+                            ssfh,
+                            isfh,
+                            faHandler
+<span class="fc" id="L103">                    ).handle(ctx);</span>
+<span class="fc" id="L104">                    break;</span>
+                case FA:
+<span class="fc" id="L106">                    lipid = faHandler.handle(ctx);</span>
+<span class="fc" id="L107">                    break;</span>
+                case GP:
+<span class="fc" id="L109">                    lipid = new GlycerophosphoLipidHandler(</span>
+                            msfh,
+                            ssfh,
+                            isfh,
+                            faHandler
+<span class="fc" id="L114">                    ).handle(ctx);</span>
+<span class="fc" id="L115">                    break;</span>
+                case SP:
+<span class="fc" id="L117">                    lipid = new SphingoLipidHandler(</span>
+                            sslh,
+                            islh,
+                            faHandler
+<span class="fc" id="L121">                    ).handle(ctx);</span>
+<span class="fc" id="L122">                    break;</span>
+                default:
+<span class="nc" id="L124">                    throw new ParseTreeVisitorException(&quot;Unhandled contextCategory: &quot; + contextCategory);</span>
+            }
+<span class="fc" id="L126">            return lipid;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

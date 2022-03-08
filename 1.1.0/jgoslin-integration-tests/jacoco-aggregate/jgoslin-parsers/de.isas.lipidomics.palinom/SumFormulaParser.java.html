@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SumFormulaParser.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom</a> &gt; <span class="el_source">SumFormulaParser.java</span></div><h1>SumFormulaParser.java</h1><pre class="source lang-java linenums">// Generated from de/isas/lipidomics/palinom/SumFormula.g4 by ANTLR 4.7.2
+package de.isas.lipidomics.palinom;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
+import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
+
+@SuppressWarnings({&quot;all&quot;, &quot;warnings&quot;, &quot;unchecked&quot;, &quot;unused&quot;, &quot;cast&quot;})
+public class SumFormulaParser extends Parser {
+<span class="fc" id="L14">	static { RuntimeMetaData.checkVersion(&quot;4.7.2&quot;, RuntimeMetaData.VERSION); }</span>
+
+	protected static final DFA[] _decisionToDFA;
+<span class="fc" id="L17">	protected static final PredictionContextCache _sharedContextCache =</span>
+		new PredictionContextCache();
+	public static final int
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16;
+	public static final int
+		RULE_molecule = 0, RULE_molecule_rule = 1, RULE_molecule_group = 2, RULE_element_group = 3, 
+		RULE_single_element = 4, RULE_element = 5, RULE_count = 6, RULE_digit = 7;
+	private static String[] makeRuleNames() {
+<span class="fc" id="L26">		return new String[] {</span>
+			&quot;molecule&quot;, &quot;molecule_rule&quot;, &quot;molecule_group&quot;, &quot;element_group&quot;, &quot;single_element&quot;, 
+			&quot;element&quot;, &quot;count&quot;, &quot;digit&quot;
+		};
+	}
+<span class="fc" id="L31">	public static final String[] ruleNames = makeRuleNames();</span>
+
+	private static String[] makeLiteralNames() {
+<span class="fc" id="L34">		return new String[] {</span>
+			null, &quot;'C'&quot;, &quot;'H'&quot;, &quot;'N'&quot;, &quot;'O'&quot;, &quot;'P'&quot;, &quot;'S'&quot;, &quot;'0'&quot;, &quot;'1'&quot;, &quot;'2'&quot;, 
+			&quot;'3'&quot;, &quot;'4'&quot;, &quot;'5'&quot;, &quot;'6'&quot;, &quot;'7'&quot;, &quot;'8'&quot;, &quot;'9'&quot;
+		};
+	}
+<span class="fc" id="L39">	private static final String[] _LITERAL_NAMES = makeLiteralNames();</span>
+	private static String[] makeSymbolicNames() {
+<span class="fc" id="L41">		return new String[] {</span>
+		};
+	}
+<span class="fc" id="L44">	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();</span>
+<span class="fc" id="L45">	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);</span>
+
+	/**
+	 * @deprecated Use {@link #VOCABULARY} instead.
+	 */
+	@Deprecated
+	public static final String[] tokenNames;
+	static {
+<span class="fc" id="L53">		tokenNames = new String[_SYMBOLIC_NAMES.length];</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">		for (int i = 0; i &lt; tokenNames.length; i++) {</span>
+<span class="nc" id="L55">			tokenNames[i] = VOCABULARY.getLiteralName(i);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">			if (tokenNames[i] == null) {</span>
+<span class="nc" id="L57">				tokenNames[i] = VOCABULARY.getSymbolicName(i);</span>
+			}
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">			if (tokenNames[i] == null) {</span>
+<span class="nc" id="L61">				tokenNames[i] = &quot;&lt;INVALID&gt;&quot;;</span>
+			}
+		}
+	}
+
+	@Override
+	@Deprecated
+	public String[] getTokenNames() {
+<span class="nc" id="L69">		return tokenNames;</span>
+	}
+
+	@Override
+
+	public Vocabulary getVocabulary() {
+<span class="nc" id="L75">		return VOCABULARY;</span>
+	}
+
+	@Override
+<span class="nc" id="L79">	public String getGrammarFileName() { return &quot;SumFormula.g4&quot;; }</span>
+
+	@Override
+<span class="nc" id="L82">	public String[] getRuleNames() { return ruleNames; }</span>
+
+	@Override
+<span class="nc" id="L85">	public String getSerializedATN() { return _serializedATN; }</span>
+
+	@Override
+<span class="fc" id="L88">	public ATN getATN() { return _ATN; }</span>
+
+	public SumFormulaParser(TokenStream input) {
+<span class="fc" id="L91">		super(input);</span>
+<span class="fc" id="L92">		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);</span>
+<span class="fc" id="L93">	}</span>
+
+	public static class MoleculeContext extends ParserRuleContext {
+		public Molecule_ruleContext molecule_rule() {
+<span class="fc" id="L97">			return getRuleContext(Molecule_ruleContext.class,0);</span>
+		}
+<span class="nc" id="L99">		public TerminalNode EOF() { return getToken(SumFormulaParser.EOF, 0); }</span>
+		public MoleculeContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L101">			super(parent, invokingState);</span>
+<span class="fc" id="L102">		}</span>
+<span class="nc" id="L103">		@Override public int getRuleIndex() { return RULE_molecule; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitMolecule(this);</span>
+<span class="nc" id="L107">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final MoleculeContext molecule() throws RecognitionException {
+<span class="fc" id="L112">		MoleculeContext _localctx = new MoleculeContext(_ctx, getState());</span>
+<span class="fc" id="L113">		enterRule(_localctx, 0, RULE_molecule);</span>
+		try {
+<span class="fc" id="L115">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L117">			setState(16);</span>
+<span class="fc" id="L118">			molecule_rule();</span>
+<span class="fc" id="L119">			setState(17);</span>
+<span class="fc" id="L120">			match(EOF);</span>
+			}
+		}
+<span class="nc" id="L123">		catch (RecognitionException re) {</span>
+<span class="nc" id="L124">			_localctx.exception = re;</span>
+<span class="nc" id="L125">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L126">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L129">			exitRule();</span>
+		}
+<span class="fc" id="L131">		return _localctx;</span>
+	}
+
+	public static class Molecule_ruleContext extends ParserRuleContext {
+		public Molecule_groupContext molecule_group() {
+<span class="fc" id="L136">			return getRuleContext(Molecule_groupContext.class,0);</span>
+		}
+		public Molecule_ruleContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L139">			super(parent, invokingState);</span>
+<span class="fc" id="L140">		}</span>
+<span class="nc" id="L141">		@Override public int getRuleIndex() { return RULE_molecule_rule; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L144" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitMolecule_rule(this);</span>
+<span class="nc" id="L145">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final Molecule_ruleContext molecule_rule() throws RecognitionException {
+<span class="fc" id="L150">		Molecule_ruleContext _localctx = new Molecule_ruleContext(_ctx, getState());</span>
+<span class="fc" id="L151">		enterRule(_localctx, 2, RULE_molecule_rule);</span>
+		try {
+<span class="fc" id="L153">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L155">			setState(19);</span>
+<span class="fc" id="L156">			molecule_group(0);</span>
+			}
+		}
+<span class="nc" id="L159">		catch (RecognitionException re) {</span>
+<span class="nc" id="L160">			_localctx.exception = re;</span>
+<span class="nc" id="L161">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L162">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L165">			exitRule();</span>
+		}
+<span class="fc" id="L167">		return _localctx;</span>
+	}
+
+	public static class Molecule_groupContext extends ParserRuleContext {
+		public Element_groupContext element_group() {
+<span class="fc" id="L172">			return getRuleContext(Element_groupContext.class,0);</span>
+		}
+		public Single_elementContext single_element() {
+<span class="fc" id="L175">			return getRuleContext(Single_elementContext.class,0);</span>
+		}
+		public List&lt;Molecule_groupContext&gt; molecule_group() {
+<span class="fc" id="L178">			return getRuleContexts(Molecule_groupContext.class);</span>
+		}
+		public Molecule_groupContext molecule_group(int i) {
+<span class="nc" id="L181">			return getRuleContext(Molecule_groupContext.class,i);</span>
+		}
+		public Molecule_groupContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L184">			super(parent, invokingState);</span>
+<span class="fc" id="L185">		}</span>
+<span class="nc" id="L186">		@Override public int getRuleIndex() { return RULE_molecule_group; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L189" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitMolecule_group(this);</span>
+<span class="nc" id="L190">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final Molecule_groupContext molecule_group() throws RecognitionException {
+<span class="nc" id="L195">		return molecule_group(0);</span>
+	}
+
+	private Molecule_groupContext molecule_group(int _p) throws RecognitionException {
+<span class="fc" id="L199">		ParserRuleContext _parentctx = _ctx;</span>
+<span class="fc" id="L200">		int _parentState = getState();</span>
+<span class="fc" id="L201">		Molecule_groupContext _localctx = new Molecule_groupContext(_ctx, _parentState);</span>
+<span class="fc" id="L202">		Molecule_groupContext _prevctx = _localctx;</span>
+<span class="fc" id="L203">		int _startState = 4;</span>
+<span class="fc" id="L204">		enterRecursionRule(_localctx, 4, RULE_molecule_group, _p);</span>
+		try {
+			int _alt;
+<span class="fc" id="L207">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L209">			setState(24);</span>
+<span class="fc" id="L210">			_errHandler.sync(this);</span>
+<span class="pc bpc" id="L211" title="1 of 3 branches missed.">			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {</span>
+			case 1:
+				{
+<span class="fc" id="L214">				setState(22);</span>
+<span class="fc" id="L215">				element_group();</span>
+				}
+<span class="fc" id="L217">				break;</span>
+			case 2:
+				{
+<span class="fc" id="L220">				setState(23);</span>
+<span class="fc" id="L221">				single_element();</span>
+				}
+				break;
+			}
+<span class="fc" id="L225">			_ctx.stop = _input.LT(-1);</span>
+<span class="fc" id="L226">			setState(30);</span>
+<span class="fc" id="L227">			_errHandler.sync(this);</span>
+<span class="fc" id="L228">			_alt = getInterpreter().adaptivePredict(_input,1,_ctx);</span>
+<span class="pc bpc" id="L229" title="1 of 4 branches missed.">			while ( _alt!=2 &amp;&amp; _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {</span>
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">				if ( _alt==1 ) {</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">					if ( _parseListeners!=null ) triggerExitRuleEvent();</span>
+<span class="fc" id="L232">					_prevctx = _localctx;</span>
+					{
+					{
+<span class="fc" id="L235">					_localctx = new Molecule_groupContext(_parentctx, _parentState);</span>
+<span class="fc" id="L236">					pushNewRecursionContext(_localctx, _startState, RULE_molecule_group);</span>
+<span class="fc" id="L237">					setState(26);</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, &quot;precpred(_ctx, 1)&quot;);</span>
+<span class="fc" id="L239">					setState(27);</span>
+<span class="fc" id="L240">					molecule_group(2);</span>
+					}
+					} 
+				}
+<span class="fc" id="L244">				setState(32);</span>
+<span class="fc" id="L245">				_errHandler.sync(this);</span>
+<span class="fc" id="L246">				_alt = getInterpreter().adaptivePredict(_input,1,_ctx);</span>
+			}
+			}
+		}
+<span class="nc" id="L250">		catch (RecognitionException re) {</span>
+<span class="nc" id="L251">			_localctx.exception = re;</span>
+<span class="nc" id="L252">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L253">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L256">			unrollRecursionContexts(_parentctx);</span>
+		}
+<span class="fc" id="L258">		return _localctx;</span>
+	}
+
+	public static class Element_groupContext extends ParserRuleContext {
+		public ElementContext element() {
+<span class="fc" id="L263">			return getRuleContext(ElementContext.class,0);</span>
+		}
+		public CountContext count() {
+<span class="fc" id="L266">			return getRuleContext(CountContext.class,0);</span>
+		}
+		public Element_groupContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L269">			super(parent, invokingState);</span>
+<span class="fc" id="L270">		}</span>
+<span class="nc" id="L271">		@Override public int getRuleIndex() { return RULE_element_group; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L274" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitElement_group(this);</span>
+<span class="nc" id="L275">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final Element_groupContext element_group() throws RecognitionException {
+<span class="fc" id="L280">		Element_groupContext _localctx = new Element_groupContext(_ctx, getState());</span>
+<span class="fc" id="L281">		enterRule(_localctx, 6, RULE_element_group);</span>
+		try {
+<span class="fc" id="L283">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L285">			setState(33);</span>
+<span class="fc" id="L286">			element();</span>
+<span class="fc" id="L287">			setState(34);</span>
+<span class="fc" id="L288">			count();</span>
+			}
+		}
+<span class="nc" id="L291">		catch (RecognitionException re) {</span>
+<span class="nc" id="L292">			_localctx.exception = re;</span>
+<span class="nc" id="L293">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L294">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L297">			exitRule();</span>
+		}
+<span class="fc" id="L299">		return _localctx;</span>
+	}
+
+	public static class Single_elementContext extends ParserRuleContext {
+		public ElementContext element() {
+<span class="fc" id="L304">			return getRuleContext(ElementContext.class,0);</span>
+		}
+		public Single_elementContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L307">			super(parent, invokingState);</span>
+<span class="fc" id="L308">		}</span>
+<span class="nc" id="L309">		@Override public int getRuleIndex() { return RULE_single_element; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L312" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitSingle_element(this);</span>
+<span class="nc" id="L313">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final Single_elementContext single_element() throws RecognitionException {
+<span class="fc" id="L318">		Single_elementContext _localctx = new Single_elementContext(_ctx, getState());</span>
+<span class="fc" id="L319">		enterRule(_localctx, 8, RULE_single_element);</span>
+		try {
+<span class="fc" id="L321">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L323">			setState(36);</span>
+<span class="fc" id="L324">			element();</span>
+			}
+		}
+<span class="nc" id="L327">		catch (RecognitionException re) {</span>
+<span class="nc" id="L328">			_localctx.exception = re;</span>
+<span class="nc" id="L329">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L330">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L333">			exitRule();</span>
+		}
+<span class="fc" id="L335">		return _localctx;</span>
+	}
+
+	public static class ElementContext extends ParserRuleContext {
+		public ElementContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L340">			super(parent, invokingState);</span>
+<span class="fc" id="L341">		}</span>
+<span class="nc" id="L342">		@Override public int getRuleIndex() { return RULE_element; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L345" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitElement(this);</span>
+<span class="nc" id="L346">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final ElementContext element() throws RecognitionException {
+<span class="fc" id="L351">		ElementContext _localctx = new ElementContext(_ctx, getState());</span>
+<span class="fc" id="L352">		enterRule(_localctx, 10, RULE_element);</span>
+		int _la;
+		try {
+<span class="fc" id="L355">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L357">			setState(38);</span>
+<span class="fc" id="L358">			_la = _input.LA(1);</span>
+<span class="pc bpc" id="L359" title="2 of 4 branches missed.">			if ( !((((_la) &amp; ~0x3f) == 0 &amp;&amp; ((1L &lt;&lt; _la) &amp; ((1L &lt;&lt; T__0) | (1L &lt;&lt; T__1) | (1L &lt;&lt; T__2) | (1L &lt;&lt; T__3) | (1L &lt;&lt; T__4) | (1L &lt;&lt; T__5))) != 0)) ) {</span>
+<span class="nc" id="L360">			_errHandler.recoverInline(this);</span>
+			}
+			else {
+<span class="pc bpc" id="L363" title="1 of 2 branches missed.">				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;</span>
+<span class="fc" id="L364">				_errHandler.reportMatch(this);</span>
+<span class="fc" id="L365">				consume();</span>
+			}
+			}
+		}
+<span class="nc" id="L369">		catch (RecognitionException re) {</span>
+<span class="nc" id="L370">			_localctx.exception = re;</span>
+<span class="nc" id="L371">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L372">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L375">			exitRule();</span>
+		}
+<span class="fc" id="L377">		return _localctx;</span>
+	}
+
+	public static class CountContext extends ParserRuleContext {
+		public DigitContext digit() {
+<span class="nc" id="L382">			return getRuleContext(DigitContext.class,0);</span>
+		}
+		public CountContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L385">			super(parent, invokingState);</span>
+<span class="fc" id="L386">		}</span>
+<span class="nc" id="L387">		@Override public int getRuleIndex() { return RULE_count; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L390" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitCount(this);</span>
+<span class="nc" id="L391">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final CountContext count() throws RecognitionException {
+<span class="fc" id="L396">		CountContext _localctx = new CountContext(_ctx, getState());</span>
+<span class="fc" id="L397">		enterRule(_localctx, 12, RULE_count);</span>
+		try {
+<span class="fc" id="L399">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L401">			setState(40);</span>
+<span class="fc" id="L402">			digit(0);</span>
+			}
+		}
+<span class="nc" id="L405">		catch (RecognitionException re) {</span>
+<span class="nc" id="L406">			_localctx.exception = re;</span>
+<span class="nc" id="L407">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L408">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L411">			exitRule();</span>
+		}
+<span class="fc" id="L413">		return _localctx;</span>
+	}
+
+	public static class DigitContext extends ParserRuleContext {
+		public List&lt;DigitContext&gt; digit() {
+<span class="nc" id="L418">			return getRuleContexts(DigitContext.class);</span>
+		}
+		public DigitContext digit(int i) {
+<span class="nc" id="L421">			return getRuleContext(DigitContext.class,i);</span>
+		}
+		public DigitContext(ParserRuleContext parent, int invokingState) {
+<span class="fc" id="L424">			super(parent, invokingState);</span>
+<span class="fc" id="L425">		}</span>
+<span class="nc" id="L426">		@Override public int getRuleIndex() { return RULE_digit; }</span>
+		@Override
+		public &lt;T&gt; T accept(ParseTreeVisitor&lt;? extends T&gt; visitor) {
+<span class="nc bnc" id="L429" title="All 2 branches missed.">			if ( visitor instanceof SumFormulaVisitor ) return ((SumFormulaVisitor&lt;? extends T&gt;)visitor).visitDigit(this);</span>
+<span class="nc" id="L430">			else return visitor.visitChildren(this);</span>
+		}
+	}
+
+	public final DigitContext digit() throws RecognitionException {
+<span class="nc" id="L435">		return digit(0);</span>
+	}
+
+	private DigitContext digit(int _p) throws RecognitionException {
+<span class="fc" id="L439">		ParserRuleContext _parentctx = _ctx;</span>
+<span class="fc" id="L440">		int _parentState = getState();</span>
+<span class="fc" id="L441">		DigitContext _localctx = new DigitContext(_ctx, _parentState);</span>
+<span class="fc" id="L442">		DigitContext _prevctx = _localctx;</span>
+<span class="fc" id="L443">		int _startState = 14;</span>
+<span class="fc" id="L444">		enterRecursionRule(_localctx, 14, RULE_digit, _p);</span>
+		try {
+			int _alt;
+<span class="fc" id="L447">			enterOuterAlt(_localctx, 1);</span>
+			{
+<span class="fc" id="L449">			setState(53);</span>
+<span class="fc" id="L450">			_errHandler.sync(this);</span>
+<span class="pc bpc" id="L451" title="1 of 11 branches missed.">			switch (_input.LA(1)) {</span>
+			case T__6:
+				{
+<span class="fc" id="L454">				setState(43);</span>
+<span class="fc" id="L455">				match(T__6);</span>
+				}
+<span class="fc" id="L457">				break;</span>
+			case T__7:
+				{
+<span class="fc" id="L460">				setState(44);</span>
+<span class="fc" id="L461">				match(T__7);</span>
+				}
+<span class="fc" id="L463">				break;</span>
+			case T__8:
+				{
+<span class="fc" id="L466">				setState(45);</span>
+<span class="fc" id="L467">				match(T__8);</span>
+				}
+<span class="fc" id="L469">				break;</span>
+			case T__9:
+				{
+<span class="fc" id="L472">				setState(46);</span>
+<span class="fc" id="L473">				match(T__9);</span>
+				}
+<span class="fc" id="L475">				break;</span>
+			case T__10:
+				{
+<span class="fc" id="L478">				setState(47);</span>
+<span class="fc" id="L479">				match(T__10);</span>
+				}
+<span class="fc" id="L481">				break;</span>
+			case T__11:
+				{
+<span class="fc" id="L484">				setState(48);</span>
+<span class="fc" id="L485">				match(T__11);</span>
+				}
+<span class="fc" id="L487">				break;</span>
+			case T__12:
+				{
+<span class="fc" id="L490">				setState(49);</span>
+<span class="fc" id="L491">				match(T__12);</span>
+				}
+<span class="fc" id="L493">				break;</span>
+			case T__13:
+				{
+<span class="fc" id="L496">				setState(50);</span>
+<span class="fc" id="L497">				match(T__13);</span>
+				}
+<span class="fc" id="L499">				break;</span>
+			case T__14:
+				{
+<span class="fc" id="L502">				setState(51);</span>
+<span class="fc" id="L503">				match(T__14);</span>
+				}
+<span class="fc" id="L505">				break;</span>
+			case T__15:
+				{
+<span class="fc" id="L508">				setState(52);</span>
+<span class="fc" id="L509">				match(T__15);</span>
+				}
+<span class="fc" id="L511">				break;</span>
+			default:
+<span class="nc" id="L513">				throw new NoViableAltException(this);</span>
+			}
+<span class="fc" id="L515">			_ctx.stop = _input.LT(-1);</span>
+<span class="fc" id="L516">			setState(59);</span>
+<span class="fc" id="L517">			_errHandler.sync(this);</span>
+<span class="fc" id="L518">			_alt = getInterpreter().adaptivePredict(_input,3,_ctx);</span>
+<span class="pc bpc" id="L519" title="1 of 4 branches missed.">			while ( _alt!=2 &amp;&amp; _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {</span>
+<span class="pc bpc" id="L520" title="1 of 2 branches missed.">				if ( _alt==1 ) {</span>
+<span class="pc bpc" id="L521" title="1 of 2 branches missed.">					if ( _parseListeners!=null ) triggerExitRuleEvent();</span>
+<span class="fc" id="L522">					_prevctx = _localctx;</span>
+					{
+					{
+<span class="fc" id="L525">					_localctx = new DigitContext(_parentctx, _parentState);</span>
+<span class="fc" id="L526">					pushNewRecursionContext(_localctx, _startState, RULE_digit);</span>
+<span class="fc" id="L527">					setState(55);</span>
+<span class="pc bpc" id="L528" title="1 of 2 branches missed.">					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, &quot;precpred(_ctx, 1)&quot;);</span>
+<span class="fc" id="L529">					setState(56);</span>
+<span class="fc" id="L530">					digit(2);</span>
+					}
+					} 
+				}
+<span class="fc" id="L534">				setState(61);</span>
+<span class="fc" id="L535">				_errHandler.sync(this);</span>
+<span class="fc" id="L536">				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);</span>
+			}
+			}
+		}
+<span class="nc" id="L540">		catch (RecognitionException re) {</span>
+<span class="nc" id="L541">			_localctx.exception = re;</span>
+<span class="nc" id="L542">			_errHandler.reportError(this, re);</span>
+<span class="nc" id="L543">			_errHandler.recover(this, re);</span>
+		}
+		finally {
+<span class="fc" id="L546">			unrollRecursionContexts(_parentctx);</span>
+		}
+<span class="fc" id="L548">		return _localctx;</span>
+	}
+
+	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+<span class="nc bnc" id="L552" title="All 3 branches missed.">		switch (ruleIndex) {</span>
+		case 2:
+<span class="nc" id="L554">			return molecule_group_sempred((Molecule_groupContext)_localctx, predIndex);</span>
+		case 7:
+<span class="nc" id="L556">			return digit_sempred((DigitContext)_localctx, predIndex);</span>
+		}
+<span class="nc" id="L558">		return true;</span>
+	}
+	private boolean molecule_group_sempred(Molecule_groupContext _localctx, int predIndex) {
+<span class="nc bnc" id="L561" title="All 2 branches missed.">		switch (predIndex) {</span>
+		case 0:
+<span class="nc" id="L563">			return precpred(_ctx, 1);</span>
+		}
+<span class="nc" id="L565">		return true;</span>
+	}
+	private boolean digit_sempred(DigitContext _localctx, int predIndex) {
+<span class="nc bnc" id="L568" title="All 2 branches missed.">		switch (predIndex) {</span>
+		case 1:
+<span class="nc" id="L570">			return precpred(_ctx, 1);</span>
+		}
+<span class="nc" id="L572">		return true;</span>
+	}
+
+	public static final String _serializedATN =
+		&quot;\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\22A\4\2\t\2\4\3\t&quot;+
+		&quot;\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3\3\3\3&quot;+
+		&quot;\3\4\3\4\3\4\5\4\33\n\4\3\4\3\4\7\4\37\n\4\f\4\16\4\&quot;\13\4\3\5\3\5\3\5&quot;+
+		&quot;\3\6\3\6\3\7\3\7\3\b\3\b\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\5&quot;+
+		&quot;\t8\n\t\3\t\3\t\7\t&lt;\n\t\f\t\16\t?\13\t\3\t\2\4\6\20\n\2\4\6\b\n\f\16&quot;+
+		&quot;\20\2\3\3\2\3\b\2D\2\22\3\2\2\2\4\25\3\2\2\2\6\32\3\2\2\2\b#\3\2\2\2\n&quot;+
+		&quot;&amp;\3\2\2\2\f(\3\2\2\2\16*\3\2\2\2\20\67\3\2\2\2\22\23\5\4\3\2\23\24\7\2&quot;+
+		&quot;\2\3\24\3\3\2\2\2\25\26\5\6\4\2\26\5\3\2\2\2\27\30\b\4\1\2\30\33\5\b\5&quot;+
+		&quot;\2\31\33\5\n\6\2\32\27\3\2\2\2\32\31\3\2\2\2\33 \3\2\2\2\34\35\f\3\2\2&quot;+
+		&quot;\35\37\5\6\4\4\36\34\3\2\2\2\37\&quot;\3\2\2\2 \36\3\2\2\2 !\3\2\2\2!\7\3\2&quot;+
+		&quot;\2\2\&quot; \3\2\2\2#$\5\f\7\2$%\5\16\b\2%\t\3\2\2\2&amp;\'\5\f\7\2\'\13\3\2\2&quot;+
+		&quot;\2()\t\2\2\2)\r\3\2\2\2*+\5\20\t\2+\17\3\2\2\2,-\b\t\1\2-8\7\t\2\2.8\7&quot;+
+		&quot;\n\2\2/8\7\13\2\2\608\7\f\2\2\618\7\r\2\2\628\7\16\2\2\638\7\17\2\2\64&quot;+
+		&quot;8\7\20\2\2\658\7\21\2\2\668\7\22\2\2\67,\3\2\2\2\67.\3\2\2\2\67/\3\2\2&quot;+
+		&quot;\2\67\60\3\2\2\2\67\61\3\2\2\2\67\62\3\2\2\2\67\63\3\2\2\2\67\64\3\2\2&quot;+
+		&quot;\2\67\65\3\2\2\2\67\66\3\2\2\28=\3\2\2\29:\f\3\2\2:&lt;\5\20\t\4;9\3\2\2&quot;+
+		&quot;\2&lt;?\3\2\2\2=;\3\2\2\2=&gt;\3\2\2\2&gt;\21\3\2\2\2?=\3\2\2\2\6\32 \67=&quot;;
+<span class="fc" id="L593">	public static final ATN _ATN =</span>
+<span class="fc" id="L594">		new ATNDeserializer().deserialize(_serializedATN.toCharArray());</span>
+	static {
+<span class="fc" id="L596">		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];</span>
+<span class="fc bfc" id="L597" title="All 2 branches covered.">		for (int i = 0; i &lt; _ATN.getNumberOfDecisions(); i++) {</span>
+<span class="fc" id="L598">			_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);</span>
+		}
+<span class="fc" id="L600">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

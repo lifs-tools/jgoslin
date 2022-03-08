@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html lang="de">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">/*</a>
+<span class="sourceLineNo">002</span><a id="line.2"> * Copyright 2019 nils.hoffmann.</a>
+<span class="sourceLineNo">003</span><a id="line.3"> *</a>
+<span class="sourceLineNo">004</span><a id="line.4"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
+<span class="sourceLineNo">005</span><a id="line.5"> * you may not use this file except in compliance with the License.</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * You may obtain a copy of the License at</a>
+<span class="sourceLineNo">007</span><a id="line.7"> *</a>
+<span class="sourceLineNo">008</span><a id="line.8"> *      http://www.apache.org/licenses/LICENSE-2.0</a>
+<span class="sourceLineNo">009</span><a id="line.9"> *</a>
+<span class="sourceLineNo">010</span><a id="line.10"> * Unless required by applicable law or agreed to in writing, software</a>
+<span class="sourceLineNo">011</span><a id="line.11"> * distributed under the License is distributed on an "AS IS" BASIS,</a>
+<span class="sourceLineNo">012</span><a id="line.12"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</a>
+<span class="sourceLineNo">013</span><a id="line.13"> * See the License for the specific language governing permissions and</a>
+<span class="sourceLineNo">014</span><a id="line.14"> * limitations under the License.</a>
+<span class="sourceLineNo">015</span><a id="line.15"> */</a>
+<span class="sourceLineNo">016</span><a id="line.16">package de.isas.lipidomics.domain;</a>
+<span class="sourceLineNo">017</span><a id="line.17"></a>
+<span class="sourceLineNo">018</span><a id="line.18">import java.util.Map;</a>
+<span class="sourceLineNo">019</span><a id="line.19">import lombok.Builder;</a>
+<span class="sourceLineNo">020</span><a id="line.20">import lombok.Data;</a>
+<span class="sourceLineNo">021</span><a id="line.21">import lombok.EqualsAndHashCode;</a>
+<span class="sourceLineNo">022</span><a id="line.22"></a>
+<span class="sourceLineNo">023</span><a id="line.23">/**</a>
+<span class="sourceLineNo">024</span><a id="line.24"> * This class summarizes the FA parts of a lipid, independent of its head group.</a>
+<span class="sourceLineNo">025</span><a id="line.25"> * Thus, it accounts the total number of carbon atoms, double bonds, the number</a>
+<span class="sourceLineNo">026</span><a id="line.26"> * of hydroxylations, the overall FA-headgroup bond type, e.g. PLASMANYL /</a>
+<span class="sourceLineNo">027</span><a id="line.27"> * PLASMENYL, if any of a lipid's FA chains has such a bond type, or ESTER or</a>
+<span class="sourceLineNo">028</span><a id="line.28"> * UNDEFINED for other cases.</a>
+<span class="sourceLineNo">029</span><a id="line.29"> *</a>
+<span class="sourceLineNo">030</span><a id="line.30"> * @author nils.hoffmann</a>
+<span class="sourceLineNo">031</span><a id="line.31"> */</a>
+<span class="sourceLineNo">032</span><a id="line.32">@Data</a>
+<span class="sourceLineNo">033</span><a id="line.33">@EqualsAndHashCode(callSuper = true)</a>
+<span class="sourceLineNo">034</span><a id="line.34">public class LipidSpeciesInfo extends FattyAcid {</a>
+<span class="sourceLineNo">035</span><a id="line.35"></a>
+<span class="sourceLineNo">036</span><a id="line.36">    private static final class None extends LipidSpeciesInfo {</a>
+<span class="sourceLineNo">037</span><a id="line.37"></a>
+<span class="sourceLineNo">038</span><a id="line.38">        private None() {</a>
+<span class="sourceLineNo">039</span><a id="line.39">            super(LipidLevel.UNDEFINED, "NONE", -1, 0, 0, 0, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);</a>
+<span class="sourceLineNo">040</span><a id="line.40">        }</a>
+<span class="sourceLineNo">041</span><a id="line.41">    }</a>
+<span class="sourceLineNo">042</span><a id="line.42"></a>
+<span class="sourceLineNo">043</span><a id="line.43">    /**</a>
+<span class="sourceLineNo">044</span><a id="line.44">     * Use this class to indicate that no lipid species info is available.</a>
+<span class="sourceLineNo">045</span><a id="line.45">     */</a>
+<span class="sourceLineNo">046</span><a id="line.46">    public static final LipidSpeciesInfo NONE = new LipidSpeciesInfo.None();</a>
+<span class="sourceLineNo">047</span><a id="line.47"></a>
+<span class="sourceLineNo">048</span><a id="line.48">    private final LipidLevel level;</a>
+<span class="sourceLineNo">049</span><a id="line.49"></a>
+<span class="sourceLineNo">050</span><a id="line.50">    /**</a>
+<span class="sourceLineNo">051</span><a id="line.51">     * Create a new LipidSpeciesInfo on the provided level.</a>
+<span class="sourceLineNo">052</span><a id="line.52">     *</a>
+<span class="sourceLineNo">053</span><a id="line.53">     * @param level the level of the species info.</a>
+<span class="sourceLineNo">054</span><a id="line.54">     * @param name the name, e.g. FA1 for the first FA.</a>
+<span class="sourceLineNo">055</span><a id="line.55">     * @param position the sn position. -1 if undefined or unknown.</a>
+<span class="sourceLineNo">056</span><a id="line.56">     * @param nCarbon the number of carbons in this FA.</a>
+<span class="sourceLineNo">057</span><a id="line.57">     * @param nHydroxy the number of hydroxyls on this FA.</a>
+<span class="sourceLineNo">058</span><a id="line.58">     * @param nDoubleBonds the number of double bonds in this FA.</a>
+<span class="sourceLineNo">059</span><a id="line.59">     * @param lipidFaBondType the bond type, e.g. ESTER.</a>
+<span class="sourceLineNo">060</span><a id="line.60">     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.</a>
+<span class="sourceLineNo">061</span><a id="line.61">     * @param modifications optional modifications for this FA.</a>
+<span class="sourceLineNo">062</span><a id="line.62">     * @see LipidFaBondType</a>
+<span class="sourceLineNo">063</span><a id="line.63">     */</a>
+<span class="sourceLineNo">064</span><a id="line.64">    @Builder(builderMethodName = "lipidSpeciesInfoBuilder")</a>
+<span class="sourceLineNo">065</span><a id="line.65">    public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {</a>
+<span class="sourceLineNo">066</span><a id="line.66">        super(name, position, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, lcb, modifications);</a>
+<span class="sourceLineNo">067</span><a id="line.67">        this.level = level;</a>
+<span class="sourceLineNo">068</span><a id="line.68">    }</a>
+<span class="sourceLineNo">069</span><a id="line.69"></a>
+<span class="sourceLineNo">070</span><a id="line.70">    /**</a>
+<span class="sourceLineNo">071</span><a id="line.71">     * Create a new LipidSpeciesInfo on the provided level.</a>
+<span class="sourceLineNo">072</span><a id="line.72">     *</a>
+<span class="sourceLineNo">073</span><a id="line.73">     * @param level the level of the species info.</a>
+<span class="sourceLineNo">074</span><a id="line.74">     * @param name the name, e.g. FA1 for the first FA.</a>
+<span class="sourceLineNo">075</span><a id="line.75">     * @param position the sn position. -1 if undefined or unknown.</a>
+<span class="sourceLineNo">076</span><a id="line.76">     * @param nCarbon the number of carbons in this FA.</a>
+<span class="sourceLineNo">077</span><a id="line.77">     * @param nHydroxy the number of hydroxyls on this FA.</a>
+<span class="sourceLineNo">078</span><a id="line.78">     * @param lipidFaBondType the bond type, e.g. ESTER.</a>
+<span class="sourceLineNo">079</span><a id="line.79">     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.</a>
+<span class="sourceLineNo">080</span><a id="line.80">     * @param modifications optional modifications for this FA.</a>
+<span class="sourceLineNo">081</span><a id="line.81">     * @param nDoubleBonds the number of double bonds in this FA.</a>
+<span class="sourceLineNo">082</span><a id="line.82">     * @param doubleBondPositions double bond positions in this FA.</a>
+<span class="sourceLineNo">083</span><a id="line.83">     * @see LipidFaBondType</a>
+<span class="sourceLineNo">084</span><a id="line.84">     */</a>
+<span class="sourceLineNo">085</span><a id="line.85">    @Builder(builderMethodName = "lipidSubspeciesInfoBuilder", builderClassName = "LipidSubspeciesInfoBuilder")</a>
+<span class="sourceLineNo">086</span><a id="line.86">    public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications, int nDoubleBonds, Map&lt;Integer, String&gt; doubleBondPositions) {</a>
+<span class="sourceLineNo">087</span><a id="line.87">        super(name, position, nCarbon, nHydroxy, lipidFaBondType, lcb, modifications, nDoubleBonds, doubleBondPositions);</a>
+<span class="sourceLineNo">088</span><a id="line.88">        this.level = level;</a>
+<span class="sourceLineNo">089</span><a id="line.89">    }</a>
+<span class="sourceLineNo">090</span><a id="line.90"></a>
+<span class="sourceLineNo">091</span><a id="line.91">    /**</a>
+<span class="sourceLineNo">092</span><a id="line.92">     * Create a new LipidSpeciesInfo on the provided level.The name is inferred</a>
+<span class="sourceLineNo">093</span><a id="line.93">     * from the level.</a>
+<span class="sourceLineNo">094</span><a id="line.94">     *</a>
+<span class="sourceLineNo">095</span><a id="line.95">     * @param level the level of the species info.</a>
+<span class="sourceLineNo">096</span><a id="line.96">     * @param nCarbon the number of carbons in this FA.</a>
+<span class="sourceLineNo">097</span><a id="line.97">     * @param nHydroxy the number of hydroxyls on this FA.</a>
+<span class="sourceLineNo">098</span><a id="line.98">     * @param nDoubleBonds the number of double bonds in this FA.</a>
+<span class="sourceLineNo">099</span><a id="line.99">     * @param lipidFaBondType the bond type, e.g. ESTER.</a>
+<span class="sourceLineNo">100</span><a id="line.100">     */</a>
+<span class="sourceLineNo">101</span><a id="line.101">    public LipidSpeciesInfo(LipidLevel level, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType) {</a>
+<span class="sourceLineNo">102</span><a id="line.102">        this(level, level.name(), -1, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, false, ModificationsList.NONE);</a>
+<span class="sourceLineNo">103</span><a id="line.103">    }</a>
+<span class="sourceLineNo">104</span><a id="line.104"></a>
+<span class="sourceLineNo">105</span><a id="line.105">    @Override</a>
+<span class="sourceLineNo">106</span><a id="line.106">    public String buildSubstructureName(LipidLevel level) {</a>
+<span class="sourceLineNo">107</span><a id="line.107">        final StringBuilder sb = new StringBuilder();</a>
+<span class="sourceLineNo">108</span><a id="line.108">        sb.</a>
+<span class="sourceLineNo">109</span><a id="line.109">                append(getName()).</a>
+<span class="sourceLineNo">110</span><a id="line.110">                append(" ").</a>
+<span class="sourceLineNo">111</span><a id="line.111">                append(getNCarbon()).</a>
+<span class="sourceLineNo">112</span><a id="line.112">                append(":").</a>
+<span class="sourceLineNo">113</span><a id="line.113">                append(getNDoubleBonds());</a>
+<span class="sourceLineNo">114</span><a id="line.114">        if (getNHydroxy() &gt; 0) {</a>
+<span class="sourceLineNo">115</span><a id="line.115">            sb.append(";").append(getNHydroxy());</a>
+<span class="sourceLineNo">116</span><a id="line.116">        }</a>
+<span class="sourceLineNo">117</span><a id="line.117">        //TODO reenable once LSI has finished modification specification</a>
+<span class="sourceLineNo">118</span><a id="line.118">//        if (!getModifications().isEmpty()) {</a>
+<span class="sourceLineNo">119</span><a id="line.119">//            sb.append("(");</a>
+<span class="sourceLineNo">120</span><a id="line.120">//            sb.append(getModifications().stream().map((t) -&gt; {</a>
+<span class="sourceLineNo">121</span><a id="line.121">//                return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();</a>
+<span class="sourceLineNo">122</span><a id="line.122">//            }).collect(Collectors.joining(",")));</a>
+<span class="sourceLineNo">123</span><a id="line.123">//            sb.append(")");</a>
+<span class="sourceLineNo">124</span><a id="line.124">//        }</a>
+<span class="sourceLineNo">125</span><a id="line.125">        return sb.toString();</a>
+<span class="sourceLineNo">126</span><a id="line.126">    }</a>
+<span class="sourceLineNo">127</span><a id="line.127"></a>
+<span class="sourceLineNo">128</span><a id="line.128">    /**</a>
+<span class="sourceLineNo">129</span><a id="line.129">     * Returns the element table for this species info adjusted for oxygen and</a>
+<span class="sourceLineNo">130</span><a id="line.130">     * hydrogen.</a>
+<span class="sourceLineNo">131</span><a id="line.131">     *</a>
+<span class="sourceLineNo">132</span><a id="line.132">     * @param numFa the number of fatty acyls to account for.</a>
+<span class="sourceLineNo">133</span><a id="line.133">     * @return the element table.</a>
+<span class="sourceLineNo">134</span><a id="line.134">     */</a>
+<span class="sourceLineNo">135</span><a id="line.135">    public ElementTable getElements(int numFa) {</a>
+<span class="sourceLineNo">136</span><a id="line.136">        ElementTable elements = super.getElements();</a>
+<span class="sourceLineNo">137</span><a id="line.137">        if (numFa &gt; 0) {</a>
+<span class="sourceLineNo">138</span><a id="line.138">            elements.incrementBy(Element.ELEMENT_O, numFa - 1);</a>
+<span class="sourceLineNo">139</span><a id="line.139">            elements.decrementBy(Element.ELEMENT_H, numFa - 1);</a>
+<span class="sourceLineNo">140</span><a id="line.140">        }</a>
+<span class="sourceLineNo">141</span><a id="line.141">        return elements;</a>
+<span class="sourceLineNo">142</span><a id="line.142">    }</a>
+<span class="sourceLineNo">143</span><a id="line.143">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SumFormulaBaseVisitor.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom</a> &gt; <span class="el_source">SumFormulaBaseVisitor.java</span></div><h1>SumFormulaBaseVisitor.java</h1><pre class="source lang-java linenums">// Generated from de/isas/lipidomics/palinom/SumFormula.g4 by ANTLR 4.7.2
+package de.isas.lipidomics.palinom;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+
+/**
+ * This class provides an empty implementation of {@link SumFormulaVisitor},
+ * which can be extended to create a visitor which only needs to handle a subset
+ * of the available methods.
+ *
+ * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
+<span class="fc" id="L13">public class SumFormulaBaseVisitor&lt;T&gt; extends AbstractParseTreeVisitor&lt;T&gt; implements SumFormulaVisitor&lt;T&gt; {</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L20">	@Override public T visitMolecule(SumFormulaParser.MoleculeContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L27">	@Override public T visitMolecule_rule(SumFormulaParser.Molecule_ruleContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L34">	@Override public T visitMolecule_group(SumFormulaParser.Molecule_groupContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L41">	@Override public T visitElement_group(SumFormulaParser.Element_groupContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L48">	@Override public T visitSingle_element(SumFormulaParser.Single_elementContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L55">	@Override public T visitElement(SumFormulaParser.ElementContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L62">	@Override public T visitCount(SumFormulaParser.CountContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L69">	@Override public T visitDigit(SumFormulaParser.DigitContext ctx) { return visitChildren(ctx); }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

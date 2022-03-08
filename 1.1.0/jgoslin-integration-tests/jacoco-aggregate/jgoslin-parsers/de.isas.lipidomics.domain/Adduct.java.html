@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Adduct.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">Adduct.java</span></div><h1>Adduct.java</h1><pre class="source lang-java linenums">/*
+ * 
+ */
+package de.isas.lipidomics.domain;
+
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+/**
+ * An adduct, generally, consists of a sum formula part, an adduct string, the
+ * charge and the charge sign. An example for a valid adduct is : [M+H]1+.
+ *
+ * @author nils.hoffmann
+ */
+<span class="fc" id="L20">@AllArgsConstructor</span>
+<span class="nc bnc" id="L21" title="All 32 branches missed.">@Data</span>
+public class Adduct {
+
+    private static final class None extends Adduct {
+
+        private None() {
+<span class="fc" id="L27">            super(&quot;&quot;, &quot;&quot;, 0, 0);</span>
+<span class="fc" id="L28">        }</span>
+    }
+
+<span class="fc" id="L31">    public static final Adduct NONE = new None();</span>
+
+<span class="nc" id="L33">    private String sumFormula;</span>
+<span class="nc" id="L34">    private String adductString;</span>
+    private Integer charge;
+<span class="nc" id="L36">    private Integer chargeSign;</span>
+
+<span class="nc" id="L38">    public Adduct() {</span>
+<span class="nc" id="L39">        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;); //To change body of generated methods, choose Tools | Templates.</span>
+    }
+
+    public void setChargeSign(Integer sign) {
+<span class="nc bnc" id="L43" title="All 6 branches missed.">        if (sign != -1 || sign != 0 || sign != 1) {</span>
+<span class="nc" id="L44">            throw new IllegalArgumentException(&quot;Sign can only be -1, 0, or 1&quot;);</span>
+        }
+<span class="nc" id="L46">    }</span>
+
+    public String getLipidString() {
+<span class="nc bnc" id="L49" title="All 4 branches missed.">        if (adductString == null || adductString.isEmpty()) {</span>
+<span class="nc" id="L50">            return &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (charge == 0) {</span>
+<span class="nc" id="L53">            return &quot;[M]&quot;;</span>
+        }
+<span class="nc" id="L55">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        sb.append(&quot;[M&quot;).append(sumFormula).append(adductString).append(&quot;]&quot;).append(charge).append((chargeSign &gt; 0) ? &quot;+&quot; : &quot;-&quot;);</span>
+<span class="nc" id="L57">        return sb.toString();</span>
+    }
+
+    public ElementTable getElements() {
+<span class="fc" id="L61">        ElementTable elements = new ElementTable();</span>
+<span class="fc" id="L62">        String adductName = Optional.ofNullable(adductString).map((t) -&gt; {</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            return t.length() &gt; 1 ? t.substring(1) : &quot;&quot;;</span>
+<span class="fc" id="L64">        }).orElse(&quot;&quot;);</span>
+        try {
+<span class="fc" id="L66">            elements.add(new ElementTable(adductName));</span>
+<span class="nc" id="L67">        } catch (ParsingException ex) {</span>
+<span class="nc" id="L68">            return elements;</span>
+<span class="fc" id="L69">        }</span>
+<span class="fc bfc" id="L70" title="All 4 branches covered.">        if (adductString.length() &gt; 0 &amp;&amp; adductString.startsWith(&quot;-&quot;)) {</span>
+<span class="fc" id="L71">            elements.keySet().stream().forEach((t) -&gt; {</span>
+<span class="fc" id="L72">                elements.negate(t);</span>
+<span class="fc" id="L73">            });</span>
+        }
+<span class="fc" id="L75">        return elements;</span>
+    }
+
+    public int getCharge() {
+<span class="fc" id="L79">        return charge * chargeSign;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

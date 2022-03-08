@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LipidClassGenerator.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.generator</a> &gt; <span class="el_source">LipidClassGenerator.java</span></div><h1>LipidClassGenerator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.generator;
+
+import com.opencsv.CSVReader;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeSpec.Builder;
+import de.isas.lipidomics.domain.ElementTable;
+import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidClass;
+import java.io.IOException;
+import java.io.Reader;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.lang.model.element.Modifier;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ *
+ * @author  nils.hoffmann
+ */
+<span class="nc" id="L53">public class LipidClassGenerator {</span>
+
+    public static void main(String... args) {
+<span class="nc" id="L56">        LipidClassGenerator gne = new LipidClassGenerator();</span>
+        try {
+<span class="nc" id="L58">            System.out.println(gne.getEnumFromTable(gne.getEnumEntries()));</span>
+<span class="nc" id="L59">        } catch (IOException ex) {</span>
+<span class="nc" id="L60">            Logger.getLogger(LipidClassGenerator.class.getName()).log(Level.SEVERE, null, ex);</span>
+<span class="nc" id="L61">        }</span>
+<span class="nc" id="L62">    }</span>
+
+<span class="nc bnc" id="L64" title="All 60 branches missed.">    @Value</span>
+    public static class LipidClassEntry {
+
+<span class="nc" id="L67">        private final String lipidName;</span>
+<span class="nc" id="L68">        private final String lipidCategory;</span>
+<span class="nc" id="L69">        private final String lipidDescription;</span>
+<span class="nc" id="L70">        private final Integer maxNumFa;</span>
+<span class="nc" id="L71">        private final String allowedNumFa;</span>
+<span class="nc" id="L72">        private final String sumFormula;</span>
+<span class="nc" id="L73">        private final List&lt;String&gt; synonyms;</span>
+    }
+
+    public Stream&lt;LipidClassEntry&gt; getEnumEntries() throws IOException {
+<span class="nc" id="L77">        try (Reader reader = Files.newBufferedReader(Paths.get(ClassLoader.getSystemResource(&quot;lipid-list.csv&quot;).toURI()))) {;</span>
+<span class="nc" id="L78">            CSVReader csvReader = new CSVReader(reader);</span>
+<span class="nc" id="L79">            csvReader.skip(1);</span>
+<span class="nc" id="L80">            Iterator&lt;String[]&gt; iter = csvReader.iterator();</span>
+<span class="nc" id="L81">            List&lt;LipidClassEntry&gt; entries = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            while (iter.hasNext()) {</span>
+<span class="nc" id="L83">                String[] s = iter.next();</span>
+<span class="nc" id="L84">                int len = s.length;</span>
+<span class="nc" id="L85">                List&lt;String&gt; synonyms = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">                for (int i = 6; i &lt; len; i++) {</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                    if (!s[i].trim().isEmpty()) {</span>
+<span class="nc" id="L88">                        synonyms.add(s[i]);</span>
+                    }
+                }
+<span class="nc" id="L91">                LipidClassEntry entry = new LipidClassEntry(</span>
+                        s[0],
+                        s[1],
+                        s[2],
+<span class="nc" id="L95">                        Integer.parseInt(s[3]),</span>
+                        s[4],
+                        s[5],
+                        synonyms
+                );
+<span class="nc" id="L100">                System.out.println(&quot;Entry: &quot; + entry);</span>
+<span class="nc" id="L101">                entries.add(entry);</span>
+<span class="nc" id="L102">            }</span>
+<span class="nc" id="L103">            return entries.stream();</span>
+<span class="nc" id="L104">        } catch (URISyntaxException ex) {</span>
+<span class="nc" id="L105">            Logger.getLogger(LipidClassGenerator.class.getName()).log(Level.SEVERE, null, ex);</span>
+        }
+<span class="nc" id="L107">        return Stream.empty();</span>
+    }
+
+    public String sanitizeToEnumConstant(String lipidName, String lipidCategory) {
+<span class="nc" id="L111">        String enumName = lipidName.replaceAll(&quot;[/\\-\\s(),.\\[\\]:;]&quot;, &quot;_&quot;).replaceAll(&quot;'&quot;, &quot;p&quot;)</span>
+<span class="nc" id="L112">                .replaceAll(&quot;^([_0-9]+)&quot;, lipidCategory + &quot;_$1&quot;).replaceAll(&quot;[_]+&quot;, &quot;_&quot;).toUpperCase();</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if(enumName.endsWith(&quot;_&quot;)) {</span>
+<span class="nc" id="L114">            return enumName.substring(0, enumName.length()-1);</span>
+        }
+<span class="nc" id="L116">        return enumName;</span>
+    }
+
+    public String getEnumFromTable(Stream&lt;LipidClassEntry&gt; stream) {
+<span class="nc" id="L120">        final Builder lipidClassBuilder = TypeSpec.enumBuilder(&quot;LipidClass&quot;).addJavadoc(</span>
+                &quot;Enumeration of lipid classes. The shorthand names / abbreviations are used to\n&quot;
+                + &quot;look up the lipid class association of a lipid head group. We try to map each\n&quot;
+                + &quot;abbreviation and synonyms thereof to LipidMAPS main class. However, not all\n&quot;
+                + &quot;described head groups are categorized in LipidMAPS, or only occur in other\n&quot;
+                + &quot;databases, so they do not have such an association at the moment.\n&quot;
+                + &quot;\n&quot;
+                + &quot;Example: Category=Glyerophospholipids maps to Class=Glycerophosphoinositols (PI)\n&quot;
+                + &quot;\n&quot;
+                + &quot;@author nils.hoffmann&quot;
+        ).
+<span class="nc" id="L131">                addModifiers(Modifier.PUBLIC);</span>
+<span class="nc" id="L132">        lipidClassBuilder.addField(LipidCategory.class, &quot;category&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L133">        lipidClassBuilder.addField(String.class, &quot;lipidMapsClassName&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L134">        ClassName synonymsClass = ClassName.get(&quot;java.lang&quot;, &quot;String&quot;);</span>
+<span class="nc" id="L135">        ClassName integersClass = ClassName.get(&quot;java.lang&quot;, &quot;Integer&quot;);</span>
+<span class="nc" id="L136">        ClassName list = ClassName.get(&quot;java.util&quot;, &quot;List&quot;);</span>
+<span class="nc" id="L137">        lipidClassBuilder.addField(String.class, &quot;allowedNumFaStr&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L138">        TypeName listOfIntegers = ParameterizedTypeName.get(list, integersClass);</span>
+<span class="nc" id="L139">        lipidClassBuilder.addField(listOfIntegers, &quot;allowedNumFa&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L140">        lipidClassBuilder.addField(Integer.class, &quot;maxNumFa&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L141">        lipidClassBuilder.addField(String.class, &quot;sumFormula&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L142">        lipidClassBuilder.addField(ElementTable.class, &quot;elementTable&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L143">        ClassName arrayList = ClassName.get(&quot;java.util&quot;, &quot;ArrayList&quot;);</span>
+<span class="nc" id="L144">        TypeName listOfSynonyms = ParameterizedTypeName.get(list, synonymsClass);</span>
+<span class="nc" id="L145">        lipidClassBuilder.addField(listOfSynonyms, &quot;synonyms&quot;, Modifier.PRIVATE, Modifier.FINAL);</span>
+<span class="nc" id="L146">        TypeName optionalLipidClass = ParameterizedTypeName.get(Optional.class, LipidClass.class);</span>
+
+<span class="nc" id="L148">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L149">                MethodSpec.constructorBuilder().</span>
+<span class="nc" id="L150">                        addModifiers(Modifier.PRIVATE).</span>
+<span class="nc" id="L151">                        addParameter(LipidCategory.class, &quot;category&quot;).</span>
+<span class="nc" id="L152">                        addStatement(&quot;this.$N = $N&quot;, &quot;category&quot;, &quot;category&quot;).</span>
+<span class="nc" id="L153">                        addParameter(String.class, &quot;lipidMapsClassName&quot;).</span>
+<span class="nc" id="L154">                        addStatement(&quot;this.$N = $N&quot;, &quot;lipidMapsClassName&quot;, &quot;lipidMapsClassName&quot;).</span>
+<span class="nc" id="L155">                        addParameter(Integer.class, &quot;maxNumFa&quot;).</span>
+<span class="nc" id="L156">                        addStatement(&quot;this.$N = $N&quot;, &quot;maxNumFa&quot;, &quot;maxNumFa&quot;).</span>
+<span class="nc" id="L157">                        addParameter(String.class, &quot;allowedNumFaStr&quot;).</span>
+<span class="nc" id="L158">                        addStatement(&quot;this.$N = $N&quot;, &quot;allowedNumFaStr&quot;, &quot;allowedNumFaStr&quot;).</span>
+<span class="nc" id="L159">                        addParameter(String.class, &quot;sumFormula&quot;).</span>
+<span class="nc" id="L160">                        addStatement(&quot;this.$N = $N&quot;, &quot;sumFormula&quot;, &quot;sumFormula&quot;).</span>
+<span class="nc" id="L161">                        addStatement(</span>
+<span class="nc" id="L162">                                CodeBlock.of(</span>
+                                        &quot;ElementTable et = new ElementTable();\n&quot;
+                                        + &quot;        if(this.sumFormula!=null &amp;&amp; !this.sumFormula.isEmpty()) {\n&quot;
+                                        + &quot;            try {\n&quot;
+                                        + &quot;                et = new ElementTable(this.sumFormula);\n&quot;
+                                        + &quot;            } catch (de.isas.lipidomics.palinom.exceptions.ParsingException ex) {\n&quot;
+                                        + &quot;                et = new ElementTable();\n&quot;
+                                        + &quot;            }\n&quot;
+                                        + &quot;        }\n&quot;
+                                        + &quot;        this.elementTable = et;&quot;
+                                )
+                        ).
+<span class="nc" id="L174">                        addParameter(listOfSynonyms, &quot;synonyms&quot;).</span>
+<span class="nc" id="L175">                        addStatement(</span>
+<span class="nc" id="L176">                                CodeBlock.of(</span>
+                                        &quot;if ($N.isEmpty()) {\n&quot;
+                                        + &quot; throw new IllegalArgumentException(\&quot;Must supply at least one synonym!\&quot;);\n&quot;
+                                        + &quot;}&quot;, &quot;synonyms&quot;)
+                        ).
+<span class="nc" id="L181">                        addStatement(</span>
+<span class="nc" id="L182">                                CodeBlock.of(</span>
+                                        &quot;this.$N = Arrays.asList(allowedNumFaStr.split(\&quot;\\\\|\&quot;)).stream().map((t) -&gt; {\n&quot;
+                                        + &quot;   return Integer.parseInt(t);\n&quot;
+                                        + &quot;}).collect(java.util.stream.Collectors.toList())&quot;, &quot;allowedNumFa&quot;)
+                        ).
+<span class="nc" id="L187">                        addStatement(&quot;this.$N = $N&quot;, &quot;synonyms&quot;, &quot;synonyms&quot;).</span>
+<span class="nc" id="L188">                        build()</span>
+        );
+
+<span class="nc" id="L191">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L192">                MethodSpec.methodBuilder(&quot;getCategory&quot;).addModifiers(Modifier.PUBLIC).returns(LipidCategory.class).addCode(&quot;return this.$N;&quot;, &quot;category&quot;).build()</span>
+        );
+<span class="nc" id="L194">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L195">                MethodSpec.methodBuilder(&quot;getAbbreviation&quot;).addModifiers(Modifier.PUBLIC).returns(String.class).addCode(&quot;return this.$N.get(0);&quot;, &quot;synonyms&quot;).build()</span>
+        );
+<span class="nc" id="L197">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L198">                MethodSpec.methodBuilder(&quot;getLipidMapsClassName&quot;).addModifiers(Modifier.PUBLIC).returns(String.class).addCode(&quot;return this.$N;&quot;, &quot;lipidMapsClassName&quot;).build()</span>
+        );
+<span class="nc" id="L200">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L201">                MethodSpec.methodBuilder(&quot;getMaxNumFa&quot;).addModifiers(Modifier.PUBLIC).returns(Integer.class).addCode(&quot;return this.$N;&quot;, &quot;maxNumFa&quot;).build()</span>
+        );
+<span class="nc" id="L203">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L204">                MethodSpec.methodBuilder(&quot;getAllowedNumFa&quot;).addModifiers(Modifier.PUBLIC).returns(listOfIntegers).addCode(&quot;return this.$N;&quot;, &quot;allowedNumFa&quot;).build()</span>
+        );
+<span class="nc" id="L206">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L207">                MethodSpec.methodBuilder(&quot;getSumFormula&quot;).addModifiers(Modifier.PUBLIC).returns(String.class).addCode(&quot;return this.$N.getSumFormula();&quot;, &quot;elementTable&quot;).build()</span>
+        );
+<span class="nc" id="L209">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L210">                MethodSpec.methodBuilder(&quot;getElements&quot;).addModifiers(Modifier.PUBLIC).returns(ElementTable.class).addCode(&quot;return this.$N.copy();&quot;, &quot;elementTable&quot;).build()</span>
+        );
+<span class="nc" id="L212">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L213">                MethodSpec.methodBuilder(&quot;getSynonyms&quot;).addModifiers(Modifier.PUBLIC).returns(listOfSynonyms).addCode(&quot;return this.$N;&quot;, &quot;synonyms&quot;).build()</span>
+        );
+
+<span class="nc" id="L216">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L217">                MethodSpec.methodBuilder(&quot;matchesAbbreviation&quot;).</span>
+<span class="nc" id="L218">                        addModifiers(Modifier.PUBLIC).</span>
+<span class="nc" id="L219">                        addParameter(String.class, &quot;headGroup&quot;).</span>
+<span class="nc" id="L220">                        addStatement(</span>
+<span class="nc" id="L221">                                CodeBlock.of(</span>
+                                        &quot;return this.synonyms.stream().anyMatch((synonym) -&gt; {\n&quot;
+                                        + &quot;return synonym.equals($N);\n&quot;
+                                        + &quot;})&quot;, &quot;headGroup&quot;)).
+<span class="nc" id="L225">                        returns(boolean.class).</span>
+<span class="nc" id="L226">                        build()</span>
+        );
+
+<span class="nc" id="L229">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L230">                MethodSpec.methodBuilder(&quot;getLysoAbbreviation&quot;).</span>
+<span class="nc" id="L231">                        addModifiers(Modifier.PUBLIC).</span>
+<span class="nc" id="L232">                        addParameter(LipidClass.class, &quot;lipidClass&quot;).</span>
+<span class="nc" id="L233">                        addStatement(</span>
+<span class="nc" id="L234">                                CodeBlock.of(</span>
+                                        &quot;if ($N.getCategory() == LipidCategory.GP) { &quot;
+                                        + &quot;return \&quot;L\&quot; + $N.getAbbreviation();\n&quot;
+                                        + &quot;}\n&quot;
+                                        + &quot;throw new ConstraintViolationException(\&quot;Lipid category must be \&quot; + LipidCategory.GP + \&quot; for lyso-classes!\&quot;)&quot;, &quot;lipidClass&quot;, &quot;lipidClass&quot;)).
+<span class="nc" id="L239">                        returns(String.class).</span>
+<span class="nc" id="L240">                        build()</span>
+        );
+
+<span class="nc" id="L243">        lipidClassBuilder.addMethod(</span>
+<span class="nc" id="L244">                MethodSpec.methodBuilder(&quot;forHeadGroup&quot;).</span>
+<span class="nc" id="L245">                        addModifiers(Modifier.PUBLIC, Modifier.STATIC).</span>
+<span class="nc" id="L246">                        addParameter(String.class, &quot;headGroup&quot;).</span>
+<span class="nc" id="L247">                        addStatement(</span>
+<span class="nc" id="L248">                                CodeBlock.of(</span>
+                                        &quot;return Arrays.asList(values()).stream().filter((lipidClass) -&gt; {\n&quot;
+                                        + &quot;    return lipidClass.matchesAbbreviation($N.trim());\n&quot;
+                                        + &quot;}).findFirst()&quot;, &quot;headGroup&quot;)).
+<span class="nc" id="L252">                        returns(optionalLipidClass).</span>
+<span class="nc" id="L253">                        build()</span>
+        );
+
+<span class="nc" id="L256">        stream.forEach((lipidClassEntry) -&gt; {</span>
+<span class="nc" id="L257">            String sanitizedName = sanitizeToEnumConstant(lipidClassEntry.getLipidName(), lipidClassEntry.getLipidCategory());</span>
+<span class="nc" id="L258">            LipidCategory category = LipidCategory.valueOf(lipidClassEntry.getLipidCategory());</span>
+<span class="nc" id="L259">            List&lt;String&gt; template = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L260">            template.addAll(</span>
+<span class="nc" id="L261">                    Arrays.asList(</span>
+<span class="nc" id="L262">                            &quot;LipidCategory.&quot; + category.name(),</span>
+                            &quot;\&quot;&quot; + lipidClassEntry.lipidDescription + &quot;\&quot;&quot;,
+                            lipidClassEntry.maxNumFa + &quot;&quot;,
+                            &quot;\&quot;&quot; + lipidClassEntry.allowedNumFa + &quot;\&quot;&quot;,
+//                            &quot;\&quot;&quot; + lipidClassEntry.lipidName + &quot;\&quot;&quot;,
+                            &quot;\&quot;&quot; + lipidClassEntry.sumFormula + &quot;\&quot;&quot;
+                    )
+            );
+<span class="nc" id="L270">            List&lt;String&gt; synonyms = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L271">            synonyms.add(&quot;\&quot;&quot; + lipidClassEntry.lipidName + &quot;\&quot;&quot;);</span>
+<span class="nc" id="L272">            synonyms.addAll(lipidClassEntry.getSynonyms().stream().map((t) -&gt; {</span>
+<span class="nc" id="L273">                return &quot;\&quot;&quot; + t + &quot;\&quot;&quot;;</span>
+<span class="nc" id="L274">            }).collect(Collectors.toList()));</span>
+<span class="nc" id="L275">            template.add(&quot;java.util.Arrays.asList(&quot; + synonyms.stream().collect(Collectors.joining(&quot;,&quot;)) + &quot;)&quot;);</span>
+<span class="nc" id="L276">            CodeBlock cb = CodeBlock.of(String.join(&quot;, &quot;, template));</span>
+<span class="nc" id="L277">            lipidClassBuilder.addEnumConstant(sanitizedName, TypeSpec.anonymousClassBuilder(cb).build());</span>
+<span class="nc" id="L278">        });</span>
+
+<span class="nc" id="L280">        return JavaFile.builder(&quot;de.isas.lipidomics.domain&quot;, lipidClassBuilder.build()).addFileComment(</span>
+                &quot; Copyright 2019 nils.hoffmann.\n&quot;
+                + &quot;\n&quot;
+                + &quot; Licensed under the Apache License, Version 2.0 (the \&quot;License\&quot;);\n&quot;
+                + &quot; you may not use this file except in compliance with the License.\n&quot;
+                + &quot; You may obtain a copy of the License at\n&quot;
+                + &quot;\n&quot;
+                + &quot;      http://www.apache.org/licenses/LICENSE-2.0\n&quot;
+                + &quot;\n&quot;
+                + &quot; Unless required by applicable law or agreed to in writing, software\n&quot;
+                + &quot; distributed under the License is distributed on an \&quot;AS IS\&quot; BASIS,\n&quot;
+                + &quot; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n&quot;
+                + &quot; See the License for the specific language governing permissions and\n&quot;
+                + &quot; limitations under the License.&quot;
+<span class="nc" id="L294">        ).build().toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

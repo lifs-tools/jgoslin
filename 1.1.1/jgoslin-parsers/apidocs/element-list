@@ -1,0 +1,10 @@
+de.isas.lipidomics.domain
+de.isas.lipidomics.generator
+de.isas.lipidomics.palinom
+de.isas.lipidomics.palinom.exceptions
+de.isas.lipidomics.palinom.goslin
+de.isas.lipidomics.palinom.goslinfragments
+de.isas.lipidomics.palinom.hmdb
+de.isas.lipidomics.palinom.lipidmaps
+de.isas.lipidomics.palinom.sumformula
+de.isas.lipidomics.palinom.swisslipids

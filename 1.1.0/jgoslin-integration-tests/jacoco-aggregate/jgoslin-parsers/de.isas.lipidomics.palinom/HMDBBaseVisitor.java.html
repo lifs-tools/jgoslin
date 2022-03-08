@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>HMDBBaseVisitor.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom</a> &gt; <span class="el_source">HMDBBaseVisitor.java</span></div><h1>HMDBBaseVisitor.java</h1><pre class="source lang-java linenums">// Generated from de/isas/lipidomics/palinom/HMDB.g4 by ANTLR 4.7.2
+package de.isas.lipidomics.palinom;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+
+/**
+ * This class provides an empty implementation of {@link HMDBVisitor},
+ * which can be extended to create a visitor which only needs to handle a subset
+ * of the available methods.
+ *
+ * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
+<span class="fc" id="L13">public class HMDBBaseVisitor&lt;T&gt; extends AbstractParseTreeVisitor&lt;T&gt; implements HMDBVisitor&lt;T&gt; {</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L20">	@Override public T visitLipid(HMDBParser.LipidContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L27">	@Override public T visitLipid_pure(HMDBParser.Lipid_pureContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L34">	@Override public T visitLipid_class(HMDBParser.Lipid_classContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L41">	@Override public T visitLipid_suffix(HMDBParser.Lipid_suffixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L48">	@Override public T visitFa(HMDBParser.FaContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L55">	@Override public T visitFa_core(HMDBParser.Fa_coreContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L62">	@Override public T visitFuran_fa(HMDBParser.Furan_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L69">	@Override public T visitFuran_fa_mono(HMDBParser.Furan_fa_monoContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L76">	@Override public T visitFuran_fa_di(HMDBParser.Furan_fa_diContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L83">	@Override public T visitLcb(HMDBParser.LcbContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L90">	@Override public T visitLcb_core(HMDBParser.Lcb_coreContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L97">	@Override public T visitCarbon(HMDBParser.CarbonContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L104">	@Override public T visitDb(HMDBParser.DbContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L111">	@Override public T visitDb_count(HMDBParser.Db_countContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L118">	@Override public T visitDb_suffix(HMDBParser.Db_suffixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L125">	@Override public T visitDb_suffix_number(HMDBParser.Db_suffix_numberContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L132">	@Override public T visitDb_positions(HMDBParser.Db_positionsContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L139">	@Override public T visitDb_position(HMDBParser.Db_positionContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L146">	@Override public T visitDb_single_position(HMDBParser.Db_single_positionContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L153">	@Override public T visitDb_position_number(HMDBParser.Db_position_numberContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L160">	@Override public T visitCistrans(HMDBParser.CistransContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L167">	@Override public T visitEther(HMDBParser.EtherContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L174">	@Override public T visitEther_link_pos(HMDBParser.Ether_link_posContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L181">	@Override public T visitEther_type(HMDBParser.Ether_typeContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L188">	@Override public T visitHydroxyl(HMDBParser.HydroxylContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L195">	@Override public T visitFa_lcb_suffix(HMDBParser.Fa_lcb_suffixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L202">	@Override public T visitFa_lcb_suffix_core(HMDBParser.Fa_lcb_suffix_coreContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L209">	@Override public T visitFa_lcb_suffix_type(HMDBParser.Fa_lcb_suffix_typeContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L216">	@Override public T visitFa_lcb_suffix_number(HMDBParser.Fa_lcb_suffix_numberContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L223">	@Override public T visitFa_lcb_prefix(HMDBParser.Fa_lcb_prefixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L230">	@Override public T visitFa_lcb_prefix_type(HMDBParser.Fa_lcb_prefix_typeContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L237">	@Override public T visitFa_species(HMDBParser.Fa_speciesContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L244">	@Override public T visitFa2(HMDBParser.Fa2Context ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L251">	@Override public T visitFa2_sorted(HMDBParser.Fa2_sortedContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L258">	@Override public T visitFa2_unsorted(HMDBParser.Fa2_unsortedContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L265">	@Override public T visitFa3(HMDBParser.Fa3Context ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L272">	@Override public T visitFa3_sorted(HMDBParser.Fa3_sortedContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L279">	@Override public T visitFa3_unsorted(HMDBParser.Fa3_unsortedContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L286">	@Override public T visitFa4(HMDBParser.Fa4Context ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L293">	@Override public T visitFa4_sorted(HMDBParser.Fa4_sortedContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L300">	@Override public T visitFa4_unsorted(HMDBParser.Fa4_unsortedContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L307">	@Override public T visitFatty_acid(HMDBParser.Fatty_acidContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L314">	@Override public T visitFa_hg(HMDBParser.Fa_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L321">	@Override public T visitFa_fa(HMDBParser.Fa_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L328">	@Override public T visitInterlink_fa(HMDBParser.Interlink_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L335">	@Override public T visitMediator(HMDBParser.MediatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L342">	@Override public T visitMediator_single(HMDBParser.Mediator_singleContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L349">	@Override public T visitMed_positions(HMDBParser.Med_positionsContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L356">	@Override public T visitMed_position(HMDBParser.Med_positionContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L363">	@Override public T visitMed_suffix(HMDBParser.Med_suffixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L370">	@Override public T visitGl(HMDBParser.GlContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L377">	@Override public T visitGl_regular(HMDBParser.Gl_regularContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L384">	@Override public T visitGl_fa(HMDBParser.Gl_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L391">	@Override public T visitGl_hg(HMDBParser.Gl_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L398">	@Override public T visitGl_molecular(HMDBParser.Gl_molecularContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L405">	@Override public T visitGl_molecular_fa(HMDBParser.Gl_molecular_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L412">	@Override public T visitGl_molecular_hg(HMDBParser.Gl_molecular_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L419">	@Override public T visitGl_mono(HMDBParser.Gl_monoContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L426">	@Override public T visitGl_mono_fa(HMDBParser.Gl_mono_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L433">	@Override public T visitGl_mono_hg(HMDBParser.Gl_mono_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L440">	@Override public T visitPl(HMDBParser.PlContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L447">	@Override public T visitPl_regular(HMDBParser.Pl_regularContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L454">	@Override public T visitPl_fa(HMDBParser.Pl_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L461">	@Override public T visitPl_hg(HMDBParser.Pl_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L468">	@Override public T visitPl_three(HMDBParser.Pl_threeContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L475">	@Override public T visitPl_three_fa(HMDBParser.Pl_three_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L482">	@Override public T visitPl_three_hg(HMDBParser.Pl_three_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L489">	@Override public T visitPl_four(HMDBParser.Pl_fourContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L496">	@Override public T visitPl_four_fa(HMDBParser.Pl_four_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L503">	@Override public T visitPl_four_hg(HMDBParser.Pl_four_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L510">	@Override public T visitSl(HMDBParser.SlContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L517">	@Override public T visitSl_hg(HMDBParser.Sl_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L524">	@Override public T visitSl_hg_names(HMDBParser.Sl_hg_namesContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L531">	@Override public T visitGanglioside(HMDBParser.GangliosideContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L538">	@Override public T visitGanglioside_names(HMDBParser.Ganglioside_namesContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L545">	@Override public T visitSl_hg_prefix(HMDBParser.Sl_hg_prefixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L552">	@Override public T visitSl_hg_suffix(HMDBParser.Sl_hg_suffixContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L559">	@Override public T visitSl_lcb(HMDBParser.Sl_lcbContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L566">	@Override public T visitSl_lcb_species(HMDBParser.Sl_lcb_speciesContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L573">	@Override public T visitSl_lcb_subspecies(HMDBParser.Sl_lcb_subspeciesContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L580">	@Override public T visitSt(HMDBParser.StContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L587">	@Override public T visitSt_species(HMDBParser.St_speciesContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L594">	@Override public T visitSt_species_hg(HMDBParser.St_species_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L601">	@Override public T visitSt_species_fa(HMDBParser.St_species_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L608">	@Override public T visitSt_sub1(HMDBParser.St_sub1Context ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L615">	@Override public T visitSt_sub1_hg(HMDBParser.St_sub1_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L622">	@Override public T visitSt_sub1_fa(HMDBParser.St_sub1_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L629">	@Override public T visitSt_sub2(HMDBParser.St_sub2Context ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L636">	@Override public T visitSt_sub2_hg(HMDBParser.St_sub2_hgContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L643">	@Override public T visitSt_sub2_fa(HMDBParser.St_sub2_faContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L650">	@Override public T visitUnsorted_fa_separator(HMDBParser.Unsorted_fa_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L657">	@Override public T visitSorted_fa_separator(HMDBParser.Sorted_fa_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L664">	@Override public T visitHeadgroup_separator(HMDBParser.Headgroup_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L671">	@Override public T visitCarbon_db_separator(HMDBParser.Carbon_db_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L678">	@Override public T visitDb_position_separator(HMDBParser.Db_position_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L685">	@Override public T visitMed_position_separator(HMDBParser.Med_position_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L692">	@Override public T visitFa_lcb_suffix_separator(HMDBParser.Fa_lcb_suffix_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L699">	@Override public T visitFa_lcb_prefix_separator(HMDBParser.Fa_lcb_prefix_separatorContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L706">	@Override public T visitNumber(HMDBParser.NumberContext ctx) { return visitChildren(ctx); }</span>
+	/**
+	 * {@inheritDoc}
+	 *
+	 * &lt;p&gt;The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+	 */
+<span class="nc" id="L713">	@Override public T visitDigit(HMDBParser.DigitContext ctx) { return visitChildren(ctx); }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

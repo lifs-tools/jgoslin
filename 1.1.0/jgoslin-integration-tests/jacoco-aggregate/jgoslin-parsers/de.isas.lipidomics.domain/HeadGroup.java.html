@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>HeadGroup.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.domain</a> &gt; <span class="el_source">HeadGroup.java</span></div><h1>HeadGroup.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020  nils.hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.isas.lipidomics.domain;
+
+import java.util.Optional;
+import lombok.Data;
+
+/**
+ * This class represents functional head groups of lipids. This is where the
+ * association to {@link LipidClass} and {@link LipidCategory} is maintained.
+ *
+ * @author  nils.hoffmann
+ */
+<span class="nc bnc" id="L27" title="All 38 branches missed.">@Data</span>
+public class HeadGroup {
+
+<span class="fc" id="L30">    private final String name;</span>
+<span class="fc" id="L31">    private final String rawName;</span>
+<span class="fc" id="L32">    private final Optional&lt;LipidClass&gt; lipidClass;</span>
+<span class="nc" id="L33">    private final LipidCategory lipidCategory;</span>
+
+    /**
+     * Creates a new head group from the given head group name. Lipid class and
+     * category will be looked up from {@link LipidClass#forHeadGroup(java.lang.String)
+     * }.
+     *
+     * @param rawName the lipid head group string.
+     */
+<span class="fc" id="L42">    public HeadGroup(String rawName) {</span>
+<span class="fc" id="L43">        this.rawName = rawName;</span>
+<span class="fc" id="L44">        this.name = rawName.trim().replaceAll(&quot; O&quot;, &quot;&quot;);</span>
+<span class="fc" id="L45">        this.lipidClass = LipidClass.forHeadGroup(this.name);</span>
+<span class="fc" id="L46">        this.lipidCategory = this.lipidClass.map((lipidClass) -&gt; {</span>
+<span class="fc" id="L47">            return lipidClass.getCategory();</span>
+<span class="fc" id="L48">        }).orElse(LipidCategory.UNDEFINED);</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * Creates a new head group from the given head group name and optionally a
+     * lipid class. The lipid class also determines the category.
+     *
+     * @param rawName the lipid head gruop string.
+     * @param lipidClass the lipid class.
+     */
+<span class="nc" id="L58">    public HeadGroup(String rawName, Optional&lt;LipidClass&gt; lipidClass) {</span>
+<span class="nc" id="L59">        this.rawName = rawName;</span>
+<span class="nc" id="L60">        this.name = rawName.trim().replaceAll(&quot; O&quot;, &quot;&quot;);</span>
+<span class="nc" id="L61">        this.lipidClass = lipidClass;</span>
+<span class="nc" id="L62">        this.lipidCategory = this.lipidClass.map((myLipidClass) -&gt; {</span>
+<span class="nc" id="L63">            return myLipidClass.getCategory();</span>
+<span class="nc" id="L64">        }).orElse(LipidCategory.UNDEFINED);</span>
+<span class="nc" id="L65">    }</span>
+
+    /**
+     * Returns a lipid string representation for the head group of this lipid.
+     * This method normalizes the original head group name to the class specific
+     * primary alias, if the level and class are known. E.g. TG is normalized to
+     * TAG.
+     *
+     * @return the normalized lipid head group.
+     */
+    public String getNormalizedName() {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (lipidClass.isPresent()) {</span>
+<span class="nc" id="L77">            return lipidClass.get().getSynonyms().get(0);</span>
+        }
+<span class="nc" id="L79">        return name;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L84">        return this.name;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

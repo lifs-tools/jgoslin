@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SumFormulaLexer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jgoslin-integration-tests</a> &gt; <a href="../index.html" class="el_bundle">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">de.isas.lipidomics.palinom</a> &gt; <span class="el_source">SumFormulaLexer.java</span></div><h1>SumFormulaLexer.java</h1><pre class="source lang-java linenums">// Generated from de/isas/lipidomics/palinom/SumFormula.g4 by ANTLR 4.7.2
+package de.isas.lipidomics.palinom;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.*;
+
+@SuppressWarnings({&quot;all&quot;, &quot;warnings&quot;, &quot;unchecked&quot;, &quot;unused&quot;, &quot;cast&quot;})
+public class SumFormulaLexer extends Lexer {
+<span class="fc" id="L14">	static { RuntimeMetaData.checkVersion(&quot;4.7.2&quot;, RuntimeMetaData.VERSION); }</span>
+
+	protected static final DFA[] _decisionToDFA;
+<span class="fc" id="L17">	protected static final PredictionContextCache _sharedContextCache =</span>
+		new PredictionContextCache();
+	public static final int
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16;
+<span class="fc" id="L22">	public static String[] channelNames = {</span>
+		&quot;DEFAULT_TOKEN_CHANNEL&quot;, &quot;HIDDEN&quot;
+	};
+
+<span class="fc" id="L26">	public static String[] modeNames = {</span>
+		&quot;DEFAULT_MODE&quot;
+	};
+
+	private static String[] makeRuleNames() {
+<span class="fc" id="L31">		return new String[] {</span>
+			&quot;T__0&quot;, &quot;T__1&quot;, &quot;T__2&quot;, &quot;T__3&quot;, &quot;T__4&quot;, &quot;T__5&quot;, &quot;T__6&quot;, &quot;T__7&quot;, &quot;T__8&quot;, 
+			&quot;T__9&quot;, &quot;T__10&quot;, &quot;T__11&quot;, &quot;T__12&quot;, &quot;T__13&quot;, &quot;T__14&quot;, &quot;T__15&quot;
+		};
+	}
+<span class="fc" id="L36">	public static final String[] ruleNames = makeRuleNames();</span>
+
+	private static String[] makeLiteralNames() {
+<span class="fc" id="L39">		return new String[] {</span>
+			null, &quot;'C'&quot;, &quot;'H'&quot;, &quot;'N'&quot;, &quot;'O'&quot;, &quot;'P'&quot;, &quot;'S'&quot;, &quot;'0'&quot;, &quot;'1'&quot;, &quot;'2'&quot;, 
+			&quot;'3'&quot;, &quot;'4'&quot;, &quot;'5'&quot;, &quot;'6'&quot;, &quot;'7'&quot;, &quot;'8'&quot;, &quot;'9'&quot;
+		};
+	}
+<span class="fc" id="L44">	private static final String[] _LITERAL_NAMES = makeLiteralNames();</span>
+	private static String[] makeSymbolicNames() {
+<span class="fc" id="L46">		return new String[] {</span>
+		};
+	}
+<span class="fc" id="L49">	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();</span>
+<span class="fc" id="L50">	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);</span>
+
+	/**
+	 * @deprecated Use {@link #VOCABULARY} instead.
+	 */
+	@Deprecated
+	public static final String[] tokenNames;
+	static {
+<span class="fc" id="L58">		tokenNames = new String[_SYMBOLIC_NAMES.length];</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">		for (int i = 0; i &lt; tokenNames.length; i++) {</span>
+<span class="nc" id="L60">			tokenNames[i] = VOCABULARY.getLiteralName(i);</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">			if (tokenNames[i] == null) {</span>
+<span class="nc" id="L62">				tokenNames[i] = VOCABULARY.getSymbolicName(i);</span>
+			}
+
+<span class="nc bnc" id="L65" title="All 2 branches missed.">			if (tokenNames[i] == null) {</span>
+<span class="nc" id="L66">				tokenNames[i] = &quot;&lt;INVALID&gt;&quot;;</span>
+			}
+		}
+	}
+
+	@Override
+	@Deprecated
+	public String[] getTokenNames() {
+<span class="nc" id="L74">		return tokenNames;</span>
+	}
+
+	@Override
+
+	public Vocabulary getVocabulary() {
+<span class="nc" id="L80">		return VOCABULARY;</span>
+	}
+
+
+	public SumFormulaLexer(CharStream input) {
+<span class="fc" id="L85">		super(input);</span>
+<span class="fc" id="L86">		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);</span>
+<span class="fc" id="L87">	}</span>
+
+	@Override
+<span class="nc" id="L90">	public String getGrammarFileName() { return &quot;SumFormula.g4&quot;; }</span>
+
+	@Override
+<span class="nc" id="L93">	public String[] getRuleNames() { return ruleNames; }</span>
+
+	@Override
+<span class="nc" id="L96">	public String getSerializedATN() { return _serializedATN; }</span>
+
+	@Override
+<span class="nc" id="L99">	public String[] getChannelNames() { return channelNames; }</span>
+
+	@Override
+<span class="nc" id="L102">	public String[] getModeNames() { return modeNames; }</span>
+
+	@Override
+<span class="nc" id="L105">	public ATN getATN() { return _ATN; }</span>
+
+	public static final String _serializedATN =
+		&quot;\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2\22C\b\1\4\2\t\2\4&quot;+
+		&quot;\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t&quot;+
+		&quot;\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\3\2\3\2\3&quot;+
+		&quot;\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b\3\t\3\t\3\n\3\n\3\13\3&quot;+
+		&quot;\13\3\f\3\f\3\r\3\r\3\16\3\16\3\17\3\17\3\20\3\20\3\21\3\21\2\2\22\3\3&quot;+
+		&quot;\5\4\7\5\t\6\13\7\r\b\17\t\21\n\23\13\25\f\27\r\31\16\33\17\35\20\37\21&quot;+
+		&quot;!\22\3\2\2\2B\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2&quot;+
+		&quot;\2\2\2\r\3\2\2\2\2\17\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2&quot;+
+		&quot;\27\3\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2&quot;+
+		&quot;\2\2\3#\3\2\2\2\5%\3\2\2\2\7\'\3\2\2\2\t)\3\2\2\2\13+\3\2\2\2\r-\3\2\2&quot;+
+		&quot;\2\17/\3\2\2\2\21\61\3\2\2\2\23\63\3\2\2\2\25\65\3\2\2\2\27\67\3\2\2\2&quot;+
+		&quot;\319\3\2\2\2\33;\3\2\2\2\35=\3\2\2\2\37?\3\2\2\2!A\3\2\2\2#$\7E\2\2$\4&quot;+
+		&quot;\3\2\2\2%&amp;\7J\2\2&amp;\6\3\2\2\2\'(\7P\2\2(\b\3\2\2\2)*\7Q\2\2*\n\3\2\2\2&quot;+
+		&quot;+,\7R\2\2,\f\3\2\2\2-.\7U\2\2.\16\3\2\2\2/\60\7\62\2\2\60\20\3\2\2\2\61&quot;+
+		&quot;\62\7\63\2\2\62\22\3\2\2\2\63\64\7\64\2\2\64\24\3\2\2\2\65\66\7\65\2\2&quot;+
+		&quot;\66\26\3\2\2\2\678\7\66\2\28\30\3\2\2\29:\7\67\2\2:\32\3\2\2\2;&lt;\78\2&quot;+
+		&quot;\2&lt;\34\3\2\2\2=&gt;\79\2\2&gt;\36\3\2\2\2?@\7:\2\2@ \3\2\2\2AB\7;\2\2B\&quot;\3\2&quot;+
+		&quot;\2\2\3\2\2&quot;;
+<span class="fc" id="L126">	public static final ATN _ATN =</span>
+<span class="fc" id="L127">		new ATNDeserializer().deserialize(_serializedATN.toCharArray());</span>
+	static {
+<span class="fc" id="L129">		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">		for (int i = 0; i &lt; _ATN.getNumberOfDecisions(); i++) {</span>
+<span class="fc" id="L131">			_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);</span>
+		}
+<span class="fc" id="L133">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
