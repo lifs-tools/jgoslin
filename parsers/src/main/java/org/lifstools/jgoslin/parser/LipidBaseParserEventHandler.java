@@ -75,6 +75,8 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
         if (useHeadGroup) {
             return headgroup;
         }
+        
+        headGroup = headgroup.getClassName();
 
         int true_fa = 0;
         for (FattyAcid fa : faList) {
@@ -101,6 +103,9 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 throw new ConstraintViolationException("No fatty acyl information lipid class '" + hg_name + "' provided.");
             }
         } else if (true_fa != poss_fa && LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
+            String hg_name = headgroup.getHeadgroup();
+            throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + hg_name + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
+        } else if (LipidClasses.getInstance().get(Headgroup.getClass(headGroup)).specialCases.contains("Lyso") && true_fa > poss_fa){
             String hg_name = headgroup.getHeadgroup();
             throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + hg_name + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
         }
