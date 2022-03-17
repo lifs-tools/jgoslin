@@ -43,6 +43,10 @@ public class FattyAcid extends FunctionalGroup {
         this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
     }
 
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds) {
+        this(_name, _num_carbon, _double_bonds, null, LipidFaBondType.ESTER, 0, null);
+    }
+
     public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, _num_carbon, _double_bonds, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
     }

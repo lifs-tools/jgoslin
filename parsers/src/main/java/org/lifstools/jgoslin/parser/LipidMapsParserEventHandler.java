@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Set;
+import org.lifstools.jgoslin.domain.DoubleBonds;
 
 /**
  * Event handler implementation for the {@link LipidMapsParser}.
@@ -395,6 +396,20 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
         if (lcb != null) {
             faList.add(0, lcb);
+        }
+        
+        if (addOmegaLinoleoyloxyCer){
+            if (faList.size() != 2){
+                throw new RuntimeException("omega-linoleoyloxy-Cer with a different combination to one long chain base and one fatty acyl chain unknown");
+            }
+            Map<String, ArrayList<FunctionalGroup>> fgroups = faList.get(faList.size() - 1).getFunctionalGroupsInternal();
+            if (!fgroups.containsKey("acyl")) fgroups.put("acyl", new ArrayList<>());
+            
+            DoubleBonds db = new DoubleBonds(2);
+            db.getDoubleBondPositions().put(9, "Z");
+            db.getDoubleBondPositions().put(12, "Z");
+            faList.get(faList.size() - 1).getFunctionalGroupsInternal().get("acyl").add(new FattyAcid("FA", 18, db));
+            headGroup = "Cer";
         }
        
         Headgroup headgroup = prepareHeadgroupAndChecks();
