@@ -477,9 +477,6 @@
                 <gpg.executable>${gpg.executable}</gpg.executable>
                 <gpg.keyname>${gpg.keyname}</gpg.keyname>
                 <gpg.passphrase>${gpg.passphrase}</gpg.passphrase>
-                <!--<gpg.defaultKeyring>true</gpg.defaultKeyring>-->
-                <!--<gpg.publicKeyring>${gpg.publicKeyring}</gpg.publicKeyring>-->
-                <!--                <gpg.secretKeyring>${gpg.dir}/secring.gpg</gpg.secretKeyring>-->
             </properties>
             <activation>
                 <property>

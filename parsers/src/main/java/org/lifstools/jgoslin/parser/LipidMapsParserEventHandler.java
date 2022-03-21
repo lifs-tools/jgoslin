@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Set;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
 import org.lifstools.jgoslin.domain.DoubleBonds;
 
 /**
@@ -400,7 +401,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         
         if (addOmegaLinoleoyloxyCer){
             if (faList.size() != 2){
-                throw new RuntimeException("omega-linoleoyloxy-Cer with a different combination to one long chain base and one fatty acyl chain unknown");
+                throw new ConstraintViolationException("omega-linoleoyloxy-Cer with a different combination to one long chain base and one fatty acyl chain unknown");
             }
             Map<String, ArrayList<FunctionalGroup>> fgroups = faList.get(faList.size() - 1).getFunctionalGroupsInternal();
             if (!fgroups.containsKey("acyl")) fgroups.put("acyl", new ArrayList<>());

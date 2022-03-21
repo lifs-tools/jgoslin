@@ -99,15 +99,12 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
 
         if (level == LipidLevel.SPECIES) {
             if (true_fa == 0 && poss_fa != 0) {
-                String hg_name = headgroup.getHeadgroup();
-                throw new ConstraintViolationException("No fatty acyl information lipid class '" + hg_name + "' provided.");
+                throw new ConstraintViolationException("No fatty acyl information lipid class '" + headgroup.getHeadgroup() + "' provided.");
             }
         } else if (true_fa != poss_fa && LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
-            String hg_name = headgroup.getHeadgroup();
-            throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + hg_name + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
+            throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + headgroup.getHeadgroup() + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
         } else if (LipidClasses.getInstance().get(Headgroup.getClass(headGroup)).specialCases.contains("Lyso") && true_fa > poss_fa){
-            String hg_name = headgroup.getHeadgroup();
-            throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + hg_name + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
+            throw new ConstraintViolationException("Number of described fatty acyl chains (" + Integer.toString(true_fa) + ") not allowed for lipid class '" + headgroup.getHeadgroup() + "' (having " + Integer.toString(poss_fa) + " fatty aycl chains).");
         }
 
         if (LipidClasses.getInstance().get(headgroup.getLipidClass()).specialCases.contains("HC")) {

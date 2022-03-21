@@ -294,8 +294,7 @@ public class FattyAcid extends FunctionalGroup {
                 case ETHER_PLASMENYL:
                     elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds + 2)); // hydrogen
                     break;
-                case ETHER:
-                case ETHER_PLASMANYL:
+                case ETHER, ETHER_PLASMANYL:
                     elements.put(Element.H, ((numCarbon + 1) * 2 - 1 - 2 * num_double_bonds)); // hydrogen
                     break;
                 case AMIDE:

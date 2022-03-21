@@ -102,7 +102,10 @@ public class LipidMapsParserTest {
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("EPC 38:3;O3", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C40H77N2O7P", lipid.getSumFormula());
-
+        
+        lipid = parser.parse("omega-linoleoyloxy-Cer(d17:1(6OH)/29:0)", handler);
+        assertEquals(LipidLevel.SN_POSITION, lipid.getLipidLevel());
+        assertEquals("Cer 64:3;O4", lipid.getLipidString(LipidLevel.SPECIES));
     }
 
     @ParameterizedTest(name = "{index}: {0}")
