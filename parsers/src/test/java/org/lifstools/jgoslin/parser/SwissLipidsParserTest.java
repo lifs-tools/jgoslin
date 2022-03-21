@@ -16,7 +16,6 @@
 package org.lifstools.jgoslin.parser;
 
 import org.lifstools.jgoslin.domain.LipidAdduct;
-import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
@@ -89,6 +89,10 @@ public class SwissLipidsParserTest {
         assertEquals("EPC 38:3;O3", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C40H77N2O7P", l.getSumFormula());
 
+        l = parser.parse("NeuGc-GalGb4Cer (d18:0/30:5(15Z,18Z,21Z,24Z,27Z))", handler);
+        assertEquals("NeuGc-GalGb4Cer 48:5;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals(1883.04177, l.getMass(), 1.0e-4);
+        assertEquals("C91H156N3O37", l.getSumFormula());
     }
 
     @ParameterizedTest(name = "{index}: {0}")

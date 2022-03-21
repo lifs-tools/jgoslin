@@ -809,7 +809,6 @@ public abstract class Parser<T> {
                         TreeNode parse_tree = new TreeNode(first_rule, NTtoRule.containsKey(first_rule));
                         fill_tree(parse_tree, DP.get(0).get(i).get(first_rule));
                         return Optional.of(new ParsingErrors(wordInGrammar, parse_tree.getText()));
-//                        break;
                     }
                 }
             }
