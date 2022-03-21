@@ -21,19 +21,15 @@ import java.util.Map.Entry;
 /**
  * Base class for lipid names parsed using the different grammars. This can
  * contain a lipid, an adduct and a sum formula.
+ *
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
 public final class LipidAdduct {
 
-    private LipidSpecies lipid;
-    private Adduct adduct;
+    private final LipidSpecies lipid;
+    private final Adduct adduct;
 
-    public LipidAdduct() {
-        lipid = null;
-        adduct = null;
-    }
-    
     public LipidAdduct(LipidSpecies lipid, Adduct adduct) {
         this.lipid = lipid;
         this.adduct = adduct;
@@ -156,16 +152,8 @@ public final class LipidAdduct {
         return lipid;
     }
 
-    public void setLipid(LipidSpecies lipid) {
-        this.lipid = lipid;
-    }
-
     public Adduct getAdduct() {
         return adduct;
     }
 
-    public void setAdduct(Adduct adduct) {
-        this.adduct = adduct;
-    }
-    
 }

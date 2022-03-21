@@ -343,23 +343,26 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
 
         Headgroup head_group = new Headgroup(headgroup);
 
-        content = new LipidAdduct();
+        LipidSpecies lipidSpecies = null;
 
         switch (level) {
             case COMPLETE_STRUCTURE ->
-                content.setLipid(new LipidCompleteStructure(head_group, fattyAcylStack, knownFunctionalGroups));
+                lipidSpecies = new LipidCompleteStructure(head_group, fattyAcylStack, knownFunctionalGroups);
             case FULL_STRUCTURE ->
-                content.setLipid(new LipidFullStructure(head_group, fattyAcylStack, knownFunctionalGroups));
+                lipidSpecies = new LipidFullStructure(head_group, fattyAcylStack, knownFunctionalGroups);
             case STRUCTURE_DEFINED ->
-                content.setLipid(new LipidStructureDefined(head_group, fattyAcylStack, knownFunctionalGroups));
+                lipidSpecies = new LipidStructureDefined(head_group, fattyAcylStack, knownFunctionalGroups);
             case SN_POSITION ->
-                content.setLipid(new LipidSnPosition(head_group, fattyAcylStack, knownFunctionalGroups));
+                lipidSpecies = new LipidSnPosition(head_group, fattyAcylStack, knownFunctionalGroups);
             case MOLECULAR_SPECIES ->
-                content.setLipid(new LipidMolecularSpecies(head_group, fattyAcylStack, knownFunctionalGroups));
+                lipidSpecies = new LipidMolecularSpecies(head_group, fattyAcylStack, knownFunctionalGroups);
             case SPECIES ->
-                content.setLipid(new LipidSpecies(head_group, fattyAcylStack, knownFunctionalGroups));
+                lipidSpecies = new LipidSpecies(head_group, fattyAcylStack, knownFunctionalGroups);
             default -> {
             }
+        }
+        if (lipidSpecies!=null) {
+            content = new LipidAdduct(lipidSpecies, null);
         }
     }
 

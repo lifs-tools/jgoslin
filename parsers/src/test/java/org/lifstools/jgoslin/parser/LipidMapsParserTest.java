@@ -19,6 +19,7 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -106,6 +107,19 @@ public class LipidMapsParserTest {
         lipid = parser.parse("omega-linoleoyloxy-Cer(d17:1(6OH)/29:0)", handler);
         assertEquals(LipidLevel.SN_POSITION, lipid.getLipidLevel());
         assertEquals("Cer 64:3;O4", lipid.getLipidString(LipidLevel.SPECIES));
+        
+        lipid = parser.parse("PC(34:1) [M+H]1+", handler);
+        assertEquals(LipidLevel.SPECIES, lipid.getLipidLevel());
+        String lipidString = lipid.getLipidString(LipidLevel.SPECIES);
+        assertEquals("PC 34:1[M+H]1+", lipidString);
+        assertEquals("PC 34:1[M+H]1+", lipid.toString());
+        assertFalse(lipid.isLyso());
+        assertFalse(lipid.isCardioLipin());
+        assertFalse(lipid.isContainsSugar());
+        assertFalse(lipid.isContainsEster());
+        assertFalse(lipid.isSpException());
+        assertEquals("PC", lipid.getExtendedClass());
+        assertEquals(760.58508d, lipid.getMass(), 1.0e-4);
     }
 
     @ParameterizedTest(name = "{index}: {0}")
