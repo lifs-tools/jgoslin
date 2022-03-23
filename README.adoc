@@ -107,6 +107,27 @@ arguments that you would pass normally will work in the same way (please replace
 
 You can also run the docker container without the `-f <YOUR_FILE>` argument to see a list of possible arguments.
 
+== Using the project code releases from Maven Central
+
+jgoslin is available from the Maven central repository:
+
+To use the parser libraries (reading and validation) in your own Maven projects, use the following dependency:
+
+<dependency>
+    <groupId>org.lifs-tools</groupId>
+    <artifactId>jgoslin-parsers</artifactId>
+    <version>${jgoslin.version}</version>
+</dependency>
+
+where jgoslin.version is the version of jgoslin you wish to use, e.g. for a release version:
+
+<properties>
+  <jgoslin.version>2.0.0</jgoslin.version>
+</properties>
+
+as defined in the properties section of your pom file.
+
+
 == Using the project code releases via JFrog
 
 The library release artifacts are available from JFrog.
@@ -137,7 +158,7 @@ or use the `-Plifs-repos` command line switch when running Maven to enable the L
 To use the parser libraries (reading and validation) in your own Maven projects, use the following dependency:
 
   <dependency>
-    <groupId>org.lifstools</groupId>
+    <groupId>org.lifs-tools</groupId>
     <artifactId>jgoslin-parsers</artifactId>
     <version>${jgoslin.version}</version>
   </dependency>
