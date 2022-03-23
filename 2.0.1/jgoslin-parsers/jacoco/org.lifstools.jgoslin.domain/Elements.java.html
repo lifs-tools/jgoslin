@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Elements.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">Elements.java</span></div><h1>Elements.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import static java.util.Map.entry;
+
+/**
+ * Utility class to look up element names, masses, shortcut names, and ordering.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+<span class="nc" id="L29">public final class Elements {</span>
+
+    public static final double ELECTRON_REST_MASS = 0.00054857990946;
+
+<span class="fc" id="L33">    public static final Map&lt;String, Element&gt; ELEMENT_POSITIONS = Map.ofEntries(</span>
+<span class="fc" id="L34">            entry(&quot;C&quot;, Element.C),</span>
+<span class="fc" id="L35">            entry(&quot;H&quot;, Element.H),</span>
+<span class="fc" id="L36">            entry(&quot;N&quot;, Element.N),</span>
+<span class="fc" id="L37">            entry(&quot;O&quot;, Element.O),</span>
+<span class="fc" id="L38">            entry(&quot;P&quot;, Element.P),</span>
+<span class="fc" id="L39">            entry(&quot;P'&quot;, Element.P32),</span>
+<span class="fc" id="L40">            entry(&quot;S&quot;, Element.S),</span>
+<span class="fc" id="L41">            entry(&quot;F&quot;, Element.F),</span>
+<span class="fc" id="L42">            entry(&quot;Cl&quot;, Element.Cl),</span>
+<span class="fc" id="L43">            entry(&quot;Br&quot;, Element.Br),</span>
+<span class="fc" id="L44">            entry(&quot;I&quot;, Element.I),</span>
+<span class="fc" id="L45">            entry(&quot;As&quot;, Element.As),</span>
+<span class="fc" id="L46">            entry(&quot;S'&quot;, Element.S34),</span>
+<span class="fc" id="L47">            entry(&quot;S''&quot;, Element.S33),</span>
+<span class="fc" id="L48">            entry(&quot;H'&quot;, Element.H2),</span>
+<span class="fc" id="L49">            entry(&quot;C'&quot;, Element.C13),</span>
+<span class="fc" id="L50">            entry(&quot;N'&quot;, Element.N15),</span>
+<span class="fc" id="L51">            entry(&quot;O'&quot;, Element.O17),</span>
+<span class="fc" id="L52">            entry(&quot;O''&quot;, Element.O18),</span>
+<span class="fc" id="L53">            entry(&quot;2H&quot;, Element.H2),</span>
+<span class="fc" id="L54">            entry(&quot;13C&quot;, Element.C13),</span>
+<span class="fc" id="L55">            entry(&quot;15N&quot;, Element.N15),</span>
+<span class="fc" id="L56">            entry(&quot;17O&quot;, Element.O17),</span>
+<span class="fc" id="L57">            entry(&quot;18O&quot;, Element.O18),</span>
+<span class="fc" id="L58">            entry(&quot;32P&quot;, Element.P32),</span>
+<span class="fc" id="L59">            entry(&quot;34S&quot;, Element.S34),</span>
+<span class="fc" id="L60">            entry(&quot;33S&quot;, Element.S33),</span>
+<span class="fc" id="L61">            entry(&quot;H2&quot;, Element.H2),</span>
+<span class="fc" id="L62">            entry(&quot;C13&quot;, Element.C13),</span>
+<span class="fc" id="L63">            entry(&quot;N15&quot;, Element.N15),</span>
+<span class="fc" id="L64">            entry(&quot;O17&quot;, Element.O17),</span>
+<span class="fc" id="L65">            entry(&quot;O18&quot;, Element.O18),</span>
+<span class="fc" id="L66">            entry(&quot;P32&quot;, Element.P32),</span>
+<span class="fc" id="L67">            entry(&quot;S34&quot;, Element.S34),</span>
+<span class="fc" id="L68">            entry(&quot;S33&quot;, Element.S33)</span>
+    );
+
+<span class="fc" id="L71">    public static final Map&lt;Element, Double&gt; ELEMENT_MASSES = Map.ofEntries(</span>
+<span class="fc" id="L72">            entry(Element.C, 12.0),</span>
+<span class="fc" id="L73">            entry(Element.H, 1.007825035),</span>
+<span class="fc" id="L74">            entry(Element.N, 14.0030740),</span>
+<span class="fc" id="L75">            entry(Element.O, 15.99491463),</span>
+<span class="fc" id="L76">            entry(Element.P, 30.973762),</span>
+<span class="fc" id="L77">            entry(Element.S, 31.9720707),</span>
+<span class="fc" id="L78">            entry(Element.H2, 2.014101779),</span>
+<span class="fc" id="L79">            entry(Element.C13, 13.0033548378),</span>
+<span class="fc" id="L80">            entry(Element.N15, 15.0001088984),</span>
+<span class="fc" id="L81">            entry(Element.O17, 16.9991315),</span>
+<span class="fc" id="L82">            entry(Element.O18, 17.9991604),</span>
+<span class="fc" id="L83">            entry(Element.P32, 31.973907274),</span>
+<span class="fc" id="L84">            entry(Element.S33, 32.97145876),</span>
+<span class="fc" id="L85">            entry(Element.S34, 33.96786690),</span>
+<span class="fc" id="L86">            entry(Element.F, 18.9984031),</span>
+<span class="fc" id="L87">            entry(Element.Cl, 34.968853),</span>
+<span class="fc" id="L88">            entry(Element.Br, 78.918327),</span>
+<span class="fc" id="L89">            entry(Element.I, 126.904473),</span>
+<span class="fc" id="L90">            entry(Element.As, 74.921595)</span>
+    );
+
+<span class="fc" id="L93">    public static final Map&lt;Element, String&gt; ELEMENT_SHORTCUT = Map.ofEntries(</span>
+<span class="fc" id="L94">            entry(Element.C, &quot;C&quot;),</span>
+<span class="fc" id="L95">            entry(Element.H, &quot;H&quot;),</span>
+<span class="fc" id="L96">            entry(Element.N, &quot;N&quot;),</span>
+<span class="fc" id="L97">            entry(Element.O, &quot;O&quot;),</span>
+<span class="fc" id="L98">            entry(Element.P, &quot;P&quot;),</span>
+<span class="fc" id="L99">            entry(Element.S, &quot;S&quot;),</span>
+<span class="fc" id="L100">            entry(Element.F, &quot;F&quot;),</span>
+<span class="fc" id="L101">            entry(Element.Cl, &quot;Cl&quot;),</span>
+<span class="fc" id="L102">            entry(Element.Br, &quot;Br&quot;),</span>
+<span class="fc" id="L103">            entry(Element.I, &quot;I&quot;),</span>
+<span class="fc" id="L104">            entry(Element.As, &quot;As&quot;),</span>
+<span class="fc" id="L105">            entry(Element.H2, &quot;H'&quot;),</span>
+<span class="fc" id="L106">            entry(Element.C13, &quot;C'&quot;),</span>
+<span class="fc" id="L107">            entry(Element.N15, &quot;N'&quot;),</span>
+<span class="fc" id="L108">            entry(Element.O17, &quot;O'&quot;),</span>
+<span class="fc" id="L109">            entry(Element.O18, &quot;O''&quot;),</span>
+<span class="fc" id="L110">            entry(Element.P32, &quot;P'&quot;),</span>
+<span class="fc" id="L111">            entry(Element.S33, &quot;S'&quot;),</span>
+<span class="fc" id="L112">            entry(Element.S34, &quot;S''&quot;)</span>
+    );
+
+<span class="fc" id="L115">    public static final ArrayList&lt;Element&gt; ELEMENT_ORDER = new ArrayList&lt;Element&gt;(List.of(Element.C, Element.H, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

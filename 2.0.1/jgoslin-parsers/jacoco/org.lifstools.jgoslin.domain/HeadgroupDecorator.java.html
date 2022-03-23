@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HeadgroupDecorator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">HeadgroupDecorator.java</span></div><h1>HeadgroupDecorator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.Map.Entry;
+
+/**
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class HeadgroupDecorator extends FunctionalGroup {
+
+    private final boolean suffix;
+    private final LipidLevel lowestVisibleLevel;
+
+    public HeadgroupDecorator(String _name, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L31">        this(_name, -1, 1, null, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);</span>
+<span class="fc" id="L32">    }</span>
+
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L35">        this(_name, _position, _count, _elements, false, LipidLevel.NO_LEVEL, knownFunctionalGroups);</span>
+<span class="fc" id="L36">    }</span>
+
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L39">        this(_name, _position, _count, _elements, _suffix, LipidLevel.NO_LEVEL, knownFunctionalGroups);</span>
+<span class="fc" id="L40">    }</span>
+
+    public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, LipidLevel _level, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L43">        super(_name, _position, _count, null, false, &quot;&quot;, _elements, knownFunctionalGroups);</span>
+<span class="fc" id="L44">        suffix = _suffix;</span>
+<span class="fc" id="L45">        lowestVisibleLevel = _level;</span>
+<span class="fc" id="L46">    }</span>
+
+    @Override
+    public FunctionalGroup copy() {
+<span class="fc" id="L50">        ElementTable e = new ElementTable();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (Entry&lt;Element, Integer&gt; kv : computeAndCopyElements().entrySet()) {</span>
+<span class="fc" id="L52">            e.put(kv.getKey(), e.get(kv.getKey()) + kv.getValue());</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">        return new HeadgroupDecorator(getName(), getPosition(), getCount(), e, suffix, lowestVisibleLevel, knownFunctionalGroups);</span>
+    }
+
+    @Override
+    public String toString(LipidLevel level) {
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (!suffix) {</span>
+<span class="fc" id="L60">            return getName();</span>
+        }
+<span class="fc" id="L62">        String decorator_string = &quot;&quot;;</span>
+<span class="fc bfc" id="L63" title="All 4 branches covered.">        if ((lowestVisibleLevel == LipidLevel.NO_LEVEL) || (lowestVisibleLevel.level &lt;= level.level)) {</span>
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (functionalGroups.containsKey(&quot;decorator_alkyl&quot;)) {</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">                if (functionalGroups.get(&quot;decorator_alkyl&quot;).size() &gt; 0) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                    decorator_string = (level.level &gt; LipidLevel.SPECIES.level) ? functionalGroups.get(&quot;decorator_alkyl&quot;).get(0).toString(level) : &quot;Alk&quot;;</span>
+                } else {
+<span class="nc" id="L69">                    decorator_string = &quot;Alk&quot;;</span>
+                }
+<span class="fc bfc" id="L71" title="All 2 branches covered.">            } else if (functionalGroups.containsKey(&quot;decorator_acyl&quot;)) {</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">                if (functionalGroups.get(&quot;decorator_acyl&quot;).size() &gt; 0) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                    decorator_string = (level.level &gt; LipidLevel.SPECIES.level) ? (&quot;FA &quot; + functionalGroups.get(&quot;decorator_acyl&quot;).get(0).toString(level))</span>
+<span class="fc" id="L74">                            : &quot;FA&quot;;</span>
+                } else {
+<span class="nc" id="L76">                    decorator_string = &quot;FA&quot;;</span>
+                }
+            } else {
+<span class="fc" id="L79">                decorator_string = getName();</span>
+            }
+<span class="fc" id="L81">            decorator_string = &quot;(&quot; + decorator_string + &quot;)&quot;;</span>
+        }
+
+<span class="fc" id="L84">        return decorator_string;</span>
+    }
+
+    public boolean isSuffix() {
+<span class="fc" id="L88">        return suffix;</span>
+    }
+
+    public LipidLevel getLowestVisibleLevel() {
+<span class="nc" id="L92">        return lowestVisibleLevel;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
