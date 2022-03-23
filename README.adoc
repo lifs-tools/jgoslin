@@ -113,17 +113,17 @@ jgoslin is available from the Maven central repository:
 
 To use the parser libraries (reading and validation) in your own Maven projects, use the following dependency:
 
-<dependency>
-    <groupId>org.lifs-tools</groupId>
-    <artifactId>jgoslin-parsers</artifactId>
-    <version>${jgoslin.version}</version>
-</dependency>
+  <dependency>
+      <groupId>org.lifs-tools</groupId>
+      <artifactId>jgoslin-parsers</artifactId>
+      <version>${jgoslin.version}</version>
+  </dependency>
 
 where jgoslin.version is the version of jgoslin you wish to use, e.g. for a release version:
 
-<properties>
-  <jgoslin.version>2.0.0</jgoslin.version>
-</properties>
+  <properties>
+    <jgoslin.version>2.0.0</jgoslin.version>
+  </properties>
 
 as defined in the properties section of your pom file.
 
