@@ -89,8 +89,25 @@ public class FattyAcidParserTest {
     @Test
     public void testSnPosition() {
         LipidAdduct l = fatty_acid_parser.parse("N-ethyl-5Z,8Z,11Z,14Z-eicosatetraenoyl amine", faHandler);
+        assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
+        assertEquals("NA 2:0/20:4(5Z,8Z,11Z,14Z)", l.getLipidString());
         assertEquals(1, l.getLipid().getFaList().get(0).getPosition());
         assertEquals(2, l.getLipid().getFaList().get(1).getPosition());
+        String snPositionLevel = l.getLipidString(LipidLevel.SN_POSITION);
+        assertEquals("NA 2:0/20:4", snPositionLevel); // this is now shorthand 2020
+        ShorthandParser sp = new ShorthandParser();
+        ShorthandParserEventHandler sph = sp.newEventHandler();
+        LipidAdduct l2 = sp.parse(snPositionLevel, sph);
+        // this is equal to SN_POSITION here
+        assertEquals(LipidLevel.STRUCTURE_DEFINED, l2.getLipidLevel());
+        String molecularSpeciesLevel = l.getLipidString(LipidLevel.MOLECULAR_SPECIES);
+        assertEquals("NA 2:0_20:4", molecularSpeciesLevel);
+        LipidAdduct l3 = sp.parse(molecularSpeciesLevel, sph);
+        assertEquals(LipidLevel.MOLECULAR_SPECIES, l3.getLipidLevel());
+        String speciesLevel = l.getLipidString(LipidLevel.SPECIES);
+        assertEquals("NA 22:4", speciesLevel);
+        LipidAdduct l4 = sp.parse(speciesLevel, sph);
+        assertEquals(LipidLevel.SPECIES, l4.getLipidLevel());
     }
 
     @ParameterizedTest(name = "{index}: {0}")

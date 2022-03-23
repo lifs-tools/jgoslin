@@ -126,6 +126,12 @@ public class LipidMapsParserTest {
         assertEquals("GalGalGalNAcGlcGlcNAcCer 42:2;O2", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals(1539.9388d, lipid.getMass(), 1.0e-4);
     }
+    
+//    @Test
+//    public void testLabeledLipids() {
+//        LipidAdduct lipid = parser.parse("PC(34:1) [M7H2+H]1+", handler);
+//        assertEquals(760.58508d, lipid.getMass(), 1.0e-4);
+//    }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
