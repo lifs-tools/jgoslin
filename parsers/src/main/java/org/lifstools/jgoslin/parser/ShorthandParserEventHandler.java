@@ -438,6 +438,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         if (fg_pos == -1) {
             setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }
+        if (fg_cnt <= 0) return;
 
         FunctionalGroup functional_group = null;
         try {

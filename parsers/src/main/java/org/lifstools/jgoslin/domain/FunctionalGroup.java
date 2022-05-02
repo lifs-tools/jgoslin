@@ -39,6 +39,7 @@ public class FunctionalGroup {
     protected ElementTable elements;
     protected Map<String, ArrayList<FunctionalGroup>> functionalGroups;
     protected KnownFunctionalGroups knownFunctionalGroups;
+    protected int numAtomsAndBonds;
 
     public FunctionalGroup(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, -1, 1, null, false, "", null, null, knownFunctionalGroups);
@@ -53,9 +54,14 @@ public class FunctionalGroup {
     }
 
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, _functional_groups, knownFunctionalGroups, 0);
+    }
+
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups, int _numAtomsAndBonds) {
         name = _name;
         position = _position;
         count = _count;
+        numAtomsAndBonds = _numAtomsAndBonds;
         stereochemistry = _stereochemistry;
         ringStereo = "";
         doubleBonds = (_double_bonds != null) ? _double_bonds : new DoubleBonds(0);

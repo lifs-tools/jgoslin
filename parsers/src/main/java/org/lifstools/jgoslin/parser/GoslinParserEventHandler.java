@@ -284,6 +284,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         if (spRegularLcb()) {
             num_h -= 1;
         }
+        if (num_h <= 0) return;
 
         FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
         functional_group.setCount(num_h);
