@@ -37,7 +37,7 @@ public class FunctionalGroup {
     protected DoubleBonds doubleBonds;
     protected boolean atomic;
     protected ElementTable elements;
-    protected Map<String, ArrayList<FunctionalGroup>> functionalGroups;
+    protected HashMap<String, ArrayList<FunctionalGroup>> functionalGroups;
     protected KnownFunctionalGroups knownFunctionalGroups;
     protected int numAtomsAndBonds;
 
@@ -51,6 +51,10 @@ public class FunctionalGroup {
 
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null, knownFunctionalGroups);
+    }
+
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups, int _numAtomsAndBonds) {
+        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null, knownFunctionalGroups, _numAtomsAndBonds);
     }
 
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
@@ -87,7 +91,7 @@ public class FunctionalGroup {
             e.put(kv.getKey(), kv.getValue());
         });
 
-        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, e, fg, knownFunctionalGroups);
+        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, e, fg, knownFunctionalGroups, numAtomsAndBonds);
         func_group_new.ringStereo = ringStereo;
         return func_group_new;
     }
@@ -216,7 +220,7 @@ public class FunctionalGroup {
      * Set the internal functional groups.
      * @param functionalGroups the functional groups to set
      */
-    public void setFunctionalGroups(Map<String, ArrayList<FunctionalGroup>> functionalGroups) {
+    public void setFunctionalGroups(HashMap<String, ArrayList<FunctionalGroup>> functionalGroups) {
         this.functionalGroups = functionalGroups;
     }
 
