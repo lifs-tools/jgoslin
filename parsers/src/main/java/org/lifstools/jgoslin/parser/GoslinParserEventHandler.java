@@ -70,6 +70,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     entry("hg_pl_pre_event", this::setHeadGroupName),
                     entry("hg_lpl_pre_event", this::setHeadGroupName),
                     entry("hg_lsl_pre_event", this::setHeadGroupName),
+                    entry("hg_so_lsl_pre_event", this::setHeadGroupName),
                     entry("hg_dsl_pre_event", this::setHeadGroupName),
                     entry("st_pre_event", this::setHeadGroupName),
                     entry("hg_ste_pre_event", this::setHeadGroupName),
@@ -217,6 +218,21 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         faList.add(currentFa);
+        if (headGroup.compareTo("Sa") == 0 || headGroup.compareTo("So") == 0 || headGroup.compareTo("S1P") == 0 || headGroup.compareTo("Sa1P") == 0){
+            FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
+            if (headGroup.compareTo("Sa") == 0 || headGroup.compareTo("So") == 0){
+                functional_group.setCount(2);
+                currentFa.setLipidFaBondType(LipidFaBondType.LCB_EXCEPTION);
+            }
+            else {
+                functional_group.setCount(1);
+                currentFa.setLipidFaBondType(LipidFaBondType.LCB_REGULAR);
+            }
+            if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+                currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
+            }
+            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
+        }
         currentFa = null;
     }
 
