@@ -135,6 +135,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
                 entry("cistrans_pre_event", this::addCistrans),
 
                 entry("ether_pre_event", this::addEther),
+                entry("lcb_pure_fa_pre_event", this::addDiHydroxyl),
                 entry("hydroxyl_pre_event", this::addHydroxyl),
                 entry("hydroxyl_lcb_pre_event", this::addHydroxylLcb),
                 entry("db_count_pre_event", this::addDoubleBonds),
@@ -346,6 +347,21 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addHydroxyl(TreeNode node) {
         int num_h = node.getInt();
+
+        if (spRegularLcb()) {
+            num_h -= 1;
+        }
+
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
+        functional_group.setCount(num_h);
+        if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+            currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
+        }
+        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
+    }
+
+    private void addDiHydroxyl(TreeNode node) {
+        int num_h = 2;
 
         if (spRegularLcb()) {
             num_h -= 1;
