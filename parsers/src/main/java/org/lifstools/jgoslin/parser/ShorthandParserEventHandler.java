@@ -110,7 +110,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("carbohydrate_structural_pre_event", this::setCarbohydrateStructural),
                     entry("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric),
                     // fatty acyl events
-                    entry("lcb_post_event", this::setLcb),
+                    entry("lcb_pre_event", this::newLcb),
+                    entry("lcb_post_event", this::addFattyAcylChain),
                     entry("fatty_acyl_chain_pre_event", this::newFattyAcylChain),
                     entry("fatty_acyl_chain_post_event", this::addFattyAcylChain),
                     entry("carbon_pre_event", this::setCarbon),
@@ -128,6 +129,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("func_group_count_pre_event", this::setFunctionalGroupCount),
                     entry("stereo_type_fg_pre_event", this::setFunctionalGroupStereo),
                     entry("molecular_func_group_name_pre_event", this::setSnPositionFuncGroup),
+                    entry("fa_db_only_post_event", this::addDiHydroxyl),
                     // set cycle events
                     entry("func_group_cycle_pre_event", this::setCycle),
                     entry("func_group_cycle_post_event", this::addCycle),
@@ -323,10 +325,10 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         tmp.put("func_group_head", 1);
     }
 
-    private void setLcb(TreeNode node) {
-        FattyAcid fa = faList.get(faList.size() - 1);
-        fa.setName("LCB");
-        fa.setType(LipidFaBondType.LCB_REGULAR);
+    private void newLcb(TreeNode node) {
+        newFattyAcylChain(node);
+        currentFas.getLast().setName("LCB");
+        ((FattyAcid)currentFas.getLast()).setType(LipidFaBondType.LCB_REGULAR);
     }
 
     private void newFattyAcylChain(TreeNode node) {
@@ -421,6 +423,24 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         gd.put("fg_stereo", "");
         gd.put("fg_ring_stereo", "");
     }
+
+    
+    private void addDiHydroxyl(TreeNode node) {
+        if (!FattyAcid.LCB_STATES.contains(((FattyAcid)currentFas.getLast()).getLipidFaBondType())) return;
+        int num_h = 1;
+
+        if (FattyAcid.fgExceptions.contains(headGroup) && !headgroupDecorators.isEmpty()) {
+            num_h -= 1;
+        }
+
+        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
+        functional_group.setCount(num_h);
+        if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+            currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
+        }
+        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
+    }
+    
 
     private void addFunctionalGroup(TreeNode node) {
         Dictionary gd = (Dictionary) tmp.get(faI());

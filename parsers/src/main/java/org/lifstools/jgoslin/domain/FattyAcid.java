@@ -34,11 +34,12 @@ import java.util.Set;
  * @author Nils Hoffmann
  */
 public class FattyAcid extends FunctionalGroup {
-
+    
+    public static final Set<String> fgExceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
+    public static final Set<LipidFaBondType> LCB_STATES = new HashSet<>(Arrays.asList(LipidFaBondType.LCB_REGULAR, LipidFaBondType.LCB_EXCEPTION));
     protected int numCarbon;
     protected LipidFaBondType lipidFaBondType;
-    private final Set<String> fgExceptions = new HashSet<>(Arrays.asList("acyl", "alkyl", "cy", "cc", "acetoxy"));
-
+    
     public FattyAcid(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
     }
