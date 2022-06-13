@@ -134,7 +134,8 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
                 entry("db_position_number_pre_event", this::addDbPositionNumber),
                 entry("cistrans_pre_event", this::addCistrans),
 
-                entry("ether_pre_event", this::addEther),
+                entry("ether_prefix_pre_event", this::addEther),
+                entry("ether_suffix_pre_event", this::addEther),
                 entry("lcb_pure_fa_pre_event", this::addDiHydroxyl),
                 entry("hydroxyl_pre_event", this::addHydroxyl),
                 entry("hydroxyl_lcb_pre_event", this::addHydroxylLcb),
@@ -338,9 +339,9 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addEther(TreeNode node) {
         String ether = node.getText();
-        if (ether.equals("O-")) {
+        if (ether.equals("O-") || ether.equals("e")) {
             currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
-        } else if (ether.equals("P-")) {
+        } else if (ether.equals("P-") || ether.equals("p")) {
             currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
         }
     }
