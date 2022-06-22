@@ -386,7 +386,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             if (mediatorFunctionPositions.size() > 0) {
                 functionalGroup.setPosition(mediatorFunctionPositions.get(0));
             }
-        } else if (mediatorFunction.equals("DH") || mediatorFunction.equals("DiH")) {
+        } else if (mediatorFunction.equals("DH") || mediatorFunction.equals("DiH") || mediatorFunction.equals("diH")) {
             functionalGroup = knownFunctionalGroups.get("OH");
             fg = "OH";
             if (mediatorFunctionPositions.size() > 0) {
