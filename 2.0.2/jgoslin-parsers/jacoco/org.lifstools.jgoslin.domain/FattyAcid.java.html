@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FattyAcid.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">FattyAcid.java</span></div><h1>FattyAcid.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+
+/**
+ * A fatty acid with a specific type. This object defines the name, position,
+ * number of carbon atoms, hydroxyls and double bonds, as well as the bond type
+ * to the head group. A FattyAcid can carry optional modifications / functional groups and can
+ * report double bond positions.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class FattyAcid extends FunctionalGroup {
+    
+<span class="fc" id="L38">    public static final Set&lt;String&gt; fgExceptions = new HashSet&lt;&gt;(Arrays.asList(&quot;acyl&quot;, &quot;alkyl&quot;, &quot;cy&quot;, &quot;cc&quot;, &quot;acetoxy&quot;));</span>
+<span class="fc" id="L39">    public static final Set&lt;LipidFaBondType&gt; LCB_STATES = new HashSet&lt;&gt;(Arrays.asList(LipidFaBondType.LCB_REGULAR, LipidFaBondType.LCB_EXCEPTION));</span>
+    protected int numCarbon;
+    protected LipidFaBondType lipidFaBondType;
+    
+    public FattyAcid(String _name, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L44">        this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);</span>
+<span class="fc" id="L45">    }</span>
+
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds) {
+<span class="fc" id="L48">        this(_name, _num_carbon, _double_bonds, null, LipidFaBondType.ESTER, 0, null);</span>
+<span class="fc" id="L49">    }</span>
+
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L52">        this(_name, _num_carbon, _double_bonds, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);</span>
+<span class="fc" id="L53">    }</span>
+
+    public FattyAcid(String _name, int _num_carbon, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L56">        this(_name, _num_carbon, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);</span>
+<span class="fc" id="L57">    }</span>
+
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L60">        this(_name, _num_carbon, _double_bonds, _functional_groups, LipidFaBondType.ESTER, 0, knownFunctionalGroups);</span>
+<span class="fc" id="L61">    }</span>
+
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; _functional_groups, LipidFaBondType _lipid_FA_bond_type, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L64">        this(_name, _num_carbon, _double_bonds, _functional_groups, _lipid_FA_bond_type, 0, knownFunctionalGroups);</span>
+<span class="fc" id="L65">    }</span>
+
+    public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; _functional_groups, LipidFaBondType _lipid_FA_bond_type, int _position, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L68">        super(_name, _position, 1, _double_bonds, false, &quot;&quot;, null, _functional_groups, knownFunctionalGroups);</span>
+<span class="fc" id="L69">        numCarbon = _num_carbon;</span>
+<span class="fc" id="L70">        lipidFaBondType = _lipid_FA_bond_type;</span>
+
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (lipidFaBondType == LipidFaBondType.LCB_REGULAR) {</span>
+<span class="fc" id="L73">            functionalGroups.put(&quot;[X]&quot;, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L74">            functionalGroups.get(&quot;[X]&quot;).add(knownFunctionalGroups.get(&quot;X&quot;));</span>
+        }
+
+<span class="fc bfc" id="L77" title="All 4 branches covered.">        if (numCarbon &lt; 0 || numCarbon == 1) {</span>
+<span class="fc" id="L78">            throw new ConstraintViolationException(&quot;FattyAcid must have at least 2 carbons! Got &quot; + Integer.toString(numCarbon));</span>
+        }
+
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (getPosition() &lt; 0) {</span>
+<span class="fc" id="L82">            throw new ConstraintViolationException(&quot;FattyAcid position must be greater or equal to 0! Got &quot; + Integer.toString(getPosition()));</span>
+        }
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (doubleBonds.getNumDoubleBonds() &lt; 0) {</span>
+<span class="fc" id="L86">            throw new ConstraintViolationException(&quot;FattyAcid must have at least 0 double bonds! Got &quot; + Integer.toString(doubleBonds.getNumDoubleBonds()));</span>
+        }
+<span class="fc" id="L88">    }</span>
+
+    @Override
+    public FunctionalGroup copy() {
+<span class="fc" id="L92">        DoubleBonds db = doubleBonds.copy();</span>
+<span class="fc" id="L93">        HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : functionalGroups.entrySet()) {</span>
+<span class="fc" id="L95">            fg.put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">            for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc" id="L97">                fg.get(kv.getKey()).add(func_group.copy());</span>
+<span class="fc" id="L98">            }</span>
+<span class="fc" id="L99">        }</span>
+
+<span class="fc" id="L101">        return new FattyAcid(getName(), numCarbon, db, fg, lipidFaBondType, getPosition(), knownFunctionalGroups);</span>
+    }
+
+    public void setType(LipidFaBondType _lipid_FA_bond_type) {
+<span class="fc" id="L105">        lipidFaBondType = _lipid_FA_bond_type;</span>
+<span class="pc bpc" id="L106" title="1 of 4 branches missed.">        if (lipidFaBondType == LipidFaBondType.LCB_REGULAR &amp;&amp; !functionalGroups.containsKey(&quot;[X]&quot;)) {</span>
+<span class="fc" id="L107">            functionalGroups.put(&quot;[X]&quot;, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L108">            functionalGroups.get(&quot;[X]&quot;).add(knownFunctionalGroups.get(&quot;X&quot;));</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        } else if (functionalGroups.containsKey(&quot;[X]&quot;)) {</span>
+<span class="fc" id="L110">            functionalGroups.remove(&quot;[X]&quot;);</span>
+        }
+
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">        setName((lipidFaBondType != LipidFaBondType.LCB_EXCEPTION &amp;&amp; lipidFaBondType != LipidFaBondType.LCB_REGULAR) ? &quot;FA&quot; : &quot;LCB&quot;);</span>
+<span class="fc" id="L114">    }</span>
+
+    public String getPrefix(LipidFaBondType lipid_FA_bond_type) {
+<span class="fc bfc" id="L117" title="All 3 branches covered.">        switch (lipid_FA_bond_type) {</span>
+            case ETHER_PLASMANYL:
+<span class="fc" id="L119">                return &quot;O-&quot;;</span>
+            case ETHER_PLASMENYL:
+<span class="fc" id="L121">                return &quot;P-&quot;;</span>
+            default:
+<span class="fc" id="L123">                return &quot;&quot;;</span>
+        }
+    }
+
+    @Override
+    public int getNDoubleBonds() {
+<span class="fc bfc" id="L129" title="All 2 branches covered.">        return super.getNDoubleBonds() + ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);</span>
+    }
+
+    public boolean lipidFaBondTypePrefix(LipidFaBondType lipid_FA_bond_type) {
+<span class="fc bfc" id="L133" title="All 6 branches covered.">        return (lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMANYL) || (lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMENYL) || (lipid_FA_bond_type == LipidFaBondType.ETHER_UNSPECIFIED);</span>
+    }
+
+    @Override
+    public String toString(LipidLevel level) {
+<span class="fc" id="L138">        StringBuilder fa_string = new StringBuilder();</span>
+<span class="fc" id="L139">        fa_string.append(getPrefix(lipidFaBondType));</span>
+<span class="fc" id="L140">        int num_carbons = numCarbon;</span>
+<span class="fc" id="L141">        int num_double_bonds = doubleBonds.getNumDoubleBonds();</span>
+
+<span class="pc bpc" id="L143" title="2 of 6 branches missed.">        if (num_carbons == 0 &amp;&amp; num_double_bonds == 0 &amp;&amp; !LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level | LipidLevel.SN_POSITION.level)) {</span>
+<span class="nc" id="L144">            return &quot;&quot;;</span>
+        }
+
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        if (LipidLevel.isLevel(level, LipidLevel.SN_POSITION.level | LipidLevel.MOLECULAR_SPECIES.level)) {</span>
+<span class="fc" id="L148">            ElementTable e = computeAndCopyElements();</span>
+<span class="fc" id="L149">            num_carbons = e.get(Element.C);</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">            num_double_bonds = getNDoubleBonds() - ((lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);</span>
+        }
+
+<span class="fc" id="L153">        fa_string.append(num_carbons).append(&quot;:&quot;).append(num_double_bonds);</span>
+
+<span class="fc bfc" id="L155" title="All 4 branches covered.">        if (!LipidLevel.isLevel(level, LipidLevel.SN_POSITION.level | LipidLevel.MOLECULAR_SPECIES.level) &amp;&amp; doubleBonds.doubleBondPositions.size() &gt; 0) {</span>
+<span class="fc" id="L156">            fa_string.append(&quot;(&quot;);</span>
+
+<span class="fc" id="L158">            int i = 0;</span>
+<span class="fc" id="L159">            ArrayList&lt;Integer&gt; sorted_db = new ArrayList&lt;&gt;(doubleBonds.doubleBondPositions.keySet());</span>
+<span class="fc" id="L160">            Collections.sort(sorted_db, (a, b) -&gt; (int) a - (int) b);</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">            for (int db_pos : sorted_db) {</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">                if (i++ &gt; 0) {</span>
+<span class="fc" id="L163">                    fa_string.append(&quot;,&quot;);</span>
+                }
+<span class="fc" id="L165">                fa_string.append(db_pos);</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">                if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {</span>
+<span class="fc" id="L167">                    fa_string.append(doubleBonds.doubleBondPositions.get(db_pos));</span>
+                }
+<span class="fc" id="L169">            }</span>
+<span class="fc" id="L170">            fa_string.append(&quot;)&quot;);</span>
+        }
+        
+        
+<span class="pc bpc" id="L174" title="1 of 4 branches missed.">        if (level == LipidLevel.COMPLETE_STRUCTURE &amp;&amp; stereochemistry.length() &gt; 0){</span>
+<span class="nc" id="L175">            fa_string.append(&quot;[&quot;).append(stereochemistry).append(&quot;]&quot;);</span>
+        }
+        
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {</span>
+<span class="fc" id="L180">            ArrayList&lt;String&gt; fg_names = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">            for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : functionalGroups.entrySet()) {</span>
+<span class="fc" id="L182">                fg_names.add(kv.getKey());</span>
+<span class="fc" id="L183">            }</span>
+<span class="fc" id="L184">            Collections.sort(fg_names, (String a, String b) -&gt; a.toLowerCase().compareTo(b.toLowerCase()));</span>
+
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            for (String fg : fg_names) {</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">                if (fg.equals(&quot;[X]&quot;)) {</span>
+<span class="fc" id="L188">                    continue;</span>
+                }
+<span class="fc" id="L190">                ArrayList&lt;FunctionalGroup&gt; fg_list = functionalGroups.get(fg);</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">                if (fg_list.isEmpty()) {</span>
+<span class="nc" id="L192">                    continue;</span>
+                }
+
+<span class="fc" id="L195">                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -&gt; a.getPosition() - b.getPosition());</span>
+
+<span class="fc" id="L197">                int i = 0;</span>
+<span class="fc" id="L198">                fa_string.append(&quot;;&quot;);</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">                for (FunctionalGroup func_group : fg_list) {</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">                    if (i++ &gt; 0) {</span>
+<span class="fc" id="L201">                        fa_string.append(&quot;,&quot;);</span>
+                    }
+<span class="fc" id="L203">                    fa_string.append(func_group.toString(level));</span>
+<span class="fc" id="L204">                }</span>
+<span class="fc" id="L205">            }</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">        } else if (level == LipidLevel.STRUCTURE_DEFINED) {</span>
+<span class="fc" id="L207">            ArrayList&lt;String&gt; fg_names = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L208">            functionalGroups.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L209">                fg_names.add(kv.getKey());</span>
+<span class="fc" id="L210">            });</span>
+<span class="fc" id="L211">            Collections.sort(fg_names, (String a, String b) -&gt; a.toLowerCase().compareTo(b.toLowerCase()));</span>
+
+<span class="fc bfc" id="L213" title="All 2 branches covered.">            for (String fg : fg_names) {</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">                if (fg.equals(&quot;[X]&quot;)) {</span>
+<span class="fc" id="L215">                    continue;</span>
+                }
+<span class="fc" id="L217">                ArrayList&lt;FunctionalGroup&gt; fg_list = functionalGroups.get(fg);</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">                if (fg_list.isEmpty()) {</span>
+<span class="nc" id="L219">                    continue;</span>
+                }
+
+<span class="fc bfc" id="L222" title="All 2 branches covered.">                if (fgExceptions.contains(fg)) {</span>
+<span class="fc" id="L223">                    fa_string.append(&quot;;&quot;);</span>
+<span class="fc" id="L224">                    int i = 0;</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">                    for (FunctionalGroup func_group : fg_list) {</span>
+<span class="fc bfc" id="L226" title="All 2 branches covered.">                        if (i++ &gt; 0) {</span>
+<span class="fc" id="L227">                            fa_string.append(&quot;,&quot;);</span>
+                        }
+<span class="fc" id="L229">                        fa_string.append(func_group.toString(level));</span>
+<span class="fc" id="L230">                    }</span>
+<span class="fc" id="L231">                } else {</span>
+<span class="fc" id="L232">                    int fg_count = 0;</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">                    for (FunctionalGroup func_group : fg_list) {</span>
+<span class="fc" id="L234">                        fg_count += func_group.getCount();</span>
+<span class="fc" id="L235">                    }</span>
+
+<span class="fc bfc" id="L237" title="All 2 branches covered.">                    if (fg_count &gt; 1) {</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">                        fa_string.append(&quot;;&quot;).append(!fg_list.get(0).atomic ? (&quot;(&quot; + fg + &quot;)&quot; + Integer.toString(fg_count)) : (fg + Integer.toString(fg_count)));</span>
+                    } else {
+<span class="fc" id="L240">                        fa_string.append(&quot;;&quot;).append(fg);</span>
+                    }
+                }
+<span class="fc" id="L243">            }</span>
+
+<span class="fc" id="L245">        } else {</span>
+<span class="fc" id="L246">            ElementTable func_elements = getFunctionalGroupElements();</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">            for (int i = 2; i &lt; Elements.ELEMENT_ORDER.size(); ++i) {</span>
+<span class="fc" id="L248">                Element e = Elements.ELEMENT_ORDER.get(i);</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">                if (func_elements.get(e) &gt; 0) {</span>
+<span class="fc" id="L250">                    fa_string.append(&quot;;&quot;).append(Elements.ELEMENT_SHORTCUT.get(e));</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">                    if (func_elements.get(e) &gt; 1) {</span>
+<span class="fc" id="L252">                        fa_string.append(func_elements.get(e));</span>
+                    }
+                }
+            }
+        }
+
+<span class="fc" id="L258">        return fa_string.toString();</span>
+    }
+
+    @JsonIgnore
+    @Override
+    public ElementTable getFunctionalGroupElements() {
+<span class="fc" id="L264">        ElementTable fgElements = super.getFunctionalGroupElements();</span>
+
+        // subtract the invisible [X] functional group for regular LCBs
+<span class="fc bfc" id="L267" title="All 4 branches covered.">        if (lipidFaBondType == LipidFaBondType.LCB_REGULAR &amp;&amp; functionalGroups.containsKey(&quot;O&quot;)) {</span>
+<span class="fc" id="L268">            fgElements.put(Element.O, fgElements.get(Element.O) - 1);</span>
+        }
+
+<span class="fc" id="L271">        return fgElements;</span>
+    }
+
+    @Override
+    public void computeElements() {
+<span class="fc" id="L276">        elements = new ElementTable();</span>
+
+<span class="fc" id="L278">        int num_double_bonds = doubleBonds.getNumDoubleBonds();</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">        if (lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) {</span>
+<span class="fc" id="L280">            num_double_bonds += 1;</span>
+        }
+
+<span class="pc bpc" id="L283" title="1 of 4 branches missed.">        if (numCarbon == 0 &amp;&amp; num_double_bonds == 0) {</span>
+<span class="fc" id="L284">            elements.put(Element.H, 1);</span>
+<span class="fc" id="L285">            return;</span>
+        }
+
+<span class="fc bfc" id="L288" title="All 4 branches covered.">        if (lipidFaBondType != LipidFaBondType.LCB_EXCEPTION &amp;&amp; lipidFaBondType != LipidFaBondType.LCB_REGULAR) {</span>
+<span class="fc" id="L289">            elements.put(Element.C, numCarbon); // carbon</span>
+<span class="pc bpc" id="L290" title="1 of 5 branches missed.">            switch (lipidFaBondType) {</span>
+                case ESTER:
+<span class="fc" id="L292">                    elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds)); // hydrogen</span>
+<span class="fc" id="L293">                    elements.put(Element.O, 1); // oxygen</span>
+<span class="fc" id="L294">                    break;</span>
+                case ETHER_PLASMENYL:
+<span class="fc" id="L296">                    elements.put(Element.H, (2 * numCarbon - 1 - 2 * num_double_bonds + 2)); // hydrogen</span>
+<span class="fc" id="L297">                    break;</span>
+                case ETHER, ETHER_PLASMANYL:
+<span class="fc" id="L299">                    elements.put(Element.H, ((numCarbon + 1) * 2 - 1 - 2 * num_double_bonds)); // hydrogen</span>
+<span class="fc" id="L300">                    break;</span>
+                case AMIDE:
+<span class="fc" id="L302">                    elements.put(Element.H, (2 * numCarbon + 1 - 2 * num_double_bonds) - 1); // hydrogen</span>
+<span class="fc" id="L303">                    break;</span>
+                default:
+<span class="nc" id="L305">                    throw new LipidException(&quot;Mass cannot be computed for fatty acyl chain with this bond type&quot;);</span>
+            }
+        } else {
+            // long chain base
+<span class="fc" id="L309">            elements.put(Element.C, numCarbon); // carbon</span>
+<span class="fc" id="L310">            elements.put(Element.H, (2 * (numCarbon - num_double_bonds) + 1)); // hydrogen</span>
+<span class="fc" id="L311">            elements.put(Element.N, 1); // nitrogen</span>
+        }
+<span class="fc" id="L313">    }</span>
+
+    public int getNumCarbon() {
+<span class="fc" id="L316">        return numCarbon;</span>
+    }
+
+    public void setNumCarbon(int numCarbon) {
+<span class="fc" id="L320">        this.numCarbon = numCarbon;</span>
+<span class="fc" id="L321">    }</span>
+
+    public LipidFaBondType getLipidFaBondType() {
+<span class="fc" id="L324">        return lipidFaBondType;</span>
+    }
+
+    public void setLipidFaBondType(LipidFaBondType lipidFaBondType) {
+<span class="fc" id="L328">        this.lipidFaBondType = lipidFaBondType;</span>
+<span class="fc" id="L329">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

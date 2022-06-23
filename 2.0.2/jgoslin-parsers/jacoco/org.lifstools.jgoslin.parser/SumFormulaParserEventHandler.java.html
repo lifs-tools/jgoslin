@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SumFormulaParserEventHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">SumFormulaParserEventHandler.java</span></div><h1>SumFormulaParserEventHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import java.util.Map;
+import static java.util.Map.entry;
+import org.lifstools.jgoslin.domain.LipidException;
+import org.lifstools.jgoslin.domain.Element;
+import org.lifstools.jgoslin.domain.LipidParsingException;
+import org.lifstools.jgoslin.domain.Elements;
+import org.lifstools.jgoslin.domain.ElementTable;
+
+/**
+ * Event handler implementation for the {@link SumFormulaParser}.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class SumFormulaParserEventHandler extends BaseParserEventHandler&lt;ElementTable&gt; {
+
+    private Element element;
+    private int count;
+
+    /**
+     * Create a new {@code SumFormulaParserEventHandler} instance.
+     */
+<span class="fc" id="L40">    public SumFormulaParserEventHandler() {</span>
+        try {
+<span class="fc" id="L42">            registeredEvents = Map.ofEntries(</span>
+<span class="fc" id="L43">                    entry(&quot;molecule_pre_event&quot;, this::resetParser),</span>
+<span class="fc" id="L44">                    entry(&quot;element_group_post_event&quot;, this::elementGroupPostEvent),</span>
+<span class="fc" id="L45">                    entry(&quot;element_pre_event&quot;, this::elementPreEvent),</span>
+<span class="fc" id="L46">                    entry(&quot;single_element_pre_event&quot;, this::singleElementGroupPreEvent),</span>
+<span class="fc" id="L47">                    entry(&quot;count_pre_event&quot;, this::countPreEvent)</span>
+            );
+<span class="nc" id="L49">        } catch (Exception e) {</span>
+<span class="nc" id="L50">            throw new LipidParsingException(&quot;Cannot initialize ShorthandParserEventHandler.&quot;);</span>
+<span class="fc" id="L51">        }</span>
+<span class="fc" id="L52">    }</span>
+
+    @Override
+    protected void resetParser(TreeNode node) {
+<span class="fc" id="L56">        content = new ElementTable();</span>
+<span class="fc" id="L57">        element = Element.H;</span>
+<span class="fc" id="L58">        count = 0;</span>
+<span class="fc" id="L59">    }</span>
+
+    private void elementGroupPostEvent(TreeNode node) {
+<span class="fc" id="L62">        content.put(element, content.get(element) + count);</span>
+<span class="fc" id="L63">    }</span>
+
+    private void elementPreEvent(TreeNode node) {
+
+<span class="fc" id="L67">        String parsed_element = node.getText();</span>
+
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (Elements.ELEMENT_POSITIONS.containsKey(parsed_element)) {</span>
+<span class="fc" id="L70">            element = Elements.ELEMENT_POSITIONS.get(parsed_element);</span>
+        } else {
+<span class="nc" id="L72">            throw new LipidException(&quot;Error: element '&quot; + parsed_element + &quot;' is unknown&quot;);</span>
+        }
+<span class="fc" id="L74">    }</span>
+
+    private void singleElementGroupPreEvent(TreeNode node) {
+<span class="fc" id="L77">        String parsed_element = node.getText();</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (Elements.ELEMENT_POSITIONS.containsKey(parsed_element)) {</span>
+<span class="fc" id="L79">            element = Elements.ELEMENT_POSITIONS.get(parsed_element);</span>
+<span class="fc" id="L80">            content.put(element, content.get(element) + 1);</span>
+        } else {
+<span class="nc" id="L82">            throw new LipidException(&quot;Error: element '&quot; + parsed_element + &quot;' is unknown&quot;);</span>
+        }
+<span class="fc" id="L84">    }</span>
+
+    private void countPreEvent(TreeNode node) {
+<span class="fc" id="L87">        count = Integer.valueOf(node.getText());</span>
+<span class="fc" id="L88">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

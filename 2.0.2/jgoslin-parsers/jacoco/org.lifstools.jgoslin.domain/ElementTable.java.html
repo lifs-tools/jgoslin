@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementTable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">ElementTable.java</span></div><h1>ElementTable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.EnumMap;
+
+/**
+ * Accounting table for chemical element frequency. This is used to calculate
+ * sum formulas and total masses for a given chemical element distribution, e.g.
+ * in a lipid.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class ElementTable extends EnumMap&lt;Element, Integer&gt; {
+
+    private ElementTable(Class&lt;Element&gt; keyType) {
+<span class="fc" id="L31">        super(keyType);</span>
+<span class="fc" id="L32">    }</span>
+
+    /**
+     * Create a new element table.
+     */
+    public ElementTable() {
+<span class="fc" id="L38">        this(Element.class);</span>
+<span class="fc" id="L39">        Elements.ELEMENT_MASSES.keySet().forEach(e -&gt; {</span>
+<span class="fc" id="L40">            put(e, 0);</span>
+<span class="fc" id="L41">        });</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Create a new element table from the provided entries.
+     * @param entries the entries
+     * @return a new element table.
+     */
+    public static ElementTable of(Entry&lt;Element, Integer&gt;... entries) {
+<span class="fc" id="L50">        ElementTable et = new ElementTable();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (Entry&lt;Element, Integer&gt; e : entries) {</span>
+<span class="fc" id="L52">            et.put(e.getKey(), e.getValue());</span>
+        }
+<span class="fc" id="L54">        return et;</span>
+    }
+
+    /**
+     * Add all elements and counts to those in this element table.
+     *
+     * @param elements the table to add to this one.
+     */
+    public void add(ElementTable elements) {
+<span class="fc" id="L63">        elements.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L64">            put(kv.getKey(), get(kv.getKey()) + kv.getValue());</span>
+<span class="fc" id="L65">        });</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * Add all alements and counts to those in this element table, but use the
+     * count argument to multiply count values in the provided table.
+     *
+     * @param elements
+     * @param multiplier
+     */
+    public void add(ElementTable elements, int multiplier) {
+<span class="fc" id="L76">        elements.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L77">            put(kv.getKey(), get(kv.getKey()) + kv.getValue() * multiplier);</span>
+<span class="fc" id="L78">        });</span>
+<span class="fc" id="L79">    }</span>
+
+    /**
+     * Copy all entries in this element table. The copy will be completely
+     * independent of this instance.
+     *
+     * @return a copy of this element table.
+     */
+    public ElementTable copy() {
+<span class="fc" id="L88">        ElementTable e = new ElementTable();</span>
+<span class="fc" id="L89">        entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L90">            e.put(kv.getKey(), kv.getValue());</span>
+<span class="fc" id="L91">        });</span>
+<span class="fc" id="L92">        return e;</span>
+    }
+    
+    /**
+     * Returns the sum formula for all elements in this table.
+     *
+     * @return the sum formula. Returns an empty string if the table is empty.
+     */
+    public String getSumFormula() {
+<span class="fc" id="L101">        StringBuilder ss = new StringBuilder();</span>
+<span class="fc" id="L102">        Elements.ELEMENT_ORDER.stream().map(e -&gt; {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            if (get(e) &gt; 0) {</span>
+<span class="fc" id="L104">                ss.append(Elements.ELEMENT_SHORTCUT.get(e));</span>
+            }
+<span class="fc" id="L106">            return e;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        }).filter(e -&gt; (get(e) &gt; 1)).forEachOrdered(e -&gt; {</span>
+<span class="fc" id="L108">            ss.append(get(e));</span>
+<span class="fc" id="L109">        });</span>
+<span class="fc" id="L110">        return ss.toString();</span>
+    }
+
+    /**
+     * Returns the individual total mass for the provided element.
+     *
+     * @param element the element to calculate the total mass for.
+     * @return the total mass for the given element, or 0.
+     */
+    public Double getMass(Element element) {
+<span class="nc" id="L120">        Integer count = getOrDefault(element, 0);</span>
+<span class="nc" id="L121">        return count.doubleValue() * Elements.ELEMENT_MASSES.get(element);</span>
+    }
+
+    /**
+     * Returns the total summed mass per number of elements.
+     *
+     * @return the total summed mass for this element table. Returns 0 if the
+     * table is empty.
+     */
+    public Double getMass() {
+<span class="nc" id="L131">        return keySet().stream().map((key) -&gt; {</span>
+<span class="nc" id="L132">            return getMass(key);</span>
+<span class="nc" id="L133">        }).reduce(0.0d, Double::sum);</span>
+    }
+    
+    /**
+     * Returns the total summed mass per number of elements, corrected for charge counts * electron rest mass.
+     *
+     * @param charge the charge of the molecule
+     * @return the total summed mass for this element table. Returns 0 if the
+     * table is empty.
+     */
+    public Double getChargedMass(int charge) {
+<span class="nc" id="L144">        Double mass = getMass();</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (charge != 0) {</span>
+<span class="nc" id="L146">            mass = (mass - charge * Elements.ELECTRON_REST_MASS) / Math.abs(charge);</span>
+        }
+<span class="nc" id="L148">        return mass;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

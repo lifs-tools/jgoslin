@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AcylAlkylGroup.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">AcylAlkylGroup.java</span></div><h1>AcylAlkylGroup.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.ArrayList;
+
+/**
+ * An acyl alkyl group as a functional group.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class AcylAlkylGroup extends FunctionalGroup {
+
+    private boolean alkyl;
+    private boolean nitrogenBond;
+
+    public AcylAlkylGroup(FattyAcid _fa, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L32">        this(_fa, -1, 1, false, false, knownFunctionalGroups);</span>
+<span class="fc" id="L33">    }</span>
+
+    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L36">        this(_fa, _position, _count, _alkyl, false, knownFunctionalGroups);</span>
+<span class="fc" id="L37">    }</span>
+
+    public AcylAlkylGroup(FattyAcid _fa, int _position, int _count, boolean _alkyl, boolean _N_bond, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L40">        super(&quot;O&quot;, _position, _count, knownFunctionalGroups);</span>
+<span class="fc" id="L41">        alkyl = _alkyl;</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (_fa != null) {</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            String key = (alkyl ? &quot;alkyl&quot; : &quot;acyl&quot;);</span>
+<span class="fc" id="L44">            functionalGroups.put(key, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L45">            functionalGroups.get(key).add(_fa);</span>
+        }
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        doubleBonds.setNumDoubleBonds(alkyl ? 0 : 1);</span>
+<span class="fc" id="L48">        setNitrogenBond(_N_bond);</span>
+
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    public FunctionalGroup copy() {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        String key = alkyl ? &quot;alkyl&quot; : &quot;acyl&quot;;</span>
+<span class="fc" id="L55">        return new AcylAlkylGroup((FattyAcid) functionalGroups.get(key).get(0).copy(), getPosition(), getCount(), alkyl, nitrogenBond, knownFunctionalGroups);</span>
+    }
+
+    public void setAlkyl(boolean alkyl) {
+<span class="nc" id="L59">        this.alkyl = alkyl;</span>
+<span class="nc" id="L60">    }</span>
+
+    public boolean isAlkyl() {
+<span class="nc" id="L63">        return this.alkyl;</span>
+    }
+
+    public void setNitrogenBond(boolean _N_bond) {
+<span class="fc" id="L67">        nitrogenBond = _N_bond;</span>
+
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (nitrogenBond) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            elements.put(Element.H, (alkyl ? 2 : 0));</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            elements.put(Element.O, (alkyl ? -1 : 0));</span>
+<span class="nc" id="L72">            elements.put(Element.N, 1);</span>
+        } else {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            elements.put(Element.H, (alkyl ? 1 : -1));</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            elements.put(Element.O, (alkyl ? 0 : 1));</span>
+        }
+<span class="fc" id="L77">    }</span>
+
+    public boolean isNitrogenBond() {
+<span class="nc" id="L80">        return this.nitrogenBond;</span>
+    }
+
+    @Override
+    public String toString(LipidLevel level) {
+<span class="fc" id="L85">        StringBuilder acyl_alkyl_string = new StringBuilder();</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (level == LipidLevel.FULL_STRUCTURE) {</span>
+<span class="fc" id="L87">            acyl_alkyl_string.append(getPosition());</span>
+        }
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        acyl_alkyl_string.append(nitrogenBond ? &quot;N&quot; : &quot;O&quot;).append(&quot;(&quot;);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (!alkyl) {</span>
+<span class="fc" id="L91">            acyl_alkyl_string.append(&quot;FA &quot;);</span>
+        }
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        String key = alkyl ? &quot;alkyl&quot; : &quot;acyl&quot;;</span>
+<span class="fc" id="L94">        acyl_alkyl_string.append(((FattyAcid) functionalGroups.get(key).get(0)).toString(level)).append(&quot;)&quot;);</span>
+
+<span class="fc" id="L96">        return acyl_alkyl_string.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

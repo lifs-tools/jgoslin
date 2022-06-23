@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidSnPosition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">LipidSnPosition.java</span></div><h1>LipidSnPosition.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.Collection;
+import java.util.Collections;
+
+/**
+ * Sn position level according to the 2020 update of the Liebisch shorthand
+ * nomenclature.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ * @see LipidLevel
+ */
+public class LipidSnPosition extends LipidMolecularSpecies {
+
+    public LipidSnPosition(Headgroup _headgroup, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L32">        this(_headgroup, Collections.emptyList(), knownFunctionalGroups);</span>
+<span class="fc" id="L33">    }</span>
+
+    public LipidSnPosition(Headgroup _headgroup, Collection&lt;FattyAcid&gt; _fa, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L36">        super(_headgroup, _fa, knownFunctionalGroups);</span>
+<span class="fc" id="L37">        info.setLevel(LipidLevel.SN_POSITION);</span>
+        
+<span class="fc" id="L39">        int pos = 1;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        for (FattyAcid fatty_acid : faList){</span>
+<span class="fc" id="L41">            fatty_acid.position = pos++;</span>
+<span class="fc" id="L42">        }</span>
+<span class="fc" id="L43">    }</span>
+
+    @Override
+    public LipidLevel getLipidLevel() {
+<span class="fc" id="L47">        return LipidLevel.SN_POSITION;</span>
+    }
+
+    @Override
+    public String getLipidString() {
+<span class="fc" id="L52">        return getLipidString(LipidLevel.NO_LEVEL);</span>
+    }
+
+    @Override
+    public String getLipidString(LipidLevel level) {
+<span class="fc bfc" id="L57" title="All 3 branches covered.">        switch (level) {</span>
+            case NO_LEVEL, SN_POSITION -&gt; {
+<span class="fc" id="L59">                return buildLipidSubspeciesName(LipidLevel.SN_POSITION);</span>
+            }
+            case MOLECULAR_SPECIES, CATEGORY, CLASS, SPECIES -&gt; {
+<span class="fc" id="L62">                return super.getLipidString(level);</span>
+            }
+
+            default -&gt;
+<span class="fc" id="L66">                throw new IllegalArgumentException(&quot;LipidSnPosition does not know how to create a lipid string for level &quot; + level.toString());</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

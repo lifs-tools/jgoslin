@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TreeNode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">TreeNode.java</span></div><h1>TreeNode.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+/**
+ * A node representing an element in the parse tree.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class TreeNode {
+
+    long rule_index;
+    TreeNode left;
+    TreeNode right;
+    char terminal;
+    boolean fire_event;
+    public static final char EOF_SIGN = '\0';
+    public static final String ONE_STR = &quot;\0&quot;;
+
+<span class="fc" id="L34">    public TreeNode(long _rule, boolean _fire_event) {</span>
+<span class="fc" id="L35">        rule_index = _rule;</span>
+<span class="fc" id="L36">        left = null;</span>
+<span class="fc" id="L37">        right = null;</span>
+<span class="fc" id="L38">        terminal = '\0';</span>
+<span class="fc" id="L39">        fire_event = _fire_event;</span>
+<span class="fc" id="L40">    }</span>
+
+    public String getText() {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (terminal == '\0') {</span>
+<span class="fc" id="L44">            String left_str = left.getText();</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">            String right_str = right != null ? right.getText() : &quot;&quot;;</span>
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">            return (!left_str.equals(ONE_STR) ? left_str : &quot;&quot;) + (!right_str.equals(ONE_STR) ? right_str : &quot;&quot;);</span>
+        }
+<span class="fc" id="L48">        return String.valueOf(terminal);</span>
+    }
+
+    public int getInt() {
+<span class="fc" id="L52">        return Integer.valueOf(getText());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

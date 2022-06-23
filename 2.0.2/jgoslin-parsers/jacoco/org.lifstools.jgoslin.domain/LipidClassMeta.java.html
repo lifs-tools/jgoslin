@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidClassMeta.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">LipidClassMeta.java</span></div><h1>LipidClassMeta.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Metadata information about a lipid on class level.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ * @see LipidClasses
+ * @see LipidLevel
+ */
+public final class LipidClassMeta {
+
+    public final LipidCategory lipidCategory;
+    public final String lipidClassName;
+    public final String description;
+    public final int maxNumFa;
+    public final int possibleNumFa;
+    public final Set&lt;String&gt; specialCases;
+    public final ElementTable elements;
+    public final List&lt;String&gt; synonyms;
+
+    /**
+     * Create a new lipid class meta instance.
+     *
+     * @param lipidCategory the lipid category
+     * @param lipidClassName the lipid class name
+     * @param description the description
+     * @param maxNumFa the maximum number of fatty acids allowed for this lipid
+     * class
+     * @param possibleNumFa the minimum possible number of fatty acids for this
+     * lipid class
+     * @param specialCases the special cases
+     * @param elements the elements (sum formula) of this class head group
+     * @param synonyms the synonyms of this lipid class head group
+     */
+<span class="fc" id="L54">    public LipidClassMeta(LipidCategory lipidCategory, String lipidClassName, String description, int maxNumFa, int possibleNumFa, Set&lt;String&gt; specialCases, ElementTable elements, List&lt;String&gt; synonyms) {</span>
+<span class="fc" id="L55">        this.lipidCategory = lipidCategory;</span>
+<span class="fc" id="L56">        this.lipidClassName = lipidClassName;</span>
+<span class="fc" id="L57">        this.description = description;</span>
+<span class="fc" id="L58">        this.maxNumFa = maxNumFa;</span>
+<span class="fc" id="L59">        this.possibleNumFa = possibleNumFa;</span>
+<span class="fc" id="L60">        this.specialCases = specialCases;</span>
+<span class="fc" id="L61">        this.elements = elements;</span>
+<span class="fc" id="L62">        this.synonyms = synonyms;</span>
+<span class="fc" id="L63">    }</span>
+
+    public LipidCategory getLipidCategory() {
+<span class="fc" id="L66">        return lipidCategory;</span>
+    }
+
+    public String getClassName() {
+<span class="fc" id="L70">        return lipidClassName;</span>
+    }
+
+    public String getDescription() {
+<span class="fc" id="L74">        return description;</span>
+    }
+
+    public int getMaxNumFa() {
+<span class="fc" id="L78">        return maxNumFa;</span>
+    }
+
+    public int getPossibleNumFa() {
+<span class="fc" id="L82">        return possibleNumFa;</span>
+    }
+
+    public Set&lt;String&gt; getSpecialCases() {
+<span class="fc" id="L86">        return specialCases;</span>
+    }
+
+    public ElementTable getElements() {
+<span class="fc" id="L90">        return elements;</span>
+    }
+
+    public List&lt;String&gt; getSynonyms() {
+<span class="fc" id="L94">        return synonyms;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

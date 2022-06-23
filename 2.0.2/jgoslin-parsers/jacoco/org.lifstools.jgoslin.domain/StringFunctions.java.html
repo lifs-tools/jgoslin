@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StringFunctions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">StringFunctions.java</span></div><h1>StringFunctions.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+/**
+ * Utility methods for strings and grammars.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class StringFunctions {
+
+<span class="fc" id="L35">    public static char DEFAULT_QUOTE = '\'';</span>
+<span class="fc" id="L36">    public static char DEFAULT_SPLIT = ',';</span>
+
+    private StringFunctions(){};
+
+    public static String strip(String s, char c) {
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        if (s.length() &gt; 0) {</span>
+<span class="fc" id="L42">            int st = 0;</span>
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">            while (st &lt; s.length() - 1 &amp;&amp; s.charAt(st) == c) {</span>
+<span class="fc" id="L44">                ++st;</span>
+            }
+<span class="fc" id="L46">            s = s.substring(st, s.length());</span>
+        }
+
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if (s.length() &gt; 0) {</span>
+<span class="fc" id="L50">            int en = 0;</span>
+<span class="pc bpc" id="L51" title="1 of 4 branches missed.">            while (en &lt; s.length() - 1 &amp;&amp; s.charAt(s.length() - 1 - en) == c) {</span>
+<span class="fc" id="L52">                ++en;</span>
+            }
+<span class="fc" id="L54">            s = s.substring(0, s.length() - en);</span>
+        }
+<span class="fc" id="L56">        return s;</span>
+    }
+
+    /**
+     * Split the provided text at {@link #DEFAULT_SPLIT} as separator, using
+     * {@link #DEFAULT_QUOTE} as the default quotation char.
+     *
+     * @param text the text to split
+     * @return the split string as a list
+     */
+    public static ArrayList&lt;String&gt; splitString(String text) {
+<span class="fc" id="L67">        return splitString(text, DEFAULT_SPLIT, DEFAULT_QUOTE, false);</span>
+    }
+
+    /**
+     * Split the provided text at separator, respecting the quote char to not
+     * split in between quoted parts.
+     *
+     * @param text the text to split
+     * @param separator the separator to split at
+     * @param quote the quotation character
+     * @return the split string as a list
+     */
+    public static ArrayList&lt;String&gt; splitString(String text, char separator, char quote) {
+<span class="fc" id="L80">        return splitString(text, separator, quote, false);</span>
+    }
+
+    /**
+     * Split the provided text at separator, respecting the quote char to not
+     * split in between quoted parts. Optionally allow empty / whitespace at the
+     * end.
+     *
+     * @param text the text to split
+     * @param separator the separator to split at
+     * @param quote the quotation character
+     * @param withEmpty if true, allow empty parts
+     * @return the split string as a list
+     */
+    public static ArrayList&lt;String&gt; splitString(String text, char separator, char quote, boolean withEmpty) {
+<span class="fc" id="L95">        boolean in_quote = false;</span>
+<span class="fc" id="L96">        ArrayList&lt;String&gt; tokens = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L97">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L98">        char last_char = '\0';</span>
+<span class="fc" id="L99">        boolean last_escaped_backslash = false;</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        for (int i = 0; i &lt; text.length(); ++i) {</span>
+<span class="fc" id="L102">            char c = text.charAt(i);</span>
+<span class="fc" id="L103">            boolean escaped_backslash = false;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            if (!in_quote) {</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">                if (c == separator) {</span>
+<span class="fc" id="L106">                    String sb_string = sb.toString();</span>
+<span class="fc bfc" id="L107" title="All 4 branches covered.">                    if (sb_string.length() &gt; 0 || withEmpty) {</span>
+<span class="fc" id="L108">                        tokens.add(sb_string);</span>
+                    }
+<span class="fc" id="L110">                    sb = new StringBuilder();</span>
+<span class="fc" id="L111">                } else {</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">                    if (c == quote) {</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">                        in_quote = !in_quote;</span>
+                    }
+<span class="fc" id="L115">                    sb.append(c);</span>
+                }
+            } else {
+<span class="pc bpc" id="L118" title="1 of 6 branches missed.">                if (c == '\\' &amp;&amp; last_char == '\\' &amp;&amp; !last_escaped_backslash) {</span>
+<span class="fc" id="L119">                    escaped_backslash = true;</span>
+<span class="fc bfc" id="L120" title="All 6 branches covered.">                } else if (c == quote &amp;&amp; !(last_char == '\\' &amp;&amp; !last_escaped_backslash)) {</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                    in_quote = !in_quote;</span>
+                }
+<span class="fc" id="L123">                sb.append(c);</span>
+            }
+
+<span class="fc" id="L126">            last_escaped_backslash = escaped_backslash;</span>
+<span class="fc" id="L127">            last_char = c;</span>
+        }
+
+<span class="fc" id="L130">        String sb_string_end = sb.toString();</span>
+
+<span class="fc bfc" id="L132" title="All 6 branches covered.">        if (sb_string_end.length() &gt; 0 || (last_char == ',' &amp;&amp; withEmpty)) {</span>
+<span class="fc" id="L133">            tokens.add(sb_string_end);</span>
+        }
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (in_quote) {</span>
+<span class="fc" id="L136">            throw new ConstraintViolationException(&quot;Error: corrupt token in grammar: '&quot; + sb_string_end+&quot;'&quot;);</span>
+        }
+<span class="fc" id="L138">        return tokens;</span>
+    }
+
+    /**
+     * Read the provided resource and split it at default new line characters
+     * into a list for each line.
+     *
+     * @param resource the resource to read
+     * @return a list of line strings
+     */
+    public static List&lt;String&gt; getResourceAsStringList(Resource resource) {
+        ArrayList&lt;String&gt; lines;
+        // read resource from classpath and current thread's context class loader
+<span class="fc" id="L151">        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {</span>
+<span class="fc" id="L152">            lines = br.lines().collect(Collectors.toCollection(ArrayList::new));</span>
+<span class="fc" id="L153">        } catch (IOException e) {</span>
+            //always pass on the original exception
+<span class="fc" id="L155">            throw new ConstraintViolationException(&quot;Error: Resource '&quot; + resource.getDescription() + &quot;' does not exist.&quot;, e);</span>
+<span class="fc" id="L156">        }</span>
+<span class="fc" id="L157">        return lines;</span>
+    }
+
+    /**
+     * Read the provided resource path, which is converted to a
+     * {@link ClassPathResource} and split it at default new line characters
+     * into a list for each line.
+     *
+     * @param resourcePath the resource path to read from
+     * @return a list of line strings
+     */
+    public static List&lt;String&gt; getResourceAsStringList(String resourcePath) {
+<span class="fc" id="L169">        return getResourceAsStringList(new ClassPathResource(resourcePath));</span>
+    }
+
+    /**
+     * Read the provided resource and return it as a string.
+     *
+     * @param resource the resource to read
+     * @return the resource content as a string
+     */
+    public static String getResourceAsString(Resource resource) {
+<span class="fc" id="L179">        StringBuilder sb = new StringBuilder();</span>
+        // read resource from classpath and current thread's context class loader
+<span class="fc" id="L181">        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {</span>
+<span class="fc" id="L182">            br.lines().forEach(line -&gt; {</span>
+<span class="fc" id="L183">                sb.append(line).append(&quot;\n&quot;);</span>
+<span class="fc" id="L184">            });</span>
+<span class="fc" id="L185">            return sb.toString();</span>
+<span class="fc" id="L186">        } catch (IOException e) {</span>
+            //always pass on the original exception
+<span class="fc" id="L188">            throw new ConstraintViolationException(&quot;Error: Resource '&quot; + resource.getDescription() + &quot;' does not exist.&quot;, e);</span>
+        }
+    }
+
+    /**
+     * Read the provided resource path and return it as a string.
+     *
+     * @param resourcePath the resource path to read from
+     * @return the resource content as a string
+     */
+    public static String getResourceAsString(String resourcePath) {
+<span class="fc" id="L199">        return getResourceAsString(new ClassPathResource(resourcePath));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

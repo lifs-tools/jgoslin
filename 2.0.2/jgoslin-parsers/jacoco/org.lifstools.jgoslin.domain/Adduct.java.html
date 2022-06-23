@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Adduct.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">Adduct.java</span></div><h1>Adduct.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Map;
+import static java.util.Map.entry;
+
+/**
+ * An adduct, generally, consists of a sum formula part, an adduct string, the
+ * charge and the charge sign. An example for a valid adduct is : [M+H]1+.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class Adduct {
+
+    private String sumFormula;
+    private String adductString;
+    private int charge;
+    private int chargeSign;
+
+<span class="fc" id="L36">    public static final Map&lt;String, ElementTable&gt; ADDUCTS = Map.ofEntries(</span>
+<span class="fc" id="L37">            entry(&quot;+H&quot;, ElementTable.of(Map.entry(Element.H, 1))),</span>
+<span class="fc" id="L38">            entry(&quot;+2H&quot;, ElementTable.of(Map.entry(Element.H, 2))),</span>
+<span class="fc" id="L39">            entry(&quot;+3H&quot;, ElementTable.of(Map.entry(Element.H, 3))),</span>
+<span class="fc" id="L40">            entry(&quot;+4H&quot;, ElementTable.of(Map.entry(Element.H, 4))),</span>
+<span class="fc" id="L41">            entry(&quot;-H&quot;, ElementTable.of(Map.entry(Element.H, -1))),</span>
+<span class="fc" id="L42">            entry(&quot;-2H&quot;, ElementTable.of(Map.entry(Element.H, -2))),</span>
+<span class="fc" id="L43">            entry(&quot;-3H&quot;, ElementTable.of(Map.entry(Element.H, -3))),</span>
+<span class="fc" id="L44">            entry(&quot;-4H&quot;, ElementTable.of(Map.entry(Element.H, -4))),</span>
+<span class="fc" id="L45">            entry(&quot;+H-H2O&quot;, ElementTable.of(Map.entry(Element.H, -1), Map.entry(Element.O, -1))),</span>
+<span class="fc" id="L46">            entry(&quot;+NH4&quot;, ElementTable.of(Map.entry(Element.N, 1), Map.entry(Element.H, 4))),</span>
+<span class="fc" id="L47">            entry(&quot;+Cl&quot;, ElementTable.of(Map.entry(Element.Cl, 1))),</span>
+<span class="fc" id="L48">            entry(&quot;+HCOO&quot;, ElementTable.of(Map.entry(Element.H, 1), Map.entry(Element.C, 1), Map.entry(Element.O, 2))),</span>
+<span class="fc" id="L49">            entry(&quot;+CH3COO&quot;, ElementTable.of(Map.entry(Element.H, 3), Map.entry(Element.C, 2), Map.entry(Element.O, 2)))</span>
+    );
+
+<span class="fc" id="L52">    public static final Map&lt;String, Integer&gt; ADDUCT_CHARGES = Map.ofEntries(</span>
+<span class="fc" id="L53">            entry(&quot;+H&quot;, 1),</span>
+<span class="fc" id="L54">            entry(&quot;+2H&quot;, 2),</span>
+<span class="fc" id="L55">            entry(&quot;+3H&quot;, 3),</span>
+<span class="fc" id="L56">            entry(&quot;+4H&quot;, 4),</span>
+<span class="fc" id="L57">            entry(&quot;-H&quot;, -1),</span>
+<span class="fc" id="L58">            entry(&quot;-2H&quot;, -2),</span>
+<span class="fc" id="L59">            entry(&quot;-3H&quot;, -3),</span>
+<span class="fc" id="L60">            entry(&quot;-4H&quot;, -4),</span>
+<span class="fc" id="L61">            entry(&quot;+H-H2O&quot;, 1),</span>
+<span class="fc" id="L62">            entry(&quot;+NH4&quot;, 1),</span>
+<span class="fc" id="L63">            entry(&quot;+Cl&quot;, -1),</span>
+<span class="fc" id="L64">            entry(&quot;+HCOO&quot;, -1),</span>
+<span class="fc" id="L65">            entry(&quot;+CH3COO&quot;, -1)</span>
+    );
+
+    public Adduct(String _sum_formula, String _adduct_string) {
+<span class="fc" id="L69">        this(_sum_formula, _adduct_string, 1, 1);</span>
+
+<span class="fc" id="L71">    }</span>
+
+<span class="fc" id="L73">    public Adduct(String _sum_formula, String _adduct_string, int _charge, int _sign) {</span>
+<span class="fc" id="L74">        sumFormula = _sum_formula;</span>
+<span class="fc" id="L75">        adductString = _adduct_string;</span>
+<span class="fc" id="L76">        charge = _charge;</span>
+<span class="fc" id="L77">        setChargeSign(_sign);</span>
+
+<span class="fc" id="L79">    }</span>
+
+    public void setSumFormula(String sumFormula) {
+<span class="nc" id="L82">        this.sumFormula = sumFormula;</span>
+<span class="nc" id="L83">    }</span>
+
+    public String getSumFormula() {
+<span class="nc" id="L86">        return this.sumFormula;</span>
+    }
+
+    public void setAdductString(String adductString) {
+<span class="fc" id="L90">        this.adductString = adductString;</span>
+<span class="fc" id="L91">    }</span>
+
+    public String getAdductString() {
+<span class="nc" id="L94">        return this.adductString;</span>
+    }
+
+    public void setChargeSign(int _sign) {
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        if (-1 &lt;= _sign &amp;&amp; _sign &lt;= 1) {</span>
+<span class="fc" id="L99">            chargeSign = _sign;</span>
+        } else {
+<span class="nc" id="L101">            throw new ConstraintViolationException(&quot;Sign can only be -1, 0, or 1&quot;);</span>
+        }
+<span class="fc" id="L103">    }</span>
+
+    public int getChargeSign() {
+<span class="nc" id="L106">        return this.chargeSign;</span>
+    }
+
+    public void setCharge(int charge) {
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (charge &gt; 0) {</span>
+<span class="fc" id="L111">            this.chargeSign = 1;</span>
+        } else {
+<span class="nc" id="L113">            this.chargeSign = -1;</span>
+        }
+<span class="fc" id="L115">        this.charge = charge;</span>
+<span class="fc" id="L116">    }</span>
+
+    public String getLipidString() {
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if (charge == 0) {</span>
+<span class="nc" id="L120">            return &quot;[M]&quot;;</span>
+        }
+<span class="fc" id="L122">        StringBuilder sb = new StringBuilder();</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        sb.append(&quot;[M&quot;).append(sumFormula).append(adductString).append(&quot;]&quot;).append(charge).append(((chargeSign &gt; 0) ? &quot;+&quot; : &quot;-&quot;));</span>
+
+<span class="fc" id="L125">        return sb.toString();</span>
+    }
+
+    @JsonIgnore
+    public ElementTable getElements() {
+<span class="fc" id="L130">        ElementTable elements = new ElementTable();</span>
+//        String adduct_name = adductString.substring(1);
+
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if (ADDUCTS.containsKey(adductString)) {</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">            if (ADDUCT_CHARGES.get(adductString) != getCharge()) {</span>
+<span class="nc" id="L135">                throw new ConstraintViolationException(&quot;Provided charge '&quot; + getCharge() + &quot;' in contradiction to adduct '&quot; + adductString + &quot;' charge '&quot; + ADDUCT_CHARGES.get(adductString) + &quot;'.&quot;);</span>
+            }
+<span class="fc" id="L137">            elements.add(ADDUCTS.get(adductString));</span>
+        } else {
+<span class="nc" id="L139">            throw new ConstraintViolationException(&quot;Adduct '&quot; + adductString + &quot;' is unknown.&quot;);</span>
+        }
+
+<span class="fc" id="L142">        return elements;</span>
+    }
+
+    /**
+     * Returns the positive elementary charge times the charge sign.
+     *
+     * @return the net charge.
+     */
+    public int getCharge() {
+<span class="fc" id="L151">        return charge * chargeSign;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
