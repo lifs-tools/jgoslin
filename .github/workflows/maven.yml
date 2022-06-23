@@ -29,19 +29,19 @@ jobs:
         git config --global author.email "${GITHUB_ACTOR}@users.noreply.github.com"
         git config --global author.name "${GITHUB_ACTOR}"
     - name: Cache SonarCloud packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
     - name: Cache Maven packages
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2        
     - name: Setup Maven settings.xml
-      uses: whelk-io/maven-settings-xml-action@v14
+      uses: whelk-io/maven-settings-xml-action@v20
       with:
         servers: '[{ "id": "lifstools-jfrog", "username": "github-deployer", "password": "${env.ARTIFACTORY_TOKEN_REF}" }]'
     - name: Set Release version env variable
