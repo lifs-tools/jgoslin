@@ -97,14 +97,14 @@ public class LipidMapsParserTest {
         assertThrows(IllegalArgumentException.class, () -> {
             tl.getLipidString(LipidLevel.COMPLETE_STRUCTURE);
         });
-        assertEquals(LipidLevel.STRUCTURE_DEFINED, lipid.getLipidLevel());
+        assertEquals(LipidLevel.FULL_STRUCTURE, lipid.getLipidLevel());
         assertEquals("EPC 16:2(4,6);OH/22:1(13);OH", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("EPC 16:2;O2/22:1;O", lipid.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("EPC 38:3;O3", lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals("C40H77N2O7P", lipid.getSumFormula());
 
-        lipid = parser.parse("omega-linoleoyloxy-Cer(d17:1(6OH)/29:0)", handler);
+        lipid = parser.parse("omega-linoleoyloxy-Cer(t17:1(6OH)/29:0)", handler);
         assertEquals(LipidLevel.SN_POSITION, lipid.getLipidLevel());
         assertEquals("Cer 64:3;O4", lipid.getLipidString(LipidLevel.SPECIES));
 
@@ -133,6 +133,7 @@ public class LipidMapsParserTest {
 //        assertEquals(760.58508d, lipid.getMass(), 1.0e-4);
 //    }
 
+    
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testLipidMapsParserFromFileTest(String lipid_name, String correct_lipid_name) {

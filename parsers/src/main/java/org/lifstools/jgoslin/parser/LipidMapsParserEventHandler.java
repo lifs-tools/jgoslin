@@ -282,14 +282,19 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addFunctionalGroup(TreeNode node) {
         if (!modText.equals("Cp")) {
-            FunctionalGroup functional_group = knownFunctionalGroups.get(modText);
-            functional_group.setPosition(modPos);
-            functional_group.setCount(modNum);
-            String fg_name = functional_group.getName();
-            if (!currentFa.getFunctionalGroupsInternal().containsKey(fg_name)) {
-                currentFa.getFunctionalGroupsInternal().put(fg_name, new ArrayList<>());
+            if (FattyAcid.LCB_STATES.contains(currentFa.getLipidFaBondType()) && modText.equals("OH") && currentFa.getFunctionalGroupsInternal().containsKey("OH") && currentFa.getFunctionalGroupsInternal().get("OH").size() > 0){
+                currentFa.getFunctionalGroupsInternal().get("OH").get(currentFa.getFunctionalGroupsInternal().get("OH").size() - 1).setPosition(modPos);
             }
-            currentFa.getFunctionalGroupsInternal().get(fg_name).add(functional_group);
+            else {
+                FunctionalGroup functional_group = knownFunctionalGroups.get(modText);
+                functional_group.setPosition(modPos);
+                functional_group.setCount(modNum);
+                String fg_name = functional_group.getName();
+                if (!currentFa.getFunctionalGroupsInternal().containsKey(fg_name)) {
+                    currentFa.getFunctionalGroupsInternal().put(fg_name, new ArrayList<>());
+                }
+                currentFa.getFunctionalGroupsInternal().get(fg_name).add(functional_group);
+            }
         } else {
             currentFa.setNumCarbon(currentFa.getNumCarbon() + 1);
             Cycle cycle = new Cycle(3, modPos, modPos + 2, knownFunctionalGroups);
@@ -308,7 +313,6 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     private void newLcb(TreeNode node) {
         lcb = new FattyAcid("LCB", knownFunctionalGroups);
         lcb.setType(LipidFaBondType.LCB_REGULAR);
-        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         currentFa = lcb;
     }
 
@@ -318,6 +322,14 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         }
         if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
+        }
+        if (currentFa.getFunctionalGroupsInternal().containsKey("OH")){
+            for(FunctionalGroup fg : currentFa.getFunctionalGroupsInternal().get("OH")){
+                if (fg.getPosition() < 1){
+                    setStructuralSubspeciesLevel(node);
+                    break;
+                }
+            }
         }
         currentFa = null;
     }
@@ -362,41 +374,58 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void addDiHydroxyl(TreeNode node) {
-        int num_h = 2;
-
-        if (spRegularLcb()) {
-            num_h -= 1;
-        }
-
-        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
-        functional_group.setCount(num_h);
         if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
             currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
         }
-        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
+        
+        FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
+        functional_group_p3.setPosition(3);
+        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
+         
+        
+        if (!spRegularLcb()) {
+            FunctionalGroup functional_group_p1 = knownFunctionalGroups.get("OH");
+            functional_group_p1.setPosition(1);
+            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p1);
+        }
     }
 
     private void addHydroxylLcb(TreeNode node) {
-        String hydroxyl = node.getText();
-        int num_h = 0;
-        if (hydroxyl.equals("m")) {
-            num_h = 1;
-        } else if (hydroxyl.equals("d")) {
-            num_h = 2;
-        } else if (hydroxyl.equals("t")) {
-            num_h = 3;
-        }
-
-        if (spRegularLcb()) {
-            num_h -= 1;
-        }
-
-        FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
-        functional_group.setCount(num_h);
         if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
             currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
         }
-        currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
+        
+        String hydroxyl = node.getText();
+        if (hydroxyl.equals("m")) {
+            FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
+            functional_group_p3.setPosition(3);
+            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
+            
+        } else if (hydroxyl.equals("d")) {
+            if (!spRegularLcb()) {
+                FunctionalGroup functional_group_p1 = knownFunctionalGroups.get("OH");
+                functional_group_p1.setPosition(1);
+                currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p1);
+            }
+            
+            FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
+            functional_group_p3.setPosition(3);
+            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
+            
+        } else if (hydroxyl.equals("t")) {
+            if (!spRegularLcb()) {
+                FunctionalGroup functional_group_p1 = knownFunctionalGroups.get("OH");
+                functional_group_p1.setPosition(1);
+                currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p1);
+            }
+            FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
+            functional_group_p3.setPosition(3);
+            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
+            
+            FunctionalGroup functional_group_t = knownFunctionalGroups.get("OH");
+            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_t);
+            
+        }
     }
 
     private void addDoubleBonds(TreeNode node) {
