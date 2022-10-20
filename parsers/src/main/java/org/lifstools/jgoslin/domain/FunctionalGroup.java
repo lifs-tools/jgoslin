@@ -39,7 +39,6 @@ public class FunctionalGroup {
     protected ElementTable elements;
     protected HashMap<String, ArrayList<FunctionalGroup>> functionalGroups;
     protected KnownFunctionalGroups knownFunctionalGroups;
-    protected int numAtomsAndBonds;
 
     public FunctionalGroup(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, -1, 1, null, false, "", null, null, knownFunctionalGroups);
@@ -53,19 +52,10 @@ public class FunctionalGroup {
         this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null, knownFunctionalGroups);
     }
 
-    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups, int _numAtomsAndBonds) {
-        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null, knownFunctionalGroups, _numAtomsAndBonds);
-    }
-
     public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, _functional_groups, knownFunctionalGroups, 0);
-    }
-
-    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups, int _numAtomsAndBonds) {
         name = _name;
         position = _position;
         count = _count;
-        numAtomsAndBonds = _numAtomsAndBonds;
         stereochemistry = _stereochemistry;
         ringStereo = "";
         doubleBonds = (_double_bonds != null) ? _double_bonds : new DoubleBonds(0);
@@ -91,7 +81,7 @@ public class FunctionalGroup {
             e.put(kv.getKey(), kv.getValue());
         });
 
-        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, e, fg, knownFunctionalGroups, numAtomsAndBonds);
+        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, e, fg, knownFunctionalGroups);
         func_group_new.ringStereo = ringStereo;
         return func_group_new;
     }

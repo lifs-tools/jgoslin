@@ -87,15 +87,20 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
         // make lyso
         boolean can_be_lyso = (LipidClasses.getInstance().size() > Headgroup.getClass("L" + headGroup)) ? LipidClasses.getInstance().get(Headgroup.getClass("L" + headGroup)).specialCases.contains("Lyso") : false;
         LipidClassMeta l = LipidClasses.getInstance().get(Headgroup.getClass("LCL"));
-        if (true_fa + 1 == poss_fa && level != LipidLevel.SPECIES && headgroup.getLipidCategory() == LipidCategory.GP && can_be_lyso) {
-            headGroup = "L" + headGroup;
-            headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
-            poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
-        } else if (true_fa + 2 == poss_fa && level != LipidLevel.SPECIES && headgroup.getLipidCategory() == LipidCategory.GP && headGroup.equals("CL")) {
-            headGroup = "DL" + headGroup;
+        if ((true_fa + 1 == poss_fa || true_fa + 2 == poss_fa) && level != LipidLevel.SPECIES && headgroup.getLipidCategory() == LipidCategory.GP && can_be_lyso) {
+            if (true_fa + 1 == poss_fa) headGroup = "L" + headGroup;
+            else headGroup = "DL" + headGroup;
             headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
             poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
         }
+        
+        else if ((true_fa + 1 == poss_fa || true_fa + 2 == poss_fa) && level != LipidLevel.SPECIES && headgroup.getLipidCategory() == LipidCategory.GL && headGroup.equals("TG")) {
+            if (true_fa + 1 == poss_fa) headGroup = "DG";
+            else headGroup = "MG";
+            headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
+            poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
+        }
+        
 
         if (level == LipidLevel.SPECIES) {
             if (true_fa == 0 && poss_fa != 0) {
