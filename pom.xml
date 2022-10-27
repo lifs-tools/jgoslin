@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.lifs-tools</groupId>
     <artifactId>jgoslin</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>jgoslin</name>
     <url>https://github.com/lifs-tools/jgoslin</url>	
@@ -60,7 +60,8 @@
         <slf4j.version>1.7.36</slf4j.version>
         <jacoco.version>0.8.8</jacoco.version>
         <sonar.organization>lifs-tools</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>		
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <native.maven.plugin.version>0.9.6</native.maven.plugin.version>
     </properties>
     <build>
         <pluginManagement>

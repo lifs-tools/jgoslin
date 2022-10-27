@@ -111,4 +111,13 @@ public class LipidParser {
         return lastSuccessfulParser;
     }
 
+    /**
+     * Returns the grammar name of the last successful parser.
+     *
+     * @return the grammar name of the last successful parser.
+     */
+    public String getLastSuccessfulGrammar() {
+        return lastSuccessfulParser.grammarName;
+    }
+
 }

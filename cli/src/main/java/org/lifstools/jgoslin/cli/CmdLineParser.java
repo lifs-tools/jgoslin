@@ -59,6 +59,7 @@ import org.lifstools.jgoslin.parser.FattyAcidParser;
 import org.lifstools.jgoslin.parser.GoslinParser;
 import org.lifstools.jgoslin.parser.HmdbParser;
 import org.lifstools.jgoslin.parser.LipidMapsParser;
+import org.lifstools.jgoslin.parser.LipidParser;
 import org.lifstools.jgoslin.parser.Parser;
 import org.lifstools.jgoslin.parser.ShorthandParser;
 import org.lifstools.jgoslin.parser.SwissLipidsParser;
@@ -78,7 +79,7 @@ public class CmdLineParser {
 
     public static final String LIPIDMAPS_CLASS_REGEXP = ".+\\[([A-Z0-9]+)\\]";
     private static final LipidClasses LIPID_CLASSES = LipidClasses.getInstance();
-    
+
     private static final Map<Grammar, Parser<LipidAdduct>> parsers = new LinkedHashMap<>();
 
     private static String getAppInfo() throws IOException {
@@ -186,7 +187,7 @@ public class CmdLineParser {
     }
 
     private static enum Grammar {
-        GOSLIN, GOSLIN_FRAGMENTS, LIPIDMAPS, SWISSLIPIDS, HMDB, SHORTHAND2020, FATTY_ACID, NONE
+        GOSLIN, GOSLINFRAGMENTS, LIPIDMAPS, SWISSLIPIDS, HMDB, SHORTHAND2020, FATTYACIDS, NONE
     };
 
     record ValidationResult(
@@ -209,8 +210,8 @@ public class CmdLineParser {
 
     private static boolean writeToStdOut(List<Pair<String, List<ValidationResult>>> results) {
 
-        try (StringWriter sw = new StringWriter()) {
-            try (BufferedWriter bw = new BufferedWriter(sw)) {
+        try ( StringWriter sw = new StringWriter()) {
+            try ( BufferedWriter bw = new BufferedWriter(sw)) {
                 writeToWriter(bw, results);
             }
             sw.flush();
@@ -225,7 +226,7 @@ public class CmdLineParser {
 
     private static boolean writeToFile(File f, List<Pair<String, List<ValidationResult>>> results) {
 
-        try (BufferedWriter bw = Files.newBufferedWriter(f.toPath())) {
+        try ( BufferedWriter bw = Files.newBufferedWriter(f.toPath())) {
             writeToWriter(bw, results);
             return true;
         } catch (IOException ex) {
@@ -248,8 +249,20 @@ public class CmdLineParser {
             m.put("Message", t.messages.stream().collect(Collectors.joining(" | ")));
             if (t.lipidAdduct != null) {
                 m.put("Adduct", t.lipidAdduct.getAdduct() == null ? "" : t.lipidAdduct.getAdduct().getLipidString());
-                m.put("Sum Formula", t.lipidAdduct.getSumFormula());
-                m.put("Mass", String.format(Locale.US, "%.4f", t.lipidAdduct.getMass()));
+                try {
+                    m.put("Sum Formula", t.lipidAdduct.getSumFormula());
+                } catch (ConstraintViolationException | NullPointerException cve) {
+                    log.debug("Could not calculate sum formula for lipid {}", t.lipidName);
+                    log.error("Exception:", cve);
+                    m.put("Sum Formula", "");
+                }
+                try {
+                    m.put("Mass", String.format(Locale.US, "%.4f", t.lipidAdduct.getMass()));
+                } catch (ConstraintViolationException | NullPointerException cve) {
+                    log.debug("Could not calculate mass for lipid {}", t.lipidName);
+                    log.error("Exception:", cve);
+                    m.put("Mass", "");
+                }
                 m.put("Lipid Maps Category", t.lipidAdduct.getLipid().getHeadGroup().getLipidCategory().getFullName() + " [" + t.lipidAdduct.getLipid().getHeadGroup().getLipidCategory().name() + "]");
                 LipidClassMeta lclass = LIPID_CLASSES.get(t.lipidAdduct.getLipid().getInfo().lipidClass);
                 m.put("Lipid Maps Main Class", lclass.description);
@@ -320,6 +333,8 @@ public class CmdLineParser {
     private static List<Pair<String, List<ValidationResult>>> parseNames(Stream<String> lipidNames) {
         return lipidNames.map((t) -> {
             return parseName(t);
+        }).toList().stream().map((t) -> {
+            return Pair.of(t.getKey(), Arrays.asList(t.getValue()));
         }).toList();
     }
 
@@ -396,37 +411,50 @@ public class CmdLineParser {
         }
     }
 
-    private static Pair<String, List<ValidationResult>> parseName(String lipidName) {
-        List<ValidationResult> results = new ArrayList<>();
-        Pair<String, ValidationResult> shorthandResult = parseNameWith(lipidName, Grammar.SHORTHAND2020);
-        if (shorthandResult.getValue().canonicalName != null) {
-            return Pair.of(shorthandResult.getKey(), Arrays.asList(shorthandResult.getValue()));
+    private static Pair<String, ValidationResult> parseName(String lipidName) {
+        Pair<String, ValidationResult> shorthandResult = null;
+        LipidParser parser = new LipidParser();
+        ValidationResult validationResult;
+        try {
+            LipidAdduct la = parser.parse(lipidName);
+            String canonicalName;
+            try {
+                canonicalName = la.getLipidString();
+            } catch (RuntimeException re) {
+                canonicalName = null;
+                log.debug("Parsing error for {}!", lipidName);
+            }
+            List<FattyAcid> fas = extractFas(la);
+            validationResult = new ValidationResult(
+                    lipidName,
+                    Grammar.valueOf(parser.getLastSuccessfulGrammar().toUpperCase()),
+                    la.getLipidLevel(),
+                    Arrays.asList(""),
+                    la,
+                    la.getLipid().getInfo(),
+                    canonicalName,
+                    LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).lipidCategory.name(),
+                    getLipidMapsClassAbbreviation(LIPID_CLASSES.get(la.getLipid().getInfo().lipidClass).lipidClassName),
+                    fas
+            );
+            shorthandResult = Pair.of(lipidName, validationResult);
+        } catch (LipidException ex) {
+            validationResult = new ValidationResult(
+                        lipidName,
+                        Grammar.NONE,
+                        LipidLevel.NO_LEVEL,
+                        Arrays.asList(ex.getMessage()),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        Collections.emptyList()
+                );
+            log.debug("Could not parse " + lipidName + " with any grammar. Message: " + ex.getMessage());
+            shorthandResult = Pair.of(lipidName, validationResult);
         }
-        Pair<String, ValidationResult> fattyAcid = parseNameWith(lipidName, Grammar.FATTY_ACID);
-        if (fattyAcid.getValue().canonicalName != null) {
-            return Pair.of(fattyAcid.getKey(), Arrays.asList(fattyAcid.getValue()));
-        }
-        Pair<String, ValidationResult> goslinResult = parseNameWith(lipidName, Grammar.GOSLIN);
-        if (goslinResult.getValue().canonicalName != null) {
-            return Pair.of(goslinResult.getKey(), Arrays.asList(goslinResult.getValue()));
-        }
-        Pair<String, ValidationResult> lipidMapsResult = parseNameWith(lipidName, Grammar.LIPIDMAPS);
-        if (lipidMapsResult.getValue().canonicalName != null) {
-            return Pair.of(lipidMapsResult.getKey(), Arrays.asList(lipidMapsResult.getValue()));
-        }
-        Pair<String, ValidationResult> swissLipidsResult = parseNameWith(lipidName, Grammar.SWISSLIPIDS);
-        if (swissLipidsResult.getValue().canonicalName != null) {
-            return Pair.of(swissLipidsResult.getKey(), Arrays.asList(swissLipidsResult.getValue()));
-        }
-        Pair<String, ValidationResult> hmdbResult = parseNameWith(lipidName, Grammar.HMDB);
-        if (hmdbResult.getValue().canonicalName != null) {
-            return Pair.of(hmdbResult.getKey(), Arrays.asList(hmdbResult.getValue()));
-        }
-        List<String> messages = new ArrayList<>(hmdbResult.getValue().messages);
-        messages.add("Lipid name could not be parsed with any grammar!");
-        ValidationResult r = new ValidationResult(lipidName, Grammar.NONE, LipidLevel.NO_LEVEL, messages, null, null, "", null, null, Collections.emptyList());
-        results.add(r);
-        return Pair.of(lipidName, results);
+        return shorthandResult;
     }
 
     private static ArrayList<FattyAcid> extractFas(LipidAdduct la) {
@@ -481,11 +509,11 @@ public class CmdLineParser {
     }
 
     private static Map<Grammar, Parser<LipidAdduct>> loadParsers() {
-        if(parsers.isEmpty()) {
+        if (parsers.isEmpty()) {
             KnownFunctionalGroups kfg = new KnownFunctionalGroups();
             for (Grammar grammar : Grammar.values()) {
                 switch (grammar) {
-                    case FATTY_ACID ->
+                    case FATTYACIDS ->
                         parsers.put(grammar, new FattyAcidParser(kfg));
                     case GOSLIN ->
                         parsers.put(grammar, new GoslinParser(kfg));
@@ -497,7 +525,7 @@ public class CmdLineParser {
                         parsers.put(grammar, new ShorthandParser(kfg));
                     case SWISSLIPIDS ->
                         parsers.put(grammar, new SwissLipidsParser(kfg));
-                    case GOSLIN_FRAGMENTS -> {
+                    case GOSLINFRAGMENTS -> {
                     }
                     case NONE -> {
                     }
