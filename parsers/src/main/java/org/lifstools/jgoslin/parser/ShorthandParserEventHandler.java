@@ -239,10 +239,11 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
     
     private void setCarbohydrateNumber(TreeNode node) {
-        int carbohydrate_num = node.getInt();
-        if (!headgroupDecorators.isEmpty() && carbohydrate_num > 0){
-            int cnt = headgroupDecorators.get(headgroupDecorators.size() - 1).getCount();
-            headgroupDecorators.get(headgroupDecorators.size() - 1).setCount(cnt + carbohydrate_num - 1);
+        int carbohydrateNum = node.getInt();
+        if (!headgroupDecorators.isEmpty() && carbohydrateNum > 0){
+            HeadgroupDecorator lastElement = headgroupDecorators.get(headgroupDecorators.size() - 1);
+            int cnt = lastElement.getCount();
+            lastElement.setCount(cnt + carbohydrateNum - 1);
         }
     }
     
