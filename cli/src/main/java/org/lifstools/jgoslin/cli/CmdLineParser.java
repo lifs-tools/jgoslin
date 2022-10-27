@@ -139,6 +139,7 @@ public class CmdLineParser {
         String lipidNameOpt = addLipidNameInputOption(options);
         String lipidFileOpt = addLipidFileInputOption(options);
         String outputToFileOpt = addOutputToFileOption(options);
+        String stripWhitespaceOpt = addStripWhitespaceOption(options);
         String grammarOpt = addGrammarOption(options);
 
         CommandLine line = parser.parse(options, args);
@@ -152,6 +153,10 @@ public class CmdLineParser {
             if (line.hasOption(outputToFileOpt)) {
                 toFile = true;
             }
+            boolean stripWhitespace = false;
+            if (line.hasOption(stripWhitespaceOpt)) {
+                stripWhitespace = true;
+            }
             Stream<String> lipidNames = Stream.empty();
             if (line.hasOption(lipidNameOpt)) {
                 lipidNames = Stream.of(line.getOptionValues(lipidNameOpt));
@@ -162,9 +167,9 @@ public class CmdLineParser {
             }
             List<Pair<String, List<ValidationResult>>> results = Collections.emptyList();
             if (line.hasOption(grammarOpt)) {
-                results = parseNamesWith(lipidNames, Grammar.valueOf(line.getOptionValue(grammarOpt)));
+                results = parseNamesWith(lipidNames, Grammar.valueOf(line.getOptionValue(grammarOpt)), stripWhitespace);
             } else {
-                results = parseNames(lipidNames);
+                results = parseNames(lipidNames, stripWhitespace);
             }
             if (results.isEmpty()) {
                 log.info("No results generated. Please check input file or lipid names passed on the cli!");
@@ -267,7 +272,7 @@ public class CmdLineParser {
                 LipidClassMeta lclass = LIPID_CLASSES.get(t.lipidAdduct.getLipid().getInfo().lipidClass);
                 m.put("Lipid Maps Main Class", lclass.description);
                 String lclassAbbr = getLipidMapsClassAbbreviation(lclass.description);
-                m.put("Functional Class Abbr", "[" + lclassAbbr + "]");
+                m.put("Functional Class Abbr", lclassAbbr);
                 m.put("Functional Class Synonyms", "[" + lclass.synonyms.stream().collect(Collectors.joining(", ")) + "]");
                 m.put("Level", t.level.name());
                 m.put("Total #C", t.lipidSpeciesInfo.getNumCarbon() + "");
@@ -330,17 +335,17 @@ public class CmdLineParser {
         }
     }
 
-    private static List<Pair<String, List<ValidationResult>>> parseNames(Stream<String> lipidNames) {
+    private static List<Pair<String, List<ValidationResult>>> parseNames(Stream<String> lipidNames, boolean stripWhitespace) {
         return lipidNames.map((t) -> {
-            return parseName(t);
+            return parseName(stripWhitespace ? t.strip() : t);
         }).toList().stream().map((t) -> {
             return Pair.of(t.getKey(), Arrays.asList(t.getValue()));
         }).toList();
     }
 
-    private static List<Pair<String, List<ValidationResult>>> parseNamesWith(Stream<String> lipidNames, Grammar grammar) {
+    private static List<Pair<String, List<ValidationResult>>> parseNamesWith(Stream<String> lipidNames, Grammar grammar, boolean stripWhitespace) {
         return lipidNames.map((t) -> {
-            return parseNameWith(t, grammar);
+            return parseNameWith(stripWhitespace ? t.strip() : t, grammar);
         }).toList().stream().map((t) -> {
             return Pair.of(t.getKey(), Arrays.asList(t.getValue()));
         }).toList();
@@ -440,17 +445,17 @@ public class CmdLineParser {
             shorthandResult = Pair.of(lipidName, validationResult);
         } catch (LipidException ex) {
             validationResult = new ValidationResult(
-                        lipidName,
-                        Grammar.NONE,
-                        LipidLevel.NO_LEVEL,
-                        Arrays.asList(ex.getMessage()),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        Collections.emptyList()
-                );
+                    lipidName,
+                    Grammar.NONE,
+                    LipidLevel.NO_LEVEL,
+                    Arrays.asList(ex.getMessage()),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    Collections.emptyList()
+            );
             log.debug("Could not parse " + lipidName + " with any grammar. Message: " + ex.getMessage());
             shorthandResult = Pair.of(lipidName, validationResult);
         }
@@ -465,11 +470,9 @@ public class CmdLineParser {
         Pattern lmcRegexp = Pattern.compile(LIPIDMAPS_CLASS_REGEXP);
         Matcher lmcMatcher = lmcRegexp.matcher(lipidMapsClass);
         if (lmcMatcher.matches() && lmcMatcher.groupCount() == 1) {
-            lipidMapsClass = lmcMatcher.group(1);
-        } else {
-            lipidMapsClass = null;
+            return "[" + lmcMatcher.group(1) + "]";
         }
-        return lipidMapsClass;
+        return "";
     }
 
     protected static String addLipidFileInputOption(Options options) {
@@ -500,6 +503,12 @@ public class CmdLineParser {
         String outputToFileOpt = "outputFile";
         options.addOption("o", outputToFileOpt, false, "Write output to file 'goslin-out.tsv' instead of to std out.");
         return outputToFileOpt;
+    }
+
+    protected static String addStripWhitespaceOption(Options options) {
+        String stripWhitespaceOpt = "stripWhitespace";
+        options.addOption("w", stripWhitespaceOpt, false, "Strip leading and trailing whitespace of names passed to goslin. Be aware that original names in output will contain the stripped names!");
+        return stripWhitespaceOpt;
     }
 
     protected static String addGrammarOption(Options options) {
