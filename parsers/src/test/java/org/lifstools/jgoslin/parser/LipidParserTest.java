@@ -16,6 +16,7 @@
 package org.lifstools.jgoslin.parser;
 
 import java.util.Arrays;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidParsingException;
@@ -133,24 +135,25 @@ public class LipidParserTest {
         assertEquals(1, dbCount);
     }
 
-    @Test
-    public void testOKuda() {
-        String[] names = {
-            "CL 18:3(9Z,12Z,15Z)/16:0/22:5(16Z,10Z,19Z,13Z,7Z)/20:0",
-            "FA 23:0;3Me,13Me,19Me",
-            "LBPA(18:1(11Z)/0:0/32:5(14Z,17Z,20Z,23Z,26Z)/0:0)",
-            "MLCL (20:2(11Z,14Z)/20:1(11Z)/20:0/0:0)",
-            "N-ethyl-5Z,8Z,11Z,14Z-eicosatetraenoyl amine",
-            "PC(21:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z))",
-            "PE(16:2(9Z,12Z)/18:1(6Z))",
-            "PIP[4'] 6:0/22:5(16Z,10Z,19Z,13Z,7Z)",
-            "TG(20:0/22:3(10Z,13Z,16Z)/22:5(7Z,10Z,13Z,16Z,19Z))[iso6]",
-            "TG-Estolide TG 68:2;O2 TG 18:1_18:1_32:0;O2 TG 16:0;O(FA 16:0)/18:1/18:1",
-            "ST 27:1;O;S"
-        };
-        Arrays.stream(names).forEach((lipidName) -> {
-            LipidAdduct l = parser.parse(lipidName);
-        });
+    @ParameterizedTest()
+    @ValueSource(strings = {
+        "CL 18:3(9Z,12Z,15Z)/16:0/22:5(16Z,10Z,19Z,13Z,7Z)/20:0",
+        "FA 23:0;3Me,13Me,19Me",
+        "LBPA(18:1(11Z)/0:0/32:5(14Z,17Z,20Z,23Z,26Z)/0:0)",
+        "MLCL (20:2(11Z,14Z)/20:1(11Z)/20:0/0:0)",
+        "N-ethyl-5Z,8Z,11Z,14Z-eicosatetraenoyl amine",
+        "PC(21:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z))",
+        "PE(16:2(9Z,12Z)/18:1(6Z))",
+        "PIP[4'] 6:0/22:5(16Z,10Z,19Z,13Z,7Z)",
+        "TG(20:0/22:3(10Z,13Z,16Z)/22:5(7Z,10Z,13Z,16Z,19Z))[iso6]",
+        "TG-EST 68:2;O2",
+        "TG-EST 18:1_18:1_32:0;O2",
+        "TG 16:0;O(FA 16:0)/18:1/18:1",
+        "ST 27:1;O;S"
+    })
+    public void testOKuda(String lipidName) {
+        LipidAdduct l = parser.parse(lipidName);
+        Assertions.assertNotNull(l);
     }
 
 }
