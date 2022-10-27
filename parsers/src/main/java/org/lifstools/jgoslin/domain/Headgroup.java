@@ -132,15 +132,22 @@ public final class Headgroup {
 
         // adding prefixes to the headgroup
         if (!LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
-            ArrayList<String> prefixes = new ArrayList<>();
+            ArrayList<HeadgroupDecorator> decoratorsTmp = new ArrayList<>();
             for (HeadgroupDecorator hgd : decorators) {
                 if (!hgd.isSuffix()) {
-                    prefixes.add(hgd.toString(level));
+                    decoratorsTmp.add((HeadgroupDecorator)hgd.copy());
                 }
             }
-            Collections.sort(prefixes);
-            for (String prefix : prefixes) {
-                headgoup_string.append(prefix);
+            for (int i = decoratorsTmp.size() - 1; i > 0; --i){
+                HeadgroupDecorator hge = decoratorsTmp.get(i);
+                HeadgroupDecorator hgeBefore = decoratorsTmp.get(i - 1);
+                if (hge.getName().equals(hgeBefore.getName())){
+                    hgeBefore.setCount(hgeBefore.getCount() + 1);
+                    decoratorsTmp.remove(i);
+                }
+            }
+            for (HeadgroupDecorator hge : decoratorsTmp) {
+                headgoup_string.append(hge.toString(level));
             }
         } else {
             for (HeadgroupDecorator hgd : decorators) {

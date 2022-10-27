@@ -57,7 +57,7 @@ public final class HeadgroupDecorator extends FunctionalGroup {
     @Override
     public String toString(LipidLevel level) {
         if (!suffix) {
-            return getName();
+            return getName() + (count > 1 ? Integer.toString(count) : "");
         }
         String decorator_string = "";
         if ((lowestVisibleLevel == LipidLevel.NO_LEVEL) || (lowestVisibleLevel.level <= level.level)) {
