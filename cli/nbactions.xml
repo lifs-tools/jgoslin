@@ -12,10 +12,10 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>-f parsers/src/main/goslin/testfiles/lipidnames.txt</exec.appArgs>
-                <exec.mainClass>${packageClassName}</exec.mainClass>
+                <exec.appArgs>-f /home/nilshoffmann/Projects/github.com/lifs-tools/lipidcompass-external-data/SwissLipids/SwissLipidsMay2020/test-lipids.txt</exec.appArgs>
+                <exec.mainClass>org.lifstools.jgoslin.cli.CmdLineParser</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/home/nilshoffmann/Projects/github.com/lifs-tools/jg</exec.workingdir>
+                <exec.workingdir>/home/nilshoffmann/Projects/github.com/lifs-tools/jgoslin</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -30,11 +30,11 @@
             <properties>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>-f parsers/src/main/goslin/testfiles/lipidnames.txt</exec.appArgs>
-                <exec.mainClass>${packageClassName}</exec.mainClass>
+                <exec.appArgs>-f /home/nilshoffmann/Projects/github.com/lifs-tools/lipidcompass-external-data/SwissLipids/SwissLipidsMay2020/test-lipids.txt</exec.appArgs>
+                <exec.mainClass>org.lifstools.jgoslin.cli.CmdLineParser</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>/home/nilshoffmann/Projects/github.com/lifs-tools/jg</exec.workingdir>
+                <exec.workingdir>/home/nilshoffmann/Projects/github.com/lifs-tools/jgoslin</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -49,10 +49,10 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.mainClass>${packageClassName}</exec.mainClass>
+                <exec.mainClass>org.lifstools.jgoslin.cli.CmdLineParser</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/home/nilshoffmann/Projects/github.com/lifs-tools/jg</exec.workingdir>
-                <exec.appArgs>-f parsers/src/main/goslin/testfiles/lipidnames.txt</exec.appArgs>
+                <exec.workingdir>/home/nilshoffmann/Projects/github.com/lifs-tools/jgoslin</exec.workingdir>
+                <exec.appArgs>-f /home/nilshoffmann/Projects/github.com/lifs-tools/lipidcompass-external-data/SwissLipids/SwissLipidsMay2020/test-lipids.txt</exec.appArgs>
             </properties>
         </action>
     </actions>

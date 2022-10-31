@@ -336,8 +336,9 @@ public class CmdLineParser {
     }
 
     private static List<Pair<String, List<ValidationResult>>> parseNames(Stream<String> lipidNames, boolean stripWhitespace) {
+        LipidParser lipidParser = new LipidParser();
         return lipidNames.map((t) -> {
-            return parseName(stripWhitespace ? t.strip() : t);
+            return parseName(stripWhitespace ? t.strip() : t, lipidParser);
         }).toList().stream().map((t) -> {
             return Pair.of(t.getKey(), Arrays.asList(t.getValue()));
         }).toList();
@@ -416,9 +417,8 @@ public class CmdLineParser {
         }
     }
 
-    private static Pair<String, ValidationResult> parseName(String lipidName) {
+    private static Pair<String, ValidationResult> parseName(String lipidName, LipidParser parser) {
         Pair<String, ValidationResult> shorthandResult = null;
-        LipidParser parser = new LipidParser();
         ValidationResult validationResult;
         try {
             LipidAdduct la = parser.parse(lipidName);
