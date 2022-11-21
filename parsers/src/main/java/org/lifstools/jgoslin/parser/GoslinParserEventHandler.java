@@ -146,6 +146,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         mediatorFunctionPositions.clear();
         mediatorSuffix = false;
         useHeadGroup = false;
+        headgroupDecorators.clear();
     }
 
     private void setHeadGroupName(TreeNode node) {

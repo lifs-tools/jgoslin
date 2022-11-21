@@ -54,25 +54,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     private boolean acerSpecies = false;
     private static final Set<String> SPECIAL_TYPES = Set.of("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc");
     private boolean containsStereoInformation = false;
-    
-    private static final Map<String, ArrayList<String>> GLYCO_TABLE = Map.ofEntries(
-        entry("ga2", new ArrayList<String>(Arrays.asList("GalNAc", "Gal", "Glc"))),
-        entry("gb3", new ArrayList<String>(Arrays.asList("Gal", "Gal", "Glc"))),
-        entry("gb4", new ArrayList<String>(Arrays.asList("GalNAc", "Gal", "Gal", "Glc"))),
-        entry("gd1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gd1a", new ArrayList<String>(Arrays.asList("Hex", "Hex", "Hex", "HexNAc", "NeuAc", "NeuAc"))),
-        entry("gd2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gd3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gm1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "Gal", "Glc"))),
-        entry("gm2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "Gal", "Glc"))),
-        entry("gm3", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "Glc"))),
-        entry("gm4", new ArrayList<String>(Arrays.asList("NeuAc", "Gal"))),
-        entry("gp1", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gq1", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "NeuAc", "Gal", "Glc")))
-    );
 
     /**
      * Create a new {@code ShorthandParserEventHandler}.
@@ -205,7 +186,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         headGroup = "";
         faList.clear();
         currentFas.clear();
-        headgroupDecorators = new ArrayList<>();
+        headgroupDecorators.clear();
         tmp = new Dictionary();
         acerSpecies = false;
         containsStereoInformation = false;
@@ -218,24 +199,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     
     private void setGlycoSphingoLipid(TreeNode node) {
-        String hg = headGroup.toLowerCase();
-        if (!GLYCO_TABLE.containsKey(hg)){
-            throw new LipidParsingException("Unknown glyco sphingolipid'" + headGroup + "'"); 
-        }
-
-        for (String carbohydrate : GLYCO_TABLE.get(hg)){
-            FunctionalGroup functional_group = null;
-            try {
-                functional_group = knownFunctionalGroups.get(carbohydrate);
-            } catch (Exception e) {
-                throw new LipidParsingException("Carbohydrate '" + carbohydrate + "' unknown");
-            }
-
-            functional_group.getElements().put(Element.O, functional_group.getElements().get(Element.O) - 1);
-            headgroupDecorators.add((HeadgroupDecorator) functional_group);
-        
-        }
-        headGroup = "Cer";
     }
     
     private void setCarbohydrateNumber(TreeNode node) {

@@ -123,6 +123,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         dbPositions = 0;
         dbCistrans = "";
         furan = new Dictionary();
+        headgroupDecorators.clear();
     }
 
     private void setIsomericLevel(TreeNode node) {
