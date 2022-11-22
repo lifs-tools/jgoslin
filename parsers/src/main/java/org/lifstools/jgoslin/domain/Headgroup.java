@@ -143,7 +143,7 @@ public final class Headgroup {
                 HeadgroupDecorator hge = decoratorsTmp.get(i);
                 HeadgroupDecorator hgeBefore = decoratorsTmp.get(i - 1);
                 if (hge.getName().equals(hgeBefore.getName())){
-                    hgeBefore.setCount(hgeBefore.getCount() + 1);
+                    hgeBefore.setCount(hgeBefore.getCount() + hge.getCount());
                     decoratorsTmp.remove(i);
                 }
             }
