@@ -366,7 +366,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         if (currentFas.peekLast().getDoubleBonds().getNumDoubleBonds() != (int) ((Dictionary) tmp.get(fa_i)).get("db_count")) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         } else if (currentFas.peekLast().getDoubleBonds().getNumDoubleBonds() > 0 && currentFas.peekLast().getDoubleBonds().getDoubleBondPositions().isEmpty()) {
-            setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
+            setLipidLevel(LipidLevel.SN_POSITION);
         }
         tmp.remove(fa_i);
 

@@ -22,7 +22,14 @@ import java.util.Map.Entry;
  * @author Dominik Kopczynski
  * @author Nils Hoffmann
  */
-public final class HeadgroupDecorator extends FunctionalGroup {
+public final class HeadgroupDecorator extends FunctionalGroup implements Comparable<HeadgroupDecorator> {
+
+    @Override
+    public int compareTo(HeadgroupDecorator hg) {
+        if (name.compareTo(hg.name) < 0) return -1;
+        return 1;
+    }
+
 
     private final boolean suffix;
     private final LipidLevel lowestVisibleLevel;

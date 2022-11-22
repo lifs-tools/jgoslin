@@ -32,7 +32,7 @@ import static java.util.Map.entry;
  * @author Nils Hoffmann
  */
 public final class Headgroup {
-
+    
     public static HashMap<String, LipidCategory> StringCategory = new HashMap<>();
     public static HashMap<String, Integer> StringClass = new HashMap<>();
     public static HashMap<Integer, String> ClassString = new HashMap<>();
@@ -138,6 +138,7 @@ public final class Headgroup {
                     decoratorsTmp.add((HeadgroupDecorator)hgd.copy());
                 }
             }
+            Collections.sort(decoratorsTmp);
             for (int i = decoratorsTmp.size() - 1; i > 0; --i){
                 HeadgroupDecorator hge = decoratorsTmp.get(i);
                 HeadgroupDecorator hgeBefore = decoratorsTmp.get(i - 1);
