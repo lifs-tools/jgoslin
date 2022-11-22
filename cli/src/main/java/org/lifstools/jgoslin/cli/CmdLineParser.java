@@ -239,6 +239,62 @@ public class CmdLineParser {
             return false;
         }
     }
+    
+    private static void initColumns(Map<String, String> map) {
+        String[] columns = {
+            "Normalized Name",	
+            "Original Name",
+            "Grammar",
+            "Message",
+            "Adduct",
+            "Sum Formula",
+            "Mass",
+            "Lipid Maps Category",
+            "Lipid Maps Main Class",
+            "Functional Class Abbr",
+            "Functional Class Synonyms",
+            "Level",
+            "Total #C",
+            "Total #DB",
+            "Total #OH",
+            "FA1 SN Position",
+            "FA1 #C",
+            "FA1 #DB",
+            "FA1 Bond Type",
+            "FA1 DB Positions",
+            "FA2 SN Position",
+            "FA2 #C",
+            "FA2 #DB",
+            "FA2 Bond Type",
+            "FA2 DB Positions",
+            "FA3 SN Position",
+            "FA3 #C",
+            "FA3 #DB",
+            "FA3 Bond Type",
+            "FA3 DB Positions",
+            "FA4 SN Position",
+            "FA4 #C",
+            "FA4 #DB",
+            "FA4 Bond Type",
+            "FA4 DB Positions",
+            "LCB SN Position",
+            "LCB #C",
+            "LCB #DB",
+            "LCB Bond Type",
+            "LCB DB Positions",
+            "Lipid Shorthand CATEGORY",
+            "Lipid Shorthand CLASS",
+            "Lipid Shorthand SPECIES",
+            "Lipid Shorthand MOLECULAR_SPECIES",
+            "Lipid Shorthand SN_POSITION",
+            "Lipid Shorthand STRUCTURE_DEFINED",
+            "Lipid Shorthand FULL_STRUCTURE",
+            "Lipid Shorthand COMPLETE_STRUCTURE"
+        };
+        Arrays.asList(columns).stream().forEach((t) -> {
+            map.put(t, "");
+        });
+    }
 
     private static String toTable(List<Pair<String, List<ValidationResult>>> results) {
         StringBuilder sb = new StringBuilder();
@@ -248,6 +304,7 @@ public class CmdLineParser {
         }).flatMap(List::stream).toList();
         List<Map<String, String>> entries = validationResults.stream().map((t) -> {
             Map<String, String> m = new LinkedHashMap<>();
+            initColumns(m);
             m.put("Normalized Name", Optional.ofNullable(t.canonicalName).orElse(""));
             m.put("Original Name", t.lipidName);
             m.put("Grammar", t.grammar.name());
@@ -303,14 +360,22 @@ public class CmdLineParser {
                         m.put("Total #" + functionalGroupKey, fgCounts);
                     }
                 }
-            } else {
-                m.put("Lipid Maps Category", "");
-                m.put("Lipid Maps Main Class", "");
-                m.put("Functional Class Abbr", "");
-                m.put("Functional Class Synonyms", "");
-                m.put("Level", "");
-                m.put("Total #C", "");
-                m.put("Total #DB", "");
+                m.put("Lipid Shorthand " + LipidLevel.CATEGORY.name(), nameForLevel(t.lipidAdduct, LipidLevel.CATEGORY));
+                m.put("Lipid Shorthand " + LipidLevel.CLASS.name(), nameForLevel(t.lipidAdduct, LipidLevel.CLASS));
+                m.put("Lipid Shorthand " + LipidLevel.SPECIES.name(), nameForLevel(t.lipidAdduct, LipidLevel.SPECIES));
+                m.put("Lipid Shorthand " + LipidLevel.MOLECULAR_SPECIES.name(), nameForLevel(t.lipidAdduct, LipidLevel.MOLECULAR_SPECIES));
+                m.put("Lipid Shorthand " + LipidLevel.SN_POSITION.name(), nameForLevel(t.lipidAdduct, LipidLevel.SN_POSITION));
+                m.put("Lipid Shorthand " + LipidLevel.STRUCTURE_DEFINED.name(), nameForLevel(t.lipidAdduct, LipidLevel.STRUCTURE_DEFINED));
+                m.put("Lipid Shorthand " + LipidLevel.FULL_STRUCTURE.name(), nameForLevel(t.lipidAdduct, LipidLevel.FULL_STRUCTURE));
+                m.put("Lipid Shorthand " + LipidLevel.COMPLETE_STRUCTURE.name(), nameForLevel(t.lipidAdduct, LipidLevel.COMPLETE_STRUCTURE));
+//            } else {
+//                m.put("Lipid Maps Category", "");
+//                m.put("Lipid Maps Main Class", "");
+//                m.put("Functional Class Abbr", "");
+//                m.put("Functional Class Synonyms", "");
+//                m.put("Level", "");
+//                m.put("Total #C", "");
+//                m.put("Total #DB", "");
             }
             keys.addAll(m.keySet());
             return m;
@@ -324,6 +389,13 @@ public class CmdLineParser {
             sb.append(l.stream().collect(Collectors.joining("\t"))).append("\n");
         }
         return sb.toString();
+    }
+
+    private static String nameForLevel(LipidAdduct la, LipidLevel level) {
+        if (level.level <= la.getLipidLevel().level) {
+            return la.getLipidString(level);
+        }
+        return "";
     }
 
     private static void writeToWriter(BufferedWriter bw, List<Pair<String, List<ValidationResult>>> results) {
