@@ -56,7 +56,7 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
         BaseParserEventHandler<ElementTable> handler = sfp.newEventHandler();
         for (ArrayList<String> row : functional_data) {
             row.add(row.get(1));
-            for (int i = 6; i < row.size(); ++i) {
+            for (int i = 7; i < row.size(); ++i) {
                 ElementTable et = row.get(2).length() > 0 ? sfp.parse(row.get(2), handler) : new ElementTable();
                 if (row.get(0).equals("FG")) {
                     put(row.get(i), new FunctionalGroup(
@@ -66,6 +66,7 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
                             new DoubleBonds(Integer.valueOf(row.get(3))),
                             (row.get(4).equals("1") ? true : false),
                             "",
+                            (row.get(5).equals("1") ? true : false),
                             et,
                             this
                     ));

@@ -40,7 +40,7 @@ public final class HeadgroupDecorator extends FunctionalGroup {
     }
 
     public HeadgroupDecorator(String _name, int _position, int _count, ElementTable _elements, boolean _suffix, LipidLevel _level, KnownFunctionalGroups knownFunctionalGroups) {
-        super(_name, _position, _count, null, false, "", _elements, knownFunctionalGroups);
+        super(_name, _position, _count, null, false, "", false, _elements, knownFunctionalGroups);
         suffix = _suffix;
         lowestVisibleLevel = _level;
     }

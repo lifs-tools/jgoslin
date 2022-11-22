@@ -65,7 +65,7 @@ public class FattyAcid extends FunctionalGroup {
     }
 
     public FattyAcid(String _name, int _num_carbon, DoubleBonds _double_bonds, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, LipidFaBondType _lipid_FA_bond_type, int _position, KnownFunctionalGroups knownFunctionalGroups) {
-        super(_name, _position, 1, _double_bonds, false, "", null, _functional_groups, knownFunctionalGroups);
+        super(_name, _position, 1, _double_bonds, false, "", false, null, _functional_groups, knownFunctionalGroups);
         numCarbon = _num_carbon;
         lipidFaBondType = _lipid_FA_bond_type;
 
@@ -132,6 +132,7 @@ public class FattyAcid extends FunctionalGroup {
     public boolean lipidFaBondTypePrefix(LipidFaBondType lipid_FA_bond_type) {
         return (lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMANYL) || (lipid_FA_bond_type == LipidFaBondType.ETHER_PLASMENYL) || (lipid_FA_bond_type == LipidFaBondType.ETHER_UNSPECIFIED);
     }
+    
 
     @Override
     public String toString(LipidLevel level) {

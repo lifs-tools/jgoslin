@@ -36,23 +36,24 @@ public class FunctionalGroup {
     protected String ringStereo;
     protected DoubleBonds doubleBonds;
     protected boolean atomic;
+    protected boolean stereoBound;
     protected ElementTable elements;
     protected HashMap<String, ArrayList<FunctionalGroup>> functionalGroups;
     protected KnownFunctionalGroups knownFunctionalGroups;
 
     public FunctionalGroup(String _name, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_name, -1, 1, null, false, "", null, null, knownFunctionalGroups);
+        this(_name, -1, 1, null, false, "", false, null, null, knownFunctionalGroups);
     }
 
     public FunctionalGroup(String _name, int _position, int _count, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_name, _position, _count, null, false, "", null, null, knownFunctionalGroups);
+        this(_name, _position, _count, null, false, "", false, null, null, knownFunctionalGroups);
     }
 
-    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups) {
-        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _elements, null, knownFunctionalGroups);
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, boolean _stereoBound, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups) {
+        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _stereoBound, _elements, null, knownFunctionalGroups);
     }
 
-    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, boolean _stereoBound, ElementTable _elements, HashMap<String, ArrayList<FunctionalGroup>> _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
         name = _name;
         position = _position;
         count = _count;
@@ -60,6 +61,7 @@ public class FunctionalGroup {
         ringStereo = "";
         doubleBonds = (_double_bonds != null) ? _double_bonds : new DoubleBonds(0);
         atomic = _is_atomic;
+        stereoBound = _stereoBound;
         elements = (_elements != null) ? _elements : new ElementTable();
         functionalGroups = (_functional_groups != null) ? _functional_groups : (new HashMap<>());
         this.knownFunctionalGroups = knownFunctionalGroups;
@@ -81,9 +83,21 @@ public class FunctionalGroup {
             e.put(kv.getKey(), kv.getValue());
         });
 
-        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, e, fg, knownFunctionalGroups);
+        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, stereoBound, e, fg, knownFunctionalGroups);
         func_group_new.ringStereo = ringStereo;
         return func_group_new;
+    }
+    
+    public boolean stereoInformationMissing(){
+        boolean missing = stereoBound && stereochemistry.isEmpty();
+        for (ArrayList<FunctionalGroup> fgList : functionalGroups.values()){
+            
+            for (FunctionalGroup fg : fgList){
+                missing |= fg.stereoInformationMissing();
+            }
+        }
+
+        return missing;
     }
 
     public void setName(String name) {
@@ -92,6 +106,14 @@ public class FunctionalGroup {
 
     public String getName() {
         return this.name;
+    }
+
+    public void setStereoBound(boolean stereoBound) {
+        this.stereoBound = stereoBound;
+    }
+
+    public boolean getStereoBound() {
+        return this.stereoBound;
     }
 
     public void setPosition(int position) {

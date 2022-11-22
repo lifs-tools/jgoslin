@@ -178,6 +178,13 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     }
 
     protected LipidSpecies assembleLipid(Headgroup headgroup) {
+        for (FattyAcid fa : faList){
+            if (fa.stereoInformationMissing()){
+                setLipidLevel(LipidLevel.FULL_STRUCTURE);
+                break;
+            }
+        }
+        
         LipidSpecies ls = null;
         switch (level) {
             case COMPLETE_STRUCTURE ->
