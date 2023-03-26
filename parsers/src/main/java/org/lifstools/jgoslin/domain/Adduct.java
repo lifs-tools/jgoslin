@@ -32,6 +32,7 @@ public final class Adduct {
     private String adductString;
     private int charge;
     private int chargeSign;
+    private ElementTable heavyElements = new ElementTable();
 
     public static final Map<String, ElementTable> ADDUCTS = Map.ofEntries(
             entry("+H", ElementTable.of(Map.entry(Element.H, 1))),
@@ -66,7 +67,7 @@ public final class Adduct {
     );
 
     public Adduct(String _sum_formula, String _adduct_string) {
-        this(_sum_formula, _adduct_string, 1, 1);
+        this(_sum_formula, _adduct_string, 0, 1);
 
     }
 
@@ -75,7 +76,6 @@ public final class Adduct {
         adductString = _adduct_string;
         charge = _charge;
         setChargeSign(_sign);
-
     }
 
     public void setSumFormula(String sumFormula) {
@@ -92,6 +92,10 @@ public final class Adduct {
 
     public String getAdductString() {
         return this.adductString;
+    }
+    
+    public ElementTable getHeavyElements(){
+        return heavyElements;
     }
 
     public void setChargeSign(int _sign) {
@@ -114,13 +118,25 @@ public final class Adduct {
         }
         this.charge = charge;
     }
+    
+    
+    public String getHeavyIsotopeString(){
+        StringBuilder sb = new StringBuilder();
+        for (Element e : Elements.ELEMENT_ORDER) {
+            if (heavyElements.get(e) > 0){
+                sb.append(heavyElements.get(e)).append(Elements.HEAVY_SHORTCUT.get(e));
+            }
+        }
+        return sb.toString();
+    }
+    
 
     public String getLipidString() {
         if (charge == 0) {
-            return "[M]";
+            return "[M" +getHeavyIsotopeString() + "]";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("[M").append(sumFormula).append(adductString).append("]").append(charge).append(((chargeSign > 0) ? "+" : "-"));
+        sb.append("[M").append(getHeavyIsotopeString()).append(sumFormula).append(adductString).append("]").append(charge).append(((chargeSign > 0) ? "+" : "-"));
 
         return sb.toString();
     }
@@ -128,15 +144,16 @@ public final class Adduct {
     @JsonIgnore
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
-//        String adduct_name = adductString.substring(1);
 
-        if (ADDUCTS.containsKey(adductString)) {
-            if (ADDUCT_CHARGES.get(adductString) != getCharge()) {
-                throw new ConstraintViolationException("Provided charge '" + getCharge() + "' in contradiction to adduct '" + adductString + "' charge '" + ADDUCT_CHARGES.get(adductString) + "'.");
+        if (adductString.length() > 0){
+            if (ADDUCTS.containsKey(adductString)) {
+                if (ADDUCT_CHARGES.get(adductString) != getCharge()) {
+                    throw new ConstraintViolationException("Provided charge '" + getCharge() + "' in contradiction to adduct '" + adductString + "' charge '" + ADDUCT_CHARGES.get(adductString) + "'.");
+                }
+                elements.add(ADDUCTS.get(adductString));
+            } else {
+                throw new ConstraintViolationException("Adduct '" + adductString + "' is unknown.");
             }
-            elements.add(ADDUCTS.get(adductString));
-        } else {
-            throw new ConstraintViolationException("Adduct '" + adductString + "' is unknown.");
         }
 
         return elements;

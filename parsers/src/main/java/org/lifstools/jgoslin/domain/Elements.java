@@ -112,5 +112,38 @@ public final class Elements {
             entry(Element.S34, "S''")
     );
 
+    public static final Map<Element, String> HEAVY_SHORTCUT = Map.ofEntries(
+            entry(Element.C, "C"),
+            entry(Element.H, "H"),
+            entry(Element.N, "N"),
+            entry(Element.O, "O"),
+            entry(Element.P, "P"),
+            entry(Element.S, "S"),
+            entry(Element.F, "F"),
+            entry(Element.Cl, "Cl"),
+            entry(Element.Br, "Br"),
+            entry(Element.I, "I"),
+            entry(Element.As, "As"),
+            entry(Element.H2, "H2"),
+            entry(Element.C13, "C13"),
+            entry(Element.N15, "N15"),
+            entry(Element.O17, "O17"),
+            entry(Element.O18, "O18"),
+            entry(Element.P32, "P32"),
+            entry(Element.S33, "S33"),
+            entry(Element.S34, "S34")
+    );
+
+    public static final Map<Element, Element> HEAVY_TO_REGULAR = Map.ofEntries(
+            entry(Element.H2, Element.H),
+            entry(Element.C13, Element.C),
+            entry(Element.N15, Element.N),
+            entry(Element.O17, Element.O),
+            entry(Element.O18, Element.O),
+            entry(Element.P32, Element.P),
+            entry(Element.S33, Element.S),
+            entry(Element.S34, Element.S)
+    );
+
     public static final ArrayList<Element> ELEMENT_ORDER = new ArrayList<Element>(List.of(Element.C, Element.H, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));
 }

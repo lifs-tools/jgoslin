@@ -51,6 +51,8 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     private int modPos;
     private int modNum;
     private boolean addOmegaLinoleoyloxyCer;
+    private int heavyNumber;
+    private Element heavyElement;
 
     private static final Set<String> HEAD_GROUP_EXCEPTIONS = Set.of("PA", "PC", "PE", "PG", "PI", "PS");
     private static final Map<String, Integer> ACER_HEADS = Map.ofEntries(
@@ -148,7 +150,11 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
                 entry("mod_pos_pre_event", this::setModPos),
                 entry("mod_num_pre_event", this::setModNum),
                 entry("single_mod_post_event", this::addFunctionalGroup),
-                entry("special_cer_prefix_pre_event", this::addAcer)
+                entry("special_cer_prefix_pre_event", this::addAcer),
+                entry("additional_modifier_pre_event", this::addAdditionalModifier),
+                entry("isotope_pair_pre_event", this::newAdduct),
+                entry("isotope_element_pre_event", this::setHeavyElement),
+                entry("isotope_number_pre_event", this::setHeavyNumber)
             );
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize LipidMapsParserEventHandler.");
@@ -174,6 +180,8 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         modText = "";
         headgroupDecorators.clear();
         addOmegaLinoleoyloxyCer = false;
+        heavyElement = Element.C;
+        heavyNumber = 0;
     }
 
     private void addAcer(TreeNode node) {
@@ -192,6 +200,27 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
         if (head.equals("1-O-lignoceroyl-omega-linoleoyloxy") || head.equals("1-O-stearoyl-omega-linoleoyloxy")) {
             addOmegaLinoleoyloxyCer = true;
+        }
+    }
+    
+    private void setHeavyElement(TreeNode node){
+        adduct.getHeavyElements().put(Element.H2, 0);
+    }
+        
+    private void setHeavyNumber(TreeNode node){
+        adduct.getHeavyElements().put(Element.H2, node.getInt());
+    }
+    
+    private void addAdditionalModifier(TreeNode node){
+        String modifier = node.getText();
+        if (modifier.equals("h")){
+            FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
+            String fg_name = functional_group.getName();
+            if (!currentFa.getFunctionalGroupsInternal().containsKey(fg_name)) {
+                currentFa.getFunctionalGroupsInternal().put(fg_name, new ArrayList<>());
+            }
+            currentFa.getFunctionalGroupsInternal().get(fg_name).add(functional_group);
+            setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }
     }
 
