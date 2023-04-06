@@ -124,14 +124,14 @@ public final class Elements {
             entry(Element.Br, "Br"),
             entry(Element.I, "I"),
             entry(Element.As, "As"),
-            entry(Element.H2, "H2"),
-            entry(Element.C13, "C13"),
-            entry(Element.N15, "N15"),
-            entry(Element.O17, "O17"),
-            entry(Element.O18, "O18"),
-            entry(Element.P32, "P32"),
-            entry(Element.S33, "S33"),
-            entry(Element.S34, "S34")
+            entry(Element.H2, "[2]H"),
+            entry(Element.C13, "[13]C"),
+            entry(Element.N15, "[15]N"),
+            entry(Element.O17, "[17]O"),
+            entry(Element.O18, "[18]O"),
+            entry(Element.P32, "[32]P"),
+            entry(Element.S33, "[33]S"),
+            entry(Element.S34, "[34]S")
     );
 
     public static final Map<Element, Element> HEAVY_TO_REGULAR = Map.ofEntries(

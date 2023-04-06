@@ -17,6 +17,7 @@ package org.lifstools.jgoslin.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
+import java.util.Map.Entry;
 import static java.util.Map.entry;
 
 /**
@@ -124,7 +125,7 @@ public final class Adduct {
         StringBuilder sb = new StringBuilder();
         for (Element e : Elements.ELEMENT_ORDER) {
             if (heavyElements.get(e) > 0){
-                sb.append(heavyElements.get(e)).append(Elements.HEAVY_SHORTCUT.get(e));
+                sb.append(Elements.HEAVY_SHORTCUT.get(e)).append(heavyElements.get(e));
             }
         }
         return sb.toString();
@@ -144,7 +145,15 @@ public final class Adduct {
     @JsonIgnore
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
-
+        
+        for (Entry<Element, Integer> kv : heavyElements.entrySet()){
+            if (kv.getValue() > 0){
+                Element regular = Elements.HEAVY_TO_REGULAR.get(kv.getKey());
+                elements.put(regular, elements.get(regular) - kv.getValue());
+                elements.put(kv.getKey(), elements.get(kv.getKey()) + kv.getValue());
+            }
+        }
+        
         if (adductString.length() > 0){
             if (ADDUCTS.containsKey(adductString)) {
                 if (ADDUCT_CHARGES.get(adductString) != getCharge()) {
