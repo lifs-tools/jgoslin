@@ -32,6 +32,7 @@ public final class Elements {
 
     public static final Map<String, Element> ELEMENT_POSITIONS = Map.ofEntries(
             entry("C", Element.C),
+            entry("D", Element.H2),
             entry("H", Element.H),
             entry("N", Element.N),
             entry("O", Element.O),
@@ -92,6 +93,7 @@ public final class Elements {
 
     public static final Map<Element, String> ELEMENT_SHORTCUT = Map.ofEntries(
             entry(Element.C, "C"),
+            entry(Element.D, "H'"),
             entry(Element.H, "H"),
             entry(Element.N, "N"),
             entry(Element.O, "O"),
@@ -114,6 +116,7 @@ public final class Elements {
 
     public static final Map<Element, String> HEAVY_SHORTCUT = Map.ofEntries(
             entry(Element.C, "C"),
+            entry(Element.D, "H2"),
             entry(Element.H, "H"),
             entry(Element.N, "N"),
             entry(Element.O, "O"),
@@ -136,6 +139,7 @@ public final class Elements {
 
     public static final Map<Element, Element> HEAVY_TO_REGULAR = Map.ofEntries(
             entry(Element.H2, Element.H),
+            entry(Element.D, Element.H),
             entry(Element.C13, Element.C),
             entry(Element.N15, Element.N),
             entry(Element.O17, Element.O),

@@ -31,6 +31,7 @@ import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import java.util.ArrayList;
 import java.util.Map;
 import static java.util.Map.entry;
+import java.util.Optional;
 import java.util.Set;
 import org.lifstools.jgoslin.domain.ConstraintViolationException;
 import org.lifstools.jgoslin.domain.DoubleBonds;
@@ -52,22 +53,22 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     private int modNum;
     private boolean addOmegaLinoleoyloxyCer;
     private int heavyNumber;
-    private Element heavyElement;
+    private Optional<Element> heavyElement = Optional.empty();
 
     private static final Set<String> HEAD_GROUP_EXCEPTIONS = Set.of("PA", "PC", "PE", "PG", "PI", "PS");
     private static final Map<String, Integer> ACER_HEADS = Map.ofEntries(
-        entry("1-O-myristoyl", 14),
-        entry("1-O-palmitoyl", 16),
-        entry("1-O-stearoyl", 18),
-        entry("1-O-eicosanoyl", 20),
-        entry("1-O-behenoyl", 22),
-        entry("1-O-lignoceroyl", 24),
-        entry("1-O-cerotoyl", 26),
-        entry("1-O-pentacosanoyl", 25),
-        entry("1-O-carboceroyl", 28),
-        entry("1-O-tricosanoyl", 30),
-        entry("1-O-lignoceroyl-omega-linoleoyloxy", 24),
-        entry("1-O-stearoyl-omega-linoleoyloxy", 18)
+            entry("1-O-myristoyl", 14),
+            entry("1-O-palmitoyl", 16),
+            entry("1-O-stearoyl", 18),
+            entry("1-O-eicosanoyl", 20),
+            entry("1-O-behenoyl", 22),
+            entry("1-O-lignoceroyl", 24),
+            entry("1-O-cerotoyl", 26),
+            entry("1-O-pentacosanoyl", 25),
+            entry("1-O-carboceroyl", 28),
+            entry("1-O-tricosanoyl", 30),
+            entry("1-O-lignoceroyl-omega-linoleoyloxy", 24),
+            entry("1-O-stearoyl-omega-linoleoyloxy", 18)
     );
 
     /**
@@ -79,82 +80,72 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         super(knownFunctionalGroups);
         try {
             registeredEvents = Map.ofEntries(
-                entry("lipid_pre_event", this::resetParser),
-                entry("lipid_post_event", this::buildLipid),
-
-                // set adduct events
-                entry("adduct_info_pre_event", this::newAdduct),
-                entry("adduct_pre_event", this::addAdduct),
-                entry("charge_pre_event", this::addCharge),
-                entry("charge_sign_pre_event", this::addChargeSign),
-
-                entry("mediator_pre_event", this::mediatorEvent),
-
-                entry("sgl_species_pre_event", this::setSpeciesLevel),
-                entry("species_fa_pre_event", this::setSpeciesLevel),
-                entry("tgl_species_pre_event", this::setSpeciesLevel),
-                entry("dpl_species_pre_event", this::setSpeciesLevel),
-                entry("cl_species_pre_event", this::setSpeciesLevel),
-                entry("dsl_species_pre_event", this::setSpeciesLevel),
-                entry("fa2_unsorted_pre_event", this::setMolecularSubspeciesLevel),
-                entry("fa3_unsorted_pre_event", this::setMolecularSubspeciesLevel),
-                entry("fa4_unsorted_pre_event", this::setMolecularSubspeciesLevel),
-                entry("hg_dg_pre_event", this::setMolecularSubspeciesLevel),
-                entry("fa_lpl_molecular_pre_event", this::setMolecularSubspeciesLevel),
-                entry("hg_lbpa_pre_event", this::setMolecularSubspeciesLevel),
-
-                entry("fa_no_hg_pre_event", this::pureFa),
-
-                entry("hg_sgl_pre_event", this::setHeadGroupName),
-                entry("hg_gl_pre_event", this::setHeadGroupName),
-                entry("hg_cl_pre_event", this::setHeadGroupName),
-                entry("hg_dpl_pre_event", this::setHeadGroupName),
-                entry("hg_lpl_pre_event", this::setHeadGroupName),
-                entry("hg_threepl_pre_event", this::setHeadGroupName),
-                entry("hg_fourpl_pre_event", this::setHeadGroupName),
-                entry("hg_dsl_pre_event", this::setHeadGroupName),
-                entry("hg_cpa_pre_event", this::setHeadGroupName),
-                entry("ch_pre_event", this::setHeadGroupName),
-                entry("hg_che_pre_event", this::setHeadGroupName),
-                entry("mediator_const_pre_event", this::setHeadGroupName),
-                entry("pk_hg_pre_event", this::setHeadGroupName),
-                entry("hg_fa_pre_event", this::setHeadGroupName),
-                entry("hg_lsl_pre_event", this::setHeadGroupName),
-                entry("special_cer_pre_event", this::setHeadGroupName),
-                entry("special_cer_hg_pre_event", this::setHeadGroupName),
-                entry("omega_linoleoyloxy_Cer_pre_event", this::setOmegaHeadGroupName),
-
-                entry("lcb_pre_event", this::newLcb),
-                entry("lcb_post_event", this::cleanLcb),
-                entry("fa_pre_event", this::newFa),
-                entry("fa_post_event", this::appendFa),
-
-                entry("glyco_struct_pre_event", this::addGlyco),
-
-                entry("db_single_position_pre_event", this::setIsomericLevel),
-                entry("db_single_position_post_event", this::addDbPosition),
-                entry("db_position_number_pre_event", this::addDbPositionNumber),
-                entry("cistrans_pre_event", this::addCistrans),
-
-                entry("ether_prefix_pre_event", this::addEther),
-                entry("ether_suffix_pre_event", this::addEther),
-                entry("lcb_pure_fa_pre_event", this::addDiHydroxyl),
-                entry("hydroxyl_pre_event", this::addHydroxyl),
-                entry("hydroxyl_lcb_pre_event", this::addHydroxylLcb),
-                entry("db_count_pre_event", this::addDoubleBonds),
-                entry("carbon_pre_event", this::addCarbon),
-
-                entry("structural_mod_pre_event", this::setStructuralSubspeciesLevel),
-                entry("single_mod_pre_event", this::setMod),
-                entry("mod_text_pre_event", this::setModText),
-                entry("mod_pos_pre_event", this::setModPos),
-                entry("mod_num_pre_event", this::setModNum),
-                entry("single_mod_post_event", this::addFunctionalGroup),
-                entry("special_cer_prefix_pre_event", this::addAcer),
-                entry("additional_modifier_pre_event", this::addAdditionalModifier),
-                entry("isotope_pair_pre_event", this::newAdduct),
-                entry("isotope_element_pre_event", this::setHeavyElement),
-                entry("isotope_number_pre_event", this::setHeavyNumber)
+                    entry("lipid_pre_event", this::resetParser),
+                    entry("lipid_post_event", this::buildLipid),
+                    // set adduct events
+                    entry("adduct_info_pre_event", this::newAdduct),
+                    entry("adduct_pre_event", this::addAdduct),
+                    entry("charge_pre_event", this::addCharge),
+                    entry("charge_sign_pre_event", this::addChargeSign),
+                    entry("mediator_pre_event", this::mediatorEvent),
+                    entry("sgl_species_pre_event", this::setSpeciesLevel),
+                    entry("species_fa_pre_event", this::setSpeciesLevel),
+                    entry("tgl_species_pre_event", this::setSpeciesLevel),
+                    entry("dpl_species_pre_event", this::setSpeciesLevel),
+                    entry("cl_species_pre_event", this::setSpeciesLevel),
+                    entry("dsl_species_pre_event", this::setSpeciesLevel),
+                    entry("fa2_unsorted_pre_event", this::setMolecularSubspeciesLevel),
+                    entry("fa3_unsorted_pre_event", this::setMolecularSubspeciesLevel),
+                    entry("fa4_unsorted_pre_event", this::setMolecularSubspeciesLevel),
+                    entry("hg_dg_pre_event", this::setMolecularSubspeciesLevel),
+                    entry("fa_lpl_molecular_pre_event", this::setMolecularSubspeciesLevel),
+                    entry("hg_lbpa_pre_event", this::setMolecularSubspeciesLevel),
+                    entry("fa_no_hg_pre_event", this::pureFa),
+                    entry("hg_sgl_pre_event", this::setHeadGroupName),
+                    entry("hg_gl_pre_event", this::setHeadGroupName),
+                    entry("hg_cl_pre_event", this::setHeadGroupName),
+                    entry("hg_dpl_pre_event", this::setHeadGroupName),
+                    entry("hg_lpl_pre_event", this::setHeadGroupName),
+                    entry("hg_threepl_pre_event", this::setHeadGroupName),
+                    entry("hg_fourpl_pre_event", this::setHeadGroupName),
+                    entry("hg_dsl_pre_event", this::setHeadGroupName),
+                    entry("hg_cpa_pre_event", this::setHeadGroupName),
+                    entry("ch_pre_event", this::setHeadGroupName),
+                    entry("hg_che_pre_event", this::setHeadGroupName),
+                    entry("mediator_const_pre_event", this::setHeadGroupName),
+                    entry("pk_hg_pre_event", this::setHeadGroupName),
+                    entry("hg_fa_pre_event", this::setHeadGroupName),
+                    entry("hg_lsl_pre_event", this::setHeadGroupName),
+                    entry("special_cer_pre_event", this::setHeadGroupName),
+                    entry("special_cer_hg_pre_event", this::setHeadGroupName),
+                    entry("omega_linoleoyloxy_Cer_pre_event", this::setOmegaHeadGroupName),
+                    entry("lcb_pre_event", this::newLcb),
+                    entry("lcb_post_event", this::cleanLcb),
+                    entry("fa_pre_event", this::newFa),
+                    entry("fa_post_event", this::appendFa),
+                    entry("glyco_struct_pre_event", this::addGlyco),
+                    entry("db_single_position_pre_event", this::setIsomericLevel),
+                    entry("db_single_position_post_event", this::addDbPosition),
+                    entry("db_position_number_pre_event", this::addDbPositionNumber),
+                    entry("cistrans_pre_event", this::addCistrans),
+                    entry("ether_prefix_pre_event", this::addEther),
+                    entry("ether_suffix_pre_event", this::addEther),
+                    entry("lcb_pure_fa_pre_event", this::addDiHydroxyl),
+                    entry("hydroxyl_pre_event", this::addHydroxyl),
+                    entry("hydroxyl_lcb_pre_event", this::addHydroxylLcb),
+                    entry("db_count_pre_event", this::addDoubleBonds),
+                    entry("carbon_pre_event", this::addCarbon),
+                    entry("structural_mod_pre_event", this::setStructuralSubspeciesLevel),
+                    entry("single_mod_pre_event", this::setMod),
+                    entry("mod_text_pre_event", this::setModText),
+                    entry("mod_pos_pre_event", this::setModPos),
+                    entry("mod_num_pre_event", this::setModNum),
+                    entry("single_mod_post_event", this::addFunctionalGroup),
+                    entry("special_cer_prefix_pre_event", this::addAcer),
+                    entry("additional_modifier_pre_event", this::addAdditionalModifier),
+                    entry("isotope_pair_pre_event", this::newAdduct),
+                    entry("isotope_element_pre_event", this::setHeavyElement),
+                    entry("isotope_number_pre_event", this::setHeavyNumber)
             );
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize LipidMapsParserEventHandler.");
@@ -180,7 +171,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         modText = "";
         headgroupDecorators.clear();
         addOmegaLinoleoyloxyCer = false;
-        heavyElement = Element.C;
+        heavyElement = Optional.empty();
         heavyNumber = 0;
     }
 
@@ -202,18 +193,32 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             addOmegaLinoleoyloxyCer = true;
         }
     }
-    
-    private void setHeavyElement(TreeNode node){
-        adduct.getHeavyElements().put(Element.H2, 0);
+
+    private void setHeavyElement(TreeNode node) {
+        String nodeHeavyElement = node.getText();
+        switch (nodeHeavyElement) {
+            case "d":
+            case "D":
+                adduct.getHeavyElements().put(Element.H2, 0);
+                heavyElement = Optional.of(Element.H2);
+                break;
+            default:
+                throw new LipidParsingException("Heavy Element '" + heavyElement + "' unknown!");
+        }
     }
-        
-    private void setHeavyNumber(TreeNode node){
-        adduct.getHeavyElements().put(Element.H2, node.getInt());
+
+    private void setHeavyNumber(TreeNode node) {
+        if (this.heavyElement.isPresent()) {
+            this.heavyNumber = node.getInt();
+            adduct.getHeavyElements().put(this.heavyElement.get(), node.getInt());
+        } else {
+            throw new LipidParsingException("Trying to parse Heavy Element number, but no Heavy Element is present!");
+        }
     }
-    
-    private void addAdditionalModifier(TreeNode node){
+
+    private void addAdditionalModifier(TreeNode node) {
         String modifier = node.getText();
-        if (modifier.equals("h")){
+        if (modifier.equals("h")) {
             FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
             String fg_name = functional_group.getName();
             if (!currentFa.getFunctionalGroupsInternal().containsKey(fg_name)) {
@@ -311,10 +316,9 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addFunctionalGroup(TreeNode node) {
         if (!modText.equals("Cp")) {
-            if (FattyAcid.LCB_STATES.contains(currentFa.getLipidFaBondType()) && modText.equals("OH") && currentFa.getFunctionalGroupsInternal().containsKey("OH") && currentFa.getFunctionalGroupsInternal().get("OH").size() > 0){
+            if (FattyAcid.LCB_STATES.contains(currentFa.getLipidFaBondType()) && modText.equals("OH") && currentFa.getFunctionalGroupsInternal().containsKey("OH") && currentFa.getFunctionalGroupsInternal().get("OH").size() > 0) {
                 currentFa.getFunctionalGroupsInternal().get("OH").get(currentFa.getFunctionalGroupsInternal().get("OH").size() - 1).setPosition(modPos);
-            }
-            else {
+            } else {
                 FunctionalGroup functional_group = knownFunctionalGroups.get(modText);
                 functional_group.setPosition(modPos);
                 functional_group.setCount(modNum);
@@ -352,9 +356,9 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
-        if (currentFa.getFunctionalGroupsInternal().containsKey("OH")){
-            for(FunctionalGroup fg : currentFa.getFunctionalGroupsInternal().get("OH")){
-                if (fg.getPosition() < 1){
+        if (currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+            for (FunctionalGroup fg : currentFa.getFunctionalGroupsInternal().get("OH")) {
+                if (fg.getPosition() < 1) {
                     setStructuralSubspeciesLevel(node);
                     break;
                 }
@@ -406,12 +410,11 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
             currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
         }
-        
+
         FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
         functional_group_p3.setPosition(3);
         currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
-         
-        
+
         if (!spRegularLcb()) {
             FunctionalGroup functional_group_p1 = knownFunctionalGroups.get("OH");
             functional_group_p1.setPosition(1);
@@ -423,24 +426,24 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
             currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
         }
-        
+
         String hydroxyl = node.getText();
         if (hydroxyl.equals("m")) {
             FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
             functional_group_p3.setPosition(3);
             currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
-            
+
         } else if (hydroxyl.equals("d")) {
             if (!spRegularLcb()) {
                 FunctionalGroup functional_group_p1 = knownFunctionalGroups.get("OH");
                 functional_group_p1.setPosition(1);
                 currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p1);
             }
-            
+
             FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
             functional_group_p3.setPosition(3);
             currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
-            
+
         } else if (hydroxyl.equals("t")) {
             if (!spRegularLcb()) {
                 FunctionalGroup functional_group_p1 = knownFunctionalGroups.get("OH");
@@ -450,10 +453,10 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
             functional_group_p3.setPosition(3);
             currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
-            
+
             FunctionalGroup functional_group_t = knownFunctionalGroups.get("OH");
             currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_t);
-            
+
         }
     }
 
@@ -473,27 +476,31 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         if (lcb != null) {
             faList.add(0, lcb);
         }
-        
-        if (addOmegaLinoleoyloxyCer){
-            if (faList.size() != 2){
+
+        if (addOmegaLinoleoyloxyCer) {
+            if (faList.size() != 2) {
                 throw new ConstraintViolationException("omega-linoleoyloxy-Cer with a different combination to one long chain base and one fatty acyl chain unknown");
             }
             Map<String, ArrayList<FunctionalGroup>> fgroups = faList.get(faList.size() - 1).getFunctionalGroupsInternal();
-            if (!fgroups.containsKey("acyl")) fgroups.put("acyl", new ArrayList<>());
-            
+            if (!fgroups.containsKey("acyl")) {
+                fgroups.put("acyl", new ArrayList<>());
+            }
+
             DoubleBonds db = new DoubleBonds(2);
             db.getDoubleBondPositions().put(9, "Z");
             db.getDoubleBondPositions().put(12, "Z");
             faList.get(faList.size() - 1).getFunctionalGroupsInternal().get("acyl").add(new FattyAcid("FA", 18, db));
             headGroup = "Cer";
         }
-       
+
         Headgroup headgroup = prepareHeadgroupAndChecks();
         content = new LipidAdduct(assembleLipid(headgroup), adduct);
     }
 
     private void newAdduct(TreeNode node) {
-        adduct = new Adduct("", "");
+        if (adduct == null) {
+            adduct = new Adduct("", "");
+        }
     }
 
     private void addAdduct(TreeNode node) {

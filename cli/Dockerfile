@@ -1,5 +1,4 @@
-FROM openjdk:11-jre-slim
-MAINTAINER Nils Hoffmann &lt;nils.hoffmann@cebitec.uni-bielefeld.de&gt;
+FROM openjdk:17-jre-slim
 VOLUME /tmp
 # receive jar file to host via argument
 ARG JAR_FILE
@@ -7,7 +6,8 @@ ARG APP_NAME
 ARG APP_PORT
 ARG APP_VERSION
 
-LABEL base.image="openjdk:11-jre-slim"
+LABEL author="Nils Hoffmann &lt;nils.hoffmann@cebitec.uni-bielefeld.de&gt;"
+LABEL base.image="openjdk:17-jre-slim"
 LABEL version="${APP_VERSION}"
 LABEL software="jgoslin-cli"
 LABEL software.version="${APP_VERSION}"

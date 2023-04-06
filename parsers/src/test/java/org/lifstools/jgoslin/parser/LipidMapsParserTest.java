@@ -15,21 +15,21 @@
  */
 package org.lifstools.jgoslin.parser;
 
-import org.lifstools.jgoslin.domain.LipidAdduct;
-import org.lifstools.jgoslin.domain.LipidLevel;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
+
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.lifstools.jgoslin.domain.ConstraintViolationException;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.StringFunctions;
-import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
 
 /**
  *
@@ -127,11 +127,20 @@ public class LipidMapsParserTest {
         //assertEquals(1539.9388d, lipid.getMass(), 1.0e-4);
     }
     
-//    @Test
-//    public void testLabeledLipids() {
-//        LipidAdduct lipid = parser.parse("PC(34:1) [M7H2+H]1+", handler);
-//        assertEquals(760.58508d, lipid.getMass(), 1.0e-4);
-//    }
+    @Test
+    public void testLabeledLipids() {
+        LipidAdduct lipid = parser.parse("PC(34:1)-d7", handler);
+        assertEquals("PC 34:1[M7H2]", lipid.getLipidString());
+        assertEquals(759.5778d, lipid.getMass(), 1.0e-4);
+        lipid = parser.parse("PC(34:1)-d7 [M+H]1+", handler);
+        assertEquals("PC 34:1[M7H2+H]1+", lipid.getLipidString());
+//        assertEquals(767.6296d, lipid.getMass(), 1.0e-4);
+        assertEquals("C42H76NO8PH'7", lipid.getSumFormula());
+
+        lipid = parser.parse("15(S)-HETE-d8", handler);
+        assertEquals(328.285361d, lipid.getMass(), 1.0e-4);
+        assertEquals("C20H24O3H'8", lipid.getSumFormula());
+    }
 
     
     @ParameterizedTest(name = "{index}: {0}")

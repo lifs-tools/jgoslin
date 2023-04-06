@@ -38,7 +38,7 @@ public class BitfieldTest {
     @Test
     public void testPrintBitfield() {
         Bitfield b = new Bitfield(4);
-        String s = b.printBitfield(4);
+        String s = Bitfield.printBitfield(4);
         assertEquals("0000000000000000000000000000000000000000000000000000000000000100", s);
     }
 }

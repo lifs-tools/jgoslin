@@ -34,7 +34,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>1.2.12</version>
         </dependency>
     </dependencies>
     <build>
@@ -110,7 +110,8 @@
             <id>docker</id>
             <properties>
                 <!--override this in settings.xml or via the maven command line -->
-                <docker.image.prefix>docker.lifs-tools.org/lifs</docker.image.prefix> 
+                <docker.image.prefix>docker.lifs-tools.org/lifs</docker.image.prefix>
+		        <jib.skip>false</jib.skip>
             </properties>
             <build>
                 <plugins>

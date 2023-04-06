@@ -21,10 +21,13 @@ import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.lifstools.jgoslin.domain.ElementTable;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import static org.lifstools.jgoslin.parser.Parser.DEFAULT_QUOTE;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -50,6 +53,20 @@ public class SumFormulaTest {
         slHandler = swiss_lipids_parser.newEventHandler();
         goslin_parser = new GoslinParser(knownFunctionalGroups, StringFunctions.getResourceAsString("Goslin.g4"), DEFAULT_QUOTE);
         gHandler = goslin_parser.newEventHandler();
+    }
+    
+    @Test
+    public void testDeuteratedLMSumFormulas() {
+        //PC 34:1[M7H2+H]1+
+        String expectedSumFormula = "C42H76D7NO8P";
+        SumFormulaParser sfp = new SumFormulaParser();
+        ElementTable et1 = sfp.parse("C42H83NO8P", sfp.newEventHandler());
+        Assert.notNull(et1, "ElementTable should not be null!");
+        assertEquals("C42H83NO8P", et1.getSumFormula());
+        ElementTable et = sfp.parse(expectedSumFormula, sfp.newEventHandler());
+        Assert.notNull(et, "ElementTable should not be null!");
+        assertEquals("C42H76NO8PH'7", et.getSumFormula());
+        assertEquals(767.6296, et.getMass(), 1.0e-4);
     }
 
     @ParameterizedTest(name = "{index}: {0}")
