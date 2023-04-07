@@ -144,6 +144,21 @@ public final class Elements {
             entry(Element.S33, Element.S),
             entry(Element.S34, Element.S)
     );
+    
+    
+    
+
+    public static final Map<String, Element> HEAVY_ELEMENT_TABLE = Map.ofEntries(
+            entry("[2]H", Element.H2),
+            entry("[13]C", Element.C13),
+            entry("[15]N", Element.N15),
+            entry("[17]O", Element.O17),
+            entry("[18]O", Element.O18),
+            entry("[32]P", Element.P32),
+            entry("[33]S", Element.S33),
+            entry("[34]S", Element.S34)
+    );
+    
 
     public static final ArrayList<Element> ELEMENT_ORDER = new ArrayList<Element>(List.of(Element.C, Element.H, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));
 }

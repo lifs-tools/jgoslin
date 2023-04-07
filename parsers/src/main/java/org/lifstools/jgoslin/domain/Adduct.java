@@ -125,7 +125,8 @@ public final class Adduct {
         StringBuilder sb = new StringBuilder();
         for (Element e : Elements.ELEMENT_ORDER) {
             if (heavyElements.get(e) > 0){
-                sb.append(Elements.HEAVY_SHORTCUT.get(e)).append(heavyElements.get(e));
+                if (heavyElements.get(e) == 1) sb.append(Elements.HEAVY_SHORTCUT.get(e));
+                else sb.append(Elements.HEAVY_SHORTCUT.get(e)).append(heavyElements.get(e));
             }
         }
         return sb.toString();

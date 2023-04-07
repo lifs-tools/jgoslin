@@ -53,22 +53,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     private Dictionary tmp = new Dictionary();
     private boolean acerSpecies = false;
     private static final Set<String> SPECIAL_TYPES = Set.of("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc");
-    private boolean containsStereoInformation = false;
     private Element heavyElement;
     private int heavyElementNumber;
-
-    private static final Map<String, Element> heavyElementTable = Map.ofEntries(
-            entry("[2]H", Element.H2),
-            entry("[13]C", Element.C13),
-            entry("[15]N", Element.N15),
-            entry("[17]O", Element.O17),
-            entry("[18]O", Element.O18),
-            entry("[32]P", Element.P32),
-            entry("[33]S", Element.S33),
-            entry("[34]S", Element.S34)
-            
-            
-    );
 
     /**
      * Create a new {@code ShorthandParserEventHandler}.
@@ -207,7 +193,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         headgroupDecorators.clear();
         tmp = new Dictionary();
         acerSpecies = false;
-        containsStereoInformation = false;
         heavyElement = Element.C;
         heavyElementNumber = 0;
     }
@@ -299,7 +284,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
         
     private void setHeavyElement(TreeNode node) {
-        heavyElement = heavyElementTable.get(node.getText());
+        heavyElement = Elements.HEAVY_ELEMENT_TABLE.get(node.getText());
     }
 
     private void addHeavyComponent(TreeNode node) {
@@ -361,7 +346,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     
     private void setFattyAcylStereo(TreeNode node){
         currentFas.getLast().setStereochemistry(node.getText());
-        containsStereoInformation = true;
     }
     
 
@@ -546,7 +530,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setFunctionalGroupStereo(TreeNode node) {
         ((Dictionary) tmp.get(faI())).put("fg_stereo", node.getText());
-        containsStereoInformation = true;
     }
 
     private void setSnPositionFuncGroup(TreeNode node) {

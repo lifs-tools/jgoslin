@@ -25,6 +25,7 @@ import org.lifstools.jgoslin.domain.FattyAcid;
 import org.lifstools.jgoslin.domain.DoubleBonds;
 import org.lifstools.jgoslin.domain.Headgroup;
 import org.lifstools.jgoslin.domain.Cycle;
+import org.lifstools.jgoslin.domain.Elements;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static java.util.Map.entry;
 import java.util.TreeMap;
+import org.lifstools.jgoslin.domain.Element;
 
 /**
  * Event handler implementation for the {@link GoslinParser}.
@@ -48,6 +50,8 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private String mediatorFunction;
     private final ArrayList<Integer> mediatorFunctionPositions = new ArrayList<>();
     private boolean mediatorSuffix;
+    private Element heavyElement;
+    private int heavyElementNumber;
 
     private final static Map<String, Integer> MEDIATOR_FA = Map.of(
             "H", 17, "O", 18, "E", 20, "Do", 22);
@@ -122,7 +126,15 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     entry("mediator_position_pre_event", this::setMediatorFunctionPosition),
                     entry("mediator_functional_group_post_event", this::addMediatorFunction),
                     entry("mediator_suffix_pre_event", this::addMediatorSuffix),
-                    entry("mediator_tetranor_pre_event", this::setMediatorTetranor)
+                    entry("mediator_tetranor_pre_event", this::setMediatorTetranor),
+        
+                    entry("isotope_pair_pre_event", this::newAdduct),
+                    entry("isotope_element_pre_event", this::setHeavyDElement),
+                    entry("isotope_number_pre_event", this::setHeavyDNumber),
+                    entry("heavy_pre_event", this::newAdduct),
+                    entry("adduct_heavy_element_pre_event", this::setHeavyElement),
+                    entry("adduct_heavy_number_pre_event", this::setHeavyNumber),
+                    entry("adduct_heavy_component_post_event", this::addHeavyComponent)
             );
 
         } catch (Exception e) {
@@ -147,6 +159,8 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         mediatorSuffix = false;
         useHeadGroup = false;
         headgroupDecorators.clear();
+        heavyElement = Element.C;
+        heavyElementNumber = 0;
     }
 
     private void setHeadGroupName(TreeNode node) {
@@ -637,4 +651,25 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         }
     }
 
+    private void setHeavyDElement(TreeNode node) {
+        adduct.getHeavyElements().put(Element.H2, 1);
+    }
+
+    private void setHeavyDNumber(TreeNode node) {
+        adduct.getHeavyElements().put(Element.H2, node.getInt());
+    }
+        
+    private void setHeavyElement(TreeNode node) {
+        heavyElement = Elements.HEAVY_ELEMENT_TABLE.get(node.getText());
+        heavyElementNumber = 1;
+    }
+    
+    private void setHeavyNumber(TreeNode node) {
+        heavyElementNumber = node.getInt();
+    }
+    
+    private void addHeavyComponent(TreeNode node) {
+        adduct.getHeavyElements().put(heavyElement, adduct.getHeavyElements().get(heavyElement) + heavyElementNumber);
+    }
+    
 }
