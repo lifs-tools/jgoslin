@@ -313,7 +313,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void newAdduct(TreeNode node) {
-        adduct = new Adduct("", "");
+        if (adduct == null) adduct = new Adduct("", "");
     }
 
     private void addAdduct(TreeNode node) {
@@ -331,6 +331,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         } else if (sign.equals("-")) {
             adduct.setChargeSign(-1);
         }
+        if (adduct.getCharge() == 0) adduct.setCharge(1);
     }
 
     private void setMediator(TreeNode node) {

@@ -54,6 +54,21 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     private boolean acerSpecies = false;
     private static final Set<String> SPECIAL_TYPES = Set.of("acyl", "alkyl", "decorator_acyl", "decorator_alkyl", "cc");
     private boolean containsStereoInformation = false;
+    private Element heavyElement;
+    private int heavyElementNumber;
+
+    private static final Map<String, Element> heavyElementTable = Map.ofEntries(
+            entry("[2]H", Element.H2),
+            entry("[13]C", Element.C13),
+            entry("[15]N", Element.N15),
+            entry("[17]O", Element.O17),
+            entry("[18]O", Element.O18),
+            entry("[32]P", Element.P32),
+            entry("[33]S", Element.S33),
+            entry("[34]S", Element.S34)
+            
+            
+    );
 
     /**
      * Create a new {@code ShorthandParserEventHandler}.
@@ -170,7 +185,10 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("hg_PE_PS_type_pre_event", this::suffixDecoratorSpecies),
                     entry("acer_hg_post_event", this::setAcer),
                     entry("acer_species_post_event", this::setAcerSpecies),
-                    entry("sterol_definition_post_event", this::setSterolDefinition)
+                    entry("sterol_definition_post_event", this::setSterolDefinition),
+                    entry("adduct_heavy_element_pre_event", this::setHeavyElement),
+                    entry("adduct_heavy_number_pre_event", this::setHeavyNumber),
+                    entry("adduct_heavy_component_post_event", this::addHeavyComponent)
             );
 
         } catch (Exception e) {
@@ -190,6 +208,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         tmp = new Dictionary();
         acerSpecies = false;
         containsStereoInformation = false;
+        heavyElement = Element.C;
+        heavyElementNumber = 0;
     }
 
     private String faI() {
@@ -253,7 +273,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void newAdduct(TreeNode node) {
-        adduct = new Adduct("", "", 0, 0);
+        if (adduct == null) adduct = new Adduct("", "", 0, 0);
     }
 
     private void addAdduct(TreeNode node) {
@@ -271,6 +291,19 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         } else {
             adduct.setChargeSign(-1);
         }
+        if (adduct.getCharge() == 0) adduct.setCharge(1);
+    }
+
+    private void setHeavyNumber(TreeNode node) {
+        heavyElementNumber = node.getInt();
+    }
+        
+    private void setHeavyElement(TreeNode node) {
+        heavyElement = heavyElementTable.get(node.getText());
+    }
+
+    private void addHeavyComponent(TreeNode node) {
+        adduct.getHeavyElements().put(heavyElement, heavyElementNumber);
     }
 
     private void setSpeciesLevel(TreeNode node) {

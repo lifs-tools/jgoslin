@@ -29,6 +29,7 @@ import org.lifstools.jgoslin.domain.Cycle;
 import org.lifstools.jgoslin.domain.FattyAcid;
 import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 import static java.util.Map.entry;
 import java.util.Optional;
@@ -53,7 +54,13 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     private int modNum;
     private boolean addOmegaLinoleoyloxyCer;
     private int heavyNumber;
-    private Optional<Element> heavyElement = Optional.empty();
+    private Optional<Element> heavyElement;
+    private boolean sphingaPure;
+    private int lcbCarbonPreSet;
+    private int lcbDbPreSet;
+    private ArrayList<FunctionalGroup> lcbHydroPreSet = new ArrayList<>();
+    private String sphingaPrefix;
+    private String sphingaSuffix;
 
     private static final Set<String> HEAD_GROUP_EXCEPTIONS = Set.of("PA", "PC", "PE", "PG", "PI", "PS");
     private static final Map<String, Integer> ACER_HEADS = Map.ofEntries(
@@ -145,7 +152,14 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
                     entry("additional_modifier_pre_event", this::addAdditionalModifier),
                     entry("isotope_pair_pre_event", this::newAdduct),
                     entry("isotope_element_pre_event", this::setHeavyElement),
-                    entry("isotope_number_pre_event", this::setHeavyNumber)
+                    entry("isotope_number_pre_event", this::setHeavyNumber),
+                    entry("sphinga_pre_event", this::newSphinga),
+                    entry("sphinga_phospho_pre_event", this::addPhospho),
+                    entry("sphinga_suffix_pre_event", this::sphingaDbSet),
+                    entry("sphinga_lcb_len_pre_event", this::addCarbonPreLen),
+                    entry("sphinga_prefix_pre_event", this::setHydroPreNum),
+                    entry("sphinga_hg_pure_pre_event", this::newSphingaPure),
+                    entry("sphinga_hg_pure_post_event", this::cleanLcb)
             );
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize LipidMapsParserEventHandler.");
@@ -173,6 +187,12 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         addOmegaLinoleoyloxyCer = false;
         heavyElement = Optional.empty();
         heavyNumber = 0;
+        sphingaPure = false;
+        lcbCarbonPreSet = 18;
+        lcbDbPreSet = 0;
+        lcbHydroPreSet.clear();
+        sphingaPrefix = "";
+        sphingaSuffix = "";
     }
 
     private void addAcer(TreeNode node) {
@@ -227,6 +247,51 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             currentFa.getFunctionalGroupsInternal().get(fg_name).add(functional_group);
             setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
         }
+    }
+
+    private void addCarbonPreLen(TreeNode node) {
+        lcbCarbonPreSet = node.getInt();
+    }
+
+    private void sphingaDbSet(TreeNode node) {
+        sphingaSuffix = node.getText();
+
+        if (sphingaSuffix.equals("anine")) {
+            lcbDbPreSet = 0;
+        } else if (sphingaSuffix.equals("osine")) {
+            lcbDbPreSet = 1;
+        } else if (sphingaSuffix.equals("adienine")) {
+            lcbDbPreSet = 2;
+        }
+    }
+
+    private void newSphinga(TreeNode node) {
+        headGroup = "SPB";
+    }
+
+    private void newSphingaPure(TreeNode node) {
+        sphingaPure = true;
+        lcbHydroPreSet.add(knownFunctionalGroups.get("OH"));
+        lcbHydroPreSet.add(knownFunctionalGroups.get("OH"));
+        lcbHydroPreSet.get(0).setPosition(1);
+        lcbHydroPreSet.get(1).setPosition(3);
+        newLcb(node);
+    }
+
+    private void setHydroPreNum(TreeNode node) {
+        lcbHydroPreSet.add(knownFunctionalGroups.get("OH"));
+        lcbHydroPreSet.get(lcbHydroPreSet.size() - 1).setPosition(4);
+        sphingaPrefix = node.getText();
+    }
+
+    private void addPhospho(TreeNode node) {
+        String phosphoSuffix = node.getText();
+        if (phosphoSuffix.equals("1-phosphate")) {
+            headGroup += "P";
+        } else if (phosphoSuffix.equals("1-phosphocholine")) {
+            headGroup = "LSM";
+        }
+        lcbHydroPreSet.remove(0);
     }
 
     private void setMolecularSubspeciesLevel(TreeNode node) {
@@ -350,6 +415,33 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void cleanLcb(TreeNode node) {
+        if (sphingaPure) {
+            lcb.setNumCarbon(lcbCarbonPreSet);
+            lcb.getDoubleBonds().setNumDoubleBonds(lcbDbPreSet);
+            currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<FunctionalGroup>());
+            for (FunctionalGroup fg : lcbHydroPreSet) {
+                currentFa.getFunctionalGroupsInternal().get("OH").add(fg);
+            }
+        }
+
+        if (!sphingaSuffix.equals("")) {
+            if ((sphingaSuffix.equals("anine") && lcb.getDoubleBonds().getNumDoubleBonds() != 0)
+                    || (sphingaSuffix.equals("osine") && lcb.getDoubleBonds().getNumDoubleBonds() != 1)
+                    || (sphingaSuffix.equals("adienine") && lcb.getDoubleBonds().getNumDoubleBonds() != 2)) {
+                throw new LipidException("Double bond count does not match with head group description");
+            }
+        }
+
+        if (sphingaPrefix.equals("Phyto") && !sphingaPure) {
+            HashSet<Integer> posHydro = new HashSet<Integer>();
+            for (FunctionalGroup fg : lcb.getFunctionalGroups().get("OH")) {
+                posHydro.add(fg.getPosition());
+            }
+            if (lcb.getFunctionalGroups().isEmpty() || !lcb.getFunctionalGroups().containsKey("OH") || !posHydro.contains(4)) {
+                throw new LipidException("hydroxyl count does not match with head group description");
+            }
+        }
+
         if (dbNumbers > -1 && dbNumbers != currentFa.getDoubleBonds().getNumDoubleBonds()) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
@@ -455,6 +547,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
 
             FunctionalGroup functional_group_t = knownFunctionalGroups.get("OH");
+            functional_group_t.setPosition(4);
             currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_t);
 
         }
@@ -517,6 +610,9 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
             adduct.setChargeSign(1);
         } else if (sign.equals("-")) {
             adduct.setChargeSign(-1);
+        }
+        if (adduct.getCharge() == 0) {
+            adduct.setCharge(1);
         }
     }
 }
