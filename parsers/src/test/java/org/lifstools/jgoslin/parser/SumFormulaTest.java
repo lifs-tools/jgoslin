@@ -55,19 +55,20 @@ public class SumFormulaTest {
         gHandler = goslin_parser.newEventHandler();
     }
     
-//    @Test
-//    public void testDeuteratedLMSumFormulas() {
-//        //PC 34:1[M7H2+H]1+
-//        String expectedSumFormula = "C42H76D7NO8P";
-//        SumFormulaParser sfp = new SumFormulaParser();
-//        ElementTable et1 = sfp.parse("C42H83NO8P", sfp.newEventHandler());
-//        Assert.notNull(et1, "ElementTable should not be null!");
-//        assertEquals("C42H83NO8P", et1.getSumFormula());
-//        ElementTable et = sfp.parse(expectedSumFormula, sfp.newEventHandler());
+    @Test
+    public void testDeuteratedLMSumFormulas() {
+        //PC 34:1[M7H2+H]1+
+        String expectedSumFormula = "C42H76D7NO8P";
+        SumFormulaParser sfp = new SumFormulaParser();
+        ElementTable et1 = sfp.parse("C42H83NO8P", sfp.newEventHandler());
+        Assert.notNull(et1, "ElementTable should not be null!");
+        assertEquals("C42H83NO8P", et1.getSumFormula());
+        ElementTable et = sfp.parse(expectedSumFormula, sfp.newEventHandler());
+        Assert.isNull(et, "Expecting ElementTable to be null!");
 //        Assert.notNull(et, "ElementTable should not be null!");
 //        assertEquals("C42H76NO8PH'7", et.getSumFormula());
 //        assertEquals(767.6296, et.getMass(), 1.0e-4);
-//    }
+    }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/formulas-lipid-maps.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
