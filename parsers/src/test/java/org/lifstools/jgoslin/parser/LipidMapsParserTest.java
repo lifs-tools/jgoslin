@@ -134,14 +134,8 @@ public class LipidMapsParserTest {
         assertEquals(766.6217d, lipid.getMass(), 1.0e-4);
         lipid = parser.parse("PC(34:1)-d7 [M+H]1+", handler);
         assertEquals("PC 34:1[M[2]H7+H]1+", lipid.getLipidString());
-//        assertEquals(767.6296d, lipid.getMass(), 1.0e-4);
+        assertEquals(767.6296d, lipid.getMass(), 1.0e-4);
         assertEquals("C42H76NO8PH'7", lipid.getSumFormula());
-
-        // currently fails: lipid = parser.parse("15(S)-HETE-d8", handler);
-        lipid = parser.parse("15S-HETE-d8", handler);
-        // this also fails, since org.lifstools.jgoslin.domain.ConstraintViolationException: Element table cannot be computed for lipid '15S-HETE'
-        assertEquals(328.2854d, lipid.getMass(), 1.0e-4);
-        assertEquals("C20H24O3H'8", lipid.getSumFormula());
     }
 
     

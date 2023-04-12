@@ -155,5 +155,15 @@ public class LipidParserTest {
         LipidAdduct l = parser.parse(lipidName);
         Assertions.assertNotNull(l);
     }
+    
+    
+    @Test
+    public void testLabeledMediators() {
+        // currently fails: lipid = parser.parse("15(S)-HETE-d8", handler);
+        LipidAdduct lipid = parser.parse("15S-HETE-d8");
+        // this also fails, since org.lifstools.jgoslin.domain.ConstraintViolationException: Element table cannot be computed for lipid '15S-HETE'
+        assertEquals(328.2854d, lipid.getMass(), 1.0e-4);
+        assertEquals("C20H24O3H'8", lipid.getSumFormula());
+    }
 
 }
