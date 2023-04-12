@@ -40,18 +40,18 @@ public class FattyAcidTest {
         });
         assertEquals("FattyAcid must have at least 2 carbons! Got 1", cve.getMessage());
         cve = assertThrows(ConstraintViolationException.class, () -> {
-            new FattyAcid("Some name", 2, db, new HashMap(), LipidFaBondType.ESTER, -2, new KnownFunctionalGroups());
+            new FattyAcid("Some name", 2, db, new HashMap<>(), LipidFaBondType.ESTER, -2, new KnownFunctionalGroups());
         });
         assertEquals("FattyAcid position must be greater or equal to 0! Got -2", cve.getMessage());
         cve = assertThrows(ConstraintViolationException.class, () -> {
-            new FattyAcid("Some name", 2, new DoubleBonds(-1), new HashMap(), LipidFaBondType.ESTER, 2, new KnownFunctionalGroups());
+            new FattyAcid("Some name", 2, new DoubleBonds(-1), new HashMap<>(), LipidFaBondType.ESTER, 2, new KnownFunctionalGroups());
         });
         assertEquals("FattyAcid must have at least 0 double bonds! Got -1", cve.getMessage());
     }
     
     @Test
     public void testFaBondTypeLCBRegular() {
-        FattyAcid fa1 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap(), LipidFaBondType.LCB_REGULAR, 2, new KnownFunctionalGroups());
+        FattyAcid fa1 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap<>(), LipidFaBondType.LCB_REGULAR, 2, new KnownFunctionalGroups());
         // [X] is a virtual group, only expose it in functionalGroupsInternal
         assertTrue(fa1.getFunctionalGroupsInternal().containsKey("[X]"));
         assertFalse(fa1.getFunctionalGroups().containsKey("[X]"));
@@ -60,13 +60,13 @@ public class FattyAcidTest {
 
     @Test
     public void testFaBondTypePrefix() {
-        FattyAcid fa1 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap(), LipidFaBondType.ESTER, 2, new KnownFunctionalGroups());
+        FattyAcid fa1 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap<>(), LipidFaBondType.ESTER, 2, new KnownFunctionalGroups());
         assertFalse(fa1.lipidFaBondTypePrefix(fa1.getLipidFaBondType()));
-        FattyAcid fa2 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap(), LipidFaBondType.ETHER_PLASMANYL, 2, new KnownFunctionalGroups());
+        FattyAcid fa2 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap<>(), LipidFaBondType.ETHER_PLASMANYL, 2, new KnownFunctionalGroups());
         assertTrue(fa2.lipidFaBondTypePrefix(fa2.getLipidFaBondType()));
-        FattyAcid fa3 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap(), LipidFaBondType.ETHER_PLASMENYL, 2, new KnownFunctionalGroups());
+        FattyAcid fa3 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap<>(), LipidFaBondType.ETHER_PLASMENYL, 2, new KnownFunctionalGroups());
         assertTrue(fa3.lipidFaBondTypePrefix(fa3.getLipidFaBondType()));
-        FattyAcid fa4 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap(), LipidFaBondType.ETHER_UNSPECIFIED, 2, new KnownFunctionalGroups());
+        FattyAcid fa4 = new FattyAcid("Some name", 2, new DoubleBonds(0), new HashMap<>(), LipidFaBondType.ETHER_UNSPECIFIED, 2, new KnownFunctionalGroups());
         assertTrue(fa4.lipidFaBondTypePrefix(fa4.getLipidFaBondType()));
     }
 }

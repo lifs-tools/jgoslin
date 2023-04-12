@@ -22,5 +22,5 @@ package org.lifstools.jgoslin.domain;
  * @author Nils Hoffmann
  */
 public enum Element {
-    C, C13, H, H2, N, N15, O, O17, O18, P, P32, S, S34, S33, F, Cl, Br, I, As
+    C, C13, D, H, H2, N, N15, O, O17, O18, P, P32, S, S34, S33, F, Cl, Br, I, As
 };

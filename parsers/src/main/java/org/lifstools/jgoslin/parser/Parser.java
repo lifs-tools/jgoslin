@@ -689,14 +689,14 @@ public abstract class Parser<T> {
             Optional<ParsingErrors> parsingErrors = parse_regular(textToParse, parserEventHandler);
             if (parsingErrors.isPresent() && !parsingErrors.get().wordInGrammar) {
                 if (throwError) {
-                    throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
+                    throw new LipidParsingException("Token '" + old_text + "' can not be parsed by grammar '" + grammarName + "'");
                 } else {
                     parserEventHandler.errorMessage = parsingErrors.get().errorMessage;
                 }
             }
         } catch (RuntimeException lpe) {
             if (throwError) {
-                throw new LipidParsingException("Lipid '" + old_text + "' can not be parsed by grammar '" + grammarName + "': ", lpe);
+                throw new LipidParsingException("Token '" + old_text + "' can not be parsed by grammar '" + grammarName + "': ", lpe);
             } else {
                 parserEventHandler.errorMessage = lpe.getLocalizedMessage();
             }

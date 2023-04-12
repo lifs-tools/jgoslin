@@ -15,22 +15,22 @@
  */
 package org.lifstools.jgoslin.parser;
 
-import java.util.Arrays;
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.lifstools.jgoslin.domain.LipidAdduct;
-import org.lifstools.jgoslin.domain.StringFunctions;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidParsingException;
+import org.lifstools.jgoslin.domain.StringFunctions;
 
 /**
  *
@@ -154,6 +154,16 @@ public class LipidParserTest {
     public void testOKuda(String lipidName) {
         LipidAdduct l = parser.parse(lipidName);
         Assertions.assertNotNull(l);
+    }
+    
+    
+    @Test
+    public void testLabeledMediators() {
+        // currently fails: lipid = parser.parse("15(S)-HETE-d8", handler);
+        LipidAdduct lipid = parser.parse("15S-HETE-d8");
+        // this also fails, since org.lifstools.jgoslin.domain.ConstraintViolationException: Element table cannot be computed for lipid '15S-HETE'
+        assertEquals(328.2854d, lipid.getMass(), 1.0e-4);
+        assertEquals("C20H24O3H'8", lipid.getSumFormula());
     }
 
 }
