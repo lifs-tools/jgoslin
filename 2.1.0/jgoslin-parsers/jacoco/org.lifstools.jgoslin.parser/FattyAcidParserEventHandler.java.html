@@ -1,0 +1,1261 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FattyAcidParserEventHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">FattyAcidParserEventHandler.java</span></div><h1>FattyAcidParserEventHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import java.util.ArrayDeque;
+import org.lifstools.jgoslin.domain.LipidMolecularSpecies;
+import org.lifstools.jgoslin.domain.GenericList;
+import org.lifstools.jgoslin.domain.LipidFaBondType;
+import org.lifstools.jgoslin.domain.LipidStructureDefined;
+import org.lifstools.jgoslin.domain.LipidException;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.Element;
+import org.lifstools.jgoslin.domain.LipidSnPosition;
+import org.lifstools.jgoslin.domain.Headgroup;
+import org.lifstools.jgoslin.domain.FunctionalGroup;
+import org.lifstools.jgoslin.domain.LipidCompleteStructure;
+import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.lifstools.jgoslin.domain.AcylAlkylGroup;
+import org.lifstools.jgoslin.domain.DoubleBonds;
+import org.lifstools.jgoslin.domain.LipidLevel;
+import org.lifstools.jgoslin.domain.Cycle;
+import org.lifstools.jgoslin.domain.CarbonChain;
+import org.lifstools.jgoslin.domain.FattyAcid;
+import org.lifstools.jgoslin.domain.LipidSpecies;
+import org.lifstools.jgoslin.domain.LipidFullStructure;
+import org.lifstools.jgoslin.domain.Dictionary;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import static java.util.Map.entry;
+import java.util.Set;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
+
+/**
+ * Event handler implementation for the {@link FattyAcidParser}.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class FattyAcidParserEventHandler extends BaseParserEventHandler&lt;LipidAdduct&gt; {
+
+    private final KnownFunctionalGroups knownFunctionalGroups;
+    private LipidLevel level;
+    private String headgroup;
+    private ArrayDeque&lt;FattyAcid&gt; fattyAcylStack;
+    private Dictionary tmp;
+
+<span class="fc" id="L64">    private static final Map&lt;String, Integer&gt; LAST_NUMBERS = Map.ofEntries(</span>
+<span class="fc" id="L65">            entry(&quot;un&quot;, 1),</span>
+<span class="fc" id="L66">            entry(&quot;hen&quot;, 1),</span>
+<span class="fc" id="L67">            entry(&quot;do&quot;, 2),</span>
+<span class="fc" id="L68">            entry(&quot;di&quot;, 2),</span>
+<span class="fc" id="L69">            entry(&quot;tri&quot;, 3),</span>
+<span class="fc" id="L70">            entry(&quot;buta&quot;, 4),</span>
+<span class="fc" id="L71">            entry(&quot;but&quot;, 4),</span>
+<span class="fc" id="L72">            entry(&quot;tetra&quot;, 4),</span>
+<span class="fc" id="L73">            entry(&quot;penta&quot;, 5),</span>
+<span class="fc" id="L74">            entry(&quot;pent&quot;, 5),</span>
+<span class="fc" id="L75">            entry(&quot;hexa&quot;, 6),</span>
+<span class="fc" id="L76">            entry(&quot;hex&quot;, 6),</span>
+<span class="fc" id="L77">            entry(&quot;hepta&quot;, 7),</span>
+<span class="fc" id="L78">            entry(&quot;hept&quot;, 7),</span>
+<span class="fc" id="L79">            entry(&quot;octa&quot;, 8),</span>
+<span class="fc" id="L80">            entry(&quot;oct&quot;, 8),</span>
+<span class="fc" id="L81">            entry(&quot;nona&quot;, 9),</span>
+<span class="fc" id="L82">            entry(&quot;non&quot;, 9)</span>
+    );
+
+<span class="fc" id="L85">    private static final Map&lt;String, Integer&gt; SECOND_NUMBERS = Map.ofEntries(</span>
+<span class="fc" id="L86">            entry(&quot;deca&quot;, 10),</span>
+<span class="fc" id="L87">            entry(&quot;dec&quot;, 10),</span>
+<span class="fc" id="L88">            entry(&quot;eicosa&quot;, 20),</span>
+<span class="fc" id="L89">            entry(&quot;eicos&quot;, 20),</span>
+<span class="fc" id="L90">            entry(&quot;cosa&quot;, 20),</span>
+<span class="fc" id="L91">            entry(&quot;cos&quot;, 20),</span>
+<span class="fc" id="L92">            entry(&quot;triaconta&quot;, 30),</span>
+<span class="fc" id="L93">            entry(&quot;triacont&quot;, 30),</span>
+<span class="fc" id="L94">            entry(&quot;tetraconta&quot;, 40),</span>
+<span class="fc" id="L95">            entry(&quot;tetracont&quot;, 40),</span>
+<span class="fc" id="L96">            entry(&quot;pentaconta&quot;, 50),</span>
+<span class="fc" id="L97">            entry(&quot;pentacont&quot;, 50),</span>
+<span class="fc" id="L98">            entry(&quot;hexaconta&quot;, 60),</span>
+<span class="fc" id="L99">            entry(&quot;hexacont&quot;, 60),</span>
+<span class="fc" id="L100">            entry(&quot;heptaconta&quot;, 70),</span>
+<span class="fc" id="L101">            entry(&quot;heptacont&quot;, 70),</span>
+<span class="fc" id="L102">            entry(&quot;octaconta&quot;, 80),</span>
+<span class="fc" id="L103">            entry(&quot;octacont&quot;, 80),</span>
+<span class="fc" id="L104">            entry(&quot;nonaconta&quot;, 90),</span>
+<span class="fc" id="L105">            entry(&quot;nonacont&quot;, 90)</span>
+    );
+
+<span class="fc" id="L108">    private static final Map&lt;String, String&gt; FUNC_GROUPS = Map.ofEntries(</span>
+<span class="fc" id="L109">            entry(&quot;keto&quot;, &quot;oxo&quot;),</span>
+<span class="fc" id="L110">            entry(&quot;ethyl&quot;, &quot;Et&quot;),</span>
+<span class="fc" id="L111">            entry(&quot;hydroxy&quot;, &quot;OH&quot;),</span>
+<span class="fc" id="L112">            entry(&quot;phospho&quot;, &quot;Ph&quot;),</span>
+<span class="fc" id="L113">            entry(&quot;oxo&quot;, &quot;oxo&quot;),</span>
+<span class="fc" id="L114">            entry(&quot;bromo&quot;, &quot;Br&quot;),</span>
+<span class="fc" id="L115">            entry(&quot;methyl&quot;, &quot;Me&quot;),</span>
+<span class="fc" id="L116">            entry(&quot;hydroperoxy&quot;, &quot;OOH&quot;),</span>
+<span class="fc" id="L117">            entry(&quot;homo&quot;, &quot;&quot;),</span>
+<span class="fc" id="L118">            entry(&quot;Epoxy&quot;, &quot;Ep&quot;),</span>
+<span class="fc" id="L119">            entry(&quot;fluro&quot;, &quot;F&quot;),</span>
+<span class="fc" id="L120">            entry(&quot;fluoro&quot;, &quot;F&quot;),</span>
+<span class="fc" id="L121">            entry(&quot;chloro&quot;, &quot;Cl&quot;),</span>
+<span class="fc" id="L122">            entry(&quot;methylene&quot;, &quot;My&quot;),</span>
+<span class="fc" id="L123">            entry(&quot;sulfooxy&quot;, &quot;Su&quot;),</span>
+<span class="fc" id="L124">            entry(&quot;amino&quot;, &quot;NH2&quot;),</span>
+<span class="fc" id="L125">            entry(&quot;sulfanyl&quot;, &quot;SH&quot;),</span>
+<span class="fc" id="L126">            entry(&quot;methoxy&quot;, &quot;OMe&quot;),</span>
+<span class="fc" id="L127">            entry(&quot;iodo&quot;, &quot;I&quot;),</span>
+<span class="fc" id="L128">            entry(&quot;cyano&quot;, &quot;CN&quot;),</span>
+<span class="fc" id="L129">            entry(&quot;nitro&quot;, &quot;NO2&quot;),</span>
+<span class="fc" id="L130">            entry(&quot;OH&quot;, &quot;OH&quot;),</span>
+<span class="fc" id="L131">            entry(&quot;thio&quot;, &quot;SH&quot;),</span>
+<span class="fc" id="L132">            entry(&quot;mercapto&quot;, &quot;SH&quot;),</span>
+<span class="fc" id="L133">            entry(&quot;carboxy&quot;, &quot;COOH&quot;),</span>
+<span class="fc" id="L134">            entry(&quot;acetoxy&quot;, &quot;Ac&quot;),</span>
+<span class="fc" id="L135">            entry(&quot;cysteinyl&quot;, &quot;Cys&quot;),</span>
+<span class="fc" id="L136">            entry(&quot;phenyl&quot;, &quot;Phe&quot;),</span>
+<span class="fc" id="L137">            entry(&quot;s-glutathionyl&quot;, &quot;SGlu&quot;),</span>
+<span class="fc" id="L138">            entry(&quot;s-cysteinyl&quot;, &quot;SCys&quot;),</span>
+<span class="fc" id="L139">            entry(&quot;butylperoxy&quot;, &quot;BOO&quot;),</span>
+<span class="fc" id="L140">            entry(&quot;dimethylarsinoyl&quot;, &quot;MMAs&quot;),</span>
+<span class="fc" id="L141">            entry(&quot;methylsulfanyl&quot;, &quot;SMe&quot;),</span>
+<span class="fc" id="L142">            entry(&quot;imino&quot;, &quot;NH&quot;),</span>
+<span class="fc" id="L143">            entry(&quot;s-cysteinylglycinyl&quot;, &quot;SCG&quot;)</span>
+    );
+
+<span class="fc" id="L146">    private static final Map&lt;String, Integer&gt; ATE = Map.ofEntries(</span>
+<span class="fc" id="L147">            entry(&quot;formate&quot;, 1),</span>
+<span class="fc" id="L148">            entry(&quot;acetate&quot;, 2),</span>
+<span class="fc" id="L149">            entry(&quot;butyrate&quot;, 4),</span>
+<span class="fc" id="L150">            entry(&quot;propionate&quot;, 3),</span>
+<span class="fc" id="L151">            entry(&quot;valerate&quot;, 5),</span>
+<span class="fc" id="L152">            entry(&quot;isobutyrate&quot;, 4)</span>
+    );
+
+<span class="fc" id="L155">    private static final Map&lt;String, Integer&gt; SPECIAL_NUMBERS = Map.ofEntries(</span>
+<span class="fc" id="L156">            entry(&quot;meth&quot;, 1),</span>
+<span class="fc" id="L157">            entry(&quot;etha&quot;, 2),</span>
+<span class="fc" id="L158">            entry(&quot;eth&quot;, 2),</span>
+<span class="fc" id="L159">            entry(&quot;propa&quot;, 3),</span>
+<span class="fc" id="L160">            entry(&quot;isoprop&quot;, 3),</span>
+<span class="fc" id="L161">            entry(&quot;prop&quot;, 3),</span>
+<span class="fc" id="L162">            entry(&quot;propi&quot;, 3),</span>
+<span class="fc" id="L163">            entry(&quot;propio&quot;, 3),</span>
+<span class="fc" id="L164">            entry(&quot;buta&quot;, 4),</span>
+<span class="fc" id="L165">            entry(&quot;but&quot;, 4),</span>
+<span class="fc" id="L166">            entry(&quot;butr&quot;, 4),</span>
+<span class="fc" id="L167">            entry(&quot;furan&quot;, 5),</span>
+<span class="fc" id="L168">            entry(&quot;valer&quot;, 5),</span>
+<span class="fc" id="L169">            entry(&quot;eicosa&quot;, 20),</span>
+<span class="fc" id="L170">            entry(&quot;eicos&quot;, 20),</span>
+<span class="fc" id="L171">            entry(&quot;icosa&quot;, 20),</span>
+<span class="fc" id="L172">            entry(&quot;icos&quot;, 20),</span>
+<span class="fc" id="L173">            entry(&quot;prosta&quot;, 20),</span>
+<span class="fc" id="L174">            entry(&quot;prost&quot;, 20),</span>
+<span class="fc" id="L175">            entry(&quot;prostan&quot;, 20)</span>
+    );
+
+<span class="fc" id="L178">    private static final Set&lt;String&gt; NOIC_SET = Set.of(&quot;noic acid&quot;, &quot;nic acid&quot;, &quot;dioic_acid&quot;);</span>
+<span class="fc" id="L179">    private static final Set&lt;String&gt; NAL_SET = Set.of(&quot;nal&quot;, &quot;dial&quot;);</span>
+<span class="fc" id="L180">    private static final Set&lt;String&gt; ACETATE_SET = Set.of(&quot;acetate&quot;, &quot;noate&quot;, &quot;nate&quot;);</span>
+
+    /**
+     * Create a new {@code FattyAcidParserEventHandler}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
+<span class="fc" id="L187">    public FattyAcidParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {</span>
+<span class="fc" id="L188">        this.knownFunctionalGroups = knownFunctionalGroups;</span>
+        try {
+<span class="fc" id="L190">            registeredEvents = Map.ofEntries(</span>
+<span class="fc" id="L191">                    entry(&quot;lipid_pre_event&quot;, this::resetParser),</span>
+<span class="fc" id="L192">                    entry(&quot;lipid_post_event&quot;, this::build_lipid),</span>
+<span class="fc" id="L193">                    entry(&quot;fatty_acid_post_event&quot;, this::set_fatty_acid),</span>
+<span class="fc" id="L194">                    entry(&quot;fatty_acid_recursion_post_event&quot;, this::set_fatty_acid),</span>
+<span class="fc" id="L195">                    entry(&quot;acid_single_type_pre_event&quot;, this::set_fatty_acyl_type),</span>
+<span class="fc" id="L196">                    entry(&quot;ol_ending_pre_event&quot;, this::set_fatty_acyl_type),</span>
+<span class="fc" id="L197">                    entry(&quot;double_bond_position_pre_event&quot;, this::set_double_bond_information),</span>
+<span class="fc" id="L198">                    entry(&quot;double_bond_position_post_event&quot;, this::add_double_bond_information),</span>
+<span class="fc" id="L199">                    entry(&quot;db_number_post_event&quot;, this::set_double_bond_position),</span>
+<span class="fc" id="L200">                    entry(&quot;cistrans_post_event&quot;, this::set_cistrans),</span>
+<span class="fc" id="L201">                    entry(&quot;acid_type_double_post_event&quot;, this::check_db),</span>
+<span class="fc" id="L202">                    entry(&quot;db_length_pre_event&quot;, this::open_db_length),</span>
+<span class="fc" id="L203">                    entry(&quot;db_length_post_event&quot;, this::close_db_length),</span>
+                    // lengths
+<span class="fc" id="L205">                    entry(&quot;functional_length_pre_event&quot;, this::reset_length),</span>
+<span class="fc" id="L206">                    entry(&quot;fatty_length_pre_event&quot;, this::reset_length),</span>
+<span class="fc" id="L207">                    entry(&quot;functional_length_post_event&quot;, this::set_functional_length),</span>
+<span class="fc" id="L208">                    entry(&quot;fatty_length_post_event&quot;, this::set_fatty_length),</span>
+                    // numbers
+<span class="fc" id="L210">                    entry(&quot;notation_specials_pre_event&quot;, this::special_number),</span>
+<span class="fc" id="L211">                    entry(&quot;notation_last_digit_pre_event&quot;, this::last_number),</span>
+<span class="fc" id="L212">                    entry(&quot;notation_second_digit_pre_event&quot;, this::second_number),</span>
+                    // functional groups
+<span class="fc" id="L214">                    entry(&quot;functional_group_pre_event&quot;, this::set_functional_group),</span>
+<span class="fc" id="L215">                    entry(&quot;functional_group_post_event&quot;, this::add_functional_group),</span>
+<span class="fc" id="L216">                    entry(&quot;functional_pos_pre_event&quot;, this::set_functional_pos),</span>
+<span class="fc" id="L217">                    entry(&quot;functional_position_pre_event&quot;, this::set_functional_position),</span>
+<span class="fc" id="L218">                    entry(&quot;functional_group_type_pre_event&quot;, this::set_functional_type),</span>
+                    // cyclo / epoxy
+<span class="fc" id="L220">                    entry(&quot;cyclo_position_pre_event&quot;, this::set_functional_group),</span>
+<span class="fc" id="L221">                    entry(&quot;cyclo_position_post_event&quot;, this::rearrange_cycle),</span>
+<span class="fc" id="L222">                    entry(&quot;epoxy_pre_event&quot;, this::set_functional_group),</span>
+<span class="fc" id="L223">                    entry(&quot;epoxy_post_event&quot;, this::add_epoxy),</span>
+<span class="fc" id="L224">                    entry(&quot;cycle_pre_event&quot;, this::set_cycle),</span>
+<span class="fc" id="L225">                    entry(&quot;methylene_post_event&quot;, this::set_methylene),</span>
+                    // dioic
+<span class="fc" id="L227">                    entry(&quot;dioic_pre_event&quot;, this::set_functional_group),</span>
+<span class="fc" id="L228">                    entry(&quot;dioic_post_event&quot;, this::set_dioic),</span>
+<span class="fc" id="L229">                    entry(&quot;dioic_acid_pre_event&quot;, this::set_fatty_acyl_type),</span>
+<span class="fc" id="L230">                    entry(&quot;dial_post_event&quot;, this::set_dial),</span>
+                    // prosta
+<span class="fc" id="L232">                    entry(&quot;prosta_pre_event&quot;, this::set_prosta),</span>
+<span class="fc" id="L233">                    entry(&quot;prosta_post_event&quot;, this::add_cyclo),</span>
+<span class="fc" id="L234">                    entry(&quot;reduction_pre_event&quot;, this::set_functional_group),</span>
+<span class="fc" id="L235">                    entry(&quot;reduction_post_event&quot;, this::reduction),</span>
+<span class="fc" id="L236">                    entry(&quot;homo_post_event&quot;, this::homo),</span>
+                    // recursion
+<span class="fc" id="L238">                    entry(&quot;recursion_description_pre_event&quot;, this::set_recursion),</span>
+<span class="fc" id="L239">                    entry(&quot;recursion_description_post_event&quot;, this::add_recursion),</span>
+<span class="fc" id="L240">                    entry(&quot;recursion_pos_pre_event&quot;, this::set_recursion_pos),</span>
+<span class="fc" id="L241">                    entry(&quot;yl_ending_pre_event&quot;, this::set_yl_ending),</span>
+<span class="fc" id="L242">                    entry(&quot;acetic_acid_post_event&quot;, this::set_acetic_acid),</span>
+<span class="fc" id="L243">                    entry(&quot;acetic_recursion_pre_event&quot;, this::set_recursion),</span>
+<span class="fc" id="L244">                    entry(&quot;acetic_recursion_post_event&quot;, this::add_recursion),</span>
+<span class="fc" id="L245">                    entry(&quot;hydroxyl_number_pre_event&quot;, this::add_hydroxyl),</span>
+<span class="fc" id="L246">                    entry(&quot;ol_pre_event&quot;, this::setup_hydroxyl),</span>
+<span class="fc" id="L247">                    entry(&quot;ol_post_event&quot;, this::add_hydroxyls),</span>
+<span class="fc" id="L248">                    entry(&quot;ol_pos_post_event&quot;, this::set_yl_ending),</span>
+                    // wax esters
+<span class="fc" id="L250">                    entry(&quot;wax_ester_pre_event&quot;, this::set_recursion),</span>
+<span class="fc" id="L251">                    entry(&quot;wax_ester_post_event&quot;, this::add_wax_ester),</span>
+<span class="fc" id="L252">                    entry(&quot;ate_post_event&quot;, this::set_ate),</span>
+<span class="fc" id="L253">                    entry(&quot;isoprop_post_event&quot;, this::set_iso),</span>
+<span class="fc" id="L254">                    entry(&quot;isobut_post_event&quot;, this::set_iso),</span>
+                    // CoA
+<span class="fc" id="L256">                    entry(&quot;coa_post_event&quot;, this::set_coa),</span>
+<span class="fc" id="L257">                    entry(&quot;methyl_pre_event&quot;, this::set_methyl),</span>
+                    // CAR
+<span class="fc" id="L259">                    entry(&quot;car_pre_event&quot;, this::set_car),</span>
+<span class="fc" id="L260">                    entry(&quot;car_post_event&quot;, this::add_car),</span>
+                    // furan
+<span class="fc" id="L262">                    entry(&quot;tetrahydrofuran_pre_event&quot;, this::set_tetrahydrofuran),</span>
+<span class="fc" id="L263">                    entry(&quot;furan_pre_event&quot;, this::set_furan),</span>
+                    // amine
+<span class="fc" id="L265">                    entry(&quot;ethanolamine_post_event&quot;, this::add_ethanolamine),</span>
+<span class="fc" id="L266">                    entry(&quot;amine_n_pre_event&quot;, this::set_recursion),</span>
+<span class="fc" id="L267">                    entry(&quot;amine_n_post_event&quot;, this::add_amine),</span>
+<span class="fc" id="L268">                    entry(&quot;amine_post_event&quot;, this::add_amine_name),</span>
+                    // functional group position summary
+<span class="fc" id="L270">                    entry(&quot;fg_pos_summary_pre_event&quot;, this::set_functional_group),</span>
+<span class="fc" id="L271">                    entry(&quot;fg_pos_summary_post_event&quot;, this::add_summary),</span>
+<span class="fc" id="L272">                    entry(&quot;func_stereo_pre_event&quot;, this::add_func_stereo)</span>
+            );
+<span class="nc" id="L274">        } catch (Exception e) {</span>
+<span class="nc" id="L275">            throw new ConstraintViolationException(&quot;Cannot initialize FattyAcidParserEventHandler.&quot;, e);</span>
+<span class="fc" id="L276">        }</span>
+<span class="fc" id="L277">    }</span>
+
+    private String FA_I() {
+<span class="fc" id="L280">        return &quot;fa&quot; + Integer.toString(fattyAcylStack.size());</span>
+    }
+
+    private void set_lipid_level(LipidLevel _level) {
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">        level = level.level &lt; _level.level ? level : _level;</span>
+<span class="fc" id="L285">    }</span>
+
+    @Override
+    protected void resetParser(TreeNode node) {
+<span class="fc" id="L289">        content = null;</span>
+<span class="fc" id="L290">        level = LipidLevel.FULL_STRUCTURE;</span>
+<span class="fc" id="L291">        headgroup = &quot;&quot;;</span>
+<span class="fc" id="L292">        fattyAcylStack = new ArrayDeque&lt;&gt;();</span>
+<span class="fc" id="L293">        fattyAcylStack.add(new FattyAcid(&quot;FA&quot;, knownFunctionalGroups));</span>
+<span class="fc" id="L294">        tmp = new Dictionary();</span>
+<span class="fc" id="L295">        tmp.put(&quot;fa1&quot;, new Dictionary());</span>
+<span class="fc" id="L296">    }</span>
+
+    void build_lipid(TreeNode node) {
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        if (tmp.containsKey(&quot;cyclo_yl&quot;)) {</span>
+<span class="fc" id="L300">            tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+
+<span class="fc" id="L302">            GenericList l1 = new GenericList();</span>
+<span class="fc" id="L303">            l1.add(1);</span>
+<span class="fc" id="L304">            l1.add(&quot;&quot;);</span>
+<span class="fc" id="L305">            ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l1);</span>
+
+<span class="fc" id="L307">            GenericList l2 = new GenericList();</span>
+<span class="fc" id="L308">            l2.add((int) tmp.get(&quot;cyclo_len&quot;));</span>
+<span class="fc" id="L309">            l2.add(&quot;&quot;);</span>
+<span class="fc" id="L310">            ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l2);</span>
+
+<span class="fc" id="L312">            add_cyclo(node);</span>
+<span class="fc" id="L313">            tmp.remove(&quot;cyclo_yl&quot;);</span>
+<span class="fc" id="L314">            tmp.remove(&quot;cyclo_len&quot;);</span>
+        }
+
+<span class="fc bfc" id="L317" title="All 2 branches covered.">        if (tmp.containsKey(&quot;post_adding&quot;)) {</span>
+<span class="fc" id="L318">            FattyAcid curr_fa_p = fattyAcylStack.peekLast();</span>
+<span class="fc" id="L319">            int s = ((GenericList) tmp.get(&quot;post_adding&quot;)).size();</span>
+<span class="fc" id="L320">            curr_fa_p.setNumCarbon(curr_fa_p.getNumCarbon() + s);</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">            for (int i = 0; i &lt; s; ++i) {</span>
+<span class="fc" id="L322">                int pos = (int) ((GenericList) tmp.get(&quot;post_adding&quot;)).get(i);</span>
+<span class="fc" id="L323">                curr_fa_p.addPosition(pos);</span>
+<span class="fc" id="L324">                DoubleBonds db = new DoubleBonds(curr_fa_p.getDoubleBonds().getNumDoubleBonds());</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">                for (Entry&lt;Integer, String&gt; kv : curr_fa_p.getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">                    db.getDoubleBondPositions().put(kv.getKey() + (kv.getKey() &gt;= pos ? 1 : 0), kv.getValue());</span>
+<span class="fc" id="L327">                }</span>
+<span class="fc" id="L328">                db.setNumDoubleBonds(db.getDoubleBondPositions().size());</span>
+<span class="fc" id="L329">                curr_fa_p.setDoubleBonds(db);</span>
+            }
+        }
+
+<span class="fc" id="L333">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+<span class="fc bfc" id="L334" title="All 2 branches covered.">        if (curr_fa.getDoubleBonds().getDoubleBondPositions().size() &gt; 0) {</span>
+<span class="fc" id="L335">            int db_right = 0;</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">            for (Entry&lt;Integer, String&gt; kv : curr_fa.getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">                db_right += kv.getValue().length() &gt; 0 ? 1 : 0;</span>
+<span class="fc" id="L338">            }</span>
+<span class="fc bfc" id="L339" title="All 2 branches covered.">            if (db_right != curr_fa.getDoubleBonds().getDoubleBondPositions().size()) {</span>
+<span class="fc" id="L340">                set_lipid_level(LipidLevel.STRUCTURE_DEFINED);</span>
+            }
+        }
+
+<span class="fc" id="L344">        Headgroup head_group = new Headgroup(headgroup);</span>
+
+<span class="fc" id="L346">        LipidSpecies lipidSpecies = null;</span>
+
+<span class="pc bpc" id="L348" title="5 of 7 branches missed.">        switch (level) {</span>
+            case COMPLETE_STRUCTURE -&gt;
+<span class="nc" id="L350">                lipidSpecies = new LipidCompleteStructure(head_group, fattyAcylStack, knownFunctionalGroups);</span>
+            case FULL_STRUCTURE -&gt;
+<span class="fc" id="L352">                lipidSpecies = new LipidFullStructure(head_group, fattyAcylStack, knownFunctionalGroups);</span>
+            case STRUCTURE_DEFINED -&gt;
+<span class="fc" id="L354">                lipidSpecies = new LipidStructureDefined(head_group, fattyAcylStack, knownFunctionalGroups);</span>
+            case SN_POSITION -&gt;
+<span class="nc" id="L356">                lipidSpecies = new LipidSnPosition(head_group, fattyAcylStack, knownFunctionalGroups);</span>
+            case MOLECULAR_SPECIES -&gt;
+<span class="nc" id="L358">                lipidSpecies = new LipidMolecularSpecies(head_group, fattyAcylStack, knownFunctionalGroups);</span>
+            case SPECIES -&gt;
+<span class="nc" id="L360">                lipidSpecies = new LipidSpecies(head_group, fattyAcylStack, knownFunctionalGroups);</span>
+            default -&gt; {
+            }
+        }
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">        if (lipidSpecies!=null) {</span>
+<span class="fc" id="L365">            content = new LipidAdduct(lipidSpecies, null);</span>
+        }
+<span class="fc" id="L367">    }</span>
+
+    void set_fatty_acyl_type(TreeNode node) {
+<span class="fc" id="L370">        String t = node.getText();</span>
+
+<span class="fc bfc" id="L372" title="All 2 branches covered.">        if (t.endsWith(&quot;ol&quot;)) {</span>
+<span class="fc" id="L373">            headgroup = &quot;FOH&quot;;</span>
+<span class="fc bfc" id="L374" title="All 2 branches covered.">        } else if (NOIC_SET.contains(t)) {</span>
+<span class="fc" id="L375">            headgroup = &quot;FA&quot;;</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">        } else if (NAL_SET.contains(t)) {</span>
+<span class="fc" id="L377">            headgroup = &quot;FAL&quot;;</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">        } else if (ACETATE_SET.contains(t)) {</span>
+<span class="fc" id="L379">            headgroup = &quot;WE&quot;;</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">        } else if (t.equals(&quot;ne&quot;)) {</span>
+<span class="fc" id="L381">            headgroup = &quot;HC&quot;;</span>
+<span class="fc" id="L382">            fattyAcylStack.peekLast().setLipidFaBondType(LipidFaBondType.ETHER);</span>
+        } else {
+<span class="fc" id="L384">            headgroup = t;</span>
+        }
+<span class="fc" id="L386">    }</span>
+
+    private void add_amine(TreeNode node) {
+<span class="fc" id="L389">        FattyAcid fa = fattyAcylStack.pollLast();</span>
+
+<span class="fc" id="L391">        fa.setLipidFaBondType(LipidFaBondType.AMIDE);</span>
+<span class="fc" id="L392">        fattyAcylStack.getLast().setLipidFaBondType(LipidFaBondType.AMIDE);</span>
+<span class="fc" id="L393">        fattyAcylStack.addFirst(fa);</span>
+<span class="fc" id="L394">    }</span>
+
+    private void set_fatty_acid(TreeNode node) {
+<span class="fc" id="L397">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+<span class="fc bfc" id="L398" title="All 2 branches covered.">        if (tmp.containsKey(&quot;length_pattern&quot;)) {</span>
+
+<span class="fc" id="L400">            String length_pattern = (String) tmp.get(&quot;length_pattern&quot;);</span>
+<span class="fc" id="L401">            int[] num = new int[((GenericList) tmp.get(&quot;length_tokens&quot;)).size()];</span>
+<span class="fc bfc" id="L402" title="All 2 branches covered.">            for (int i = 0; i &lt; ((GenericList) tmp.get(&quot;length_tokens&quot;)).size(); ++i) {</span>
+<span class="fc" id="L403">                num[i] = (int) ((GenericList) tmp.get(&quot;length_tokens&quot;)).get(i);</span>
+            }
+
+<span class="fc" id="L406">            int l = 0, d = 0;</span>
+<span class="fc bfc" id="L407" title="All 4 branches covered.">            if (length_pattern.equals(&quot;L&quot;) || length_pattern.equals(&quot;S&quot;)) {</span>
+<span class="fc" id="L408">                l += num[0];</span>
+<span class="fc bfc" id="L409" title="All 2 branches covered.">            } else if (length_pattern.equals(&quot;LS&quot;)) {</span>
+<span class="fc" id="L410">                l += num[0] + num[1];</span>
+<span class="pc bpc" id="L411" title="1 of 6 branches missed.">            } else if (length_pattern.equals(&quot;LL&quot;) || length_pattern.equals(&quot;SL&quot;) || length_pattern.equals(&quot;SS&quot;)) {</span>
+<span class="fc" id="L412">                l += num[0];</span>
+<span class="fc" id="L413">                d += num[1];</span>
+<span class="fc bfc" id="L414" title="All 4 branches covered.">            } else if (length_pattern.equals(&quot;LSL&quot;) || length_pattern.equals(&quot;LSS&quot;)) {</span>
+<span class="fc" id="L415">                l += num[0] + num[1];</span>
+<span class="fc" id="L416">                d += num[2];</span>
+<span class="fc bfc" id="L417" title="All 2 branches covered.">            } else if (length_pattern.equals(&quot;LSLS&quot;)) {</span>
+<span class="fc" id="L418">                l += num[0] + num[1];</span>
+<span class="fc" id="L419">                d += num[2] + num[3];</span>
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">            } else if (length_pattern.equals(&quot;SLS&quot;)) {</span>
+<span class="nc" id="L421">                l += num[0];</span>
+<span class="nc" id="L422">                d += num[1] + num[2];</span>
+<span class="pc bpc" id="L423" title="1 of 4 branches missed.">            } else if (length_pattern.length() &gt; 0 &amp;&amp; length_pattern.charAt(0) == 'X') {</span>
+<span class="fc" id="L424">                l += num[0];</span>
+<span class="fc bfc" id="L425" title="All 2 branches covered.">                for (int i = 1; i &lt; ((GenericList) tmp.get(&quot;length_tokens&quot;)).size(); ++i) {</span>
+<span class="fc" id="L426">                    d += num[i];</span>
+                }
+<span class="pc bpc" id="L428" title="1 of 2 branches missed.">            } else if (length_pattern.equals(&quot;LLS&quot;)) { // false</span>
+<span class="nc" id="L429">                throw new ConstraintViolationException(&quot;Cannot determine fatty acid and double bond length in '&quot; + node.getText() + &quot;'&quot;);</span>
+            }
+<span class="fc" id="L431">            curr_fa.setNumCarbon(curr_fa.getNumCarbon() + l);</span>
+<span class="pc bpc" id="L432" title="1 of 4 branches missed.">            if (curr_fa.getDoubleBonds().getDoubleBondPositions().isEmpty() &amp;&amp; d &gt; 0) {</span>
+<span class="nc" id="L433">                curr_fa.getDoubleBonds().setNumDoubleBonds(d);</span>
+            }
+        }
+
+<span class="fc bfc" id="L437" title="All 2 branches covered.">        if (curr_fa.getFunctionalGroupsInternal().containsKey(&quot;noyloxy&quot;)) {</span>
+<span class="fc bfc" id="L438" title="All 2 branches covered.">            if (headgroup.equals(&quot;FA&quot;)) {</span>
+<span class="fc" id="L439">                headgroup = &quot;FAHFA&quot;;</span>
+            }
+
+<span class="fc bfc" id="L442" title="All 2 branches covered.">            while (curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).size() &gt; 0) {</span>
+<span class="fc" id="L443">                FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).get(curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).size() - 1);</span>
+<span class="fc" id="L444">                curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).remove(curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).size() - 1);</span>
+
+<span class="fc" id="L446">                AcylAlkylGroup acyl = new AcylAlkylGroup(fa, knownFunctionalGroups);</span>
+<span class="fc" id="L447">                acyl.setPosition(fa.getPosition());</span>
+
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">                if (!curr_fa.getFunctionalGroupsInternal().containsKey(&quot;acyl&quot;)) {</span>
+<span class="fc" id="L450">                    curr_fa.getFunctionalGroupsInternal().put(&quot;acyl&quot;, new ArrayList&lt;&gt;());</span>
+                }
+<span class="fc" id="L452">                curr_fa.getFunctionalGroupsInternal().get(&quot;acyl&quot;).add(acyl);</span>
+<span class="fc" id="L453">            }</span>
+<span class="fc" id="L454">            curr_fa.getFunctionalGroupsInternal().remove(&quot;noyloxy&quot;);</span>
+<span class="pc bpc" id="L455" title="1 of 4 branches missed.">        } else if (curr_fa.getFunctionalGroupsInternal().containsKey(&quot;nyloxy&quot;) || curr_fa.getFunctionalGroupsInternal().containsKey(&quot;yloxy&quot;)) {</span>
+<span class="pc bpc" id="L456" title="1 of 2 branches missed.">            String yloxy = curr_fa.getFunctionalGroupsInternal().containsKey(&quot;nyloxy&quot;) ? &quot;nyloxy&quot; : &quot;yloxy&quot;;</span>
+<span class="fc bfc" id="L457" title="All 2 branches covered.">            while (curr_fa.getFunctionalGroupsInternal().get(yloxy).size() &gt; 0) {</span>
+<span class="fc" id="L458">                FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroupsInternal().get(yloxy).get(curr_fa.getFunctionalGroupsInternal().get(yloxy).size() - 1);</span>
+<span class="fc" id="L459">                curr_fa.getFunctionalGroupsInternal().get(yloxy).remove(curr_fa.getFunctionalGroupsInternal().get(yloxy).size() - 1);</span>
+
+<span class="fc" id="L461">                AcylAlkylGroup alkyl = new AcylAlkylGroup(fa, -1, 1, true, knownFunctionalGroups);</span>
+<span class="fc" id="L462">                alkyl.setPosition(fa.getPosition());</span>
+
+<span class="pc bpc" id="L464" title="1 of 2 branches missed.">                if (!curr_fa.getFunctionalGroupsInternal().containsKey(&quot;alkyl&quot;)) {</span>
+<span class="fc" id="L465">                    curr_fa.getFunctionalGroupsInternal().put(&quot;alkyl&quot;, new ArrayList&lt;&gt;());</span>
+                }
+<span class="fc" id="L467">                curr_fa.getFunctionalGroupsInternal().get(&quot;alkyl&quot;).add(alkyl);</span>
+<span class="fc" id="L468">            }</span>
+<span class="fc" id="L469">            curr_fa.getFunctionalGroupsInternal().remove(yloxy);</span>
+<span class="fc" id="L470">        } else {</span>
+<span class="fc" id="L471">            boolean has_yl = false;</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">            for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : curr_fa.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc bfc" id="L473" title="All 2 branches covered.">                if (kv.getKey().endsWith(&quot;yl&quot;)) {</span>
+<span class="fc" id="L474">                    has_yl = true;</span>
+<span class="fc" id="L475">                    break;</span>
+                }
+<span class="fc" id="L477">            }</span>
+<span class="fc bfc" id="L478" title="All 2 branches covered.">            if (has_yl) {</span>
+                while (true) {
+<span class="fc" id="L480">                    String yl = &quot;&quot;;</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">                    for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : curr_fa.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc bfc" id="L482" title="All 2 branches covered.">                        if (kv.getKey().endsWith(&quot;yl&quot;)) {</span>
+<span class="fc" id="L483">                            yl = kv.getKey();</span>
+<span class="fc" id="L484">                            break;</span>
+                        }
+<span class="fc" id="L486">                    }</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">                    if (yl.length() == 0) {</span>
+<span class="fc" id="L488">                        break;</span>
+                    }
+
+<span class="fc bfc" id="L491" title="All 2 branches covered.">                    while (curr_fa.getFunctionalGroupsInternal().get(yl).size() &gt; 0) {</span>
+<span class="fc" id="L492">                        FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroupsInternal().get(yl).get(curr_fa.getFunctionalGroupsInternal().get(yl).size() - 1);</span>
+<span class="fc" id="L493">                        curr_fa.getFunctionalGroupsInternal().get(yl).remove(curr_fa.getFunctionalGroupsInternal().get(yl).size() - 1);</span>
+
+<span class="fc bfc" id="L495" title="All 2 branches covered.">                        if (tmp.containsKey(&quot;cyclo&quot;)) {</span>
+<span class="fc" id="L496">                            int cyclo_len = curr_fa.getNumCarbon();</span>
+<span class="fc" id="L497">                            tmp.put(&quot;cyclo_len&quot;, cyclo_len);</span>
+<span class="fc bfc" id="L498" title="All 4 branches covered.">                            if (fa.getPosition() != cyclo_len &amp;&amp; !tmp.containsKey(&quot;furan&quot;)) {</span>
+<span class="fc" id="L499">                                switch_position(curr_fa, 2 + cyclo_len);</span>
+                            }
+<span class="fc" id="L501">                            fa.shiftPositions(cyclo_len);</span>
+<span class="fc bfc" id="L502" title="All 2 branches covered.">                            if (tmp.containsKey(&quot;furan&quot;)) {</span>
+<span class="fc" id="L503">                                curr_fa.shiftPositions(-1);</span>
+                            }
+
+<span class="fc bfc" id="L506" title="All 2 branches covered.">                            for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : fa.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc bfc" id="L507" title="All 2 branches covered.">                                if (!curr_fa.getFunctionalGroupsInternal().containsKey(kv.getKey())) {</span>
+<span class="fc" id="L508">                                    curr_fa.getFunctionalGroupsInternal().put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+                                }
+<span class="fc bfc" id="L510" title="All 2 branches covered.">                                for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc" id="L511">                                    curr_fa.getFunctionalGroupsInternal().get(kv.getKey()).add(func_group);</span>
+<span class="fc" id="L512">                                }</span>
+<span class="fc" id="L513">                            }</span>
+
+<span class="fc" id="L515">                            curr_fa.setNumCarbon(cyclo_len + fa.getNumCarbon());</span>
+
+<span class="fc bfc" id="L517" title="All 2 branches covered.">                            for (Entry&lt;Integer, String&gt; kv : fa.getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="fc" id="L518">                                curr_fa.getDoubleBonds().getDoubleBondPositions().put(kv.getKey() + cyclo_len, kv.getValue());</span>
+<span class="fc" id="L519">                            }</span>
+<span class="fc" id="L520">                            curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getDoubleBondPositions().size());</span>
+
+<span class="fc bfc" id="L522" title="All 4 branches covered.">                            if (!tmp.containsKey(&quot;tetrahydrofuran&quot;) &amp;&amp; tmp.containsKey(&quot;furan&quot;)) {</span>
+<span class="fc" id="L523">                                curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getNumDoubleBonds() + 2);</span>
+<span class="pc bpc" id="L524" title="1 of 2 branches missed.">                                if (!curr_fa.getDoubleBonds().getDoubleBondPositions().containsKey(1)) {</span>
+<span class="fc" id="L525">                                    curr_fa.getDoubleBonds().getDoubleBondPositions().put(1, &quot;E&quot;);</span>
+                                }
+<span class="pc bpc" id="L527" title="1 of 2 branches missed.">                                if (!curr_fa.getDoubleBonds().getDoubleBondPositions().containsKey(3)) {</span>
+<span class="fc" id="L528">                                    curr_fa.getDoubleBonds().getDoubleBondPositions().put(3, &quot;E&quot;);</span>
+                                }
+                            }
+
+<span class="fc" id="L532">                            tmp.put(&quot;cyclo_yl&quot;, true);</span>
+<span class="fc" id="L533">                        } else {</span>
+                            // add carbon chains here here
+                            // special chains: i.e. ethyl, methyl
+<span class="fc" id="L536">                            String fg_name = &quot;&quot;;</span>
+<span class="fc bfc" id="L537" title="All 4 branches covered.">                            if (fa.getDoubleBonds().getNumDoubleBonds() == 0 &amp;&amp; fa.getFunctionalGroupsInternal().isEmpty()) {</span>
+<span class="fc" id="L538">                                FunctionalGroup fg = null;</span>
+<span class="pc bpc" id="L539" title="1 of 2 branches missed.">                                if (fa.getNumCarbon() == 1) {</span>
+<span class="nc" id="L540">                                    fg_name = &quot;Me&quot;;</span>
+<span class="nc" id="L541">                                    fg = knownFunctionalGroups.get(fg_name);</span>
+<span class="fc bfc" id="L542" title="All 2 branches covered.">                                } else if (fa.getNumCarbon() == 2) {</span>
+<span class="fc" id="L543">                                    fg_name = &quot;Et&quot;;</span>
+<span class="fc" id="L544">                                    fg = knownFunctionalGroups.get(fg_name);</span>
+                                }
+<span class="pc bpc" id="L546" title="1 of 4 branches missed.">                                if (fg != null &amp;&amp; fg_name.length() &gt; 0) {</span>
+<span class="fc" id="L547">                                    fg.setPosition(fa.getPosition());</span>
+<span class="pc bpc" id="L548" title="1 of 2 branches missed.">                                    if (!curr_fa.getFunctionalGroupsInternal().containsKey(fg_name)) {</span>
+<span class="fc" id="L549">                                        curr_fa.getFunctionalGroupsInternal().put(fg_name, new ArrayList&lt;&gt;());</span>
+                                    }
+<span class="fc" id="L551">                                    curr_fa.getFunctionalGroupsInternal().get(fg_name).add(fg);</span>
+                                }
+                            }
+<span class="fc bfc" id="L554" title="All 2 branches covered.">                            if (fg_name.length() == 0) {</span>
+<span class="fc" id="L555">                                CarbonChain cc = new CarbonChain(fa, fa.getPosition(), knownFunctionalGroups);</span>
+<span class="pc bpc" id="L556" title="1 of 2 branches missed.">                                if (!curr_fa.getFunctionalGroupsInternal().containsKey(&quot;cc&quot;)) {</span>
+<span class="fc" id="L557">                                    curr_fa.getFunctionalGroupsInternal().put(&quot;cc&quot;, new ArrayList&lt;&gt;());</span>
+                                }
+<span class="fc" id="L559">                                curr_fa.getFunctionalGroupsInternal().get(&quot;cc&quot;).add(cc);</span>
+                            }
+                        }
+<span class="fc" id="L562">                    }</span>
+<span class="fc bfc" id="L563" title="All 2 branches covered.">                    if (tmp.containsKey(&quot;cyclo&quot;)) {</span>
+<span class="fc" id="L564">                        tmp.remove(&quot;cyclo&quot;);</span>
+                    }
+<span class="fc" id="L566">                    curr_fa.getFunctionalGroupsInternal().remove(yl);</span>
+<span class="fc" id="L567">                }</span>
+            }
+        }
+
+<span class="fc bfc" id="L571" title="All 2 branches covered.">        if (curr_fa.getFunctionalGroupsInternal().containsKey(&quot;cyclo&quot;)) {</span>
+<span class="fc" id="L572">            FattyAcid fa = (FattyAcid) curr_fa.getFunctionalGroupsInternal().get(&quot;cyclo&quot;).get(0);</span>
+<span class="fc" id="L573">            curr_fa.getFunctionalGroupsInternal().remove(&quot;cyclo&quot;);</span>
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">            if (!tmp.containsKey(&quot;cyclo_len&quot;)) {</span>
+<span class="nc" id="L575">                tmp.put(&quot;cyclo_len&quot;, 5);</span>
+            }
+<span class="fc" id="L577">            int start_pos = curr_fa.getNumCarbon() + 1;</span>
+<span class="fc" id="L578">            int end_pos = curr_fa.getNumCarbon() + (int) tmp.get(&quot;cyclo_len&quot;);</span>
+<span class="fc" id="L579">            fa.shiftPositions(start_pos - 1);</span>
+
+<span class="pc bpc" id="L581" title="1 of 2 branches missed.">            if (curr_fa.getFunctionalGroupsInternal().containsKey(&quot;cy&quot;)) {</span>
+<span class="nc bnc" id="L582" title="All 2 branches missed.">                for (FunctionalGroup cy : curr_fa.getFunctionalGroupsInternal().get(&quot;cy&quot;)) {</span>
+<span class="nc" id="L583">                    cy.shiftPositions(start_pos - 1);</span>
+<span class="nc" id="L584">                }</span>
+            }
+<span class="fc bfc" id="L586" title="All 2 branches covered.">            for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : fa.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc bfc" id="L587" title="All 2 branches covered.">                if (!curr_fa.getFunctionalGroupsInternal().containsKey(kv.getKey())) {</span>
+<span class="fc" id="L588">                    curr_fa.getFunctionalGroupsInternal().put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+                }
+<span class="fc bfc" id="L590" title="All 2 branches covered.">                for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc" id="L591">                    curr_fa.getFunctionalGroupsInternal().get(kv.getKey()).add(func_group);</span>
+<span class="fc" id="L592">                }</span>
+<span class="fc" id="L593">            }</span>
+
+<span class="fc bfc" id="L595" title="All 2 branches covered.">            for (Entry&lt;Integer, String&gt; kv : fa.getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="fc" id="L596">                curr_fa.getDoubleBonds().getDoubleBondPositions().put(kv.getKey() + start_pos - 1, kv.getValue());</span>
+<span class="fc" id="L597">            }</span>
+<span class="fc" id="L598">            curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getDoubleBondPositions().size());</span>
+
+<span class="fc bfc" id="L600" title="All 4 branches covered.">            if (!tmp.containsKey(&quot;tetrahydrofuran&quot;) &amp;&amp; tmp.containsKey(&quot;furan&quot;)) {</span>
+<span class="fc" id="L601">                curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getNumDoubleBonds() + 2);</span>
+<span class="pc bpc" id="L602" title="1 of 2 branches missed.">                if (!curr_fa.getDoubleBonds().getDoubleBondPositions().containsKey(1 + curr_fa.getNumCarbon())) {</span>
+<span class="nc" id="L603">                    curr_fa.getDoubleBonds().getDoubleBondPositions().put(1 + curr_fa.getNumCarbon(), &quot;E&quot;);</span>
+                }
+<span class="pc bpc" id="L605" title="1 of 2 branches missed.">                if (!curr_fa.getDoubleBonds().getDoubleBondPositions().containsKey(3 + curr_fa.getNumCarbon())) {</span>
+<span class="nc" id="L606">                    curr_fa.getDoubleBonds().getDoubleBondPositions().put(3 + curr_fa.getNumCarbon(), &quot;E&quot;);</span>
+                }
+            }
+
+<span class="fc" id="L610">            curr_fa.setNumCarbon(curr_fa.getNumCarbon() + fa.getNumCarbon());</span>
+
+<span class="fc" id="L612">            tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+<span class="fc" id="L613">            GenericList l1 = new GenericList();</span>
+<span class="fc" id="L614">            l1.add(start_pos);</span>
+<span class="fc" id="L615">            l1.add(&quot;&quot;);</span>
+<span class="fc" id="L616">            ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l1);</span>
+<span class="fc" id="L617">            GenericList l2 = new GenericList();</span>
+<span class="fc" id="L618">            l2.add(end_pos);</span>
+<span class="fc" id="L619">            l2.add(&quot;&quot;);</span>
+<span class="fc" id="L620">            ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l2);</span>
+
+<span class="fc" id="L622">            add_cyclo(node);</span>
+
+<span class="pc bpc" id="L624" title="1 of 2 branches missed.">            if (tmp.containsKey(&quot;cyclo_len&quot;)) {</span>
+<span class="fc" id="L625">                tmp.remove(&quot;cyclo_len&quot;);</span>
+            }
+<span class="pc bpc" id="L627" title="1 of 2 branches missed.">            if (tmp.containsKey(&quot;cyclo&quot;)) {</span>
+<span class="nc" id="L628">                tmp.remove(&quot;cyclo&quot;);</span>
+            }
+<span class="fc bfc" id="L630" title="All 2 branches covered.">        } else if (tmp.containsKey(&quot;cyclo&quot;)) {</span>
+<span class="fc" id="L631">            tmp.put(&quot;cyclo_yl&quot;, 1);</span>
+<span class="fc" id="L632">            tmp.put(&quot;cyclo_len&quot;, curr_fa.getNumCarbon());</span>
+<span class="fc" id="L633">            tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+<span class="fc" id="L634">            GenericList l1 = new GenericList();</span>
+<span class="fc" id="L635">            l1.add(1);</span>
+<span class="fc" id="L636">            l1.add(&quot;&quot;);</span>
+<span class="fc" id="L637">            ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l1);</span>
+<span class="fc" id="L638">            GenericList l2 = new GenericList();</span>
+<span class="fc" id="L639">            l2.add(curr_fa.getNumCarbon());</span>
+<span class="fc" id="L640">            l2.add(&quot;&quot;);</span>
+<span class="fc" id="L641">            ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l2);</span>
+
+<span class="fc" id="L643">            tmp.remove(&quot;cyclo&quot;);</span>
+        }
+
+<span class="fc" id="L646">        tmp.put(&quot;length_pattern&quot;, &quot;&quot;);</span>
+<span class="fc" id="L647">        tmp.put(&quot;length_tokens&quot;, new GenericList());</span>
+<span class="fc" id="L648">        tmp.put(&quot;add_lengths&quot;, 0);</span>
+<span class="fc" id="L649">    }</span>
+
+    private void switch_position(FunctionalGroup func_group, int switch_num) {
+<span class="fc" id="L652">        func_group.setPosition(switch_num - func_group.getPosition());</span>
+<span class="fc bfc" id="L653" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : func_group.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc bfc" id="L654" title="All 2 branches covered.">            for (FunctionalGroup fg : kv.getValue()) {</span>
+<span class="fc" id="L655">                switch_position(fg, switch_num);</span>
+<span class="fc" id="L656">            }</span>
+<span class="fc" id="L657">        }</span>
+<span class="fc" id="L658">    }</span>
+
+    private void add_cyclo(TreeNode node) {
+<span class="fc" id="L661">        int start = (int) ((GenericList) ((GenericList) tmp.get(&quot;fg_pos&quot;)).get(0)).get(0);</span>
+<span class="fc" id="L662">        int end = (int) ((GenericList) ((GenericList) tmp.get(&quot;fg_pos&quot;)).get(1)).get(0);</span>
+
+<span class="fc" id="L664">        DoubleBonds cyclo_db = new DoubleBonds();</span>
+        // check double bonds
+<span class="fc bfc" id="L666" title="All 2 branches covered.">        if (fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().size() &gt; 0) {</span>
+<span class="fc bfc" id="L667" title="All 2 branches covered.">            for (Entry&lt;Integer, String&gt; kv : fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="fc bfc" id="L668" title="All 4 branches covered.">                if (start &lt;= kv.getKey() &amp;&amp; kv.getKey() &lt;= end) {</span>
+<span class="fc" id="L669">                    cyclo_db.getDoubleBondPositions().put(kv.getKey(), kv.getValue());</span>
+                }
+<span class="fc" id="L671">            }</span>
+<span class="fc" id="L672">            cyclo_db.setNumDoubleBonds(cyclo_db.getDoubleBondPositions().size());</span>
+
+<span class="fc bfc" id="L674" title="All 2 branches covered.">            for (Entry&lt;Integer, String&gt; kv : cyclo_db.getDoubleBondPositions().entrySet()) {</span>
+<span class="fc" id="L675">                fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().remove(kv.getKey());</span>
+<span class="fc" id="L676">            }</span>
+<span class="fc" id="L677">            fattyAcylStack.peekLast().getDoubleBonds().setNumDoubleBonds(fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().size());</span>
+
+        }
+        // check functionalGroups
+<span class="fc" id="L681">        HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; cyclo_fg = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L682">        HashSet&lt;String&gt; remove_list = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L683">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+
+<span class="pc bpc" id="L685" title="1 of 2 branches missed.">        if (curr_fa.getFunctionalGroupsInternal().containsKey(&quot;noyloxy&quot;)) {</span>
+<span class="nc" id="L686">            ArrayList&lt;Integer&gt; remove_item = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L687">            int i = 0;</span>
+<span class="nc bnc" id="L688" title="All 2 branches missed.">            for (FunctionalGroup func_group : curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;)) {</span>
+<span class="nc bnc" id="L689" title="All 4 branches missed.">                if (start &lt;= func_group.getPosition() &amp;&amp; func_group.getPosition() &lt;= end) {</span>
+<span class="nc" id="L690">                    CarbonChain cc = new CarbonChain((FattyAcid) func_group, func_group.getPosition(), knownFunctionalGroups);</span>
+
+<span class="nc bnc" id="L692" title="All 2 branches missed.">                    if (!curr_fa.getFunctionalGroupsInternal().containsKey(&quot;cc&quot;)) {</span>
+<span class="nc" id="L693">                        curr_fa.getFunctionalGroupsInternal().put(&quot;cc&quot;, new ArrayList&lt;&gt;());</span>
+                    }
+<span class="nc" id="L695">                    curr_fa.getFunctionalGroupsInternal().get(&quot;cc&quot;).add(cc);</span>
+<span class="nc" id="L696">                    remove_item.add(i);</span>
+                }
+<span class="nc" id="L698">                ++i;</span>
+<span class="nc" id="L699">            }</span>
+<span class="nc bnc" id="L700" title="All 2 branches missed.">            for (int ii = remove_item.size() - 1; ii &gt;= 0; --ii) {</span>
+<span class="nc" id="L701">                curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).remove((int) remove_item.get(ii));</span>
+            }
+<span class="nc bnc" id="L703" title="All 2 branches missed.">            if (curr_fa.getFunctionalGroupsInternal().get(&quot;noyloxy&quot;).isEmpty()) {</span>
+<span class="nc" id="L704">                remove_list.add(&quot;noyloxy&quot;);</span>
+            }
+        }
+
+<span class="fc bfc" id="L708" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : curr_fa.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc" id="L709">            ArrayList&lt;Integer&gt; remove_item = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L710">            int i = 0;</span>
+<span class="fc bfc" id="L711" title="All 2 branches covered.">            for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc bfc" id="L712" title="All 4 branches covered.">                if (start &lt;= func_group.getPosition() &amp;&amp; func_group.getPosition() &lt;= end) {</span>
+<span class="fc bfc" id="L713" title="All 2 branches covered.">                    if (!cyclo_fg.containsKey(kv.getKey())) {</span>
+<span class="fc" id="L714">                        cyclo_fg.put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+                    }
+<span class="fc" id="L716">                    cyclo_fg.get(kv.getKey()).add(func_group);</span>
+<span class="fc" id="L717">                    remove_item.add(i);</span>
+                }
+<span class="fc" id="L719">                ++i;</span>
+<span class="fc" id="L720">            }</span>
+<span class="fc bfc" id="L721" title="All 2 branches covered.">            for (int ii = remove_item.size() - 1; ii &gt;= 0; --ii) {</span>
+<span class="fc" id="L722">                kv.getValue().remove((int) remove_item.get(ii));</span>
+            }
+<span class="fc bfc" id="L724" title="All 2 branches covered.">            if (kv.getValue().isEmpty()) {</span>
+<span class="fc" id="L725">                remove_list.add(kv.getKey());</span>
+            }
+<span class="fc" id="L727">        }</span>
+<span class="fc bfc" id="L728" title="All 2 branches covered.">        for (String fg : remove_list) {</span>
+<span class="fc" id="L729">            curr_fa.getFunctionalGroupsInternal().remove(fg);</span>
+<span class="fc" id="L730">        }</span>
+
+<span class="fc" id="L732">        ArrayList&lt;Element&gt; bridge_chain = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L733" title="All 2 branches covered.">        if (tmp.containsKey(&quot;furan&quot;)) {</span>
+<span class="fc" id="L734">            tmp.remove(&quot;furan&quot;);</span>
+<span class="fc" id="L735">            bridge_chain.add(Element.O);</span>
+        }
+
+<span class="fc" id="L738">        Cycle cycle = new Cycle(end - start + 1 + bridge_chain.size(), start, end, cyclo_db, cyclo_fg, bridge_chain, knownFunctionalGroups);</span>
+<span class="fc bfc" id="L739" title="All 2 branches covered.">        if (!fattyAcylStack.peekLast().getFunctionalGroupsInternal().containsKey(&quot;cy&quot;)) {</span>
+<span class="fc" id="L740">            fattyAcylStack.peekLast().getFunctionalGroupsInternal().put(&quot;cy&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L742">        fattyAcylStack.peekLast().getFunctionalGroupsInternal().get(&quot;cy&quot;).add(cycle);</span>
+<span class="fc" id="L743">    }</span>
+
+    private void add_wax_ester(TreeNode node) {
+<span class="fc" id="L746">        FattyAcid fa = fattyAcylStack.pollLast();</span>
+<span class="fc" id="L747">        fa.setLipidFaBondType(LipidFaBondType.ETHER);</span>
+<span class="fc" id="L748">        fattyAcylStack.addFirst(fa);</span>
+<span class="fc" id="L749">    }</span>
+
+    private void set_methyl(TreeNode node) {
+<span class="fc" id="L752">        fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + 1);</span>
+<span class="fc" id="L753">    }</span>
+
+    private void set_acetic_acid(TreeNode node) {
+<span class="fc" id="L756">        fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + 2);</span>
+<span class="fc" id="L757">        headgroup = &quot;FA&quot;;</span>
+<span class="fc" id="L758">    }</span>
+
+    private void set_methylene(TreeNode node) {
+<span class="fc" id="L761">        tmp.put(&quot;fg_type&quot;, &quot;methylene&quot;);</span>
+<span class="fc" id="L762">        GenericList gl = (GenericList) tmp.get(&quot;fg_pos&quot;);</span>
+<span class="fc bfc" id="L763" title="All 2 branches covered.">        if (gl.size() &gt; 1) {</span>
+<span class="pc bpc" id="L764" title="1 of 2 branches missed.">            if ((int) ((GenericList) gl.get(0)).get(0) &lt; (int) ((GenericList) gl.get(1)).get(0)) {</span>
+<span class="fc" id="L765">                ((GenericList) gl.get(1)).set(0, (int) ((GenericList) gl.get(1)).get(0) + 1);</span>
+<span class="nc bnc" id="L766" title="All 2 branches missed.">            } else if ((int) ((GenericList) gl.get(0)).get(0) &gt; (int) ((GenericList) gl.get(1)).get(0)) {</span>
+<span class="nc" id="L767">                ((GenericList) gl.get(0)).set(0, (int) ((GenericList) gl.get(0)).get(0) + 1);</span>
+            }
+<span class="fc" id="L769">            fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + 1);</span>
+<span class="fc" id="L770">            tmp.put(&quot;add_methylene&quot;, 1);</span>
+        }
+<span class="fc" id="L772">    }</span>
+
+    private void set_car(TreeNode node) {
+<span class="fc" id="L775">        tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+<span class="fc" id="L776">        tmp.put(&quot;fg_type&quot;, &quot;&quot;);</span>
+<span class="fc" id="L777">    }</span>
+
+    private void add_car(TreeNode node) {
+<span class="fc" id="L780">        headgroup = &quot;CAR&quot;;</span>
+<span class="fc" id="L781">    }</span>
+
+    private void add_ethanolamine(TreeNode node) {
+<span class="fc" id="L784">        headgroup = &quot;NAE&quot;;</span>
+<span class="fc" id="L785">    }</span>
+
+    private void add_amine_name(TreeNode node) {
+<span class="fc" id="L788">        headgroup = &quot;NA&quot;;</span>
+<span class="fc" id="L789">    }</span>
+
+    private void reset_length(TreeNode node) {
+<span class="fc" id="L792">        tmp.put(&quot;length&quot;, 0);</span>
+<span class="fc" id="L793">        tmp.put(&quot;length_pattern&quot;, &quot;&quot;);</span>
+<span class="fc" id="L794">        tmp.put(&quot;length_tokens&quot;, new GenericList());</span>
+<span class="fc" id="L795">        tmp.put(&quot;add_lengths&quot;, 1);</span>
+<span class="fc" id="L796">    }</span>
+
+    private void set_fatty_length(TreeNode node) {
+<span class="fc" id="L799">        tmp.put(&quot;add_lengths&quot;, 0);</span>
+<span class="fc" id="L800">    }</span>
+
+    private void last_number(TreeNode node) {
+<span class="fc bfc" id="L803" title="All 2 branches covered.">        if ((int) tmp.get(&quot;add_lengths&quot;) == 1) {</span>
+<span class="fc" id="L804">            tmp.put(&quot;length&quot;, (int) tmp.get(&quot;length&quot;) + LAST_NUMBERS.get(node.getText()));</span>
+<span class="fc" id="L805">            tmp.put(&quot;length_pattern&quot;, (String) tmp.get(&quot;length_pattern&quot;) + &quot;L&quot;);</span>
+<span class="fc" id="L806">            ((GenericList) tmp.get(&quot;length_tokens&quot;)).add(LAST_NUMBERS.get(node.getText()));</span>
+        }
+<span class="fc" id="L808">    }</span>
+
+    private void second_number(TreeNode node) {
+<span class="pc bpc" id="L811" title="1 of 2 branches missed.">        if ((int) tmp.get(&quot;add_lengths&quot;) == 1) {</span>
+<span class="fc" id="L812">            tmp.put(&quot;length&quot;, (int) tmp.get(&quot;length&quot;) + SECOND_NUMBERS.get(node.getText()));</span>
+<span class="fc" id="L813">            tmp.put(&quot;length_pattern&quot;, (String) tmp.get(&quot;length_pattern&quot;) + &quot;S&quot;);</span>
+<span class="fc" id="L814">            ((GenericList) tmp.get(&quot;length_tokens&quot;)).add(SECOND_NUMBERS.get(node.getText()));</span>
+        }
+<span class="fc" id="L816">    }</span>
+
+    private void special_number(TreeNode node) {
+<span class="pc bpc" id="L819" title="1 of 2 branches missed.">        if ((int) tmp.get(&quot;add_lengths&quot;) == 1) {</span>
+<span class="fc" id="L820">            tmp.put(&quot;length&quot;, (int) tmp.get(&quot;length&quot;) + SPECIAL_NUMBERS.get(node.getText()));</span>
+<span class="fc" id="L821">            tmp.put(&quot;length_pattern&quot;, (String) tmp.get(&quot;length_pattern&quot;) + &quot;X&quot;);</span>
+<span class="fc" id="L822">            ((GenericList) tmp.get(&quot;length_tokens&quot;)).add(SPECIAL_NUMBERS.get(node.getText()));</span>
+        }
+<span class="fc" id="L824">    }</span>
+
+    private void set_iso(TreeNode node) {
+<span class="fc" id="L827">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+<span class="fc" id="L828">        curr_fa.setNumCarbon(curr_fa.getNumCarbon() - 1);</span>
+<span class="fc" id="L829">        FunctionalGroup fg = knownFunctionalGroups.get(&quot;Me&quot;);</span>
+<span class="fc" id="L830">        fg.setPosition(2);</span>
+<span class="pc bpc" id="L831" title="1 of 2 branches missed.">        if (!curr_fa.getFunctionalGroupsInternal().containsKey(&quot;Me&quot;)) {</span>
+<span class="fc" id="L832">            curr_fa.getFunctionalGroupsInternal().put(&quot;Me&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L834">        curr_fa.getFunctionalGroupsInternal().get(&quot;Me&quot;).add(fg);</span>
+<span class="fc" id="L835">    }</span>
+
+    private void set_prosta(TreeNode node) {
+<span class="fc" id="L838">        int minus_pos = 0;</span>
+<span class="fc bfc" id="L839" title="All 2 branches covered.">        if (tmp.containsKey(&quot;reduction&quot;)) {</span>
+<span class="fc bfc" id="L840" title="All 2 branches covered.">            for (Object o : (GenericList) tmp.get(&quot;reduction&quot;)) {</span>
+<span class="fc" id="L841">                int i = (int) o;</span>
+<span class="pc bpc" id="L842" title="1 of 2 branches missed.">                minus_pos += i &lt; 8 ? 1 : 0;</span>
+<span class="fc" id="L843">            }</span>
+        }
+
+<span class="fc" id="L846">        tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+<span class="fc" id="L847">        GenericList l1 = new GenericList();</span>
+<span class="fc" id="L848">        l1.add(8 - minus_pos);</span>
+<span class="fc" id="L849">        l1.add(&quot;&quot;);</span>
+
+<span class="fc" id="L851">        GenericList l2 = new GenericList();</span>
+<span class="fc" id="L852">        l2.add(12 - minus_pos);</span>
+<span class="fc" id="L853">        l2.add(&quot;&quot;);</span>
+
+<span class="fc" id="L855">        ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l1);</span>
+<span class="fc" id="L856">        ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(l2);</span>
+<span class="fc" id="L857">        tmp.put(&quot;fg_type&quot;, &quot;cy&quot;);</span>
+<span class="fc" id="L858">    }</span>
+
+    private void set_tetrahydrofuran(TreeNode node) {
+<span class="fc" id="L861">        tmp.put(&quot;furan&quot;, 1);</span>
+<span class="fc" id="L862">        tmp.put(&quot;tetrahydrofuran&quot;, 1);</span>
+<span class="fc" id="L863">        set_cycle(node);</span>
+<span class="fc" id="L864">    }</span>
+
+    private void set_furan(TreeNode node) {
+<span class="fc" id="L867">        tmp.put(&quot;furan&quot;, 1);</span>
+<span class="fc" id="L868">        set_cycle(node);</span>
+<span class="fc" id="L869">    }</span>
+
+    private void check_db(TreeNode node) {
+<span class="fc" id="L872">        String fa_i = FA_I();</span>
+<span class="fc" id="L873">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+<span class="fc bfc" id="L874" title="All 2 branches covered.">        if (((Dictionary) tmp.get(fa_i)).containsKey(&quot;fg_pos_summary&quot;)) {</span>
+<span class="fc bfc" id="L875" title="All 2 branches covered.">            for (Entry&lt;String, Object&gt; kv : ((Dictionary) ((Dictionary) tmp.get(fa_i)).get(&quot;fg_pos_summary&quot;)).entrySet()) {</span>
+<span class="fc" id="L876">                int k = Integer.valueOf(kv.getKey());</span>
+<span class="fc" id="L877">                String v = (String) ((Dictionary) ((Dictionary) tmp.get(fa_i)).get(&quot;fg_pos_summary&quot;)).get(kv.getKey());</span>
+<span class="fc bfc" id="L878" title="All 10 branches covered.">                if (k &gt; 0 &amp;&amp; !curr_fa.getDoubleBonds().getDoubleBondPositions().containsKey(k) &amp;&amp; (v.equals(&quot;E&quot;) || v.equals(&quot;Z&quot;) || v.length() == 0)) {</span>
+<span class="fc" id="L879">                    curr_fa.getDoubleBonds().getDoubleBondPositions().put(k, v);</span>
+<span class="fc" id="L880">                    curr_fa.getDoubleBonds().setNumDoubleBonds(curr_fa.getDoubleBonds().getDoubleBondPositions().size());</span>
+                }
+<span class="fc" id="L882">            }</span>
+        }
+<span class="fc" id="L884">    }</span>
+
+    private void set_coa(TreeNode node) {
+<span class="fc" id="L887">        headgroup = &quot;CoA&quot;;</span>
+<span class="fc" id="L888">    }</span>
+
+    private void set_yl_ending(TreeNode node) {
+<span class="fc" id="L891">        int l = Integer.valueOf(node.getText()) - 1;</span>
+<span class="fc bfc" id="L892" title="All 2 branches covered.">        if (l == 0) {</span>
+<span class="fc" id="L893">            return;</span>
+        }
+
+<span class="fc" id="L896">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+
+<span class="fc bfc" id="L898" title="All 2 branches covered.">        if (tmp.containsKey(&quot;furan&quot;)) {</span>
+<span class="fc" id="L899">            curr_fa.setNumCarbon(curr_fa.getNumCarbon() - l);</span>
+<span class="fc" id="L900">            return;</span>
+        }
+
+<span class="fc" id="L903">        String fname = &quot;&quot;;</span>
+<span class="fc" id="L904">        FunctionalGroup fg = null;</span>
+<span class="fc bfc" id="L905" title="All 2 branches covered.">        if (l == 1) {</span>
+<span class="fc" id="L906">            fname = &quot;Me&quot;;</span>
+<span class="fc" id="L907">            fg = knownFunctionalGroups.get(fname);</span>
+<span class="fc bfc" id="L908" title="All 2 branches covered.">        } else if (l == 2) {</span>
+<span class="fc" id="L909">            fname = &quot;Et&quot;;</span>
+<span class="fc" id="L910">            fg = knownFunctionalGroups.get(fname);</span>
+        } else {
+<span class="fc" id="L912">            FattyAcid fa = new FattyAcid(&quot;FA&quot;, l, knownFunctionalGroups);</span>
+            // shift functional groups
+<span class="fc bfc" id="L914" title="All 2 branches covered.">            for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : curr_fa.getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc" id="L915">                ArrayList&lt;Integer&gt; remove_item = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L916">                int i = 0;</span>
+<span class="fc bfc" id="L917" title="All 2 branches covered.">                for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="pc bpc" id="L918" title="1 of 2 branches missed.">                    if (func_group.getPosition() &lt;= l) {</span>
+<span class="fc" id="L919">                        remove_item.add(i);</span>
+<span class="fc bfc" id="L920" title="All 2 branches covered.">                        if (!fa.getFunctionalGroupsInternal().containsKey(kv.getKey())) {</span>
+<span class="fc" id="L921">                            fa.getFunctionalGroupsInternal().put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+                        }
+<span class="fc" id="L923">                        func_group.setPosition(l + 1 - func_group.getPosition());</span>
+<span class="fc" id="L924">                        fa.getFunctionalGroupsInternal().get(kv.getKey()).add(func_group);</span>
+                    }
+<span class="fc" id="L926">                }</span>
+<span class="fc bfc" id="L927" title="All 2 branches covered.">                for (int ii = remove_item.size() - 1; ii &gt;= 0; --ii) {</span>
+<span class="fc" id="L928">                    curr_fa.getFunctionalGroupsInternal().get(kv.getKey()).remove((int) remove_item.get(ii));</span>
+                }
+<span class="fc" id="L930">            }</span>
+<span class="fc" id="L931">            Map&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; func_dict = curr_fa.getFunctionalGroupsInternal();</span>
+<span class="fc" id="L932">            curr_fa.setFunctionalGroups(new HashMap&lt;&gt;());</span>
+<span class="fc bfc" id="L933" title="All 2 branches covered.">            for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : func_dict.entrySet()) {</span>
+<span class="pc bpc" id="L934" title="1 of 2 branches missed.">                if (kv.getValue().size() &gt; 0) {</span>
+<span class="nc" id="L935">                    curr_fa.getFunctionalGroupsInternal().put(kv.getKey(), kv.getValue());</span>
+                }
+<span class="fc" id="L937">            }</span>
+
+            // shift double bonds
+<span class="pc bpc" id="L940" title="1 of 2 branches missed.">            if (curr_fa.getDoubleBonds().getDoubleBondPositions().size() &gt; 0) {</span>
+<span class="fc" id="L941">                fa.setDoubleBonds(new DoubleBonds());</span>
+<span class="fc bfc" id="L942" title="All 2 branches covered.">                for (Entry&lt;Integer, String&gt; kv : curr_fa.getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="pc bpc" id="L943" title="1 of 2 branches missed.">                    if (kv.getKey() &lt;= l) {</span>
+<span class="nc" id="L944">                        fa.getDoubleBonds().getDoubleBondPositions().put(l + 1 - kv.getKey(), kv.getValue());</span>
+                    }
+<span class="fc" id="L946">                }</span>
+<span class="fc" id="L947">                fa.getDoubleBonds().setNumDoubleBonds(fa.getDoubleBonds().getDoubleBondPositions().size());</span>
+<span class="pc bpc" id="L948" title="1 of 2 branches missed.">                for (Entry&lt;Integer, String&gt; kv : fa.getDoubleBonds().getDoubleBondPositions().entrySet()) {</span>
+<span class="nc" id="L949">                    curr_fa.getDoubleBonds().getDoubleBondPositions().remove(kv.getKey());</span>
+<span class="nc" id="L950">                }</span>
+            }
+<span class="fc" id="L952">            fname = &quot;cc&quot;;</span>
+<span class="fc" id="L953">            fg = new CarbonChain(fa, knownFunctionalGroups);</span>
+        }
+<span class="fc" id="L955">        curr_fa.setNumCarbon(curr_fa.getNumCarbon() - l);</span>
+<span class="fc" id="L956">        fg.setPosition(l);</span>
+<span class="fc" id="L957">        curr_fa.shiftPositions(-l);</span>
+<span class="fc bfc" id="L958" title="All 2 branches covered.">        if (!curr_fa.getFunctionalGroupsInternal().containsKey(fname)) {</span>
+<span class="fc" id="L959">            curr_fa.getFunctionalGroupsInternal().put(fname, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L961">        curr_fa.getFunctionalGroupsInternal().get(fname).add(fg);</span>
+<span class="fc" id="L962">    }</span>
+
+    private void set_dial(TreeNode node) {
+<span class="fc" id="L965">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+<span class="fc" id="L966">        int pos = curr_fa.getNumCarbon();</span>
+<span class="fc" id="L967">        FunctionalGroup fg = knownFunctionalGroups.get(&quot;oxo&quot;);</span>
+<span class="fc" id="L968">        fg.setPosition(pos);</span>
+<span class="pc bpc" id="L969" title="1 of 2 branches missed.">        if (!curr_fa.getFunctionalGroupsInternal().containsKey(&quot;oxo&quot;)) {</span>
+<span class="fc" id="L970">            curr_fa.getFunctionalGroupsInternal().put(&quot;oxo&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L972">        curr_fa.getFunctionalGroupsInternal().get(&quot;oxo&quot;).add(fg);</span>
+<span class="fc" id="L973">    }</span>
+
+    private void open_db_length(TreeNode node) {
+<span class="fc" id="L976">        tmp.put(&quot;add_lengths&quot;, 1);</span>
+<span class="fc" id="L977">    }</span>
+
+    private void close_db_length(TreeNode node) {
+<span class="fc" id="L980">        tmp.put(&quot;add_lengths&quot;, 0);</span>
+<span class="fc" id="L981">    }</span>
+
+    private void set_dioic(TreeNode node) {
+<span class="fc" id="L984">        headgroup = &quot;FA&quot;;</span>
+<span class="fc bfc" id="L985" title="All 2 branches covered.">        int pos = (((GenericList) tmp.get(&quot;fg_pos&quot;)).size() == 2) ? (int) ((GenericList) ((GenericList) tmp.get(&quot;fg_pos&quot;)).get(1)).get(0) : fattyAcylStack.peekLast().getNumCarbon();</span>
+<span class="fc bfc" id="L986" title="All 2 branches covered.">        if (tmp.containsKey(&quot;reduction&quot;)) {</span>
+<span class="fc" id="L987">            pos -= ((GenericList) tmp.get(&quot;reduction&quot;)).size();</span>
+        }
+<span class="fc" id="L989">        fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() - 1);</span>
+<span class="fc" id="L990">        FunctionalGroup func_group = knownFunctionalGroups.get(&quot;COOH&quot;);</span>
+<span class="fc" id="L991">        func_group.setPosition(pos - 1);</span>
+<span class="pc bpc" id="L992" title="1 of 2 branches missed.">        if (!fattyAcylStack.peekLast().getFunctionalGroupsInternal().containsKey(&quot;COOH&quot;)) {</span>
+<span class="fc" id="L993">            fattyAcylStack.peekLast().getFunctionalGroupsInternal().put(&quot;COOH&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L995">        fattyAcylStack.peekLast().getFunctionalGroupsInternal().get(&quot;COOH&quot;).add(func_group);</span>
+<span class="fc" id="L996">    }</span>
+
+    private void setup_hydroxyl(TreeNode node) {
+<span class="fc" id="L999">        tmp.put(&quot;hydroxyl_pos&quot;, new GenericList());</span>
+<span class="fc" id="L1000">    }</span>
+
+    private void add_hydroxyls(TreeNode node) {
+<span class="fc bfc" id="L1003" title="All 2 branches covered.">        if (((GenericList) tmp.get(&quot;hydroxyl_pos&quot;)).size() &gt; 1) {</span>
+<span class="fc" id="L1004">            FunctionalGroup fg_oh = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L1005">            ArrayList&lt;Integer&gt; sorted_pos = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L1006" title="All 2 branches covered.">            for (Object o : (GenericList) tmp.get(&quot;hydroxyl_pos&quot;)) {</span>
+<span class="fc" id="L1007">                int i = (int) o;</span>
+<span class="fc" id="L1008">                sorted_pos.add(i);</span>
+<span class="fc" id="L1009">            }</span>
+<span class="fc" id="L1010">            Collections.sort(sorted_pos, (Integer a, Integer b) -&gt; b.compareTo(a));</span>
+<span class="fc bfc" id="L1011" title="All 2 branches covered.">            for (int i = 0; i &lt; sorted_pos.size() - 1; ++i) {</span>
+<span class="fc" id="L1012">                int pos = sorted_pos.get(i);</span>
+<span class="fc" id="L1013">                FunctionalGroup fg_insert = fg_oh.copy();</span>
+<span class="fc" id="L1014">                fg_insert.setPosition(pos);</span>
+<span class="fc bfc" id="L1015" title="All 2 branches covered.">                if (!fattyAcylStack.peekLast().getFunctionalGroupsInternal().containsKey(&quot;OH&quot;)) {</span>
+<span class="fc" id="L1016">                    fattyAcylStack.peekLast().getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+                }
+<span class="fc" id="L1018">                fattyAcylStack.peekLast().getFunctionalGroupsInternal().get(&quot;OH&quot;).add(fg_insert);</span>
+            }
+        }
+<span class="fc" id="L1021">    }</span>
+
+    private void set_ate(TreeNode node) {
+<span class="fc" id="L1024">        fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + ATE.get(node.getText()));</span>
+<span class="fc" id="L1025">        headgroup = &quot;WE&quot;;</span>
+<span class="fc" id="L1026">    }</span>
+
+    private void add_hydroxyl(TreeNode node) {
+<span class="fc" id="L1029">        int h = Integer.valueOf(node.getText());</span>
+<span class="fc" id="L1030">        ((GenericList) tmp.get(&quot;hydroxyl_pos&quot;)).add(h);</span>
+<span class="fc" id="L1031">    }</span>
+
+    private void set_functional_group(TreeNode node) {
+<span class="fc" id="L1034">        tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+<span class="fc" id="L1035">        tmp.put(&quot;fg_type&quot;, &quot;&quot;);</span>
+<span class="fc" id="L1036">    }</span>
+
+    private void add_functional_group(TreeNode node) {
+<span class="fc bfc" id="L1039" title="All 2 branches covered.">        if (tmp.containsKey(&quot;added_func_group&quot;)) {</span>
+<span class="fc" id="L1040">            tmp.remove(&quot;added_func_group&quot;);</span>
+<span class="fc" id="L1041">            return;</span>
+<span class="fc bfc" id="L1042" title="All 2 branches covered.">        } else if (tmp.containsKey(&quot;add_methylene&quot;)) {</span>
+<span class="fc" id="L1043">            tmp.remove(&quot;add_methylene&quot;);</span>
+<span class="fc" id="L1044">            add_cyclo(node);</span>
+<span class="fc" id="L1045">            return;</span>
+        }
+
+<span class="fc" id="L1048">        String t = (String) tmp.get(&quot;fg_type&quot;);</span>
+
+<span class="fc" id="L1050">        FunctionalGroup fg = null;</span>
+<span class="fc bfc" id="L1051" title="All 2 branches covered.">        if (!t.equals(&quot;acetoxy&quot;)) {</span>
+<span class="pc bpc" id="L1052" title="1 of 2 branches missed.">            if (!FUNC_GROUPS.containsKey(t)) {</span>
+<span class="nc" id="L1053">                throw new LipidException(&quot;Unknown functional group: '&quot; + t + &quot;'&quot;);</span>
+            }
+<span class="fc" id="L1055">            t = FUNC_GROUPS.get(t);</span>
+<span class="fc bfc" id="L1056" title="All 2 branches covered.">            if (t.length() == 0) {</span>
+<span class="fc" id="L1057">                return;</span>
+            }
+<span class="fc" id="L1059">            fg = knownFunctionalGroups.get(t);</span>
+        } else {
+<span class="fc" id="L1061">            fg = new AcylAlkylGroup(new FattyAcid(&quot;O&quot;, 2, knownFunctionalGroups), knownFunctionalGroups);</span>
+        }
+
+<span class="fc" id="L1064">        FattyAcid fa = fattyAcylStack.peekLast();</span>
+<span class="fc bfc" id="L1065" title="All 2 branches covered.">        if (!fa.getFunctionalGroupsInternal().containsKey(t)) {</span>
+<span class="fc" id="L1066">            fa.getFunctionalGroupsInternal().put(t, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L1068">        int l = ((GenericList) tmp.get(&quot;fg_pos&quot;)).size();</span>
+<span class="fc bfc" id="L1069" title="All 2 branches covered.">        for (Object o : (GenericList) tmp.get(&quot;fg_pos&quot;)) {</span>
+<span class="fc" id="L1070">            GenericList lst = (GenericList) o;</span>
+<span class="fc" id="L1071">            int pos = (int) lst.get(0);</span>
+
+<span class="fc" id="L1073">            int num_pos = 0;</span>
+<span class="fc bfc" id="L1074" title="All 2 branches covered.">            if (tmp.containsKey(&quot;reduction&quot;)) {</span>
+<span class="fc bfc" id="L1075" title="All 2 branches covered.">                for (Object oo : (GenericList) tmp.get(&quot;reduction&quot;)) {</span>
+<span class="fc" id="L1076">                    int i = (int) oo;</span>
+<span class="pc bpc" id="L1077" title="1 of 2 branches missed.">                    num_pos += i &lt; pos ? 1 : 0;</span>
+<span class="fc" id="L1078">                }</span>
+            }
+<span class="fc" id="L1080">            FunctionalGroup fg_insert = fg.copy();</span>
+<span class="fc" id="L1081">            fg_insert.setPosition(pos - num_pos);</span>
+<span class="fc" id="L1082">            fa.getFunctionalGroupsInternal().get(t).add(fg_insert);</span>
+<span class="fc" id="L1083">        }</span>
+<span class="fc" id="L1084">    }</span>
+
+    private void set_double_bond_information(TreeNode node) {
+<span class="fc" id="L1087">        ((Dictionary) tmp.get(FA_I())).put(&quot;db_position&quot;, 0);</span>
+<span class="fc" id="L1088">        ((Dictionary) tmp.get(FA_I())).put(&quot;db_cistrans&quot;, &quot;&quot;);</span>
+<span class="fc" id="L1089">    }</span>
+
+    private void add_double_bond_information(TreeNode node) {
+<span class="fc" id="L1092">        int pos = (int) ((Dictionary) tmp.get(FA_I())).get(&quot;db_position&quot;);</span>
+<span class="fc" id="L1093">        String str_pos = Integer.toString(pos);</span>
+<span class="fc" id="L1094">        String cistrans = (String) ((Dictionary) tmp.get(FA_I())).get(&quot;db_cistrans&quot;);</span>
+<span class="fc bfc" id="L1095" title="All 6 branches covered.">        if (cistrans.length() == 0 &amp;&amp; ((Dictionary) tmp.get(FA_I())).containsKey(&quot;fg_pos_summary&quot;) &amp;&amp; ((Dictionary) ((Dictionary) tmp.get(FA_I())).get(&quot;fg_pos_summary&quot;)).containsKey(str_pos)) {</span>
+<span class="fc" id="L1096">            cistrans = (String) ((Dictionary) ((Dictionary) tmp.get(FA_I())).get(&quot;fg_pos_summary&quot;)).get(str_pos);</span>
+        }
+<span class="fc bfc" id="L1098" title="All 2 branches covered.">        if (pos == 0) {</span>
+<span class="fc" id="L1099">            return;</span>
+        }
+
+<span class="fc" id="L1102">        cistrans = cistrans.toUpperCase();</span>
+
+<span class="fc" id="L1104">        ((Dictionary) tmp.get(FA_I())).remove(&quot;db_position&quot;);</span>
+<span class="fc" id="L1105">        ((Dictionary) tmp.get(FA_I())).remove(&quot;db_cistrans&quot;);</span>
+
+<span class="fc bfc" id="L1107" title="All 4 branches covered.">        if (!cistrans.equals(&quot;E&quot;) &amp;&amp; !cistrans.equals(&quot;Z&quot;)) {</span>
+<span class="fc" id="L1108">            cistrans = &quot;&quot;;</span>
+        }
+<span class="pc bpc" id="L1110" title="1 of 4 branches missed.">        if (!fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().containsKey(pos) || fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().get(pos).length() == 0) {</span>
+<span class="fc" id="L1111">            fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().put(pos, cistrans);</span>
+<span class="fc" id="L1112">            fattyAcylStack.peekLast().getDoubleBonds().setNumDoubleBonds(fattyAcylStack.peekLast().getDoubleBonds().getDoubleBondPositions().size());</span>
+        }
+<span class="fc" id="L1114">    }</span>
+
+    private void set_cistrans(TreeNode node) {
+<span class="fc" id="L1117">        ((Dictionary) tmp.get(FA_I())).put(&quot;db_cistrans&quot;, node.getText());</span>
+<span class="fc" id="L1118">    }</span>
+
+    private void set_double_bond_position(TreeNode node) {
+<span class="fc" id="L1121">        int pos = Integer.valueOf(node.getText());</span>
+<span class="fc" id="L1122">        int num_db = 0;</span>
+<span class="fc bfc" id="L1123" title="All 2 branches covered.">        if (tmp.containsKey(&quot;reduction&quot;)) {</span>
+<span class="fc" id="L1124">            GenericList gl = (GenericList) tmp.get(&quot;reduction&quot;);</span>
+<span class="fc" id="L1125">            int l = gl.size();</span>
+<span class="fc bfc" id="L1126" title="All 2 branches covered.">            for (int i = 0; i &lt; l; ++i) {</span>
+<span class="pc bpc" id="L1127" title="1 of 2 branches missed.">                num_db += ((int) gl.get(i) &lt; pos) ? 1 : 0;</span>
+            }
+        }
+
+<span class="fc" id="L1131">        ((Dictionary) tmp.get(FA_I())).put(&quot;db_position&quot;, pos - num_db);</span>
+<span class="fc" id="L1132">    }</span>
+
+    private void add_summary(TreeNode node) {
+<span class="fc" id="L1135">        String fa_i = FA_I();</span>
+<span class="fc" id="L1136">        ((Dictionary) tmp.get(fa_i)).put(&quot;fg_pos_summary&quot;, new Dictionary());</span>
+<span class="fc bfc" id="L1137" title="All 2 branches covered.">        for (Object o : (GenericList) tmp.get(&quot;fg_pos&quot;)) {</span>
+<span class="fc" id="L1138">            GenericList lst = (GenericList) o;</span>
+<span class="fc" id="L1139">            String k = Integer.toString((int) lst.get(0));</span>
+<span class="fc" id="L1140">            String v = ((String) lst.get(1)).toUpperCase();</span>
+<span class="fc" id="L1141">            ((Dictionary) ((Dictionary) tmp.get(fa_i)).get(&quot;fg_pos_summary&quot;)).put(k, v);</span>
+<span class="fc" id="L1142">        }</span>
+<span class="fc" id="L1143">    }</span>
+
+    private void set_functional_length(TreeNode node) {
+<span class="pc bpc" id="L1146" title="1 of 2 branches missed.">        if ((int) tmp.get(&quot;length&quot;) != ((GenericList) tmp.get(&quot;fg_pos&quot;)).size()) {</span>
+<span class="nc" id="L1147">            throw new LipidException(&quot;Length of functional group '&quot; + Integer.toString((int) tmp.get(&quot;length&quot;)) + &quot;' does not match with number of its positions '&quot; + Integer.toString(((GenericList) tmp.get(&quot;fg_pos&quot;)).size()) + &quot;'&quot;);</span>
+        }
+<span class="fc" id="L1149">    }</span>
+
+    private void set_functional_type(TreeNode node) {
+<span class="fc" id="L1152">        tmp.put(&quot;fg_type&quot;, node.getText());</span>
+<span class="fc" id="L1153">    }</span>
+
+    private void add_epoxy(TreeNode node) {
+<span class="fc" id="L1156">        GenericList gl = (GenericList) tmp.get(&quot;fg_pos&quot;);</span>
+<span class="fc bfc" id="L1157" title="All 2 branches covered.">        while (gl.size() &gt; 1) {</span>
+<span class="fc" id="L1158">            gl.remove(gl.size() - 1);</span>
+        }
+<span class="fc" id="L1160">        tmp.put(&quot;fg_type&quot;, &quot;Epoxy&quot;);</span>
+<span class="fc" id="L1161">    }</span>
+
+    private void set_functional_position(TreeNode node) {
+<span class="fc" id="L1164">        GenericList gl = new GenericList();</span>
+<span class="fc" id="L1165">        gl.add(0);</span>
+<span class="fc" id="L1166">        gl.add(&quot;&quot;);</span>
+<span class="fc" id="L1167">        ((GenericList) tmp.get(&quot;fg_pos&quot;)).add(gl);</span>
+<span class="fc" id="L1168">    }</span>
+
+    private void set_functional_pos(TreeNode node) {
+<span class="fc" id="L1171">        GenericList gl = (GenericList) tmp.get(&quot;fg_pos&quot;);</span>
+<span class="fc" id="L1172">        ((GenericList) gl.get(gl.size() - 1)).set(0, Integer.valueOf(node.getText()));</span>
+<span class="fc" id="L1173">    }</span>
+
+    private void add_func_stereo(TreeNode node) {
+<span class="fc" id="L1176">        int l = ((GenericList) tmp.get(&quot;fg_pos&quot;)).size();</span>
+<span class="fc" id="L1177">        ((GenericList) ((GenericList) tmp.get(&quot;fg_pos&quot;)).get(l - 1)).set(1, node.getText());</span>
+<span class="fc" id="L1178">    }</span>
+
+    private void reduction(TreeNode node) {
+<span class="fc" id="L1181">        int shift_len = -((GenericList) tmp.get(&quot;fg_pos&quot;)).size();</span>
+<span class="fc" id="L1182">        fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + shift_len);</span>
+<span class="fc bfc" id="L1183" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : fattyAcylStack.peekLast().getFunctionalGroupsInternal().entrySet()) {</span>
+<span class="fc bfc" id="L1184" title="All 2 branches covered.">            for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc" id="L1185">                func_group.shiftPositions(shift_len);</span>
+<span class="fc" id="L1186">            }</span>
+<span class="fc" id="L1187">        }</span>
+
+<span class="fc" id="L1189">        tmp.put(&quot;reduction&quot;, new GenericList());</span>
+<span class="fc bfc" id="L1190" title="All 2 branches covered.">        for (Object o : (GenericList) tmp.get(&quot;fg_pos&quot;)) {</span>
+<span class="fc" id="L1191">            GenericList lst = (GenericList) o;</span>
+<span class="fc" id="L1192">            ((GenericList) tmp.get(&quot;reduction&quot;)).add((int) lst.get(0));</span>
+<span class="fc" id="L1193">        }</span>
+<span class="fc" id="L1194">    }</span>
+
+    private void homo(TreeNode node) {
+<span class="fc" id="L1197">        tmp.put(&quot;post_adding&quot;, new GenericList());</span>
+<span class="fc bfc" id="L1198" title="All 2 branches covered.">        for (Object o : (GenericList) tmp.get(&quot;fg_pos&quot;)) {</span>
+<span class="fc" id="L1199">            GenericList lst = (GenericList) o;</span>
+<span class="fc" id="L1200">            ((GenericList) tmp.get(&quot;post_adding&quot;)).add((int) lst.get(0));</span>
+<span class="fc" id="L1201">        }</span>
+<span class="fc" id="L1202">    }</span>
+
+    private void set_cycle(TreeNode node) {
+<span class="fc" id="L1205">        tmp.put(&quot;cyclo&quot;, 1);</span>
+<span class="fc" id="L1206">    }</span>
+
+    private void rearrange_cycle(TreeNode node) {
+<span class="fc bfc" id="L1209" title="All 2 branches covered.">        if (tmp.containsKey(&quot;post_adding&quot;)) {</span>
+<span class="fc" id="L1210">            fattyAcylStack.peekLast().setNumCarbon(fattyAcylStack.peekLast().getNumCarbon() + ((GenericList) tmp.get(&quot;post_adding&quot;)).size());</span>
+<span class="fc" id="L1211">            tmp.remove(&quot;post_adding&quot;);</span>
+        }
+
+<span class="fc" id="L1214">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+<span class="fc" id="L1215">        int start = (int) ((GenericList) ((GenericList) tmp.get(&quot;fg_pos&quot;)).get(0)).get(0);</span>
+<span class="pc bpc" id="L1216" title="1 of 2 branches missed.">        if (curr_fa.getFunctionalGroupsInternal().containsKey(&quot;cy&quot;)) {</span>
+<span class="fc bfc" id="L1217" title="All 2 branches covered.">            for (FunctionalGroup cy : curr_fa.getFunctionalGroupsInternal().get(&quot;cy&quot;)) {</span>
+<span class="fc" id="L1218">                int shift_val = start - cy.getPosition();</span>
+<span class="fc bfc" id="L1219" title="All 2 branches covered.">                if (shift_val == 0) {</span>
+<span class="fc" id="L1220">                    continue;</span>
+                }
+<span class="fc" id="L1222">                ((Cycle) cy).rearrangeFunctionalGroups(curr_fa, shift_val);</span>
+<span class="fc" id="L1223">            }</span>
+        }
+<span class="fc" id="L1225">    }</span>
+
+    private void set_recursion(TreeNode node) {
+<span class="fc" id="L1228">        tmp.put(&quot;fg_pos&quot;, new GenericList());</span>
+<span class="fc" id="L1229">        tmp.put(&quot;fg_type&quot;, &quot;&quot;);</span>
+<span class="fc" id="L1230">        fattyAcylStack.add(new FattyAcid(&quot;FA&quot;, knownFunctionalGroups));</span>
+<span class="fc" id="L1231">        tmp.put(FA_I(), new Dictionary());</span>
+<span class="fc" id="L1232">        ((Dictionary) tmp.get(FA_I())).put(&quot;recursion_pos&quot;, 0);</span>
+<span class="fc" id="L1233">    }</span>
+
+    private void add_recursion(TreeNode node) {
+<span class="fc" id="L1236">        int pos = (int) ((Dictionary) tmp.get(FA_I())).get(&quot;recursion_pos&quot;);</span>
+<span class="fc" id="L1237">        FattyAcid fa = fattyAcylStack.pollLast();</span>
+
+<span class="fc" id="L1239">        fa.setPosition(pos);</span>
+<span class="fc" id="L1240">        FattyAcid curr_fa = fattyAcylStack.peekLast();</span>
+
+<span class="fc" id="L1242">        String fname = &quot;&quot;;</span>
+<span class="fc bfc" id="L1243" title="All 2 branches covered.">        if (tmp.containsKey(&quot;cyclo_yl&quot;)) {</span>
+<span class="fc" id="L1244">            fname = &quot;cyclo&quot;;</span>
+<span class="fc" id="L1245">            tmp.remove(&quot;cyclo_yl&quot;);</span>
+        } else {
+<span class="fc" id="L1247">            fname = headgroup;</span>
+        }
+<span class="fc bfc" id="L1249" title="All 2 branches covered.">        if (!curr_fa.getFunctionalGroupsInternal().containsKey(fname)) {</span>
+<span class="fc" id="L1250">            curr_fa.getFunctionalGroupsInternal().put(fname, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L1252">        curr_fa.getFunctionalGroupsInternal().get(fname).add(fa);</span>
+<span class="fc" id="L1253">        tmp.put(&quot;added_func_group&quot;, 1);</span>
+<span class="fc" id="L1254">    }</span>
+
+    private void set_recursion_pos(TreeNode node) {
+<span class="fc" id="L1257">        ((Dictionary) tmp.get(FA_I())).put(&quot;recursion_pos&quot;, Integer.valueOf(node.getText()));</span>
+<span class="fc" id="L1258">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

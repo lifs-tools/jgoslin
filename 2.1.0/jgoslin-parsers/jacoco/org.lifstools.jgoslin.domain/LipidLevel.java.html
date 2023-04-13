@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidLevel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">LipidLevel.java</span></div><h1>LipidLevel.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+/**
+ * Defines the taxonomy of lipid levels, including UNDEFINED for lipids where
+ * the level can not be inferred or does not apply. The levels are based on
+ * &lt;pre&gt;Gerhard Liebisch et al. Update on LIPID MAPS classification, nomenclature, and shorthand notation for MS-derived lipid structures. J. Lipid Res. Volume 61, ISSUE 12, P1539-1555, December 01, 2020.&lt;/pre&gt;
+ * 
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+<span class="fc" id="L26">public enum LipidLevel {</span>
+<span class="fc" id="L27">    NO_LEVEL(1),</span>
+<span class="fc" id="L28">    UNDEFINED_LEVEL(2),</span>
+<span class="fc" id="L29">    CATEGORY(4), // Mediators, Glycerolipids, Glycerophospholipids, Sphingolipids, Steroids, Prenols</span>
+<span class="fc" id="L30">    CLASS(8), // Glyerophospholipids -&gt; Glycerophosphoinositols PI</span>
+<span class="fc" id="L31">    SPECIES(16), // Phosphatidylinositol (16:0) or PI 16:0;O</span>
+<span class="fc" id="L32">    MOLECULAR_SPECIES(32), // Phosphatidylinositol 8:0-8:0;O or PI 8:0-8:0;O</span>
+<span class="fc" id="L33">    SN_POSITION(64), // Phosphatidylinositol 8:0/8:0;O or PI 8:0/8:0;O</span>
+<span class="fc" id="L34">    STRUCTURE_DEFINED(128), // Phosphatidylinositol 8:0/8:0;OH or PI 8:0/8:0;OH</span>
+<span class="fc" id="L35">    FULL_STRUCTURE(256), // e.g. PI 18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z);5OH</span>
+<span class="fc" id="L36">    COMPLETE_STRUCTURE(512); // e.g. PI 18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z);5OH[R]</span>
+
+    public int level;
+
+<span class="fc" id="L40">    LipidLevel(int l) {</span>
+<span class="fc" id="L41">        level = l;</span>
+<span class="fc" id="L42">    }</span>
+
+    public static boolean isLevel(LipidLevel l, int pattern) {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        return (l.level &amp; pattern) != 0;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

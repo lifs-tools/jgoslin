@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bitfield.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">Bitfield.java</span></div><h1>Bitfield.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Bit field implementation. This class is dedicated to have an efficient sorted
+ * set class storing values within 0..n-1 and fast sequential iterator.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+final class Bitfield {
+
+    private final long[] field;
+    private final int length;
+    private final int field_len;
+    private int num_size;
+<span class="fc" id="L35">    private int iter = 0;</span>
+<span class="fc" id="L36">    private int pos = 0;</span>
+
+<span class="fc" id="L38">    Bitfield(int _length) {</span>
+<span class="fc" id="L39">        length = _length;</span>
+<span class="fc" id="L40">        field_len = 1 + ((length + 1) &gt;&gt;&gt; 6);</span>
+<span class="fc" id="L41">        field = new long[field_len];</span>
+<span class="fc" id="L42">        num_size = 0;</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for (int i = 0; i &lt; field_len; ++i) {</span>
+<span class="fc" id="L44">            field[i] = 0L;</span>
+        }
+<span class="fc" id="L46">    }</span>
+
+    void add(int pos) {
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if (!find(pos)) {</span>
+<span class="fc" id="L50">            field[pos &gt;&gt;&gt; 6] |= (long) (1L &lt;&lt; (pos &amp; 63));</span>
+<span class="fc" id="L51">            ++num_size;</span>
+        }
+<span class="fc" id="L53">    }</span>
+
+    boolean find(int pos) {
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        return ((field[pos &gt;&gt;&gt; 6] &gt;&gt;&gt; (pos &amp; 63)) &amp; 1L) == 1L;</span>
+    }
+
+    boolean isNotSet(int pos) {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        return ((field[pos &gt;&gt;&gt; 6] &gt;&gt;&gt; (pos &amp; 63)) &amp; 1L) == 0L;</span>
+    }
+
+    static String printBitfield(long l) {
+<span class="fc" id="L64">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (int i = 63; i &gt;= 0; --i) {</span>
+<span class="fc" id="L66">            sb.append(((l &gt;&gt;&gt; i) &amp; 1L));</span>
+        }
+<span class="fc" id="L68">        return sb.toString();</span>
+    }
+
+    void resetIterator() {
+<span class="fc" id="L72">        iter = 0;</span>
+<span class="fc" id="L73">        pos = -1;</span>
+<span class="fc" id="L74">    }</span>
+
+    boolean hasNext() {
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        return iter &lt; num_size;</span>
+    }
+
+    int next() {
+<span class="fc" id="L81">        pos += 1;</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if (pos &gt;= length) {</span>
+<span class="nc" id="L83">            throw new ConstraintViolationException(&quot;Bitfield out of range at pos=&quot; + pos + &quot; for length=&quot; + length);</span>
+        }
+
+<span class="fc" id="L86">        int field_pos = pos &gt;&gt;&gt; 6;</span>
+<span class="fc" id="L87">        long field_bits = field[field_pos] &amp; (long) (~((1L &lt;&lt; (long) (pos &amp; 63)) - 1L));</span>
+
+        do {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            if (field_bits != 0) {</span>
+<span class="fc" id="L91">                pos = (field_pos &lt;&lt; 6) + (int) java.lang.Long.numberOfTrailingZeros(field_bits &amp; (-field_bits));</span>
+<span class="fc" id="L92">                iter += 1;</span>
+<span class="fc" id="L93">                return pos;</span>
+            }
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">            if (++field_pos &lt; field_len) {</span>
+<span class="fc" id="L96">                field_bits = field[field_pos];</span>
+            }
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        } while (field_pos &lt; field_len);</span>
+
+<span class="nc" id="L100">        throw new ConstraintViolationException(&quot;Bitfield out of range at pos=&quot; + pos + &quot; for field_len=&quot; + field_len);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

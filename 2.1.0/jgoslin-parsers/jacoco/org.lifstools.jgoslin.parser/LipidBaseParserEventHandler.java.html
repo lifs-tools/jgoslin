@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidBaseParserEventHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">LipidBaseParserEventHandler.java</span></div><h1>LipidBaseParserEventHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.LipidMolecularSpecies;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
+import org.lifstools.jgoslin.domain.LipidStructureDefined;
+import org.lifstools.jgoslin.domain.LipidFaBondType;
+import org.lifstools.jgoslin.domain.LipidClassMeta;
+import org.lifstools.jgoslin.domain.LipidSnPosition;
+import org.lifstools.jgoslin.domain.Headgroup;
+import org.lifstools.jgoslin.domain.LipidClasses;
+import org.lifstools.jgoslin.domain.LipidCompleteStructure;
+import org.lifstools.jgoslin.domain.LipidAdduct;
+import org.lifstools.jgoslin.domain.Adduct;
+import org.lifstools.jgoslin.domain.LipidLevel;
+import org.lifstools.jgoslin.domain.LipidCategory;
+import org.lifstools.jgoslin.domain.FattyAcid;
+import org.lifstools.jgoslin.domain.LipidSpecies;
+import org.lifstools.jgoslin.domain.LipidFullStructure;
+import org.lifstools.jgoslin.domain.HeadgroupDecorator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import static java.util.Map.entry;
+import org.lifstools.jgoslin.domain.Element;
+import org.lifstools.jgoslin.domain.FunctionalGroup;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidParsingException;
+
+/**
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler&lt;LipidAdduct&gt; {
+
+<span class="fc" id="L54">    protected LipidLevel level = LipidLevel.COMPLETE_STRUCTURE;</span>
+<span class="fc" id="L55">    protected String headGroup = &quot;&quot;;</span>
+<span class="fc" id="L56">    protected FattyAcid lcb = null;</span>
+<span class="fc" id="L57">    protected List&lt;FattyAcid&gt; faList = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L58">    protected FattyAcid currentFa = null;</span>
+<span class="fc" id="L59">    protected Adduct adduct = null;</span>
+<span class="fc" id="L60">    protected ArrayList&lt;HeadgroupDecorator&gt; headgroupDecorators = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L61">    protected boolean useHeadGroup = false;</span>
+    protected KnownFunctionalGroups knownFunctionalGroups;
+    
+<span class="fc" id="L64">    private static final Map&lt;String, ArrayList&lt;String&gt;&gt; GLYCO_TABLE = Map.ofEntries(</span>
+<span class="fc" id="L65">        entry(&quot;ga2&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;GalNAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L66">        entry(&quot;gb3&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;Gal&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L67">        entry(&quot;gb4&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;GalNAc&quot;, &quot;Gal&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L68">        entry(&quot;gd1&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;Gal&quot;, &quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L69">        entry(&quot;gd1a&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;Hex&quot;, &quot;Hex&quot;, &quot;Hex&quot;, &quot;HexNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;))),</span>
+<span class="fc" id="L70">        entry(&quot;gd2&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L71">        entry(&quot;gd3&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L72">        entry(&quot;gm1&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;Gal&quot;, &quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L73">        entry(&quot;gm2&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L74">        entry(&quot;gm3&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L75">        entry(&quot;gm4&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;NeuAc&quot;, &quot;Gal&quot;))),</span>
+<span class="fc" id="L76">        entry(&quot;gp1&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L77">        entry(&quot;gq1&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;NeuAc&quot;, &quot;Gal&quot;, &quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L78">        entry(&quot;gt1&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;Gal&quot;, &quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L79">        entry(&quot;gt2&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;GalNAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;))),</span>
+<span class="fc" id="L80">        entry(&quot;gt3&quot;, new ArrayList&lt;String&gt;(Arrays.asList(&quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;NeuAc&quot;, &quot;Gal&quot;, &quot;Glc&quot;)))</span>
+    );
+
+<span class="fc" id="L83">    protected static HashSet&lt;String&gt; SP_EXCEPTION_CLASSES = new HashSet&lt;&gt;(Arrays.asList(&quot;Cer&quot;, &quot;Ceramide&quot;, &quot;Sphingosine&quot;, &quot;So&quot;, &quot;Sphinganine&quot;, &quot;Sa&quot;, &quot;SPH&quot;, &quot;Sph&quot;, &quot;LCB&quot;));</span>
+
+<span class="fc" id="L85">    public LipidBaseParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {</span>
+<span class="fc" id="L86">        this.knownFunctionalGroups = knownFunctionalGroups;</span>
+<span class="fc" id="L87">    }</span>
+
+    protected void setLipidLevel(LipidLevel _level) {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        level = level.level &lt; _level.level ? level : _level;</span>
+<span class="fc" id="L91">    }</span>
+
+    protected boolean spRegularLcb() {
+<span class="pc bpc" id="L94" title="3 of 10 branches missed.">        return Headgroup.getCategory(headGroup) == LipidCategory.SP &amp;&amp; (currentFa.getLipidFaBondType() == LipidFaBondType.LCB_REGULAR || currentFa.getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION) &amp;&amp; !(SP_EXCEPTION_CLASSES.contains(headGroup) &amp;&amp; headgroupDecorators.isEmpty());</span>
+    }
+
+    protected Headgroup prepareHeadgroupAndChecks() {
+        
+<span class="fc" id="L99">        String hg = headGroup.toLowerCase();</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (GLYCO_TABLE.containsKey(hg)){</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            for (String carbohydrate : GLYCO_TABLE.get(hg)){</span>
+<span class="fc" id="L102">                FunctionalGroup functional_group = null;</span>
+                try {
+<span class="fc" id="L104">                    functional_group = knownFunctionalGroups.get(carbohydrate);</span>
+<span class="nc" id="L105">                } catch (Exception e) {</span>
+<span class="nc" id="L106">                    throw new LipidParsingException(&quot;Carbohydrate '&quot; + carbohydrate + &quot;' unknown&quot;);</span>
+<span class="fc" id="L107">                }</span>
+
+<span class="fc" id="L109">                functional_group.getElements().put(Element.O, functional_group.getElements().get(Element.O) - 1);</span>
+<span class="fc" id="L110">                headgroupDecorators.add((HeadgroupDecorator) functional_group);</span>
+
+<span class="fc" id="L112">            }</span>
+<span class="fc" id="L113">            headGroup = &quot;Cer&quot;;</span>
+        }
+        
+        
+<span class="fc" id="L117">        Headgroup headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (useHeadGroup) {</span>
+<span class="fc" id="L119">            return headgroup;</span>
+        }
+        
+<span class="fc" id="L122">        headGroup = headgroup.getClassName();</span>
+
+<span class="fc" id="L124">        int true_fa = 0;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        for (FattyAcid fa : faList) {</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">            true_fa += (fa.getNumCarbon() &gt; 0 || fa.getDoubleBonds().getNumDoubleBonds() &gt; 0) ? 1 : 0;</span>
+<span class="fc" id="L127">        }</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">        int poss_fa = (LipidClasses.getInstance().size() &gt; headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;</span>
+
+        // make lyso
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        boolean can_be_lyso = (LipidClasses.getInstance().size() &gt; Headgroup.getClass(&quot;L&quot; + headGroup)) ? LipidClasses.getInstance().get(Headgroup.getClass(&quot;L&quot; + headGroup)).specialCases.contains(&quot;Lyso&quot;) : false;</span>
+<span class="fc" id="L132">        LipidClassMeta l = LipidClasses.getInstance().get(Headgroup.getClass(&quot;LCL&quot;));</span>
+<span class="fc bfc" id="L133" title="All 10 branches covered.">        if ((true_fa + 1 == poss_fa || true_fa + 2 == poss_fa) &amp;&amp; level != LipidLevel.SPECIES &amp;&amp; headgroup.getLipidCategory() == LipidCategory.GP &amp;&amp; can_be_lyso) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">            if (true_fa + 1 == poss_fa) headGroup = &quot;L&quot; + headGroup;</span>
+<span class="fc" id="L135">            else headGroup = &quot;DL&quot; + headGroup;</span>
+<span class="fc" id="L136">            headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">            poss_fa = (LipidClasses.getInstance().size() &gt; headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;</span>
+        }
+        
+<span class="pc bpc" id="L140" title="1 of 10 branches missed.">        else if ((true_fa + 1 == poss_fa || true_fa + 2 == poss_fa) &amp;&amp; level != LipidLevel.SPECIES &amp;&amp; headgroup.getLipidCategory() == LipidCategory.GL &amp;&amp; headGroup.equals(&quot;TG&quot;)) {</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">            if (true_fa + 1 == poss_fa) headGroup = &quot;DG&quot;;</span>
+<span class="nc" id="L142">            else headGroup = &quot;MG&quot;;</span>
+<span class="fc" id="L143">            headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">            poss_fa = (LipidClasses.getInstance().size() &gt; headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;</span>
+        }
+        
+
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (level == LipidLevel.SPECIES) {</span>
+<span class="pc bpc" id="L149" title="3 of 4 branches missed.">            if (true_fa == 0 &amp;&amp; poss_fa != 0) {</span>
+<span class="nc" id="L150">                throw new ConstraintViolationException(&quot;No fatty acyl information lipid class '&quot; + headgroup.getHeadgroup() + &quot;' provided.&quot;);</span>
+            }
+<span class="pc bpc" id="L152" title="1 of 4 branches missed.">        } else if (true_fa != poss_fa &amp;&amp; LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {</span>
+<span class="fc" id="L153">            throw new ConstraintViolationException(&quot;Number of described fatty acyl chains (&quot; + Integer.toString(true_fa) + &quot;) not allowed for lipid class '&quot; + headgroup.getHeadgroup() + &quot;' (having &quot; + Integer.toString(poss_fa) + &quot; fatty aycl chains).&quot;);</span>
+<span class="pc bpc" id="L154" title="1 of 4 branches missed.">        } else if (LipidClasses.getInstance().get(Headgroup.getClass(headGroup)).specialCases.contains(&quot;Lyso&quot;) &amp;&amp; true_fa &gt; poss_fa){</span>
+<span class="nc" id="L155">            throw new ConstraintViolationException(&quot;Number of described fatty acyl chains (&quot; + Integer.toString(true_fa) + &quot;) not allowed for lipid class '&quot; + headgroup.getHeadgroup() + &quot;' (having &quot; + Integer.toString(poss_fa) + &quot; fatty aycl chains).&quot;);</span>
+        }
+
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        if (LipidClasses.getInstance().get(headgroup.getLipidClass()).specialCases.contains(&quot;HC&quot;)) {</span>
+<span class="fc" id="L159">            faList.get(0).setLipidFaBondType(LipidFaBondType.ETHER);</span>
+        }
+
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (LipidClasses.getInstance().get(headgroup.getLipidClass()).specialCases.contains(&quot;Amide&quot;)) {</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">            for (FattyAcid fatty : faList){</span>
+<span class="fc" id="L164">                fatty.setLipidFaBondType(LipidFaBondType.AMIDE);</span>
+<span class="fc" id="L165">            }</span>
+        }
+
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        int max_num_fa = (LipidClasses.getInstance().size() &gt; headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).maxNumFa : 0;</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        if (max_num_fa != faList.size()) {</span>
+<span class="fc" id="L170">            setLipidLevel(LipidLevel.MOLECULAR_SPECIES);</span>
+        }
+
+<span class="fc bfc" id="L173" title="All 4 branches covered.">        if (faList.size() &gt; 0 &amp;&amp; headgroup.isSpException()) {</span>
+<span class="fc" id="L174">            faList.get(0).setType(LipidFaBondType.LCB_EXCEPTION);</span>
+        }
+
+<span class="fc" id="L177">        return headgroup;</span>
+    }
+
+    protected LipidSpecies assembleLipid(Headgroup headgroup) {
+<span class="fc bfc" id="L181" title="All 2 branches covered.">        for (FattyAcid fa : faList){</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">            if (fa.stereoInformationMissing()){</span>
+<span class="fc" id="L183">                setLipidLevel(LipidLevel.FULL_STRUCTURE);</span>
+<span class="fc" id="L184">                break;</span>
+            }
+<span class="fc" id="L186">        }</span>
+        
+<span class="fc" id="L188">        LipidSpecies ls = null;</span>
+<span class="pc bpc" id="L189" title="1 of 7 branches missed.">        switch (level) {</span>
+            case COMPLETE_STRUCTURE -&gt;
+<span class="fc" id="L191">                ls = new LipidCompleteStructure(headgroup, faList, knownFunctionalGroups);</span>
+            case FULL_STRUCTURE -&gt;
+<span class="fc" id="L193">                ls = new LipidFullStructure(headgroup, faList, knownFunctionalGroups);</span>
+            case STRUCTURE_DEFINED -&gt;
+<span class="fc" id="L195">                ls = new LipidStructureDefined(headgroup, faList, knownFunctionalGroups);</span>
+            case SN_POSITION -&gt;
+<span class="fc" id="L197">                ls = new LipidSnPosition(headgroup, faList, knownFunctionalGroups);</span>
+            case MOLECULAR_SPECIES -&gt;
+<span class="fc" id="L199">                ls = new LipidMolecularSpecies(headgroup, faList, knownFunctionalGroups);</span>
+            case SPECIES -&gt;
+<span class="fc" id="L201">                ls = new LipidSpecies(headgroup, faList, knownFunctionalGroups);</span>
+            default -&gt; {
+            }
+        }
+<span class="fc" id="L205">        return ls;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

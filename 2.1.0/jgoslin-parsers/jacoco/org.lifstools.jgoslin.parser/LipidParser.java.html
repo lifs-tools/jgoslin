@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">LipidParser.java</span></div><h1>LipidParser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.LipidAdduct;
+import java.util.Arrays;
+import java.util.List;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidParsingException;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import org.springframework.core.io.ClassPathResource;
+
+/**
+ * Implementation that uses all available parsers to parse a given lipid name.
+ * First successful parser implementation wins.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class LipidParser {
+
+    private final List&lt;Parser&lt;LipidAdduct&gt;&gt; parserList;
+<span class="fc" id="L36">    private Parser&lt;LipidAdduct&gt; lastSuccessfulParser = null;</span>
+
+<span class="fc" id="L38">    private LipidParser(Parser&lt;LipidAdduct&gt;... parsers) {</span>
+<span class="fc" id="L39">        parserList = Arrays.asList(parsers);</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Create a new lipid parser instance.
+     *
+     */
+    public LipidParser() {
+<span class="fc" id="L47">        this(new KnownFunctionalGroups(StringFunctions.getResourceAsStringList(new ClassPathResource(&quot;functional-groups.csv&quot;)), new SumFormulaParser()));</span>
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * Create a new lipid parser instance.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
+    public LipidParser(KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L56">        this(</span>
+                new ShorthandParser(knownFunctionalGroups),
+                new FattyAcidParser(knownFunctionalGroups),
+                new GoslinParser(knownFunctionalGroups),
+                new LipidMapsParser(knownFunctionalGroups),
+                new SwissLipidsParser(knownFunctionalGroups),
+                new HmdbParser(knownFunctionalGroups)
+        );
+<span class="fc" id="L64">    }</span>
+
+    /**
+     * This method tries multiple parsers in a defined order to parse the
+     * provided lipid name.If no parser is able to parse the name successfully,
+     * an exception is thrown.
+     *
+     * @param lipidName the lipid name to parse.
+     * @return the {@link LipidAdduct} if parsing with at least one parser
+     * succeeded.
+     * @throws LipidParsingException if now parser was able to parse the
+     * provided lipid name.
+     */
+    public LipidAdduct parse(String lipidName) {
+<span class="fc" id="L78">        lastSuccessfulParser = null;</span>
+<span class="fc" id="L79">        Parser&lt;LipidAdduct&gt; lastParser = null;</span>
+<span class="fc" id="L80">        BaseParserEventHandler&lt;LipidAdduct&gt; eventHandler = null;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        for (Parser&lt;LipidAdduct&gt; parser : parserList) {</span>
+<span class="fc" id="L82">            lastParser = parser;</span>
+<span class="fc" id="L83">            eventHandler = parser.newEventHandler();</span>
+<span class="fc" id="L84">            LipidAdduct lipid = parser.parse(lipidName, eventHandler, false);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            if (lipid != null) {</span>
+<span class="fc" id="L86">                lastSuccessfulParser = parser;</span>
+<span class="fc" id="L87">                return lipid;</span>
+            }
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">        String message = &quot; Parsing failed &quot;;</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (eventHandler == null) {</span>
+<span class="nc" id="L92">            message += &quot; with unknown reason.&quot;;</span>
+        } else {
+<span class="fc" id="L94">            String errorMessage = eventHandler.errorMessage;</span>
+<span class="pc bpc" id="L95" title="2 of 4 branches missed.">            if (errorMessage == null || errorMessage.isEmpty()) {</span>
+<span class="nc" id="L96">                errorMessage = lipidName;</span>
+            }
+<span class="fc" id="L98">            message += (&quot;at or after &quot; + errorMessage);</span>
+        }
+<span class="fc" id="L100">        throw new LipidParsingException(&quot;Could not parse lipid '&quot; + lipidName + &quot;' with any parser!&quot; + message);</span>
+    }
+
+    /**
+     * Returns the last successful parser instance. May be null, if either no
+     * parser has been applied yet, or no parser has been successfully applied
+     * for parsing the last lipid name.
+     *
+     * @return the last successful parser instance.
+     */
+    public Parser&lt;LipidAdduct&gt; getLastSuccessfulParser() {
+<span class="fc" id="L111">        return lastSuccessfulParser;</span>
+    }
+
+    /**
+     * Returns the grammar name of the last successful parser.
+     *
+     * @return the grammar name of the last successful parser.
+     */
+    public String getLastSuccessfulGrammar() {
+<span class="nc" id="L120">        return lastSuccessfulParser.grammarName;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

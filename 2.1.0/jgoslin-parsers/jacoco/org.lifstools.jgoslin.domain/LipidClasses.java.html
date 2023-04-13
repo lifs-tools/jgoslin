@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LipidClasses.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">LipidClasses.java</span></div><h1>LipidClasses.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import org.lifstools.jgoslin.parser.SumFormulaParser;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import static java.util.Map.entry;
+import org.lifstools.jgoslin.parser.BaseParserEventHandler;
+import org.springframework.core.io.ClassPathResource;
+
+/**
+ * Lookup class for lipid classes, consisting of {@link LipidClassMeta} entries,
+ * derived from lipid-list.csv.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class LipidClasses extends ArrayList&lt;LipidClassMeta&gt; {
+
+<span class="fc" id="L38">    private static final LipidClasses LIPID_CLASSES = new LipidClasses();</span>
+    public static final int UNDEFINED_CLASS = 0;
+
+    private LipidClasses() {
+<span class="fc" id="L42">        super();</span>
+<span class="fc" id="L43">        loadData(StringFunctions.getResourceAsStringList(new ClassPathResource(&quot;lipid-list.csv&quot;)), new SumFormulaParser());</span>
+<span class="fc" id="L44">    }</span>
+
+    private void loadData(List&lt;String&gt; lines, SumFormulaParser sfp) {
+<span class="fc" id="L47">        add(new LipidClassMeta(LipidCategory.NO_CATEGORY,</span>
+                &quot;UNDEFINED&quot;,
+                &quot;&quot;,
+                0,
+                0,
+                new HashSet&lt;&gt;(),
+                new ElementTable(),
+<span class="fc" id="L54">                new ArrayList&lt;&gt;(Arrays.asList(&quot;UNDEFINED&quot;))</span>
+        ));
+
+<span class="fc" id="L57">        int lineCounter = 0;</span>
+<span class="fc" id="L58">        int SYNONYM_START_INDEX = 7;</span>
+
+<span class="fc" id="L60">        HashMap&lt;String, ArrayList&lt;String&gt;&gt; data = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L61">        HashSet&lt;String&gt; keys = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L62">        Map&lt;String, Integer&gt; enum_names = new HashMap&lt;&gt;(Map.ofEntries(</span>
+<span class="fc" id="L63">                entry(&quot;GL&quot;, 1),</span>
+<span class="fc" id="L64">                entry(&quot;GP&quot;, 1),</span>
+<span class="fc" id="L65">                entry(&quot;SP&quot;, 1),</span>
+<span class="fc" id="L66">                entry(&quot;ST&quot;, 1),</span>
+<span class="fc" id="L67">                entry(&quot;FA&quot;, 1),</span>
+<span class="fc" id="L68">                entry(&quot;PK&quot;, 1),</span>
+<span class="fc" id="L69">                entry(&quot;SL&quot;, 1),</span>
+<span class="fc" id="L70">                entry(&quot;UNDEFINED&quot;, 1)</span>
+        ));
+
+<span class="fc" id="L73">        Map&lt;String, LipidCategory&gt; names_to_category = Map.ofEntries(</span>
+<span class="fc" id="L74">                entry(&quot;GL&quot;, LipidCategory.GL),</span>
+<span class="fc" id="L75">                entry(&quot;GP&quot;, LipidCategory.GP),</span>
+<span class="fc" id="L76">                entry(&quot;SP&quot;, LipidCategory.SP),</span>
+<span class="fc" id="L77">                entry(&quot;ST&quot;, LipidCategory.ST),</span>
+<span class="fc" id="L78">                entry(&quot;FA&quot;, LipidCategory.FA),</span>
+<span class="fc" id="L79">                entry(&quot;PK&quot;, LipidCategory.PK),</span>
+<span class="fc" id="L80">                entry(&quot;SL&quot;, LipidCategory.SL),</span>
+<span class="fc" id="L81">                entry(&quot;UNDEFINED&quot;, LipidCategory.UNDEFINED)</span>
+        );
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for (String line : lines) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            if (lineCounter++ == 0) {</span>
+<span class="fc" id="L86">                continue;</span>
+            }
+<span class="fc" id="L88">            ArrayList&lt;String&gt; tokens = StringFunctions.splitString(line, ',', '&quot;', true);</span>
+
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">            if (keys.contains(tokens.get(0))) {</span>
+<span class="nc" id="L91">                throw new ConstraintViolationException(&quot;Error: lipid name '&quot; + tokens.get(0) + &quot;' occurs multiple times in the lipid list.&quot;);</span>
+            }
+<span class="fc" id="L93">            keys.add(tokens.get(0));</span>
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">            for (int i = SYNONYM_START_INDEX; i &lt; tokens.size(); ++i) {</span>
+<span class="fc" id="L96">                String test_lipid_name = tokens.get(i);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">                if (test_lipid_name.length() == 0) {</span>
+<span class="fc" id="L98">                    continue;</span>
+                }
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">                if (keys.contains(test_lipid_name)) {</span>
+<span class="nc" id="L101">                    throw new ConstraintViolationException(&quot;Error: lipid name '&quot; + test_lipid_name + &quot;' occurs multiple times in the lipid list.&quot;);</span>
+                }
+<span class="fc" id="L103">                keys.add(test_lipid_name);</span>
+            }
+
+<span class="fc" id="L106">            String enum_name = tokens.get(0);</span>
+<span class="fc" id="L107">            StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            for (int i = 0; i &lt; enum_name.length(); ++i) {</span>
+<span class="fc" id="L109">                char c = enum_name.charAt(i);</span>
+<span class="fc bfc" id="L110" title="All 4 branches covered.">                if ('A' &lt;= c &amp;&amp; c &lt;= 'Z') {</span>
+<span class="fc" id="L111">                    sb.append(c);</span>
+<span class="fc bfc" id="L112" title="All 4 branches covered.">                } else if ('0' &lt;= c &amp;&amp; c &lt;= '9') {</span>
+<span class="fc" id="L113">                    sb.append(c);</span>
+<span class="pc bpc" id="L114" title="1 of 4 branches missed.">                } else if ('a' &lt;= c &amp;&amp; c &lt;= 'z') {</span>
+<span class="fc" id="L115">                    sb.append(Character.toString(c - ('a' - 'A')));</span>
+                } else {
+<span class="fc" id="L117">                    sb.append('_');</span>
+                }
+            }
+<span class="fc" id="L120">            enum_name = sb.toString();</span>
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">            if (enum_name.charAt(0) == '_') {</span>
+<span class="fc" id="L123">                enum_name = &quot;L&quot; + enum_name;</span>
+            }
+
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">            if (enum_name.charAt(0) &lt; 'A' || 'Z' &lt; enum_name.charAt(0)) {</span>
+<span class="fc" id="L127">                enum_name = &quot;L&quot; + enum_name;</span>
+            }
+
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            if (!enum_names.containsKey(enum_name)) {</span>
+<span class="fc" id="L131">                enum_names.put(enum_name, 1);</span>
+            } else {
+<span class="fc" id="L133">                int cnt = enum_names.get(enum_name) + 1;</span>
+<span class="fc" id="L134">                enum_names.put(enum_name, cnt);</span>
+<span class="fc" id="L135">                enum_name += ('A' + cnt - 1);</span>
+<span class="fc" id="L136">                enum_names.put(enum_name, 1);</span>
+            }
+
+<span class="fc" id="L139">            data.put(enum_name, tokens);</span>
+<span class="fc" id="L140">        }</span>
+
+        // creating the lipid class dictionary
+<span class="fc" id="L143">        BaseParserEventHandler&lt;ElementTable&gt; handler = sfp.newEventHandler();</span>
+<span class="fc" id="L144">        data.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L145">            HashSet&lt;String&gt; special_cases = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L146">            StringFunctions.splitString(kv.getValue().get(5), ';', '&quot;').forEach(scase -&gt; {</span>
+<span class="fc" id="L147">                special_cases.add(StringFunctions.strip(scase, '&quot;'));</span>
+<span class="fc" id="L148">            });</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">            ElementTable e = kv.getValue().get(6).length() &gt; 0 ? sfp.parse(kv.getValue().get(6), handler) : new ElementTable();</span>
+<span class="fc" id="L150">            ArrayList&lt;String&gt; synonyms = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L151">            synonyms.add(kv.getValue().get(0));</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            for (int ii = SYNONYM_START_INDEX; ii &lt; kv.getValue().size(); ++ii) {</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">                if (kv.getValue().get(ii).length() &gt; 0) {</span>
+<span class="fc" id="L154">                    synonyms.add(StringFunctions.strip(kv.getValue().get(ii), '&quot;'));</span>
+                }
+            }
+<span class="fc" id="L157">            add(new LipidClassMeta(names_to_category.get(kv.getValue().get(1)),</span>
+<span class="fc" id="L158">                    kv.getValue().get(0),</span>
+<span class="fc" id="L159">                    kv.getValue().get(2),</span>
+<span class="fc" id="L160">                    Integer.valueOf(kv.getValue().get(3)),</span>
+<span class="fc" id="L161">                    Integer.valueOf(kv.getValue().get(4)),</span>
+                    special_cases,
+                    e,
+                    synonyms));
+<span class="fc" id="L165">        });</span>
+<span class="fc" id="L166">    }</span>
+
+    public static LipidClasses getInstance() {
+<span class="fc" id="L169">        return LIPID_CLASSES;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

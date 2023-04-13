@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseParserEventHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">BaseParserEventHandler.java</span></div><h1>BaseParserEventHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.LipidParsingException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import org.lifstools.jgoslin.domain.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Abstract base class for parser event handling.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ * @param &lt;T&gt; the type of object created from parsers using this event handler.
+ */
+public abstract class BaseParserEventHandler&lt;T&gt; {
+
+<span class="fc" id="L37">    private static final Logger log = LoggerFactory.getLogger(BaseParserEventHandler.class);</span>
+
+<span class="fc" id="L39">    protected Map&lt;String, Consumer&lt;TreeNode&gt;&gt; registeredEvents = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L40">    protected Set&lt;String&gt; ruleNames = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L41">    protected T content = null;</span>
+<span class="fc" id="L42">    protected String errorMessage = &quot;&quot;;</span>
+
+<span class="fc" id="L44">    protected BaseParserEventHandler() {</span>
+<span class="fc" id="L45">        registeredEvents = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L46">        ruleNames = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L47">    }</span>
+
+    // checking if all registered events are reasonable and orrur as rules in the grammar
+    protected void sanityCheck(Parser&lt;T&gt; parser) {
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (String event_name : registeredEvents.keySet()) {</span>
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">            if (!event_name.endsWith(&quot;_pre_event&quot;) &amp;&amp; !event_name.endsWith(&quot;_post_event&quot;)) {</span>
+<span class="nc" id="L53">                throw new ConstraintViolationException(&quot;Parser event handler error: event '&quot; + event_name + &quot;' does not contain the suffix '_pre_event' or '_post_event'&quot;);</span>
+            }
+<span class="fc" id="L55">            String rule_name = event_name.replace(&quot;_pre_event&quot;, &quot;&quot;).replace(&quot;_post_event&quot;, &quot;&quot;);</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">            if (!ruleNames.contains(rule_name)) {</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">                throw new ConstraintViolationException(&quot;Parser event handler error: rule '&quot; + rule_name + &quot;' in event '&quot; + event_name + &quot;' is not present in the grammar&quot; + (parser != null ? &quot; '&quot; + parser.grammarName + &quot;'&quot; : &quot;&quot;));</span>
+            }
+<span class="fc" id="L59">        }</span>
+<span class="fc" id="L60">    }</span>
+
+    protected void handleEvent(String event_name, TreeNode node) {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (log.isDebugEnabled()) {</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            String reg_event = registeredEvents.containsKey(event_name) ? &quot;*&quot; : &quot;&quot;;</span>
+<span class="nc" id="L65">            log.debug(event_name + reg_event + &quot;: \&quot;&quot; + node.getText() + &quot;\&quot;&quot;);</span>
+        }
+
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (registeredEvents.containsKey(event_name)) {</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L70">                log.debug(event_name + &quot;: \&quot;&quot; + node.getText() + &quot;\&quot;&quot;);</span>
+            }
+            try {
+<span class="fc" id="L73">                registeredEvents.get(event_name).accept(node);</span>
+<span class="fc" id="L74">            } catch (Exception e) {</span>
+<span class="fc" id="L75">                throw new LipidParsingException(e.toString(), e);</span>
+<span class="fc" id="L76">            }</span>
+        }
+<span class="fc" id="L78">    }</span>
+
+    protected abstract void resetParser(TreeNode node);
+
+    public String getErrorMessage() {
+<span class="nc" id="L83">        return this.errorMessage;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

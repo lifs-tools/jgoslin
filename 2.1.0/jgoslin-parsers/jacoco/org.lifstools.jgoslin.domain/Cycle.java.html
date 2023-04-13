@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Cycle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">Cycle.java</span></div><h1>Cycle.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
+/**
+ * A cyclic hydrocarbon chain as a functional group.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class Cycle extends FunctionalGroup {
+
+    private int cycle;
+    private int start;
+    private int end;
+    private final ArrayList&lt;Element&gt; bridgeChain;
+
+    public Cycle(int _cycle, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L38">        this(_cycle, -1, -1, null, null, null, knownFunctionalGroups);</span>
+<span class="fc" id="L39">    }</span>
+
+    public Cycle(int _cycle, int _start, int _end, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L42">        this(_cycle, _start, _end, null, null, null, knownFunctionalGroups);</span>
+<span class="fc" id="L43">    }</span>
+
+    public Cycle(int _cycle, int _start, int _end, HashMap&lt;String, ArrayList&lt; FunctionalGroup&gt;&gt; _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L46">        this(_cycle, _start, _end, null, _functional_groups, null, knownFunctionalGroups);</span>
+
+<span class="fc" id="L48">    }</span>
+
+    public Cycle(int _cycle, int _start, int _end, DoubleBonds _double_bonds, HashMap&lt;String, ArrayList&lt; FunctionalGroup&gt;&gt; _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L51">        this(_cycle, _start, _end, _double_bonds, _functional_groups, null, knownFunctionalGroups);</span>
+
+<span class="fc" id="L53">    }</span>
+
+    public Cycle(int _cycle, int _start, int _end, DoubleBonds _double_bonds, HashMap&lt;String, ArrayList&lt; FunctionalGroup&gt;&gt; _functional_groups, ArrayList&lt; Element&gt; _bridge_chain, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L56">        super(&quot;cy&quot;, _start, 1, _double_bonds, false, &quot;&quot;, false, null, _functional_groups, knownFunctionalGroups);</span>
+<span class="fc" id="L57">        cycle = _cycle;</span>
+<span class="fc" id="L58">        start = _start;</span>
+<span class="fc" id="L59">        end = _end;</span>
+<span class="fc" id="L60">        elements.put(Element.H, elements.get(Element.H) - 2);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        bridgeChain = (_bridge_chain == null) ? new ArrayList&lt;&gt;() : _bridge_chain;</span>
+<span class="fc" id="L62">    }</span>
+
+    @Override
+    public FunctionalGroup copy() {
+<span class="fc" id="L66">        DoubleBonds db = doubleBonds.copy();</span>
+<span class="fc" id="L67">        HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L68">        functionalGroups.entrySet().stream().map(kv -&gt; {</span>
+<span class="fc" id="L69">            fg.put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L70">            return kv;</span>
+<span class="fc" id="L71">        }).forEachOrdered(kv -&gt; {</span>
+<span class="fc" id="L72">            kv.getValue().forEach(func_group -&gt; {</span>
+<span class="fc" id="L73">                fg.get(kv.getKey()).add(func_group.copy());</span>
+<span class="fc" id="L74">            });</span>
+<span class="fc" id="L75">        });</span>
+<span class="fc" id="L76">        ArrayList&lt;Element&gt; bc = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        for (Element e : bridgeChain) {</span>
+<span class="fc" id="L78">            bc.add(e);</span>
+<span class="fc" id="L79">        }</span>
+
+<span class="fc" id="L81">        return new Cycle(cycle, start, end, db, fg, bc, knownFunctionalGroups);</span>
+    }
+
+    public int getCycle() {
+<span class="fc" id="L85">        return cycle;</span>
+    }
+
+    public void setCycle(int cycle) {
+<span class="fc" id="L89">        this.cycle = cycle;</span>
+<span class="fc" id="L90">    }</span>
+
+    public int getStart() {
+<span class="fc" id="L93">        return start;</span>
+    }
+
+    public void setStart(int start) {
+<span class="fc" id="L97">        this.start = start;</span>
+<span class="fc" id="L98">    }</span>
+
+    public int getEnd() {
+<span class="fc" id="L101">        return end;</span>
+    }
+
+    public void setEnd(int end) {
+<span class="fc" id="L105">        this.end = end;</span>
+<span class="fc" id="L106">    }</span>
+
+    public ArrayList&lt;Element&gt; getBridgeChain() {
+<span class="fc" id="L109">        return bridgeChain;</span>
+    }
+
+    @Override
+    public int getNDoubleBonds() throws ConstraintViolationException {
+<span class="fc" id="L114">        return super.getNDoubleBonds() + 1;</span>
+    }
+
+    @Override
+    public void addPosition(int pos) {
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        start += (start &gt;= pos) ? 1 : 0;</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        end += (end &gt;= pos) ? 1 : 0;</span>
+<span class="fc" id="L121">        super.addPosition(pos);</span>
+<span class="fc" id="L122">    }</span>
+
+    public void rearrangeFunctionalGroups(FunctionalGroup parent, int shift) {
+        // put everything back into parent
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        for (Entry&lt;Integer, String&gt; kv : doubleBonds.doubleBondPositions.entrySet()) {</span>
+<span class="fc" id="L127">            parent.doubleBonds.doubleBondPositions.put(kv.getKey(), kv.getValue());</span>
+<span class="fc" id="L128">        }</span>
+<span class="fc" id="L129">        doubleBonds = new DoubleBonds();</span>
+
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : functionalGroups.entrySet()) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            if (!parent.functionalGroups.containsKey(kv.getKey())) {</span>
+<span class="fc" id="L133">                parent.functionalGroups.put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+            }
+<span class="fc" id="L135">            parent.functionalGroups.get(kv.getKey()).addAll(functionalGroups.get(kv.getKey()));</span>
+<span class="fc" id="L136">        }</span>
+<span class="fc" id="L137">        functionalGroups = new HashMap&lt;&gt;();</span>
+
+        // shift the cycle
+<span class="fc" id="L140">        shiftPositions(shift);</span>
+
+        // take back what's mine# check double bonds
+<span class="fc bfc" id="L143" title="All 4 branches covered.">        parent.doubleBonds.doubleBondPositions.entrySet().stream().filter(kv -&gt; (start &lt;= kv.getKey() &amp;&amp; kv.getKey() &lt;= end)).forEachOrdered(kv -&gt; {</span>
+<span class="fc" id="L144">            doubleBonds.doubleBondPositions.put(kv.getKey(), kv.getValue());</span>
+<span class="fc" id="L145">        });</span>
+<span class="fc" id="L146">        doubleBonds.setNumDoubleBonds(doubleBonds.doubleBondPositions.size());</span>
+
+<span class="fc" id="L148">        doubleBonds.doubleBondPositions.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L149">            parent.doubleBonds.doubleBondPositions.remove(kv.getKey());</span>
+<span class="fc" id="L150">        });</span>
+<span class="fc" id="L151">        parent.doubleBonds.setNumDoubleBonds(parent.doubleBonds.doubleBondPositions.size());</span>
+
+<span class="fc" id="L153">        HashSet&lt;String&gt; remove_list = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : parent.functionalGroups.entrySet()) {</span>
+<span class="fc" id="L155">            ArrayList&lt;Integer&gt; remove_item = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L157">            int i = 0;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc bfc" id="L159" title="All 6 branches covered.">                if (start &lt;= func_group.getPosition() &amp;&amp; func_group.getPosition() &lt;= end &amp;&amp; func_group != this) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">                    if (!functionalGroups.containsKey(kv.getKey())) {</span>
+<span class="fc" id="L161">                        functionalGroups.put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+                    }
+<span class="fc" id="L163">                    functionalGroups.get(kv.getKey()).add(func_group);</span>
+<span class="fc" id="L164">                    remove_item.add(i);</span>
+                }
+<span class="fc" id="L166">                ++i;</span>
+<span class="fc" id="L167">            }</span>
+
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            while (remove_item.size() &gt; 0) {</span>
+<span class="fc" id="L170">                int pos = remove_item.get(remove_item.size() - 1);</span>
+<span class="fc" id="L171">                remove_item.remove(remove_item.size() - 1);</span>
+<span class="fc" id="L172">                kv.getValue().remove(pos);</span>
+<span class="fc" id="L173">            }</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (kv.getValue().isEmpty()) {</span>
+<span class="fc" id="L175">                remove_list.add(kv.getKey());</span>
+            }
+<span class="fc" id="L177">        }</span>
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        for (String fg : remove_list) {</span>
+<span class="fc" id="L180">            parent.functionalGroups.remove(fg);</span>
+<span class="fc" id="L181">        }</span>
+<span class="fc" id="L182">    }</span>
+
+    @Override
+    public void shiftPositions(int shift) {
+<span class="fc" id="L186">        super.shiftPositions(shift);</span>
+<span class="fc" id="L187">        start += shift;</span>
+<span class="fc" id="L188">        end += shift;</span>
+<span class="fc" id="L189">        DoubleBonds db = new DoubleBonds();</span>
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">        for (Entry&lt;Integer, String&gt; kv : doubleBonds.doubleBondPositions.entrySet()) {</span>
+<span class="nc" id="L191">            db.doubleBondPositions.put(kv.getKey() + shift, kv.getValue());</span>
+<span class="nc" id="L192">        }</span>
+<span class="fc" id="L193">        db.setNumDoubleBonds(db.doubleBondPositions.size());</span>
+<span class="fc" id="L194">        doubleBonds = db;</span>
+<span class="fc" id="L195">    }</span>
+
+    @Override
+    public void computeElements() {
+<span class="fc" id="L199">        elements = new ElementTable();</span>
+<span class="fc" id="L200">        elements.put(Element.H, -2 - 2 * doubleBonds.getNumDoubleBonds());</span>
+
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        for (Element chain_element : bridgeChain) {</span>
+            try {
+<span class="pc bpc" id="L204" title="5 of 7 branches missed.">                switch (chain_element) {</span>
+                    case C:
+<span class="nc" id="L206">                        elements.put(Element.C, elements.get(Element.C) + 1);</span>
+<span class="nc" id="L207">                        elements.put(Element.H, elements.get(Element.H) + 2);</span>
+<span class="nc" id="L208">                        break;</span>
+
+                    case N:
+<span class="nc" id="L211">                        elements.put(Element.N, elements.get(Element.N) + 1);</span>
+<span class="nc" id="L212">                        elements.put(Element.H, elements.get(Element.H) + 1);</span>
+<span class="nc" id="L213">                        break;</span>
+
+                    case P:
+<span class="nc" id="L216">                        elements.put(Element.P, elements.get(Element.P) + 1);</span>
+<span class="nc" id="L217">                        elements.put(Element.H, elements.get(Element.H) + 1);</span>
+<span class="nc" id="L218">                        break;</span>
+
+                    case As:
+<span class="nc" id="L221">                        elements.put(Element.As, elements.get(Element.As) + 1);</span>
+<span class="nc" id="L222">                        elements.put(Element.H, elements.get(Element.H) + 1);</span>
+<span class="nc" id="L223">                        break;</span>
+
+                    case O:
+<span class="fc" id="L226">                        elements.put(Element.O, elements.get(Element.O) + 1);</span>
+<span class="fc" id="L227">                        break;</span>
+
+                    case S:
+<span class="fc" id="L230">                        elements.put(Element.S, elements.get(Element.S) + 1);</span>
+                        break;
+
+                }
+<span class="nc" id="L234">            } catch (Exception e) {</span>
+<span class="nc" id="L235">                throw new ConstraintViolationException(&quot;Element '&quot; + Elements.ELEMENT_SHORTCUT.get(chain_element) + &quot;' cannot be part of a cycle bridge&quot;, e);</span>
+<span class="fc" id="L236">            }</span>
+<span class="fc" id="L237">        }</span>
+
+        // add all implicit carbon chain elements
+<span class="pc bpc" id="L240" title="1 of 4 branches missed.">        if (start != -1 &amp;&amp; end != -1) {</span>
+<span class="fc" id="L241">            int n = Math.max(0, cycle - (end - start + 1 + bridgeChain.size()));</span>
+<span class="fc" id="L242">            elements.put(Element.C, elements.get(Element.C) + n);</span>
+<span class="fc" id="L243">            elements.put(Element.H, elements.get(Element.H) + 2 * n);</span>
+        }
+<span class="fc" id="L245">    }</span>
+
+    @Override
+    public String toString(LipidLevel level) {
+<span class="fc" id="L249">        StringBuilder cycle_string = new StringBuilder();</span>
+<span class="fc" id="L250">        cycle_string.append(&quot;[&quot;);</span>
+<span class="fc bfc" id="L251" title="All 4 branches covered.">        if (start != -1 &amp;&amp; LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {</span>
+<span class="fc" id="L252">            cycle_string.append(start).append(&quot;-&quot;).append(end);</span>
+        }
+
+<span class="pc bpc" id="L255" title="1 of 4 branches missed.">        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level) &amp;&amp; bridgeChain.size() &gt; 0) {</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">            for (Element e : bridgeChain) {</span>
+<span class="fc" id="L257">                cycle_string.append(Elements.ELEMENT_SHORTCUT.get(e));</span>
+<span class="fc" id="L258">            }</span>
+        }
+<span class="fc" id="L260">        cycle_string.append(&quot;cy&quot;).append(cycle);</span>
+<span class="fc" id="L261">        cycle_string.append(&quot;:&quot;).append(doubleBonds.getNumDoubleBonds());</span>
+
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">            if (doubleBonds.doubleBondPositions.size() &gt; 0) {</span>
+<span class="fc" id="L265">                int i = 0;</span>
+<span class="fc" id="L266">                cycle_string.append(&quot;(&quot;);</span>
+<span class="fc" id="L267">                ArrayList&lt;Integer&gt; sorted = new ArrayList&lt;&gt;(doubleBonds.doubleBondPositions.keySet());</span>
+<span class="fc" id="L268">                Collections.sort(sorted, (a, b) -&gt; (int) a - (int) b);</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">                for (int key : sorted) {</span>
+<span class="fc" id="L270">                    String value = doubleBonds.doubleBondPositions.get(key);</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">                    if (i++ &gt; 0) {</span>
+<span class="fc" id="L272">                        cycle_string.append(&quot;,&quot;);</span>
+                    }
+<span class="fc bfc" id="L274" title="All 2 branches covered.">                    if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {</span>
+<span class="fc" id="L275">                        cycle_string.append(key).append(value);</span>
+                    } else {
+<span class="fc" id="L277">                        cycle_string.append(key);</span>
+                    }
+<span class="fc" id="L279">                }</span>
+<span class="fc" id="L280">                cycle_string.append(&quot;)&quot;);</span>
+            }
+        }
+
+<span class="fc bfc" id="L284" title="All 2 branches covered.">        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {</span>
+<span class="fc" id="L285">            ArrayList&lt;String&gt; fg_names = new ArrayList&lt;&gt;(functionalGroups.keySet());</span>
+<span class="fc" id="L286">            Collections.sort(fg_names, (String a, String b) -&gt; a.toLowerCase().compareTo(b.toLowerCase()));</span>
+
+<span class="fc bfc" id="L288" title="All 2 branches covered.">            for (String fg : fg_names) {</span>
+<span class="fc" id="L289">                ArrayList&lt;FunctionalGroup&gt; fg_list = functionalGroups.get(fg);</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">                if (fg_list.isEmpty()) {</span>
+<span class="nc" id="L291">                    continue;</span>
+                }
+
+<span class="fc" id="L294">                Collections.sort(fg_list, (FunctionalGroup a, FunctionalGroup b) -&gt; a.getPosition() - b.getPosition());</span>
+<span class="fc" id="L295">                int i = 0;</span>
+<span class="fc" id="L296">                cycle_string.append(&quot;;&quot;);</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">                for (FunctionalGroup func_group : fg_list) {</span>
+<span class="fc bfc" id="L298" title="All 2 branches covered.">                    if (i++ &gt; 0) {</span>
+<span class="fc" id="L299">                        cycle_string.append(&quot;,&quot;);</span>
+                    }
+<span class="fc" id="L301">                    cycle_string.append(func_group.toString(level));</span>
+<span class="fc" id="L302">                }</span>
+<span class="fc" id="L303">            }</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">        } else if (level == LipidLevel.STRUCTURE_DEFINED) {</span>
+<span class="fc" id="L305">            ArrayList&lt;String&gt; fg_names = new ArrayList&lt;&gt;(functionalGroups.keySet());</span>
+<span class="fc" id="L306">            Collections.sort(fg_names, (String a, String b) -&gt; a.toLowerCase().compareTo(b.toLowerCase()));</span>
+
+<span class="fc bfc" id="L308" title="All 2 branches covered.">            for (String fg : fg_names) {</span>
+<span class="fc" id="L309">                ArrayList&lt;FunctionalGroup&gt; fg_list = functionalGroups.get(fg);</span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">                if (fg_list.size() &gt; 0) {</span>
+<span class="fc bfc" id="L311" title="All 4 branches covered.">                    if (fg_list.size() == 1 &amp;&amp; fg_list.get(0).getCount() == 1) {</span>
+<span class="fc" id="L312">                        cycle_string.append(&quot;;&quot;).append(fg_list.get(0).toString(level));</span>
+                    } else {
+<span class="fc" id="L314">                        int fg_count = 0;</span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">                        for (FunctionalGroup func_group : fg_list) {</span>
+<span class="fc" id="L316">                            fg_count += func_group.getCount();</span>
+<span class="fc" id="L317">                        }</span>
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">                        if (fg_count &gt; 1) {</span>
+<span class="fc" id="L319">                            cycle_string.append(&quot;;(&quot;).append(fg).append(&quot;)&quot;).append(fg_count);</span>
+                        } else {
+<span class="nc" id="L321">                            cycle_string.append(&quot;;&quot;).append(fg);</span>
+                        }
+                    }
+                }
+<span class="fc" id="L325">            }</span>
+        }
+
+<span class="fc" id="L328">        cycle_string.append(&quot;]&quot;);</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">        if (getStereochemistry().length() &gt; 0) {</span>
+<span class="nc" id="L330">            cycle_string.append(&quot;[&quot;).append(getStereochemistry()).append(&quot;]&quot;);</span>
+        }
+
+<span class="fc" id="L333">        return cycle_string.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

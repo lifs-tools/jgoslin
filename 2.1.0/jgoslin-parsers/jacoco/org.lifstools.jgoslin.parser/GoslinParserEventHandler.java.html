@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoslinParserEventHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.parser</a> &gt; <span class="el_source">GoslinParserEventHandler.java</span></div><h1>GoslinParserEventHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.Adduct;
+import org.lifstools.jgoslin.domain.LipidFaBondType;
+import org.lifstools.jgoslin.domain.LipidLevel;
+import org.lifstools.jgoslin.domain.LipidException;
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidParsingException;
+import org.lifstools.jgoslin.domain.FattyAcid;
+import org.lifstools.jgoslin.domain.DoubleBonds;
+import org.lifstools.jgoslin.domain.Headgroup;
+import org.lifstools.jgoslin.domain.Cycle;
+import org.lifstools.jgoslin.domain.Elements;
+import org.lifstools.jgoslin.domain.FunctionalGroup;
+import org.lifstools.jgoslin.domain.LipidAdduct;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import static java.util.Map.entry;
+import java.util.TreeMap;
+import org.lifstools.jgoslin.domain.Element;
+
+/**
+ * Event handler implementation for the {@link GoslinParser}.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
+
+    private int dbPosition;
+    private String dbCistrans;
+    private char plasmalogen;
+    private String mediatorFunction;
+<span class="fc" id="L51">    private final ArrayList&lt;Integer&gt; mediatorFunctionPositions = new ArrayList&lt;&gt;();</span>
+    private boolean mediatorSuffix;
+    private Element heavyElement;
+    private int heavyElementNumber;
+
+<span class="fc" id="L56">    private final static Map&lt;String, Integer&gt; MEDIATOR_FA = Map.of(</span>
+<span class="fc" id="L57">            &quot;H&quot;, 17, &quot;O&quot;, 18, &quot;E&quot;, 20, &quot;Do&quot;, 22);</span>
+<span class="fc" id="L58">    private final static Map&lt;String, Integer&gt; MEDIATOR_DB = Map.of(</span>
+<span class="fc" id="L59">            &quot;M&quot;, 1, &quot;D&quot;, 2, &quot;Tr&quot;, 3, &quot;T&quot;, 4, &quot;P&quot;, 5, &quot;H&quot;, 6);</span>
+
+    /**
+     * Create a new {@code GoslinParserEventHandler}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
+    public GoslinParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L67">        super(knownFunctionalGroups);</span>
+        try {
+<span class="fc" id="L69">            registeredEvents = Map.ofEntries(</span>
+<span class="fc" id="L70">                    entry(&quot;lipid_pre_event&quot;, this::resetParser),</span>
+<span class="fc" id="L71">                    entry(&quot;lipid_post_event&quot;, this::buildLipid),</span>
+<span class="fc" id="L72">                    entry(&quot;hg_cl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L73">                    entry(&quot;hg_mlcl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L74">                    entry(&quot;hg_pl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L75">                    entry(&quot;hg_lpl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L76">                    entry(&quot;hg_lsl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L77">                    entry(&quot;hg_so_lsl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L78">                    entry(&quot;hg_dsl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L79">                    entry(&quot;st_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L80">                    entry(&quot;hg_ste_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L81">                    entry(&quot;hg_stes_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L82">                    entry(&quot;hg_mgl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L83">                    entry(&quot;hg_dgl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L84">                    entry(&quot;hg_sgl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L85">                    entry(&quot;hg_tgl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L86">                    entry(&quot;hg_dlcl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L87">                    entry(&quot;hg_sac_di_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L88">                    entry(&quot;hg_sac_f_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L89">                    entry(&quot;hg_tpl_pre_event&quot;, this::setHeadGroupName),</span>
+<span class="fc" id="L90">                    entry(&quot;gl_species_pre_event&quot;, this::setSpeciesLevel),</span>
+<span class="fc" id="L91">                    entry(&quot;pl_species_pre_event&quot;, this::setSpeciesLevel),</span>
+<span class="fc" id="L92">                    entry(&quot;sl_species_pre_event&quot;, this::setSpeciesLevel),</span>
+<span class="fc" id="L93">                    entry(&quot;fa2_unsorted_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L94">                    entry(&quot;fa3_unsorted_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L95">                    entry(&quot;fa4_unsorted_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L96">                    entry(&quot;slbpa_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L97">                    entry(&quot;dlcl_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L98">                    entry(&quot;mlcl_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L99">                    entry(&quot;lcb_pre_event&quot;, this::newLcb),</span>
+<span class="fc" id="L100">                    entry(&quot;lcb_post_event&quot;, this::cleanLcb),</span>
+<span class="fc" id="L101">                    entry(&quot;fa_pre_event&quot;, this::newFa),</span>
+<span class="fc" id="L102">                    entry(&quot;fa_post_event&quot;, this::appendFa),</span>
+<span class="fc" id="L103">                    entry(&quot;db_single_position_pre_event&quot;, this::setIsomericLevel),</span>
+<span class="fc" id="L104">                    entry(&quot;db_single_position_post_event&quot;, this::addDbPosition),</span>
+<span class="fc" id="L105">                    entry(&quot;db_position_number_pre_event&quot;, this::addDbPositionNumber),</span>
+<span class="fc" id="L106">                    entry(&quot;cistrans_pre_event&quot;, this::addCistrans),</span>
+<span class="fc" id="L107">                    entry(&quot;ether_pre_event&quot;, this::addEther),</span>
+<span class="fc" id="L108">                    entry(&quot;old_hydroxyl_pre_event&quot;, this::addOldHydroxyl),</span>
+<span class="fc" id="L109">                    entry(&quot;db_count_pre_event&quot;, this::addDoubleBonds),</span>
+<span class="fc" id="L110">                    entry(&quot;carbon_pre_event&quot;, this::addCarbon),</span>
+<span class="fc" id="L111">                    entry(&quot;hydroxyl_pre_event&quot;, this::addHydroxyl),</span>
+<span class="fc" id="L112">                    entry(&quot;adduct_info_pre_event&quot;, this::newAdduct),</span>
+<span class="fc" id="L113">                    entry(&quot;adduct_pre_event&quot;, this::addAdduct),</span>
+<span class="fc" id="L114">                    entry(&quot;charge_pre_event&quot;, this::addCharge),</span>
+<span class="fc" id="L115">                    entry(&quot;charge_sign_pre_event&quot;, this::addChargeSign),</span>
+<span class="fc" id="L116">                    entry(&quot;lpl_pre_event&quot;, this::setMolecularSubspeciesLevel),</span>
+<span class="fc" id="L117">                    entry(&quot;plasmalogen_pre_event&quot;, this::setPlasmalogen),</span>
+<span class="fc" id="L118">                    entry(&quot;mediator_pre_event&quot;, this::setMediator),</span>
+<span class="fc" id="L119">                    entry(&quot;mediator_post_event&quot;, this::addMediator),</span>
+<span class="fc" id="L120">                    entry(&quot;unstructured_mediator_pre_event&quot;, this::setUnstructuredMediator),</span>
+<span class="fc" id="L121">                    entry(&quot;trivial_mediator_pre_event&quot;, this::setTrivialMediator),</span>
+<span class="fc" id="L122">                    entry(&quot;mediator_carbon_pre_event&quot;, this::setMediatorCarbon),</span>
+<span class="fc" id="L123">                    entry(&quot;mediator_db_pre_event&quot;, this::setMediatorDB),</span>
+<span class="fc" id="L124">                    entry(&quot;mediator_mono_functions_pre_event&quot;, this::setMediatorFunction),</span>
+<span class="fc" id="L125">                    entry(&quot;mediator_di_functions_pre_event&quot;, this::setMediatorFunction),</span>
+<span class="fc" id="L126">                    entry(&quot;mediator_position_pre_event&quot;, this::setMediatorFunctionPosition),</span>
+<span class="fc" id="L127">                    entry(&quot;mediator_functional_group_post_event&quot;, this::addMediatorFunction),</span>
+<span class="fc" id="L128">                    entry(&quot;mediator_suffix_pre_event&quot;, this::addMediatorSuffix),</span>
+<span class="fc" id="L129">                    entry(&quot;mediator_tetranor_pre_event&quot;, this::setMediatorTetranor),</span>
+        
+<span class="fc" id="L131">                    entry(&quot;isotope_pair_pre_event&quot;, this::newAdduct),</span>
+<span class="fc" id="L132">                    entry(&quot;isotope_element_pre_event&quot;, this::setHeavyDElement),</span>
+<span class="fc" id="L133">                    entry(&quot;isotope_number_pre_event&quot;, this::setHeavyDNumber),</span>
+<span class="fc" id="L134">                    entry(&quot;heavy_pre_event&quot;, this::newAdduct),</span>
+<span class="fc" id="L135">                    entry(&quot;adduct_heavy_element_pre_event&quot;, this::setHeavyElement),</span>
+<span class="fc" id="L136">                    entry(&quot;adduct_heavy_number_pre_event&quot;, this::setHeavyNumber),</span>
+<span class="fc" id="L137">                    entry(&quot;adduct_heavy_component_post_event&quot;, this::addHeavyComponent)</span>
+            );
+
+<span class="nc" id="L140">        } catch (Exception e) {</span>
+<span class="nc" id="L141">            throw new LipidParsingException(&quot;Cannot initialize GoslinParserEventHandler&quot;);</span>
+<span class="fc" id="L142">        }</span>
+<span class="fc" id="L143">    }</span>
+
+    @Override
+    protected void resetParser(TreeNode node) {
+<span class="fc" id="L147">        content = null;</span>
+<span class="fc" id="L148">        level = LipidLevel.FULL_STRUCTURE;</span>
+<span class="fc" id="L149">        headGroup = &quot;&quot;;</span>
+<span class="fc" id="L150">        lcb = null;</span>
+<span class="fc" id="L151">        faList.clear();</span>
+<span class="fc" id="L152">        currentFa = null;</span>
+<span class="fc" id="L153">        adduct = null;</span>
+<span class="fc" id="L154">        dbPosition = 0;</span>
+<span class="fc" id="L155">        dbCistrans = &quot;&quot;;</span>
+<span class="fc" id="L156">        plasmalogen = '\0';</span>
+<span class="fc" id="L157">        mediatorFunction = &quot;&quot;;</span>
+<span class="fc" id="L158">        mediatorFunctionPositions.clear();</span>
+<span class="fc" id="L159">        mediatorSuffix = false;</span>
+<span class="fc" id="L160">        useHeadGroup = false;</span>
+<span class="fc" id="L161">        headgroupDecorators.clear();</span>
+<span class="fc" id="L162">        heavyElement = Element.C;</span>
+<span class="fc" id="L163">        heavyElementNumber = 0;</span>
+<span class="fc" id="L164">    }</span>
+
+    private void setHeadGroupName(TreeNode node) {
+<span class="fc" id="L167">        headGroup = node.getText();</span>
+<span class="fc" id="L168">    }</span>
+
+    private void setSpeciesLevel(TreeNode node) {
+<span class="fc" id="L171">        setLipidLevel(LipidLevel.SPECIES);</span>
+<span class="fc" id="L172">    }</span>
+
+    private void setIsomericLevel(TreeNode node) {
+<span class="fc" id="L175">        dbPosition = 0;</span>
+<span class="fc" id="L176">        dbCistrans = &quot;&quot;;</span>
+<span class="fc" id="L177">    }</span>
+
+    private void addDbPosition(TreeNode node) {
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">        if (currentFa != null) {</span>
+<span class="fc" id="L181">            currentFa.getDoubleBonds().getDoubleBondPositions().put(dbPosition, dbCistrans);</span>
+<span class="pc bpc" id="L182" title="1 of 4 branches missed.">            if (!dbCistrans.equals(&quot;E&quot;) &amp;&amp; !dbCistrans.equals(&quot;Z&quot;)) {</span>
+<span class="nc" id="L183">                setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+            }
+        }
+<span class="fc" id="L186">    }</span>
+
+    private void setPlasmalogen(TreeNode node) {
+<span class="fc" id="L189">        plasmalogen = node.getText().toUpperCase().charAt(0);</span>
+<span class="fc" id="L190">    }</span>
+
+    private void addDbPositionNumber(TreeNode node) {
+<span class="fc" id="L193">        dbPosition = Integer.valueOf(node.getText());</span>
+<span class="fc" id="L194">    }</span>
+
+    private void addCistrans(TreeNode node) {
+<span class="fc" id="L197">        dbCistrans = node.getText();</span>
+<span class="fc" id="L198">    }</span>
+
+    private void setMolecularSubspeciesLevel(TreeNode node) {
+<span class="fc" id="L201">        setLipidLevel(LipidLevel.MOLECULAR_SPECIES);</span>
+<span class="fc" id="L202">    }</span>
+
+    private void newFa(TreeNode node) {
+<span class="fc" id="L205">        LipidFaBondType lipid_FA_bond_type = LipidFaBondType.ESTER;</span>
+<span class="fc" id="L206">        currentFa = new FattyAcid(&quot;FA&quot;, 2, null, null, lipid_FA_bond_type, knownFunctionalGroups);</span>
+<span class="fc" id="L207">    }</span>
+
+    private void newLcb(TreeNode node) {
+<span class="fc" id="L210">        lcb = new FattyAcid(&quot;LCB&quot;, knownFunctionalGroups);</span>
+<span class="fc" id="L211">        lcb.setType(LipidFaBondType.LCB_REGULAR);</span>
+<span class="fc" id="L212">        currentFa = lcb;</span>
+<span class="fc" id="L213">        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+<span class="fc" id="L214">    }</span>
+
+    private void cleanLcb(TreeNode node) {
+<span class="fc bfc" id="L217" title="All 4 branches covered.">        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() &amp;&amp; currentFa.getDoubleBonds().getNumDoubleBonds() &gt; 0) {</span>
+<span class="fc" id="L218">            setLipidLevel(LipidLevel.SN_POSITION);</span>
+        }
+<span class="fc" id="L220">        currentFa = null;</span>
+<span class="fc" id="L221">    }</span>
+
+    private void appendFa(TreeNode node) {
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">        if (currentFa.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED) {</span>
+<span class="nc" id="L225">            throw new LipidException(&quot;Lipid with unspecified ether bond cannot be treated properly.&quot;);</span>
+        }
+<span class="fc bfc" id="L227" title="All 4 branches covered.">        if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() &amp;&amp; currentFa.getDoubleBonds().getNumDoubleBonds() &gt; 0) {</span>
+<span class="fc" id="L228">            setLipidLevel(LipidLevel.SN_POSITION);</span>
+        }
+
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if (currentFa.getDoubleBonds().getNumDoubleBonds() &lt; 0) {</span>
+<span class="nc" id="L232">            throw new LipidException(&quot;Double bond count does not match with number of double bond positions&quot;);</span>
+        }
+
+<span class="fc" id="L235">        faList.add(currentFa);</span>
+<span class="pc bpc" id="L236" title="4 of 8 branches missed.">        if (headGroup.compareTo(&quot;Sa&quot;) == 0 || headGroup.compareTo(&quot;So&quot;) == 0 || headGroup.compareTo(&quot;S1P&quot;) == 0 || headGroup.compareTo(&quot;Sa1P&quot;) == 0){</span>
+<span class="nc" id="L237">            FunctionalGroup functional_group = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="nc bnc" id="L238" title="All 4 branches missed.">            if (headGroup.compareTo(&quot;Sa&quot;) == 0 || headGroup.compareTo(&quot;So&quot;) == 0){</span>
+<span class="nc" id="L239">                functional_group.setCount(2);</span>
+<span class="nc" id="L240">                currentFa.setLipidFaBondType(LipidFaBondType.LCB_EXCEPTION);</span>
+            }
+            else {
+<span class="nc" id="L243">                functional_group.setCount(1);</span>
+<span class="nc" id="L244">                currentFa.setLipidFaBondType(LipidFaBondType.LCB_REGULAR);</span>
+            }
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            if (!currentFa.getFunctionalGroupsInternal().containsKey(&quot;OH&quot;)) {</span>
+<span class="nc" id="L247">                currentFa.getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+            }
+<span class="nc" id="L249">            currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).add(functional_group);</span>
+        }
+<span class="fc" id="L251">        currentFa = null;</span>
+<span class="fc" id="L252">    }</span>
+
+    private void buildLipid(TreeNode node) {
+<span class="fc bfc" id="L255" title="All 2 branches covered.">        if (lcb != null) {</span>
+<span class="fc" id="L256">            faList.add(0, lcb);</span>
+<span class="fc" id="L257">            lcb = null;</span>
+<span class="fc" id="L258">            currentFa = null;</span>
+        }
+
+<span class="pc bpc" id="L261" title="2 of 6 branches missed.">        if (plasmalogen != '\0' &amp;&amp; faList.size() &gt; 0 &amp;&amp; lcb == null) {</span>
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">            faList.get(0).setLipidFaBondType(plasmalogen == 'O' ? LipidFaBondType.ETHER_PLASMANYL : LipidFaBondType.ETHER_PLASMENYL);</span>
+        }
+
+<span class="fc" id="L265">        Headgroup headgroup = prepareHeadgroupAndChecks();</span>
+
+<span class="fc" id="L267">        LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);</span>
+<span class="fc" id="L268">        content = lipid;</span>
+
+<span class="fc" id="L270">    }</span>
+
+    private void addEther(TreeNode node) {
+<span class="fc" id="L273">        String ether = node.getText();</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        if (ether.equals(&quot;a&quot;)) {</span>
+<span class="fc" id="L275">            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);</span>
+<span class="pc bpc" id="L276" title="1 of 2 branches missed.">        } else if (ether.equals(&quot;p&quot;)) {</span>
+<span class="fc" id="L277">            currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);</span>
+<span class="fc" id="L278">            currentFa.getDoubleBonds().setNumDoubleBonds(Math.max(0, currentFa.getDoubleBonds().getNumDoubleBonds() - 1));</span>
+        }
+<span class="fc" id="L280">        plasmalogen = '\0';</span>
+<span class="fc" id="L281">    }</span>
+
+    private void addOldHydroxyl(TreeNode node) {
+<span class="fc" id="L284">        String old_hydroxyl = node.getText();</span>
+<span class="fc" id="L285">        int num_h = 0;</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">        if (old_hydroxyl.equals(&quot;d&quot;)) {</span>
+<span class="fc" id="L287">            num_h = 2;</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">        } else if (old_hydroxyl.equals(&quot;t&quot;)) {</span>
+<span class="nc" id="L289">            num_h = 3;</span>
+        }
+
+<span class="fc bfc" id="L292" title="All 2 branches covered.">        if (spRegularLcb()) {</span>
+<span class="fc" id="L293">            num_h -= 1;</span>
+        }
+
+<span class="fc" id="L296">        FunctionalGroup functional_group = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L297">        functional_group.setCount(num_h);</span>
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">        if (!currentFa.getFunctionalGroupsInternal().containsKey(&quot;OH&quot;)) {</span>
+<span class="fc" id="L299">            currentFa.getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L301">        currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).add(functional_group);</span>
+<span class="fc" id="L302">    }</span>
+
+    private void addDoubleBonds(TreeNode node) {
+<span class="fc" id="L305">        currentFa.getDoubleBonds().setNumDoubleBonds(Integer.valueOf(node.getText()));</span>
+<span class="fc" id="L306">    }</span>
+
+    private void addCarbon(TreeNode node) {
+<span class="fc" id="L309">        currentFa.setNumCarbon(Integer.valueOf(node.getText()));</span>
+<span class="fc" id="L310">    }</span>
+
+    private void addHydroxyl(TreeNode node) {
+<span class="fc" id="L313">        int num_h = Integer.valueOf(node.getText());</span>
+
+<span class="fc bfc" id="L315" title="All 2 branches covered.">        if (spRegularLcb()) {</span>
+<span class="fc" id="L316">            num_h -= 1;</span>
+        }
+<span class="fc bfc" id="L318" title="All 2 branches covered.">        if (num_h &lt;= 0) return;</span>
+
+<span class="fc" id="L320">        FunctionalGroup functional_group = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L321">        functional_group.setCount(num_h);</span>
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">        if (!currentFa.getFunctionalGroupsInternal().containsKey(&quot;OH&quot;)) {</span>
+<span class="fc" id="L323">            currentFa.getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L325">        currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).add(functional_group);</span>
+<span class="fc" id="L326">        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+<span class="fc" id="L327">    }</span>
+
+    private void newAdduct(TreeNode node) {
+<span class="pc bpc" id="L330" title="1 of 2 branches missed.">        if (adduct == null) adduct = new Adduct(&quot;&quot;, &quot;&quot;);</span>
+<span class="fc" id="L331">    }</span>
+
+    private void addAdduct(TreeNode node) {
+<span class="fc" id="L334">        adduct.setAdductString(node.getText());</span>
+<span class="fc" id="L335">    }</span>
+
+    private void addCharge(TreeNode node) {
+<span class="fc" id="L338">        adduct.setCharge(Integer.valueOf(node.getText()));</span>
+<span class="fc" id="L339">    }</span>
+
+    private void addChargeSign(TreeNode node) {
+<span class="fc" id="L342">        String sign = node.getText();</span>
+<span class="fc bfc" id="L343" title="All 2 branches covered.">        if (sign.equals(&quot;+&quot;)) {</span>
+<span class="fc" id="L344">            adduct.setChargeSign(1);</span>
+<span class="pc bpc" id="L345" title="1 of 2 branches missed.">        } else if (sign.equals(&quot;-&quot;)) {</span>
+<span class="fc" id="L346">            adduct.setChargeSign(-1);</span>
+        }
+<span class="pc bpc" id="L348" title="1 of 2 branches missed.">        if (adduct.getCharge() == 0) adduct.setCharge(1);</span>
+<span class="fc" id="L349">    }</span>
+
+    private void setMediator(TreeNode node) {
+<span class="fc" id="L352">        headGroup = &quot;FA&quot;;</span>
+<span class="fc" id="L353">        currentFa = new FattyAcid(&quot;FA&quot;, knownFunctionalGroups);</span>
+<span class="fc" id="L354">        faList.add(currentFa);</span>
+<span class="fc" id="L355">        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);</span>
+<span class="fc" id="L356">    }</span>
+
+    private void setUnstructuredMediator(TreeNode node) {
+<span class="fc" id="L359">        headGroup = node.getText();</span>
+<span class="fc" id="L360">        useHeadGroup = true;</span>
+<span class="fc" id="L361">        faList.clear();</span>
+<span class="fc" id="L362">    }</span>
+
+    private void setMediatorTetranor(TreeNode node) {
+<span class="fc" id="L365">        currentFa.setNumCarbon(currentFa.getNumCarbon() - 4);</span>
+<span class="fc" id="L366">    }</span>
+
+    private void setMediatorCarbon(TreeNode node) {
+<span class="fc" id="L369">        currentFa.setNumCarbon(currentFa.getNumCarbon() + MEDIATOR_FA.get(node.getText()));</span>
+<span class="fc" id="L370">    }</span>
+
+    private void setMediatorDB(TreeNode node) {
+<span class="fc" id="L373">        currentFa.getDoubleBonds().setNumDoubleBonds(MEDIATOR_DB.get(node.getText()));</span>
+<span class="fc" id="L374">    }</span>
+
+    private void setMediatorFunction(TreeNode node) {
+<span class="fc" id="L377">        mediatorFunction = node.getText();</span>
+<span class="fc" id="L378">    }</span>
+
+    private void setMediatorFunctionPosition(TreeNode node) {
+<span class="fc" id="L381">        mediatorFunctionPositions.add(node.getInt());</span>
+<span class="fc" id="L382">    }</span>
+
+    private void addMediatorFunction(TreeNode node) {
+<span class="fc" id="L385">        FunctionalGroup functionalGroup = null;</span>
+<span class="fc" id="L386">        String fg = &quot;&quot;;</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">        if (mediatorFunction.equals(&quot;H&quot;)) {</span>
+<span class="fc" id="L388">            functionalGroup = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L389">            fg = &quot;OH&quot;;</span>
+<span class="pc bpc" id="L390" title="1 of 2 branches missed.">            if (mediatorFunctionPositions.size() &gt; 0) {</span>
+<span class="fc" id="L391">                functionalGroup.setPosition(mediatorFunctionPositions.get(0));</span>
+            }
+<span class="fc bfc" id="L393" title="All 2 branches covered.">        } else if (mediatorFunction.equals(&quot;Oxo&quot;)) {</span>
+<span class="fc" id="L394">            functionalGroup = knownFunctionalGroups.get(&quot;oxo&quot;);</span>
+<span class="fc" id="L395">            fg = &quot;oxo&quot;;</span>
+<span class="pc bpc" id="L396" title="1 of 2 branches missed.">            if (mediatorFunctionPositions.size() &gt; 0) {</span>
+<span class="fc" id="L397">                functionalGroup.setPosition(mediatorFunctionPositions.get(0));</span>
+            }
+<span class="fc bfc" id="L399" title="All 2 branches covered.">        } else if (mediatorFunction.equals(&quot;Hp&quot;)) {</span>
+<span class="fc" id="L400">            functionalGroup = knownFunctionalGroups.get(&quot;OOH&quot;);</span>
+<span class="fc" id="L401">            fg = &quot;OOH&quot;;</span>
+<span class="pc bpc" id="L402" title="1 of 2 branches missed.">            if (mediatorFunctionPositions.size() &gt; 0) {</span>
+<span class="fc" id="L403">                functionalGroup.setPosition(mediatorFunctionPositions.get(0));</span>
+            }
+<span class="fc bfc" id="L405" title="All 4 branches covered.">        } else if (mediatorFunction.equals(&quot;E&quot;) || mediatorFunction.equals(&quot;Ep&quot;)) {</span>
+<span class="fc" id="L406">            functionalGroup = knownFunctionalGroups.get(&quot;Ep&quot;);</span>
+<span class="fc" id="L407">            fg = &quot;Ep&quot;;</span>
+<span class="pc bpc" id="L408" title="1 of 2 branches missed.">            if (mediatorFunctionPositions.size() &gt; 0) {</span>
+<span class="fc" id="L409">                functionalGroup.setPosition(mediatorFunctionPositions.get(0));</span>
+            }
+<span class="pc bpc" id="L411" title="4 of 6 branches missed.">        } else if (mediatorFunction.equals(&quot;DH&quot;) || mediatorFunction.equals(&quot;DiH&quot;) || mediatorFunction.equals(&quot;diH&quot;)) {</span>
+<span class="fc" id="L412">            functionalGroup = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L413">            fg = &quot;OH&quot;;</span>
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">            if (mediatorFunctionPositions.size() &gt; 0) {</span>
+<span class="fc" id="L415">                functionalGroup.setPosition(mediatorFunctionPositions.get(0));</span>
+<span class="fc" id="L416">                FunctionalGroup functionalGroup2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L417">                functionalGroup2.setPosition(mediatorFunctionPositions.get(1));</span>
+<span class="fc" id="L418">                currentFa.getFunctionalGroupsInternal().put(&quot;OH&quot;, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L419">                currentFa.getFunctionalGroupsInternal().get(&quot;OH&quot;).add(functionalGroup2);</span>
+            }
+        }
+
+<span class="fc bfc" id="L423" title="All 2 branches covered.">        if (!currentFa.getFunctionalGroupsInternal().containsKey(fg)) {</span>
+<span class="fc" id="L424">            currentFa.getFunctionalGroupsInternal().put(fg, new ArrayList&lt;&gt;());</span>
+        }
+<span class="fc" id="L426">        currentFa.getFunctionalGroupsInternal().get(fg).add(functionalGroup);</span>
+<span class="fc" id="L427">    }</span>
+
+    private void setTrivialMediator(TreeNode node) {
+<span class="fc" id="L430">        headGroup = &quot;FA&quot;;</span>
+
+<span class="pc bpc" id="L432" title="3 of 21 branches missed.">        switch (node.getText()) {</span>
+            case &quot;Palmitic acid&quot;:
+<span class="fc" id="L434">                currentFa = new FattyAcid(&quot;FA&quot;, 16, knownFunctionalGroups);</span>
+<span class="fc" id="L435">                break;</span>
+
+            case &quot;Linoleic acid&quot;:
+<span class="fc" id="L438">                currentFa = new FattyAcid(&quot;FA&quot;, 18, new DoubleBonds(2), knownFunctionalGroups);</span>
+<span class="fc" id="L439">                break;</span>
+
+            case &quot;AA&quot;:
+<span class="fc" id="L442">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(4), knownFunctionalGroups);</span>
+<span class="fc" id="L443">                break;</span>
+
+            case &quot;ALA&quot;:
+<span class="nc" id="L446">                currentFa = new FattyAcid(&quot;FA&quot;, 18, new DoubleBonds(3), knownFunctionalGroups);</span>
+<span class="nc" id="L447">                break;</span>
+
+            case &quot;EPA&quot;:
+<span class="fc" id="L450">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(5), knownFunctionalGroups);</span>
+<span class="fc" id="L451">                break;</span>
+
+            case &quot;DHA&quot;:
+<span class="fc" id="L454">                currentFa = new FattyAcid(&quot;FA&quot;, 22, new DoubleBonds(6), knownFunctionalGroups);</span>
+<span class="fc" id="L455">                break;</span>
+
+            case &quot;LTB4&quot;: {
+<span class="fc" id="L458">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L459">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L460">                f1.setPosition(5);</span>
+<span class="fc" id="L461">                f2.setPosition(12);</span>
+<span class="fc" id="L462">                DoubleBonds db = new DoubleBonds(new TreeMap&lt;&gt;(Map.of(6, &quot;Z&quot;, 8, &quot;E&quot;, 10, &quot;E&quot;, 14, &quot;Z&quot;)));</span>
+<span class="fc" id="L463">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1, f2))));</span>
+<span class="fc" id="L464">                currentFa = new FattyAcid(&quot;FA&quot;, 20, db, fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L466">            break;</span>
+
+            case &quot;Resolvin D3&quot;: {
+<span class="fc" id="L469">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L470">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L471">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L472">                f1.setPosition(4);</span>
+<span class="fc" id="L473">                f2.setPosition(11);</span>
+<span class="fc" id="L474">                f3.setPosition(17);</span>
+<span class="fc" id="L475">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1, f2, f3))));</span>
+<span class="fc" id="L476">                currentFa = new FattyAcid(&quot;FA&quot;, 22, new DoubleBonds(6), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L478">            break;</span>
+
+            case &quot;Maresin 1&quot;: {
+<span class="fc" id="L481">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L482">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L483">                f1.setPosition(4);</span>
+<span class="fc" id="L484">                f2.setPosition(14);</span>
+<span class="fc" id="L485">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1, f2))));</span>
+<span class="fc" id="L486">                currentFa = new FattyAcid(&quot;FA&quot;, 22, new DoubleBonds(6), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L488">            break;</span>
+
+            case &quot;Resolvin D2&quot;: {
+<span class="fc" id="L491">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L492">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L493">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L494">                f1.setPosition(4);</span>
+<span class="fc" id="L495">                f2.setPosition(16);</span>
+<span class="fc" id="L496">                f3.setPosition(17);</span>
+<span class="fc" id="L497">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1, f2, f3))));</span>
+<span class="fc" id="L498">                currentFa = new FattyAcid(&quot;FA&quot;, 22, new DoubleBonds(6), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L500">            break;</span>
+
+            case &quot;Resolvin D5&quot;: {
+<span class="fc" id="L503">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L504">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L505">                f1.setPosition(7);</span>
+<span class="fc" id="L506">                f2.setPosition(17);</span>
+<span class="fc" id="L507">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1, f2))));</span>
+<span class="fc" id="L508">                currentFa = new FattyAcid(&quot;FA&quot;, 22, new DoubleBonds(6), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L510">            break;</span>
+
+            case &quot;Resolvin D1&quot;: {
+<span class="fc" id="L513">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L514">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L515">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L516">                f1.setPosition(7);</span>
+<span class="fc" id="L517">                f2.setPosition(8);</span>
+<span class="fc" id="L518">                f3.setPosition(17);</span>
+<span class="fc" id="L519">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1, f2, f3))));</span>
+<span class="fc" id="L520">                currentFa = new FattyAcid(&quot;FA&quot;, 22, new DoubleBonds(6), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L522">            break;</span>
+
+            case &quot;TXB1&quot;: {
+<span class="fc" id="L525">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L526">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L527">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L528">                FunctionalGroup f4 = knownFunctionalGroups.get(&quot;oxy&quot;);</span>
+<span class="fc" id="L529">                f1.setPosition(15);</span>
+<span class="fc" id="L530">                f2.setPosition(9);</span>
+<span class="fc" id="L531">                f3.setPosition(11);</span>
+<span class="fc" id="L532">                f4.setPosition(11);</span>
+<span class="fc" id="L533">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2, f3)), &quot;oxo&quot;, new ArrayList&lt;&gt;(Arrays.asList(f4))));</span>
+<span class="fc" id="L534">                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L535">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L536">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(1), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L538">            break;</span>
+
+            case &quot;TXB2&quot;: {
+<span class="fc" id="L541">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L542">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L543">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L544">                FunctionalGroup f4 = knownFunctionalGroups.get(&quot;oxy&quot;);</span>
+<span class="fc" id="L545">                f1.setPosition(15);</span>
+<span class="fc" id="L546">                f2.setPosition(9);</span>
+<span class="fc" id="L547">                f3.setPosition(11);</span>
+<span class="fc" id="L548">                f4.setPosition(11);</span>
+<span class="fc" id="L549">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2, f3)), &quot;oxy&quot;, new ArrayList&lt;&gt;(Arrays.asList(f4))));</span>
+<span class="fc" id="L550">                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L551">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L552">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(2), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L554">            break;</span>
+
+            case &quot;TXB3&quot;: {
+<span class="fc" id="L557">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L558">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L559">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L560">                FunctionalGroup f4 = knownFunctionalGroups.get(&quot;oxy&quot;);</span>
+<span class="fc" id="L561">                f1.setPosition(15);</span>
+<span class="fc" id="L562">                f2.setPosition(9);</span>
+<span class="fc" id="L563">                f3.setPosition(11);</span>
+<span class="fc" id="L564">                f4.setPosition(11);</span>
+<span class="fc" id="L565">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2, f3)), &quot;oxy&quot;, new ArrayList&lt;&gt;(Arrays.asList(f4))));</span>
+<span class="fc" id="L566">                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L567">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L568">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(3), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L570">            break;</span>
+
+            case &quot;PGF2alpha&quot;: {
+<span class="fc" id="L573">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L574">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L575">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L576">                f1.setPosition(15);</span>
+<span class="fc" id="L577">                f2.setPosition(9);</span>
+<span class="fc" id="L578">                f3.setPosition(11);</span>
+<span class="fc" id="L579">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2, f3))));</span>
+<span class="fc" id="L580">                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L581">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L582">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(2), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L584">            break;</span>
+
+            case &quot;PGD2&quot;: {
+<span class="fc" id="L587">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L588">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L589">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;oxo&quot;);</span>
+<span class="fc" id="L590">                f1.setPosition(15);</span>
+<span class="fc" id="L591">                f2.setPosition(9);</span>
+<span class="fc" id="L592">                f3.setPosition(11);</span>
+<span class="fc" id="L593">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2)), &quot;oxo&quot;, new ArrayList&lt;&gt;(Arrays.asList(f3))));</span>
+<span class="fc" id="L594">                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L595">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L596">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(2), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L598">            break;</span>
+
+            case &quot;PGE2&quot;: {
+<span class="fc" id="L601">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L602">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;oxo&quot;);</span>
+<span class="fc" id="L603">                FunctionalGroup f3 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L604">                f1.setPosition(15);</span>
+<span class="fc" id="L605">                f2.setPosition(9);</span>
+<span class="fc" id="L606">                f3.setPosition(11);</span>
+<span class="fc" id="L607">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f3)), &quot;oxo&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2))));</span>
+<span class="fc" id="L608">                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L609">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L610">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(2), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L612">            break;</span>
+
+            case &quot;PGB2&quot;: {
+<span class="fc" id="L615">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L616">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="fc" id="L617">                f1.setPosition(15);</span>
+<span class="fc" id="L618">                f2.setPosition(9);</span>
+<span class="fc" id="L619">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2))));</span>
+<span class="fc" id="L620">                Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);</span>
+<span class="fc" id="L621">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="fc" id="L622">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(2), fg, knownFunctionalGroups);</span>
+            }
+<span class="fc" id="L624">            break;</span>
+
+            case &quot;15d-PGJ2&quot;: {
+<span class="nc" id="L627">                FunctionalGroup f1 = knownFunctionalGroups.get(&quot;OH&quot;);</span>
+<span class="nc" id="L628">                FunctionalGroup f2 = knownFunctionalGroups.get(&quot;oxo&quot;);</span>
+<span class="nc" id="L629">                f1.setPosition(15);</span>
+<span class="nc" id="L630">                f2.setPosition(11);</span>
+<span class="nc" id="L631">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fgc = new HashMap&lt;&gt;(Map.of(&quot;oxo&quot;, new ArrayList&lt;&gt;(Arrays.asList(f2))));</span>
+<span class="nc" id="L632">                Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);</span>
+<span class="nc" id="L633">                HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;(Map.of(&quot;OH&quot;, new ArrayList&lt;&gt;(Arrays.asList(f1)), &quot;cy&quot;, new ArrayList&lt;&gt;(Arrays.asList(cy))));</span>
+<span class="nc" id="L634">                currentFa = new FattyAcid(&quot;FA&quot;, 20, new DoubleBonds(3), fg, knownFunctionalGroups);</span>
+            }
+            break;
+        }
+
+<span class="fc" id="L639">        faList.clear();</span>
+<span class="fc" id="L640">        faList.add(currentFa);</span>
+<span class="fc" id="L641">        mediatorSuffix = true;</span>
+<span class="fc" id="L642">    }</span>
+
+    private void addMediatorSuffix(TreeNode node) {
+<span class="fc" id="L645">        mediatorSuffix = true;</span>
+<span class="fc" id="L646">    }</span>
+
+    private void addMediator(TreeNode node) {
+<span class="fc bfc" id="L649" title="All 2 branches covered.">        if (!mediatorSuffix) {</span>
+<span class="fc" id="L650">            currentFa.getDoubleBonds().setNumDoubleBonds(currentFa.getDoubleBonds().getNumDoubleBonds() - 1);</span>
+        }
+<span class="fc" id="L652">    }</span>
+
+    private void setHeavyDElement(TreeNode node) {
+<span class="fc" id="L655">        adduct.getHeavyElements().put(Element.H2, 1);</span>
+<span class="fc" id="L656">    }</span>
+
+    private void setHeavyDNumber(TreeNode node) {
+<span class="fc" id="L659">        adduct.getHeavyElements().put(Element.H2, node.getInt());</span>
+<span class="fc" id="L660">    }</span>
+        
+    private void setHeavyElement(TreeNode node) {
+<span class="nc" id="L663">        heavyElement = Elements.HEAVY_ELEMENT_TABLE.get(node.getText());</span>
+<span class="nc" id="L664">        heavyElementNumber = 1;</span>
+<span class="nc" id="L665">    }</span>
+    
+    private void setHeavyNumber(TreeNode node) {
+<span class="nc" id="L668">        heavyElementNumber = node.getInt();</span>
+<span class="nc" id="L669">    }</span>
+    
+    private void addHeavyComponent(TreeNode node) {
+<span class="nc" id="L672">        adduct.getHeavyElements().put(heavyElement, adduct.getHeavyElements().get(heavyElement) + heavyElementNumber);</span>
+<span class="nc" id="L673">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

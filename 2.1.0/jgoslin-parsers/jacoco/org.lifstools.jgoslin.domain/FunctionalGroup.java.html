@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FunctionalGroup.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jgoslin-parsers</a> &gt; <a href="index.source.html" class="el_package">org.lifstools.jgoslin.domain</a> &gt; <span class="el_source">FunctionalGroup.java</span></div><h1>FunctionalGroup.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+/**
+ * A functional group of a fatty acid, it can contain nested functional groups.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public class FunctionalGroup {
+
+    protected String name;
+<span class="fc" id="L33">    protected int position = -1;</span>
+    protected int count;
+    protected String stereochemistry;
+    protected String ringStereo;
+    protected DoubleBonds doubleBonds;
+    protected boolean atomic;
+    protected boolean stereoBound;
+    protected ElementTable elements;
+    protected HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; functionalGroups;
+    protected KnownFunctionalGroups knownFunctionalGroups;
+
+    public FunctionalGroup(String _name, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L45">        this(_name, -1, 1, null, false, &quot;&quot;, false, null, null, knownFunctionalGroups);</span>
+<span class="fc" id="L46">    }</span>
+
+    public FunctionalGroup(String _name, int _position, int _count, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L49">        this(_name, _position, _count, null, false, &quot;&quot;, false, null, null, knownFunctionalGroups);</span>
+<span class="fc" id="L50">    }</span>
+
+    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, boolean _stereoBound, ElementTable _elements, KnownFunctionalGroups knownFunctionalGroups) {
+<span class="fc" id="L53">        this(_name, _position, _count, _double_bonds, _is_atomic, _stereochemistry, _stereoBound, _elements, null, knownFunctionalGroups);</span>
+<span class="fc" id="L54">    }</span>
+
+<span class="fc" id="L56">    public FunctionalGroup(String _name, int _position, int _count, DoubleBonds _double_bonds, boolean _is_atomic, String _stereochemistry, boolean _stereoBound, ElementTable _elements, HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; _functional_groups, KnownFunctionalGroups knownFunctionalGroups) {</span>
+<span class="fc" id="L57">        name = _name;</span>
+<span class="fc" id="L58">        position = _position;</span>
+<span class="fc" id="L59">        count = _count;</span>
+<span class="fc" id="L60">        stereochemistry = _stereochemistry;</span>
+<span class="fc" id="L61">        ringStereo = &quot;&quot;;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        doubleBonds = (_double_bonds != null) ? _double_bonds : new DoubleBonds(0);</span>
+<span class="fc" id="L63">        atomic = _is_atomic;</span>
+<span class="fc" id="L64">        stereoBound = _stereoBound;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        elements = (_elements != null) ? _elements : new ElementTable();</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        functionalGroups = (_functional_groups != null) ? _functional_groups : (new HashMap&lt;&gt;());</span>
+<span class="fc" id="L67">        this.knownFunctionalGroups = knownFunctionalGroups;</span>
+<span class="fc" id="L68">    }</span>
+
+    public FunctionalGroup copy() {
+<span class="fc" id="L71">        DoubleBonds db = doubleBonds.copy();</span>
+<span class="fc" id="L72">        HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; fg = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L73">        functionalGroups.entrySet().stream().map(kv -&gt; {</span>
+<span class="nc" id="L74">            fg.put(kv.getKey(), new ArrayList&lt;&gt;());</span>
+<span class="nc" id="L75">            return kv;</span>
+<span class="fc" id="L76">        }).forEachOrdered(kv -&gt; {</span>
+<span class="nc" id="L77">            kv.getValue().forEach(func_group -&gt; {</span>
+<span class="nc" id="L78">                fg.get(kv.getKey()).add(func_group.copy());</span>
+<span class="nc" id="L79">            });</span>
+<span class="nc" id="L80">        });</span>
+<span class="fc" id="L81">        ElementTable e = new ElementTable();</span>
+<span class="fc" id="L82">        elements.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L83">            e.put(kv.getKey(), kv.getValue());</span>
+<span class="fc" id="L84">        });</span>
+
+<span class="fc" id="L86">        FunctionalGroup func_group_new = new FunctionalGroup(name, position, count, db, atomic, stereochemistry, stereoBound, e, fg, knownFunctionalGroups);</span>
+<span class="fc" id="L87">        func_group_new.ringStereo = ringStereo;</span>
+<span class="fc" id="L88">        return func_group_new;</span>
+    }
+    
+    public boolean stereoInformationMissing(){
+<span class="fc bfc" id="L92" title="All 4 branches covered.">        boolean missing = stereoBound &amp;&amp; stereochemistry.isEmpty();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for (ArrayList&lt;FunctionalGroup&gt; fgList : functionalGroups.values()){</span>
+            
+<span class="fc bfc" id="L95" title="All 2 branches covered.">            for (FunctionalGroup fg : fgList){</span>
+<span class="fc" id="L96">                missing |= fg.stereoInformationMissing();</span>
+<span class="fc" id="L97">            }</span>
+<span class="fc" id="L98">        }</span>
+
+<span class="fc" id="L100">        return missing;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L104">        this.name = name;</span>
+<span class="fc" id="L105">    }</span>
+
+    public String getName() {
+<span class="fc" id="L108">        return this.name;</span>
+    }
+
+    public void setStereoBound(boolean stereoBound) {
+<span class="nc" id="L112">        this.stereoBound = stereoBound;</span>
+<span class="nc" id="L113">    }</span>
+
+    public boolean getStereoBound() {
+<span class="nc" id="L116">        return this.stereoBound;</span>
+    }
+
+    public void setPosition(int position) {
+<span class="fc" id="L120">        this.position = position;</span>
+<span class="fc" id="L121">    }</span>
+
+    public int getPosition() {
+<span class="fc" id="L124">        return this.position;</span>
+    }
+
+    public void setCount(int count) {
+<span class="fc" id="L128">        this.count = count;</span>
+<span class="fc" id="L129">    }</span>
+
+    public int getCount() {
+<span class="fc" id="L132">        return this.count;</span>
+    }
+
+    @JsonIgnore
+    public String getStereochemistry() {
+<span class="fc" id="L137">        return stereochemistry;</span>
+    }
+
+    public void setStereochemistry(String stereochemistry) {
+<span class="fc" id="L141">        this.stereochemistry = stereochemistry;</span>
+<span class="fc" id="L142">    }</span>
+
+    @JsonIgnore
+    public String getRingStereo() {
+<span class="fc" id="L146">        return ringStereo;</span>
+    }
+
+    public void setRingStereo(String ringStereo) {
+<span class="fc" id="L150">        this.ringStereo = ringStereo;</span>
+<span class="fc" id="L151">    }</span>
+
+    public DoubleBonds getDoubleBonds() {
+<span class="fc" id="L154">        return this.doubleBonds;</span>
+    }
+
+    public void setDoubleBonds(DoubleBonds doubleBonds) {
+<span class="fc" id="L158">        this.doubleBonds = doubleBonds;</span>
+<span class="fc" id="L159">    }</span>
+
+    public void setAtomic(boolean atomic) {
+<span class="fc" id="L162">        this.atomic = atomic;</span>
+<span class="fc" id="L163">    }</span>
+
+    @JsonIgnore
+    public boolean isAtomic() {
+<span class="fc" id="L167">        return this.atomic;</span>
+    }
+
+    @JsonIgnore
+    public ElementTable getElements() {
+<span class="fc" id="L172">        return this.elements;</span>
+    }
+
+    public void setElements(ElementTable elements) {
+<span class="fc" id="L176">        this.elements = elements;</span>
+<span class="fc" id="L177">    }</span>
+
+    @JsonIgnore
+    public ElementTable computeAndCopyElements() {
+<span class="fc" id="L181">        computeElements();</span>
+<span class="fc" id="L182">        ElementTable _elements = elements.copy();</span>
+<span class="fc" id="L183">        _elements.add(getFunctionalGroupElements());</span>
+<span class="fc" id="L184">        return _elements;</span>
+    }
+
+    public void shiftPositions(int shift) {
+<span class="fc" id="L188">        position += shift;</span>
+<span class="fc" id="L189">        functionalGroups.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L190">            kv.getValue().forEach(fg -&gt; {</span>
+<span class="fc" id="L191">                fg.shiftPositions(shift);</span>
+<span class="fc" id="L192">            });</span>
+<span class="fc" id="L193">        });</span>
+<span class="fc" id="L194">    }</span>
+
+    /**
+     * Return the total count for the given functional group name, or 0.
+     * @param functionalGroup the functional group name.
+     * @return the total count
+     */
+    public Integer getTotalFunctionalGroupCount(String functionalGroup) {
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        if (&quot;[X]&quot;.equals(functionalGroup)) {</span>
+<span class="fc" id="L203">            return 0;</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">        } else if (functionalGroups.containsKey(functionalGroup)) {</span>
+<span class="fc" id="L205">            return functionalGroups.get(functionalGroup).stream().map(fg -&gt; fg.getCount()).reduce(0, Integer::sum);</span>
+        } else {
+<span class="fc" id="L207">            return 0;</span>
+        }
+    }
+
+    /**
+     * Returns a copy of the internally used functional groups map, with the virtual [X] group for regular LCBs removed.
+     * @return a copy of the internal functional groups
+     * @see #getFunctionalGroupsInternal() to obtain the internal datastructure by reference.
+     */
+    public Map&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; getFunctionalGroups() {
+<span class="fc" id="L217">        Map&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; mapCopy = new HashMap&lt;&gt;(functionalGroups);</span>
+<span class="fc" id="L218">        mapCopy.remove(&quot;[X]&quot;);</span>
+<span class="fc" id="L219">        return mapCopy;</span>
+    }
+    
+    /**
+     * Returns the internal representation of the functional groups, including the virtual [X] group for regular LCBs.
+     * @return the internal datastructure by reference.
+     */
+    @JsonIgnore
+    public Map&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; getFunctionalGroupsInternal() {
+<span class="fc" id="L228">        return functionalGroups;</span>
+    }
+
+    /**
+     * Set the internal functional groups.
+     * @param functionalGroups the functional groups to set
+     */
+    public void setFunctionalGroups(HashMap&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; functionalGroups) {
+<span class="fc" id="L236">        this.functionalGroups = functionalGroups;</span>
+<span class="fc" id="L237">    }</span>
+
+    @JsonIgnore
+    public ElementTable getFunctionalGroupElements() {
+<span class="fc" id="L241">        ElementTable _elements = new ElementTable();</span>
+
+<span class="fc" id="L243">        functionalGroups.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L244">            kv.getValue().forEach(func_group -&gt; {</span>
+<span class="fc" id="L245">                _elements.add(func_group.computeAndCopyElements(), func_group.count);</span>
+<span class="fc" id="L246">            });</span>
+<span class="fc" id="L247">        });</span>
+
+<span class="fc" id="L249">        return _elements;</span>
+    }
+
+    public void computeElements() {
+<span class="fc" id="L253">        functionalGroups.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L254">            kv.getValue().forEach(func_group -&gt; {</span>
+<span class="fc" id="L255">                func_group.computeElements();</span>
+<span class="fc" id="L256">            });</span>
+<span class="fc" id="L257">        });</span>
+<span class="fc" id="L258">    }</span>
+
+    public String toString(LipidLevel level) {
+<span class="fc" id="L261">        String fg_string = &quot;&quot;;</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)) {</span>
+<span class="pc bpc" id="L263" title="2 of 4 branches missed.">            if ('0' &lt;= name.charAt(0) &amp;&amp; name.charAt(0) &lt;= '9') {</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">                fg_string = (position &gt; -1) ? (Integer.toString(position) + ringStereo + &quot;(&quot; + name + &quot;)&quot;) : name;</span>
+            } else {
+<span class="fc bfc" id="L266" title="All 2 branches covered.">                fg_string = (position &gt; -1) ? (Integer.toString(position) + ringStereo + name) : name;</span>
+            }
+        } else {
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">            fg_string = (count &gt; 1) ? (&quot;(&quot; + name + &quot;)&quot; + Integer.toString(count)) : name;</span>
+        }
+<span class="fc bfc" id="L271" title="All 4 branches covered.">        if (stereochemistry.length() &gt; 0 &amp;&amp; level == LipidLevel.COMPLETE_STRUCTURE) {</span>
+<span class="fc" id="L272">            fg_string += &quot;[&quot; + stereochemistry + &quot;]&quot;;</span>
+        }
+
+<span class="fc" id="L275">        return fg_string;</span>
+    }
+
+    public int getNDoubleBonds() throws ConstraintViolationException {
+<span class="fc" id="L279">        int db = count * doubleBonds.getNumDoubleBonds();</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">        for (Entry&lt;String, ArrayList&lt;FunctionalGroup&gt;&gt; kv : functionalGroups.entrySet()) {</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">            for (FunctionalGroup func_group : kv.getValue()) {</span>
+<span class="fc" id="L282">                db += func_group.getNDoubleBonds();</span>
+<span class="fc" id="L283">            }</span>
+<span class="fc" id="L284">        }</span>
+
+<span class="fc" id="L286">        return db;</span>
+    }
+
+    public void addPosition(int pos) {
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        position += (position &gt;= pos) ? 1 : 0;</span>
+
+<span class="fc" id="L292">        functionalGroups.entrySet().forEach(kv -&gt; {</span>
+<span class="fc" id="L293">            kv.getValue().forEach(fg -&gt; {</span>
+<span class="fc" id="L294">                fg.addPosition(pos);</span>
+<span class="fc" id="L295">            });</span>
+<span class="fc" id="L296">        });</span>
+<span class="fc" id="L297">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>
