@@ -4,3 +4,4 @@
 /cli/target/
 /parsers/target/
 /parsers/nbproject/
+.vscode/
