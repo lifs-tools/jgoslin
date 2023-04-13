@@ -5,3 +5,4 @@
 /parsers/target/
 /parsers/nbproject/
 .vscode/
+/cli/nbproject/

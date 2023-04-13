@@ -191,7 +191,7 @@ public class CmdLineParser {
         }
     }
 
-    private static enum Grammar {
+    private enum Grammar {
         GOSLIN, GOSLINFRAGMENTS, LIPIDMAPS, SWISSLIPIDS, HMDB, SHORTHAND2020, FATTYACIDS, NONE
     };
 
@@ -220,7 +220,6 @@ public class CmdLineParser {
                 writeToWriter(bw, results);
             }
             sw.flush();
-            sw.close();
             log.info(sw.toString());
             return true;
         } catch (IOException ex) {

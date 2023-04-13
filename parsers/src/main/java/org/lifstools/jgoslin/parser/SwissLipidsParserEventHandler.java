@@ -38,9 +38,9 @@ import static java.util.Map.entry;
  */
 public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
-    public int dbPosition;
-    public String dbCistrans;
-    public int suffixNumber;
+    private int dbPosition;
+    private String dbCistrans;
+    private int suffixNumber;
 
     /**
      * Create a new {@code SwissLipidsParserEventHandler}.
