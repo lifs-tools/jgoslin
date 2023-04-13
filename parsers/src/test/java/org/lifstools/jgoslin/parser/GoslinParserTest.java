@@ -182,6 +182,13 @@ public class GoslinParserTest {
         LipidAdduct la = parser.parse("12-HETE", parser.newEventHandler());
         assertEquals("FA1", la.getLipid().getFaList().get(0).getName());
     }
+        
+    @Test
+    public void testLabeledMediators() {
+        LipidAdduct lipid = parser.parse("15S-HETE-d8", parser.newEventHandler());
+        assertEquals(328.2854d, lipid.getMass(), 1.0e-4);
+        assertEquals("C20H24O3H'8", lipid.getSumFormula());
+    }
 
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/goslin-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
