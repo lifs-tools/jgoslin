@@ -111,6 +111,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("hg_PE_PS_pre_event", this::setHeadgroupName),
                     // set head group headgroupDecorators
                     entry("carbohydrate_pre_event", this::setCarbohydrate),
+                    entry("carbohydrate_sulfo_pre_event", this::setCarbohydrate),
                     entry("carbohydrate_structural_pre_event", this::setCarbohydrateStructural),
                     entry("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric),
                     entry("glyco_sphingo_lipid_pre_event", this::setGlycoSphingoLipid),
