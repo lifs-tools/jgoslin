@@ -120,6 +120,9 @@ public class LipidMapsParserTest {
         assertFalse(lipid.isSpException());
         assertEquals("PC", lipid.getExtendedClass());
         assertEquals(760.58508d, lipid.getMass(), 1.0e-4);
+        
+        lipid = parser.parse("TG(20:0/22:3(10Z,13Z,16Z)/22:5(7Z,10Z,13Z,16Z,19Z))[iso6]", handler);
+        assertEquals("TG", lipid.getClassName());
 
         //lipid = parser.parse("GalNAcβ1-4(Galβ1-4GlcNAcβ1-3)Galβ1-4Glcβ-Cer(d18:1/24:1(15Z))", handler);
         // Lipid Maps Species name is currently "Hex(3)-HexNAc(2)-Cer 42:2;O2"
