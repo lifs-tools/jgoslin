@@ -124,9 +124,11 @@ public final class Headgroup {
 
         String hgs = useHeadgroup ? headgroup : getClassString(lipidClass);
 
+        /*
         if (level == LipidLevel.CLASS) {
             return hgs;
         }
+        */
 
         StringBuilder headgoup_string = new StringBuilder();
 
