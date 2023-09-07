@@ -34,11 +34,15 @@ import org.lifstools.jgoslin.domain.LipidFullStructure;
 import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Map.entry;
+import java.util.TreeMap;
+import org.lifstools.jgoslin.domain.Cycle;
+import org.lifstools.jgoslin.domain.DoubleBonds;
 import org.lifstools.jgoslin.domain.Element;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
@@ -203,6 +207,212 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
             }
         }
         return ls;
+    }
+    
+    
+
+    protected FattyAcid resolveFaSynonym(String mediatorName) {
+
+        switch (mediatorName) {
+            case "Palmitic acid":
+                return new FattyAcid("FA", 16, knownFunctionalGroups);
+
+            case "Linoleic acid":
+                return new FattyAcid("FA", 18, new DoubleBonds(2), knownFunctionalGroups);
+
+            case "AA":
+                return new FattyAcid("FA", 20, new DoubleBonds(4), knownFunctionalGroups);
+
+            case "ALA":
+                return new FattyAcid("FA", 18, new DoubleBonds(3), knownFunctionalGroups);
+
+            case "EPA":
+                return new FattyAcid("FA", 20, new DoubleBonds(5), knownFunctionalGroups);
+
+            case "DHA":
+                return new FattyAcid("FA", 22, new DoubleBonds(6), knownFunctionalGroups);
+
+            case "LTB4": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                f1.setPosition(5);
+                f2.setPosition(12);
+                DoubleBonds db = new DoubleBonds(new TreeMap<>(Map.of(6, "Z", 8, "E", 10, "E", 14, "Z")));
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2))));
+                return new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+            }
+
+            case "Resolvin D3": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(4);
+                f2.setPosition(11);
+                f3.setPosition(17);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
+                return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+            }
+
+            case "Maresin 1": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                f1.setPosition(4);
+                f2.setPosition(14);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2))));
+                return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+            }
+
+            case "Resolvin D2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(4);
+                f2.setPosition(16);
+                f3.setPosition(17);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
+                return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+            }
+
+            case "Resolvin D5": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                f1.setPosition(7);
+                f2.setPosition(17);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2))));
+                return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+            }
+
+            case "Resolvin D1": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(7);
+                f2.setPosition(8);
+                f3.setPosition(17);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
+                return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
+            }
+
+            case "TXB1": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f4 = knownFunctionalGroups.get("oxy");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                f4.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)), "oxo", new ArrayList<>(Arrays.asList(f4))));
+                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(1), fg, knownFunctionalGroups);
+            }
+
+            case "TXB2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f4 = knownFunctionalGroups.get("oxy");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                f4.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)), "oxy", new ArrayList<>(Arrays.asList(f4))));
+                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+            }
+
+            case "TXB3": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f4 = knownFunctionalGroups.get("oxy");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                f4.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)), "oxy", new ArrayList<>(Arrays.asList(f4))));
+                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
+            }
+
+            case "PGF2alpha": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3))));
+                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+            }
+
+            case "PGD2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2)), "oxo", new ArrayList<>(Arrays.asList(f3))));
+                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+            }
+
+            case "PGE2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f3)), "oxo", new ArrayList<>(Arrays.asList(f2))));
+                Cycle cy = new Cycle(5, 8, 12, fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+            }
+
+            case "PGB2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2))));
+                Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+            }
+
+            case "15d-PGJ2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+                f1.setPosition(15);
+                f2.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2))));
+                Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
+            }
+
+            case "PGJ2": {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+                f1.setPosition(15);
+                f2.setPosition(11);
+                HashMap<String, ArrayList<FunctionalGroup>> fgc = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2))));
+                Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgc, knownFunctionalGroups);
+                HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+                return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
+            }
+            
+            default:
+                return null;
+        }
     }
 
 }
