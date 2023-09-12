@@ -39,14 +39,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Map.entry;
 import java.util.TreeMap;
 import org.lifstools.jgoslin.domain.Cycle;
 import org.lifstools.jgoslin.domain.DoubleBonds;
-import org.lifstools.jgoslin.domain.Element;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
-import org.lifstools.jgoslin.domain.LipidParsingException;
 
 /**
  *
@@ -64,25 +61,6 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     protected ArrayList<HeadgroupDecorator> headgroupDecorators = new ArrayList<>();
     protected boolean useHeadGroup = false;
     protected KnownFunctionalGroups knownFunctionalGroups;
-    
-    private static final Map<String, ArrayList<String>> GLYCO_TABLE = Map.ofEntries(
-        entry("ga2", new ArrayList<String>(Arrays.asList("GalNAc", "Gal", "Glc"))),
-        entry("gb3", new ArrayList<String>(Arrays.asList("Gal", "Gal", "Glc"))),
-        entry("gb4", new ArrayList<String>(Arrays.asList("GalNAc", "Gal", "Gal", "Glc"))),
-        entry("gd1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gd1a", new ArrayList<String>(Arrays.asList("Hex", "Hex", "Hex", "HexNAc", "NeuAc", "NeuAc"))),
-        entry("gd2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gd3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gm1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "Gal", "Glc"))),
-        entry("gm2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "Gal", "Glc"))),
-        entry("gm3", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "Glc"))),
-        entry("gm4", new ArrayList<String>(Arrays.asList("NeuAc", "Gal"))),
-        entry("gp1", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gq1", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "NeuAc", "Gal", "Glc")))
-    );
 
     protected static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
 
@@ -99,25 +77,6 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     }
 
     protected Headgroup prepareHeadgroupAndChecks() {
-        
-        String hg = headGroup.toLowerCase();
-        if (GLYCO_TABLE.containsKey(hg)){
-            for (String carbohydrate : GLYCO_TABLE.get(hg)){
-                FunctionalGroup functional_group = null;
-                try {
-                    functional_group = knownFunctionalGroups.get(carbohydrate);
-                } catch (Exception e) {
-                    throw new LipidParsingException("Carbohydrate '" + carbohydrate + "' unknown");
-                }
-
-                functional_group.getElements().put(Element.O, functional_group.getElements().get(Element.O) - 1);
-                headgroupDecorators.add((HeadgroupDecorator) functional_group);
-
-            }
-            headGroup = "Cer";
-        }
-        
-        
         Headgroup headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
         if (useHeadGroup) {
             return headgroup;

@@ -37,6 +37,7 @@ public final class Headgroup {
     public static HashMap<String, Integer> StringClass = new HashMap<>();
     public static HashMap<Integer, String> ClassString = new HashMap<>();
     public static HashSet<String> exceptionHeadgroups = new HashSet<>(Arrays.asList("Cer", "SPB"));
+    protected KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups();
 
     private String headgroup;
     private LipidCategory lipidCategory;
@@ -55,17 +56,57 @@ public final class Headgroup {
             entry(LipidCategory.FA, "FA"),
             entry(LipidCategory.SL, "SL")
     );
+    
+    private static final Map<String, ArrayList<String>> GLYCO_TABLE = Map.ofEntries(
+        entry("ga2", new ArrayList<String>(Arrays.asList("GalNAc", "Gal", "Glc"))),
+        entry("gb3", new ArrayList<String>(Arrays.asList("Gal", "Gal", "Glc"))),
+        entry("gb4", new ArrayList<String>(Arrays.asList("GalNAc", "Gal", "Gal", "Glc"))),
+        entry("gd1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gd1a", new ArrayList<String>(Arrays.asList("Hex", "Hex", "Hex", "HexNAc", "NeuAc", "NeuAc"))),
+        entry("gd2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gd3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gm1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "Gal", "Glc"))),
+        entry("gm2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "Gal", "Glc"))),
+        entry("gm3", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "Glc"))),
+        entry("gm4", new ArrayList<String>(Arrays.asList("NeuAc", "Gal"))),
+        entry("gp1", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gq1", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gt1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gt2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gt3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "NeuAc", "Gal", "Glc")))
+    );
 
     public Headgroup(String _headgroup) {
         this(_headgroup, null, false);
     }
 
     public Headgroup(String _headgroup, ArrayList<HeadgroupDecorator> _decorators, boolean _use_headgroup) {
+        decorators = new ArrayList<>();
+        
+        String hg = _headgroup.toLowerCase();
+        if (GLYCO_TABLE.containsKey(hg)){
+            for (String carbohydrate : GLYCO_TABLE.get(hg)){
+                FunctionalGroup functional_group = null;
+                try {
+                    functional_group = knownFunctionalGroups.get(carbohydrate);
+                } catch (Exception e) {
+                    throw new LipidParsingException("Carbohydrate '" + carbohydrate + "' unknown");
+                }
+
+                functional_group.getElements().put(Element.O, functional_group.getElements().get(Element.O) - 1);
+                decorators.add((HeadgroupDecorator) functional_group);
+
+            }
+            _headgroup = "Cer";
+        }
+        
         headgroup = _headgroup;
         lipidCategory = getCategory(_headgroup);
         lipidClass = getClass(headgroup);
         useHeadgroup = _use_headgroup;
-        decorators = (_decorators != null) ? _decorators : new ArrayList<>();
+        if (_decorators != null){
+            for (HeadgroupDecorator hgd : _decorators) decorators.add(hgd);
+        }
         spException = (lipidCategory == LipidCategory.SP) && exceptionHeadgroups.contains(LipidClasses.getInstance().get(lipidClass).lipidClassName) && (decorators.isEmpty());
     }
 
@@ -136,9 +177,13 @@ public final class Headgroup {
         if (!LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level | LipidLevel.STRUCTURE_DEFINED.level)) {
             ArrayList<HeadgroupDecorator> decoratorsTmp = new ArrayList<>();
             for (HeadgroupDecorator hgd : decorators) {
-                if (!hgd.isSuffix()) {
-                    decoratorsTmp.add((HeadgroupDecorator)hgd.copy());
-                }
+                if (hgd.isSuffix()) continue;
+                
+                HeadgroupDecorator hgd_copy = (HeadgroupDecorator)hgd.copy();
+                hgd_copy.name = hgd_copy.name.replace("Gal", "Hex");
+                hgd_copy.name = hgd_copy.name.replace("Glc", "Hex");
+                hgd_copy.name = hgd_copy.name.replace("S(3')", "S");
+                decoratorsTmp.add(hgd_copy);
             }
             Collections.sort(decoratorsTmp);
             for (int i = decoratorsTmp.size() - 1; i > 0; --i){

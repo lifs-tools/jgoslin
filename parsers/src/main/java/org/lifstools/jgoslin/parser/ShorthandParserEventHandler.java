@@ -110,9 +110,9 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("hg_pip_pure_t_pre_event", this::setHeadgroupName),
                     entry("hg_PE_PS_pre_event", this::setHeadgroupName),
                     // set head group headgroupDecorators
-                    entry("carbohydrate_pre_event", this::setCarbohydrate),
-                    entry("carbohydrate_sulfo_pre_event", this::setCarbohydrate),
-                    entry("carbohydrate_structural_pre_event", this::setCarbohydrateStructural),
+                    entry("carbohydrate_sn_pre_event", this::setCarbohydrate),
+                    entry("carbohydrate_iso_pre_event", this::setCarbohydrate),
+                    entry("carbohydrate_sn_position_pre_event", this::setCarbohydrateSnPosition),
                     entry("carbohydrate_isomeric_pre_event", this::setCarbohydrateIsomeric),
                     entry("glyco_sphingo_lipid_pre_event", this::setGlycoSphingoLipid),
                     entry("carbohydrate_number_pre_event", this::setCarbohydrateNumber),
@@ -350,8 +350,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
     
 
-    private void setCarbohydrateStructural(TreeNode node) {
-        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
+    private void setCarbohydrateSnPosition(TreeNode node) {
+        setLipidLevel(LipidLevel.SN_POSITION);
         tmp.put("func_group_head", 1);
     }
 

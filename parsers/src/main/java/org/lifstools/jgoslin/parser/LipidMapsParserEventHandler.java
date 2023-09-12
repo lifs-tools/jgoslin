@@ -164,6 +164,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         } catch (Exception e) {
             throw new LipidParsingException("Cannot initialize LipidMapsParserEventHandler.");
         }
+        
     }
 
     @Override
