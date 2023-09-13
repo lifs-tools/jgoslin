@@ -33,17 +33,17 @@ import static java.util.Map.entry;
  */
 public final class Headgroup {
     
-    public static HashMap<String, LipidCategory> StringCategory = new HashMap<>();
-    public static HashMap<String, Integer> StringClass = new HashMap<>();
-    public static HashMap<Integer, String> ClassString = new HashMap<>();
-    public static HashSet<String> exceptionHeadgroups = new HashSet<>(Arrays.asList("Cer", "SPB"));
-    protected KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups();
+    public final static HashMap<String, LipidCategory> StringCategory = new HashMap<>();
+    public final static HashMap<String, Integer> StringClass = new HashMap<>();
+    public final static HashMap<Integer, String> ClassString = new HashMap<>();
+    public final static HashSet<String> exceptionHeadgroups = new HashSet<>(Arrays.asList("Cer", "SPB"));
+    private final static KnownFunctionalGroups knownFunctionalGroups = new KnownFunctionalGroups();
 
     private String headgroup;
     private LipidCategory lipidCategory;
     private int lipidClass;
     private boolean useHeadgroup;
-    private ArrayList<HeadgroupDecorator> decorators;
+    private ArrayList<HeadgroupDecorator> decorators = new ArrayList<>();
     private boolean spException;
 
     public static final Map<LipidCategory, String> CategoryString = Map.ofEntries(
@@ -81,10 +81,8 @@ public final class Headgroup {
     }
 
     public Headgroup(String _headgroup, ArrayList<HeadgroupDecorator> _decorators, boolean _use_headgroup) {
-        decorators = new ArrayList<>();
-        
         String hg = _headgroup.toLowerCase();
-        if (GLYCO_TABLE.containsKey(hg)){
+        if (GLYCO_TABLE.containsKey(hg) && !_use_headgroup){
             for (String carbohydrate : GLYCO_TABLE.get(hg)){
                 FunctionalGroup functional_group = null;
                 try {
