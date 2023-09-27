@@ -39,11 +39,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import org.lifstools.jgoslin.domain.Cycle;
 import org.lifstools.jgoslin.domain.DoubleBonds;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.LipidParsingException;
 
 /**
  *
@@ -75,6 +77,32 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     protected boolean spRegularLcb() {
         return Headgroup.getCategory(headGroup) == LipidCategory.SP && (currentFa.getLipidFaBondType() == LipidFaBondType.LCB_REGULAR || currentFa.getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION) && !(SP_EXCEPTION_CLASSES.contains(headGroup) && headgroupDecorators.isEmpty());
     }
+    
+    
+
+    protected boolean check_full_structure(FunctionalGroup obj){
+        boolean full = true;
+
+        boolean is_fa = (obj instanceof FattyAcid);
+        if (is_fa && ((FattyAcid)obj).getNumCarbon() == 0) return true;
+        if (is_fa && obj.getDoubleBonds().getNumDoubleBonds() > 0 && obj.getDoubleBonds().getDoubleBondPositions().isEmpty()) return false;
+        if (is_fa && !obj.getDoubleBonds().getDoubleBondPositions().isEmpty()){
+            int sum = 0;
+            for (Entry<Integer, String> kv : obj.getDoubleBonds().getDoubleBondPositions().entrySet())
+                sum += (kv.getValue().equals("E") || kv.getValue().equals("Z") || (kv.getValue().equals("") && kv.getKey() == ((FattyAcid)obj).getNumCarbon() - 1)) ? 1 : 0;
+            full &= (sum == obj.getDoubleBonds().getDoubleBondPositions().size());
+
+        }
+
+        for (Entry<String, ArrayList<FunctionalGroup>> kv : obj.getFunctionalGroupsInternal().entrySet()){
+            for (FunctionalGroup fg : kv.getValue()){
+                if (fg.getName().equals("X")) continue;
+                if (fg.getPosition() < 0) return false;
+                full &= check_full_structure(fg);
+            }
+        }
+        return full;
+    }
 
     protected Headgroup prepareHeadgroupAndChecks() {
         Headgroup headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
@@ -105,6 +133,16 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
             else headGroup = "MG";
             headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
             poss_fa = (LipidClasses.getInstance().size() > headgroup.getLipidClass()) ? LipidClasses.getInstance().get(headgroup.getLipidClass()).possibleNumFa : 0;
+        }
+        
+        // check if all functional groups have a position to be full structure
+        if (LipidLevel.isLevel(level, LipidLevel.COMPLETE_STRUCTURE.level | LipidLevel.FULL_STRUCTURE.level)){
+            for (FattyAcid fa : faList){
+                if (!check_full_structure(fa)){
+                    setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
+                    break;
+                }
+            }
         }
         
 
@@ -171,27 +209,31 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     
 
     protected FattyAcid resolveFaSynonym(String mediatorName) {
-
+        
         switch (mediatorName) {
-            case "Palmitic acid":
+            case "Palmitic acid" -> {
                 return new FattyAcid("FA", 16, knownFunctionalGroups);
+            }
 
-            case "Linoleic acid":
+            case "LA", "Linoleic acid" -> {
                 return new FattyAcid("FA", 18, new DoubleBonds(2), knownFunctionalGroups);
-
-            case "AA":
+            }
+            case "Arachidonic acid", "AA" -> {
                 return new FattyAcid("FA", 20, new DoubleBonds(4), knownFunctionalGroups);
+            }
 
-            case "ALA":
+            case "ALA" -> {
                 return new FattyAcid("FA", 18, new DoubleBonds(3), knownFunctionalGroups);
-
-            case "EPA":
+            }
+            case "EPA" -> {
                 return new FattyAcid("FA", 20, new DoubleBonds(5), knownFunctionalGroups);
+            }
 
-            case "DHA":
+            case "DHA" -> {
                 return new FattyAcid("FA", 22, new DoubleBonds(6), knownFunctionalGroups);
+            }
 
-            case "LTB4": {
+            case "LTB4" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 f1.setPosition(5);
@@ -201,7 +243,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
             }
 
-            case "Resolvin D3": {
+            case "RvD3", "Resolvin D3" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -212,7 +254,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
             }
 
-            case "Maresin 1": {
+            case "Mar1", "Maresin 1" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 f1.setPosition(4);
@@ -221,7 +263,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
             }
 
-            case "Resolvin D2": {
+            case "Resolvin D2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -231,8 +273,8 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
                 return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
             }
-
-            case "Resolvin D5": {
+            
+            case "Resolvin D5" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 f1.setPosition(7);
@@ -241,7 +283,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
             }
 
-            case "Resolvin D1": {
+            case "Resolvin D1" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -251,8 +293,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2, f3))));
                 return new FattyAcid("FA", 22, new DoubleBonds(6), fg, knownFunctionalGroups);
             }
-
-            case "TXB1": {
+            case "TXB1" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -267,7 +308,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(1), fg, knownFunctionalGroups);
             }
 
-            case "TXB2": {
+            case "TXB2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -282,7 +323,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
             }
 
-            case "TXB3": {
+            case "TXB3" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -297,7 +338,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
             }
 
-            case "PGF2alpha": {
+            case "PGF2alpha" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -310,7 +351,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
             }
 
-            case "PGD2": {
+            case "PGD2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
@@ -323,7 +364,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
             }
 
-            case "PGE2": {
+            case "PGE2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
                 FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -336,7 +377,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
             }
 
-            case "PGB2": {
+            case "PGB2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("OH");
                 f1.setPosition(15);
@@ -347,7 +388,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
             }
 
-            case "15d-PGJ2": {
+            case "15d-PGJ2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
                 f1.setPosition(15);
@@ -358,7 +399,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 return new FattyAcid("FA", 20, new DoubleBonds(3), fg, knownFunctionalGroups);
             }
 
-            case "PGJ2": {
+            case "PGJ2" -> {
                 FunctionalGroup f1 = knownFunctionalGroups.get("OH");
                 FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
                 f1.setPosition(15);
@@ -368,9 +409,52 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
                 HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
                 return new FattyAcid("FA", 20, new DoubleBonds(2), fg, knownFunctionalGroups);
             }
+
+            case "PGF1alpha" -> {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(15);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                
+                Cycle cy = new Cycle(5, 8, 12, null, new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)))), knownFunctionalGroups);
+                return new FattyAcid("FA", 20, new DoubleBonds(1), new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy)))), knownFunctionalGroups);
+            }
+
+            case "PDX" -> {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                f1.setPosition(10);
+                f2.setPosition(17);
+                return new FattyAcid("FA", 2, new DoubleBonds(6), new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1, f2)))), knownFunctionalGroups);
+            }
+
+            case "Oleic acid", "OA" ->  {
+                return new FattyAcid("FA", 18, new DoubleBonds(1));
+            }
+
+            case "DGLA" ->  {
+                return new FattyAcid("FA", 20, new DoubleBonds(3));
+            }
             
-            default:
-                return null;
+            case "iPF2alpha-VI" -> {
+                FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+                FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+                f1.setPosition(5);
+                f2.setPosition(9);
+                f3.setPosition(11);
+                
+                
+                Cycle cy = new Cycle(5, 8, 12, null, new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3)))), knownFunctionalGroups);
+                return new FattyAcid("FA", 20, new DoubleBonds(2), new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy)))), knownFunctionalGroups);
+                
+            }
+
+            default -> {
+                throw new LipidParsingException("Mediator '" + mediatorName +"' is unknown.");
+            }
         }
     }
 

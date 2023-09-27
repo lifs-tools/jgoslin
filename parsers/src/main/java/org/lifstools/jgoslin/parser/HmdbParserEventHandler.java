@@ -47,6 +47,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     private String dbCistrans;
     private Dictionary furan = null;
     private String funcType;
+    private ArrayList<FunctionalGroup> updateFunctionalGroup = new ArrayList<>();
 
     /**
      * Create a new {@code HmdbParserEventHandler}.
@@ -214,6 +215,13 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void appendFa(TreeNode node) {
+        if (!updateFunctionalGroup.isEmpty()){
+            for (FunctionalGroup fg : updateFunctionalGroup){
+                fg.setPosition(fg.getPosition() + currentFa.getNumCarbon());
+            }
+            updateFunctionalGroup.clear();
+        }
+        
         if (currentFa.getDoubleBonds().getNumDoubleBonds() < 0) {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
@@ -270,8 +278,9 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addMethyl(TreeNode node) {
         FunctionalGroup functionalGroup = knownFunctionalGroups.get("Me");
-        functionalGroup.setPosition(currentFa.getNumCarbon() - (node.getText().equals("i-") ? 1 : 2));
+        functionalGroup.setPosition(-(node.getText().equals("i-") ? 1 : 2));
         currentFa.setNumCarbon(currentFa.getNumCarbon() - 1);
+        updateFunctionalGroup.add(functionalGroup);
 
         if (!currentFa.getFunctionalGroupsInternal().containsKey("Me")) {
             currentFa.getFunctionalGroupsInternal().put("Me", new ArrayList<>());

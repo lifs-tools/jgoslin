@@ -97,7 +97,7 @@ public class HmdbParserTest {
         assertEquals("C40H77N2O7P", l.getSumFormula());
         
         l = parser.parse("DG(a-21:0/20:5(5Z,8Z,10E,14Z,17Z)+=O(12S)/0:0)", handler);
-        assertEquals("DG 20:0;Me/20:5(5Z,8Z,10E,14Z,17Z);12oxo/0:0", l.getLipidString(LipidLevel.FULL_STRUCTURE));
+        assertEquals("DG 20:0;18Me/20:5(5Z,8Z,10E,14Z,17Z);12oxo/0:0", l.getLipidString(LipidLevel.FULL_STRUCTURE));
         assertEquals("DG 20:0;Me/20:5(5,8,10,14,17);oxo/0:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("DG 21:0/20:6;O/0:0", l.getLipidString(LipidLevel.SN_POSITION));
         assertEquals("DG 21:0_20:6;O", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));

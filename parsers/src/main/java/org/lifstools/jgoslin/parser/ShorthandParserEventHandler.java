@@ -567,6 +567,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setCycleStart(TreeNode node) {
         ((Cycle) currentFas.peekLast()).setStart(Integer.valueOf(node.getText()));
+        ((Cycle) currentFas.peekLast()).setPosition(Integer.valueOf(node.getText()));
     }
 
     private void setCycleEnd(TreeNode node) {

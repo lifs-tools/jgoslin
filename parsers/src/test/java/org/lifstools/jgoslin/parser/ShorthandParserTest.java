@@ -234,6 +234,7 @@ public class ShorthandParserTest {
         assertEquals(2, l.getLipid().getFaList().get(1).getPosition());
     }
 
+
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/shorthand-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testShorthandParserFromFilesTest(String fullStructure, String structureDefined, String snPosition, String molecularSpecies, String species, String sumFormula, String noIdea) {
@@ -249,10 +250,10 @@ public class ShorthandParserTest {
         }
 
         List<String> lipidNamesOnLevel = Arrays.asList(fullStructure, structureDefined, snPosition, molecularSpecies, species);
-
         for (int lev = 0; lev < levels.size(); ++lev) {
             LipidLevel lipid_level = levels.get(lev);
             String n = lipid.getLipidString(lipid_level);
+            
             assertEquals(lipidNamesOnLevel.get(lev), n);
             assertEquals(formula, lipid.getSumFormula());
 

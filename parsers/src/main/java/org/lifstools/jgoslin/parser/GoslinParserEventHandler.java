@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import static java.util.Map.entry;
 import java.util.TreeMap;
 import org.lifstools.jgoslin.domain.Element;
@@ -252,6 +253,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void buildLipid(TreeNode node) {
+        
         if (lcb != null) {
             faList.add(0, lcb);
             lcb = null;
@@ -408,6 +410,12 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             if (mediatorFunctionPositions.size() > 0) {
                 functionalGroup.setPosition(mediatorFunctionPositions.get(0));
             }
+        } else if (mediatorFunction.equals("NO2")) {
+            functionalGroup = knownFunctionalGroups.get("NO2");
+            fg = "NO2";
+            if (mediatorFunctionPositions.size() > 0) {
+                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
+            }
         } else if (mediatorFunction.equals("DH") || mediatorFunction.equals("DiH") || mediatorFunction.equals("diH")) {
             functionalGroup = knownFunctionalGroups.get("OH");
             fg = "OH";
@@ -428,7 +436,18 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setTrivialMediator(TreeNode node) {
         headGroup = "FA";
+        
+        FattyAcid tmpFa = currentFa;
         currentFa = resolveFaSynonym(node.getText());
+        if (tmpFa != null){
+            for (Entry<String, ArrayList<FunctionalGroup>> kv : tmpFa.getFunctionalGroupsInternal().entrySet()){
+                if (!currentFa.getFunctionalGroupsInternal().containsKey(kv.getKey())){
+                    currentFa.getFunctionalGroupsInternal().put(kv.getKey(), new ArrayList<>());
+                }
+                for (FunctionalGroup fg : kv.getValue()) currentFa.getFunctionalGroupsInternal().get(kv.getKey()).add(fg);
+            }
+            tmpFa.getFunctionalGroupsInternal().clear();
+        }
 
         faList.clear();
         faList.add(currentFa);
