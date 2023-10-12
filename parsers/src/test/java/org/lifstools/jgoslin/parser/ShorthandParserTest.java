@@ -180,6 +180,26 @@ public class ShorthandParserTest {
         l = parser.parse("EPC 34:2;O2", handler);
         assertEquals("EPC 34:2;O2", l.getLipidString());
         assertEquals("C36H71N2O6P", l.getSumFormula());
+    
+        l = parser.parse("SPBP 18:1;O2", handler);
+        assertEquals("SPBP 18:1;O2", l.getLipidString());
+        assertEquals("C18H38NO5P", l.getSumFormula());
+
+        l = parser.parse("LSM 18:1;O2", handler);
+        assertEquals("LSM 18:1;O2", l.getLipidString());
+
+        l = parser.parse("LSM(1) 18:1(5Z);3OH", handler);
+        assertEquals("LSM(1) 18:1(5Z);3OH", l.getLipidString());
+
+        l = parser.parse("LHexCer 18:1;O2", handler);
+        assertEquals("LHexCer 18:1;O2", l.getLipidString());
+
+        l = parser.parse("LHexCer 18:1;O2/0:0", handler);
+        assertEquals("LHexCer 18:1;O2", l.getLipidString());
+
+        l = parser.parse("LHexCer(1) 18:1(5E);3OH/0:0", handler);
+        assertEquals("LHexCer(1) 18:1(5E);3OH", l.getLipidString());
+        
         
         l = parser.parse("Gal-Glc-Cer(1) 17:1(5E);15Me[R];3OH[R],4OH[S]/22:0;2OH[R]", handler);
         assertEquals(LipidLevel.COMPLETE_STRUCTURE, l.getLipidLevel());
