@@ -407,14 +407,14 @@
             <id>jfrog</id>
             <distributionManagement>
                 <repository>
-                    <id>lifstools-jfrog</id>
-                    <name>lifstools-release</name>
-                    <url>https://lifstools.jfrog.io/artifactory/lifs-libs-release-local</url>
+                    <id>artifactory-releases</id>
+                    <name>lifstools-release-local</name>
+                    <url>https://m.lifs-tools.org/artifactory/lifs-libs-release-local</url>
                 </repository>
                 <snapshotRepository>
-                    <id>lifstools-jfrog</id>
-                    <name>lifstools-snapshot</name>
-                    <url>https://lifstools.jfrog.io/artifactory/lifs-libs-snapshot-local</url>
+                    <id>artifactory-snapshots</id>
+                    <name>lifstools-snapshot-local</name>
+                    <url>https://m.lifs-tools.org/artifactory/lifs-libs-snapshot-local</url>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
