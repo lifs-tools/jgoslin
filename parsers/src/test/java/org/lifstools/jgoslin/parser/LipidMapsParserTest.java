@@ -49,6 +49,7 @@ public class LipidMapsParserTest {
         handler = parser.newEventHandler();
     }
 
+    
     @Test
     public void testDefaultConstructorTest() {
         LipidMapsParser gp = new LipidMapsParser();
@@ -56,7 +57,7 @@ public class LipidMapsParserTest {
     }
 
     @Test
-    public void testLipidMapsParserTest() {
+    public void testLipidMapsParserTest() {        
         LipidAdduct lipid = parser.parse("Cer(d18:1(8Z)/24:0)", handler);
         assertEquals("Cer 18:1(8);(OH)2/24:0", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("Cer 18:1;O2/24:0", lipid.getLipidString(LipidLevel.SN_POSITION));
@@ -124,10 +125,8 @@ public class LipidMapsParserTest {
         lipid = parser.parse("TG(20:0/22:3(10Z,13Z,16Z)/22:5(7Z,10Z,13Z,16Z,19Z))[iso6]", handler);
         assertEquals("TG", lipid.getClassName());
 
-        //lipid = parser.parse("GalNAcβ1-4(Galβ1-4GlcNAcβ1-3)Galβ1-4Glcβ-Cer(d18:1/24:1(15Z))", handler);
-        // Lipid Maps Species name is currently "Hex(3)-HexNAc(2)-Cer 42:2;O2"
-        //assertEquals("GalGalGalNAcGlcGlcNAcCer 42:2;O2", lipid.getLipidString(LipidLevel.SPECIES));
-        //assertEquals(1539.9388d, lipid.getMass(), 1.0e-4);
+        lipid = parser.parse("GalNAc-4(Gal-4GlcNAc-3)Gal-4Glc-Cer(d18:1/24:1(15Z))", handler);
+        assertEquals("Hex3HexNAc2Cer 42:2;O2", lipid.getLipidString(LipidLevel.SPECIES));
     }
     
     @Test
@@ -140,7 +139,7 @@ public class LipidMapsParserTest {
         assertEquals(767.6290d, lipid.getMass(), 1.0e-4);
         assertEquals("C42H76NO8PH'7", lipid.getSumFormula());
     }
-
+    
     
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
@@ -149,6 +148,7 @@ public class LipidMapsParserTest {
             //skip test
             assertTrue(true, "Skipping trivial / unsupported name: " + lipid_name);
         } else {
+            System.out.println(lipid_name);
             LipidAdduct lipid = parser.parse(lipid_name, handler);
             assertTrue(lipid != null);
             if (!correct_lipid_name.equals("Unsupported lipid") && correct_lipid_name.length() > 0) {

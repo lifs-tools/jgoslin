@@ -179,10 +179,27 @@ public class GoslinParserTest {
 
     @Test
     public void testHete() {
-        LipidAdduct la = parser.parse("12-HETE", parser.newEventHandler());
-        assertEquals("FA1", la.getLipid().getFaList().get(0).getName());
-    }
+        LipidAdduct lipidAdduct = null;
         
+        lipidAdduct = parser.parse("12-HETE", handler);
+        assertEquals("FA1", lipidAdduct.getLipid().getFaList().get(0).getName());
+    
+        lipidAdduct = parser.parse("NO2-OA", handler);
+        assertEquals("FA 18:1;NO2", lipidAdduct.getLipid().getLipidString(LipidLevel.STRUCTURE_DEFINED));
+    
+        lipidAdduct = parser.parse("7(R),14(S)-DiHDHA", handler);
+        assertEquals("FA 22:6;(OH)2", lipidAdduct.getLipid().getLipidString(LipidLevel.STRUCTURE_DEFINED));
+    
+        lipidAdduct = parser.parse("Mar1", handler);
+        assertEquals("FA 22:6;(OH)2", lipidAdduct.getLipid().getLipidString(LipidLevel.STRUCTURE_DEFINED));
+    
+        lipidAdduct = parser.parse("LA", handler);
+        assertEquals("FA 18:2", lipidAdduct.getLipid().getLipidString(LipidLevel.STRUCTURE_DEFINED));
+    
+        lipidAdduct = parser.parse("iPF2alpha-VI", handler);
+        assertEquals("FA 20:2;[cy5:0;(OH)2];OH", lipidAdduct.getLipid().getLipidString(LipidLevel.STRUCTURE_DEFINED));
+    }
+    
     @Test
     public void testLabeledMediators() {
         LipidAdduct lipid = parser.parse("15S-HETE-d8", parser.newEventHandler());

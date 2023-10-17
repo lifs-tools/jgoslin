@@ -95,25 +95,25 @@ public class ShorthandParserTest {
         l = parser.parse("Gal-Cer(1) 18:1(5Z);3OH/24:0", handler);
         assertEquals("Gal-Cer(1) 18:1(5Z);3OH/24:0", l.getLipidString());
         assertEquals("Gal-Cer 18:1(5);OH/24:0", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
-        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
-        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("GalCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("HexCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("Gal-Cer 18:1(5);OH/24:0", handler);
         assertEquals("Gal-Cer 18:1(5);OH/24:0", l.getLipidString());
-        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
-        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
-        assertEquals("GalCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.SN_POSITION));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("HexCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("GalCer 18:1;O2/24:0", handler);
-        assertEquals("GalCer 18:1;O2/24:0", l.getLipidString());
-        assertEquals("GalCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
+        assertEquals("HexCer 18:1;O2/24:0", l.getLipidString());
+        assertEquals("HexCer 42:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("GalCer 42:1;O2", handler);
-        assertEquals("GalCer 42:1;O2", l.getLipidString());
+        assertEquals("HexCer 42:1;O2", l.getLipidString());
         assertEquals("C48H93NO8", l.getSumFormula());
 
         l = parser.parse("SPB 18:1(4Z);1OH,3OH", handler);
@@ -180,13 +180,33 @@ public class ShorthandParserTest {
         l = parser.parse("EPC 34:2;O2", handler);
         assertEquals("EPC 34:2;O2", l.getLipidString());
         assertEquals("C36H71N2O6P", l.getSumFormula());
+    
+        l = parser.parse("SPBP 18:1;O2", handler);
+        assertEquals("SPBP 18:1;O2", l.getLipidString());
+        assertEquals("C18H38NO5P", l.getSumFormula());
+
+        l = parser.parse("LSM 18:1;O2", handler);
+        assertEquals("LSM 18:1;O2", l.getLipidString());
+
+        l = parser.parse("LSM(1) 18:1(5Z);3OH", handler);
+        assertEquals("LSM(1) 18:1(5Z);3OH", l.getLipidString());
+
+        l = parser.parse("LHexCer 18:1;O2", handler);
+        assertEquals("LHexCer 18:1;O2", l.getLipidString());
+
+        l = parser.parse("LHexCer 18:1;O2/0:0", handler);
+        assertEquals("LHexCer 18:1;O2", l.getLipidString());
+
+        l = parser.parse("LHexCer(1) 18:1(5E);3OH/0:0", handler);
+        assertEquals("LHexCer(1) 18:1(5E);3OH", l.getLipidString());
         
-        l = parser.parse("Hex-Hex-Cer(1) 17:1(5E);15Me[R];3OH[R],4OH[S]/22:0;2OH[R]", handler);
+        
+        l = parser.parse("Gal-Glc-Cer(1) 17:1(5E);15Me[R];3OH[R],4OH[S]/22:0;2OH[R]", handler);
         assertEquals(LipidLevel.COMPLETE_STRUCTURE, l.getLipidLevel());
-        l = parser.parse("Hex-Hex-Cer(1) 17:1(5E);15Me;3OH,4OH/22:0;2OH", handler);
+        l = parser.parse("Gal-Glc-Cer(1) 17:1(5E);15Me;3OH,4OH/22:0;2OH", handler);
         assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
-        assertEquals("Hex-Hex-Cer(1) 17:1(5E);15Me;3OH,4OH/22:0;2OH", l.getLipidString());
-        assertEquals("Hex-Hex-Cer 17:1(5);Me;(OH)2/22:0;OH", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
+        assertEquals("Gal-Glc-Cer(1) 17:1(5E);15Me;3OH,4OH/22:0;2OH", l.getLipidString());
+        assertEquals("Gal-Glc-Cer 17:1(5);Me;(OH)2/22:0;OH", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));
         assertEquals("Hex2Cer 18:1;O3/22:0;O", l.getLipidString(LipidLevel.SN_POSITION));
         
         assertThrows(LipidException.class, () -> {
@@ -234,6 +254,7 @@ public class ShorthandParserTest {
         assertEquals(2, l.getLipid().getFaList().get(1).getPosition());
     }
 
+
     @ParameterizedTest(name = "{index}: {0}")
     @CsvFileSource(resources = "/testfiles/shorthand-test.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testShorthandParserFromFilesTest(String fullStructure, String structureDefined, String snPosition, String molecularSpecies, String species, String sumFormula, String noIdea) {
@@ -249,10 +270,10 @@ public class ShorthandParserTest {
         }
 
         List<String> lipidNamesOnLevel = Arrays.asList(fullStructure, structureDefined, snPosition, molecularSpecies, species);
-
         for (int lev = 0; lev < levels.size(); ++lev) {
             LipidLevel lipid_level = levels.get(lev);
             String n = lipid.getLipidString(lipid_level);
+            
             assertEquals(lipidNamesOnLevel.get(lev), n);
             assertEquals(formula, lipid.getSumFormula());
 
