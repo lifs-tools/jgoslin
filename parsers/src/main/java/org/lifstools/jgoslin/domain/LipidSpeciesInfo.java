@@ -34,6 +34,7 @@ public final class LipidSpeciesInfo extends FattyAcid {
     private LipidLevel level;
     public int numEthers;
     public int numSpecifiedFa;
+    public int possFa;
     public int totalFa;
     public LipidFaBondType extendedClass;
     public static final String[] ETHER_PREFIX = {"", "O-", "dO-", "tO-", "eO-"};
@@ -47,6 +48,7 @@ public final class LipidSpeciesInfo extends FattyAcid {
         numSpecifiedFa = 0;
         extendedClass = LipidFaBondType.ESTER;
         totalFa = (LipidClasses.getInstance().size() > lipidClass) ? LipidClasses.getInstance().get(lipidClass).maxNumFa : 0;
+        possFa = (LipidClasses.getInstance().size() > lipidClass) ? LipidClasses.getInstance().get(lipidClass).possibleNumFa : 0;
     }
 
     @Override

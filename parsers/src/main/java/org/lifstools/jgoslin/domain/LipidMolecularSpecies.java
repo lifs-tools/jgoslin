@@ -46,11 +46,12 @@ public class LipidMolecularSpecies extends LipidSpecies {
 
         // add 0:0 dummys
         for (int i = _fa.size(); i < info.totalFa; ++i) {
-            FattyAcid fatty_acid = new FattyAcid("FA" + Integer.toString(i + 1), knownFunctionalGroups);
-            fatty_acid.position = -1;
-            info.add(fatty_acid);
-            fa.put(fatty_acid.getName(), fatty_acid);
-            faList.add(fatty_acid);
+            FattyAcid fattyAcid = new FattyAcid("FA" + Integer.toString(i + 1), knownFunctionalGroups);
+            fattyAcid.position = -1;
+            fattyAcid.unresolvedHiddenFa = (1 < _fa.size() && _fa.size() < info.possFa);
+            info.add(fattyAcid);
+            fa.put(fattyAcid.getName(), fattyAcid);
+            faList.add(fattyAcid);
         }
     }
 
