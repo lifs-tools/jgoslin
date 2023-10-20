@@ -199,6 +199,9 @@ public class ShorthandParserTest {
 
         l = parser.parse("LHexCer(1) 18:1(5E);3OH/0:0", handler);
         assertEquals("LHexCer(1) 18:1(5E);3OH", l.getLipidString());
+
+        l = parser.parse("TG 18:0_42:2", handler);
+        assertEquals("TG 18:0_42:2", l.getLipidString());
         
         
         l = parser.parse("Gal-Glc-Cer(1) 17:1(5E);15Me[R];3OH[R],4OH[S]/22:0;2OH[R]", handler);

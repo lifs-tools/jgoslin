@@ -39,6 +39,7 @@ public class FattyAcid extends FunctionalGroup {
     public static final Set<LipidFaBondType> LCB_STATES = new HashSet<>(Arrays.asList(LipidFaBondType.LCB_REGULAR, LipidFaBondType.LCB_EXCEPTION));
     protected int numCarbon;
     protected LipidFaBondType lipidFaBondType;
+    public boolean unresolvedHiddenFa = false;
     
     public FattyAcid(String _name, KnownFunctionalGroups knownFunctionalGroups) {
         this(_name, 0, null, null, LipidFaBondType.ESTER, 0, knownFunctionalGroups);
@@ -275,6 +276,12 @@ public class FattyAcid extends FunctionalGroup {
     @Override
     public void computeElements() {
         elements = new ElementTable();
+        
+        if (unresolvedHiddenFa){
+            elements.put(Element.O, 1);
+            elements.put(Element.H, -1);
+            return;
+        }
 
         int num_double_bonds = doubleBonds.getNumDoubleBonds();
         if (lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL) {

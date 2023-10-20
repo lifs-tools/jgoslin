@@ -221,7 +221,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         if (acerSpecies) {
             faList.get(0).setNumCarbon(faList.get(0).getNumCarbon() - 2);
         }
-        Headgroup headgroup = prepareHeadgroupAndChecks();
+        Headgroup headgroup = prepareHeadgroupAndChecks(false);
 
         // add count numbers for fatty acyl chains
         int fa_it = (faList.size() > 0 && (faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_EXCEPTION || faList.get(0).getLipidFaBondType() == LipidFaBondType.LCB_REGULAR)) ? 1 : 0;
