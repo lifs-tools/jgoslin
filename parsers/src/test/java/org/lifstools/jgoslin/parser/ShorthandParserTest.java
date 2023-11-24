@@ -203,6 +203,10 @@ public class ShorthandParserTest {
         l = parser.parse("TG 18:0_42:2", handler);
         assertEquals("TG 18:0_42:2", l.getLipidString());
         
+        l = parser.parse("cLPA 18:0", handler);
+        assertEquals("CPA 18:0", l.getLipidString());
+        assertEquals("C21H41O6P", l.getSumFormula());
+        
         
         l = parser.parse("Gal-Glc-Cer(1) 17:1(5E);15Me[R];3OH[R],4OH[S]/22:0;2OH[R]", handler);
         assertEquals(LipidLevel.COMPLETE_STRUCTURE, l.getLipidLevel());

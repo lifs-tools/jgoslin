@@ -86,6 +86,11 @@ public class GoslinParserTest {
         assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
         assertEquals("LSM 17:1;O2", l.getLipidString(LipidLevel.SPECIES));
         assertEquals("C22H47N2O5P", l.getSumFormula());
+        
+        
+        l = parser.parse("13-oxoODE", handler);
+        assertEquals("FA 18:3;O", l.getLipidString(LipidLevel.MOLECULAR_SPECIES));
+        assertEquals("C18H30O3", l.getSumFormula());
 
         l = parser.parse("LCB 18:1(4E);2", handler);
         assertEquals("SPB 18:1(4);(OH)2", l.getLipidString(LipidLevel.STRUCTURE_DEFINED));

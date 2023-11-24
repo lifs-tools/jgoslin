@@ -99,6 +99,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("pl_hg_single_pre_event", this::setHeadgroupName),
                     entry("pl_hg_double_pre_event", this::setHeadgroupName),
                     entry("pl_hg_quadro_pre_event", this::setHeadgroupName),
+                    entry("pl_cpa_head_pre_event", this::setHeadgroupName),
                     entry("sl_hg_single_pre_event", this::setHeadgroupName),
                     entry("pl_hg_double_fa_hg_pre_event", this::setHeadgroupName),
                     entry("sl_hg_double_name_pre_event", this::setHeadgroupName),
