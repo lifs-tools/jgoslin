@@ -15,6 +15,7 @@
  */
 package org.lifstools.jgoslin.domain;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,6 +149,7 @@ public final class Headgroup {
         return ClassString.containsKey(_lipid_class) ? ClassString.get(_lipid_class) : "UNDEFINED";
     }
 
+    @JsonGetter("lipidClass")
     public String getClassName() {
         return LipidClasses.getInstance().get(lipidClass).lipidClassName;
     }
@@ -234,6 +236,7 @@ public final class Headgroup {
         return elements;
     }
 
+    @JsonGetter("name")
     public String getHeadgroup() {
         return headgroup;
     }
@@ -250,6 +253,7 @@ public final class Headgroup {
         this.lipidCategory = lipidCategory;
     }
 
+    @JsonIgnore
     public int getLipidClass() {
         return lipidClass;
     }
