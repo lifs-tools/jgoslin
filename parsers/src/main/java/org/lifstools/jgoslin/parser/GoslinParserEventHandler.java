@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import static java.util.Map.entry;
 import java.util.TreeMap;
 import org.lifstools.jgoslin.domain.Element;
+import static org.lifstools.jgoslin.parser.Parser.EOF_SIGN;
 
 /**
  * Event handler implementation for the {@link GoslinParser}.
@@ -53,6 +54,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private boolean mediatorSuffix;
     private Element heavyElement;
     private int heavyElementNumber;
+    private boolean trivialMediator;
 
     private final static Map<String, Integer> MEDIATOR_FA = Map.of(
             "H", 17, "O", 18, "E", 20, "Do", 22);
@@ -162,6 +164,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         headgroupDecorators.clear();
         heavyElement = Element.C;
         heavyElementNumber = 0;
+        trivialMediator = false;
     }
 
     private void setHeadGroupName(TreeNode node) {
@@ -265,6 +268,19 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         }
 
         Headgroup headgroup = prepareHeadgroupAndChecks();
+        String lipidName = node.getText();
+        if (lipidName.charAt(lipidName.length() - 1) == EOF_SIGN) lipidName = lipidName.substring(0, lipidName.length() - 1);
+        HashMap<String, ArrayList<Integer>> trivialDb = knownFunctionalGroups.getTmDb();
+        
+        if (trivialMediator && trivialDb.containsKey(lipidName)){
+            ArrayList<Integer> dbPos = trivialDb.get(lipidName);
+            faList.get(0).getDoubleBonds().setNumDoubleBonds(dbPos.size());
+            Map<Integer, String> doubleBondPositions = faList.get(0).getDoubleBonds().getDoubleBondPositions();
+            doubleBondPositions.clear();
+            
+            for (Integer p : dbPos) doubleBondPositions.put(p, "");
+            level = LipidLevel.FULL_STRUCTURE;
+        }
 
         LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);
         content = lipid;
@@ -368,6 +384,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void setMediatorCarbon(TreeNode node) {
+        trivialMediator = true;
         currentFa.setNumCarbon(currentFa.getNumCarbon() + MEDIATOR_FA.get(node.getText()));
     }
 
@@ -398,13 +415,13 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             if (mediatorFunctionPositions.size() > 0) {
                 functionalGroup.setPosition(mediatorFunctionPositions.get(0));
             }
-        } else if (mediatorFunction.equals("Hp")) {
+        } else if (mediatorFunction.toLowerCase().equals("hp")) {
             functionalGroup = knownFunctionalGroups.get("OOH");
             fg = "OOH";
             if (mediatorFunctionPositions.size() > 0) {
                 functionalGroup.setPosition(mediatorFunctionPositions.get(0));
             }
-        } else if (mediatorFunction.equals("E") || mediatorFunction.equals("Ep")) {
+        } else if (mediatorFunction.equals("E") || mediatorFunction.toLowerCase().equals("ep")) {
             functionalGroup = knownFunctionalGroups.get("Ep");
             fg = "Ep";
             if (mediatorFunctionPositions.size() > 0) {

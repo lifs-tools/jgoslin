@@ -36,6 +36,7 @@
                                     <includes>
                                         <include>lipid-list.csv</include>
                                         <include>functional-groups.csv</include>
+                                        <include>trivial_mediators.csv</include>
                                         <include>**/*.g4</include>
                                     </includes>
                                 </resource>

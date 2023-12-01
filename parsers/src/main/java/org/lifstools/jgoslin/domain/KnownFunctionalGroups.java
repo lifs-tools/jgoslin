@@ -33,11 +33,25 @@ import org.springframework.core.io.ClassPathResource;
 public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
 
     public static final int UNDEFINED_CLASS = 0;
+    private final HashMap<String, ArrayList<Integer>> trivialMediators = new HashMap<>();
 
-    private void loadData(List<String> lines, SumFormulaParser sumFormulaParser) {
+    private void loadData(List<String> lines, List<String> linesTM, SumFormulaParser sumFormulaParser) {
         int lineCounter = 0;
         ArrayList< ArrayList<String>> functional_data = new ArrayList<>();
         HashSet<String> functional_data_set = new HashSet<>();
+        
+        for (String line : linesTM) {
+            if (line.isEmpty()) continue;
+            
+            ArrayList<String> tokens = StringFunctions.splitString(line, '\t', '"', true);
+            if (tokens.size() != 2 || containsKey(tokens.get(0))) continue;
+            
+            ArrayList<Integer> positions = new ArrayList<>();
+            for (String pos : StringFunctions.splitString(tokens.get(1), ',', '"', true)){
+                positions.add(Integer.parseInt(pos));
+            }
+            trivialMediators.put(tokens.get(0), positions);
+        }
 
         for (String line : lines) {
             if (lineCounter++ == 0) {
@@ -89,10 +103,18 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
 
     public KnownFunctionalGroups(List<String> lines, SumFormulaParser sumFormulaParser) {
         super();
-        loadData(lines, sumFormulaParser);
+        loadData(lines, StringFunctions.getResourceAsStringList(new ClassPathResource("trivial_mediators.csv")), sumFormulaParser);
     }
 
     public FunctionalGroup get(String s) {
         return super.get(s).copy();
+    }
+
+    public HashMap<String, ArrayList<Integer>> getTmDb() {
+        return trivialMediators;
+    }
+
+    public ArrayList<Integer> db(String s) {
+        return trivialMediators.get(s);
     }
 }
