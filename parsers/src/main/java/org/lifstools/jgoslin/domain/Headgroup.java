@@ -74,7 +74,15 @@ public final class Headgroup {
         entry("gq1", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
         entry("gt1", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
         entry("gt2", new ArrayList<String>(Arrays.asList("GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
-        entry("gt3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "NeuAc", "Gal", "Glc")))
+        entry("gt3", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gd0a", new ArrayList<String>(Arrays.asList("HexNAc", "Hex", "NeuAc", "HexNAc", "Hex", "NeuAc", "Hex"))),
+        entry("gd1b", new ArrayList<String>(Arrays.asList("Gal", "GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gq1b", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gt1b", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gd1a-ac", new ArrayList<String>(Arrays.asList("Hex", "Hex", "Hex", "HexNAc", "NeuAc", "NeuAc", "NeuAc"))),
+        entry("gq1-ac", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gt1b-ac", new ArrayList<String>(Arrays.asList("NeuAc", "Gal", "GalNAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc"))),
+        entry("gt3-ac", new ArrayList<String>(Arrays.asList("NeuAc", "NeuAc", "NeuAc", "NeuAc", "NeuAc", "Gal", "Glc")))
     );
 
     public Headgroup(String _headgroup) {

@@ -210,9 +210,9 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addEther(TreeNode node) {
         String ether = node.getText();
-        if (ether.equals("O-")) {
+        if (ether.equals("O")) {
             currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
-        } else if (ether.equals("P-")) {
+        } else if (ether.equals("P")) {
             currentFa.setLipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
         }
     }

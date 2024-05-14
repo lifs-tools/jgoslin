@@ -174,6 +174,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("acer_hg_post_event", this::setAcer),
                     entry("acer_species_post_event", this::setAcerSpecies),
                     entry("sterol_definition_post_event", this::setSterolDefinition),
+                    entry("sterol_ester_definition_post_event", this::setSterolDefinition),
                     entry("adduct_heavy_element_pre_event", this::setHeavyElement),
                     entry("adduct_heavy_number_pre_event", this::setHeavyNumber),
                     entry("adduct_heavy_component_post_event", this::addHeavyComponent)
