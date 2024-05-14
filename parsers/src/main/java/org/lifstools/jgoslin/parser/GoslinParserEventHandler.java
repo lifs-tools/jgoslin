@@ -614,7 +614,9 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         else if (prostaglandinNumber == "2") db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E")));
         else if (prostaglandinNumber == "3") db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E", 17, "Z")));
 
-        if (prostaglandinType == "B"){
+        System.out.println(prostaglandinNumber + " " + prostaglandinType);
+        
+        if (prostaglandinType.equals("B")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
             FunctionalGroup f2 = knownFunctionalGroups.get("OH");
             f1.setPosition(15);
@@ -624,7 +626,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }
-        else if (prostaglandinType == "D"){
+        else if (prostaglandinType.equals("D")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
             FunctionalGroup f2 = knownFunctionalGroups.get("OH");
             FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
@@ -636,7 +638,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }
-        else if (prostaglandinType == "E"){
+        else if (prostaglandinType.equals("E")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
             FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
             FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -648,7 +650,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }
-        else if (prostaglandinType == "F"){
+        else if (prostaglandinType.equals("F")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
             FunctionalGroup f2 = knownFunctionalGroups.get("OH");
             FunctionalGroup f3 = knownFunctionalGroups.get("OH");
@@ -660,7 +662,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }
-        else if (prostaglandinType == "J"){
+        else if (prostaglandinType.equals("J")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
             FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
             f1.setPosition(15);
@@ -670,7 +672,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }
-        else if (prostaglandinType == "K"){
+        else if (prostaglandinType.equals("K")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
             FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
             FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
@@ -692,5 +694,6 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         mediatorSuffix = true;
         prostaglandinType = "";
         prostaglandinNumber = "";
+        
     }
 }
