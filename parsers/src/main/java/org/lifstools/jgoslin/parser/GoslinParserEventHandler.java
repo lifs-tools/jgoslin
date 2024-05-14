@@ -31,11 +31,15 @@ import org.lifstools.jgoslin.domain.LipidAdduct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import static java.util.Map.entry;
 import java.util.TreeMap;
 import org.lifstools.jgoslin.domain.Element;
+import org.lifstools.jgoslin.domain.HeadgroupDecorator;
 import static org.lifstools.jgoslin.parser.Parser.EOF_SIGN;
 
 /**
@@ -55,6 +59,8 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private Element heavyElement;
     private int heavyElementNumber;
     private boolean trivialMediator;
+    private String prostaglandinType;
+    private String prostaglandinNumber;
 
     private final static Map<String, Integer> MEDIATOR_FA = Map.of(
             "H", 17, "O", 18, "E", 20, "Do", 22);
@@ -137,7 +143,11 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     entry("heavy_pre_event", this::newAdduct),
                     entry("adduct_heavy_element_pre_event", this::setHeavyElement),
                     entry("adduct_heavy_number_pre_event", this::setHeavyNumber),
-                    entry("adduct_heavy_component_post_event", this::addHeavyComponent)
+                    entry("adduct_heavy_component_post_event", this::addHeavyComponent),
+    
+                    entry("prostaglandin_number_pre_event", this::setProstaglandinNumber),
+                    entry("prostaglandin_type_pre_event", this::setProstaglandinType),
+                    entry("prostaglandin_post_event", this::addProstaglandin)
             );
 
         } catch (Exception e) {
@@ -148,7 +158,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     @Override
     protected void resetParser(TreeNode node) {
         content = null;
-        level = LipidLevel.FULL_STRUCTURE;
+        level = LipidLevel.COMPLETE_STRUCTURE;
         headGroup = "";
         lcb = null;
         faList.clear();
@@ -165,6 +175,8 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         heavyElement = Element.C;
         heavyElementNumber = 0;
         trivialMediator = false;
+        prostaglandinType = "";
+        prostaglandinNumber = "";
     }
 
     private void setHeadGroupName(TreeNode node) {
@@ -236,6 +248,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             throw new LipidException("Double bond count does not match with number of double bond positions");
         }
 
+        removeDeoxy(currentFa.getFunctionalGroupsInternal());
         faList.add(currentFa);
         if (headGroup.compareTo("Sa") == 0 || headGroup.compareTo("So") == 0 || headGroup.compareTo("S1P") == 0 || headGroup.compareTo("Sa1P") == 0){
             FunctionalGroup functional_group = knownFunctionalGroups.get("OH");
@@ -451,6 +464,80 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         currentFa.getFunctionalGroupsInternal().get(fg).add(functionalGroup);
     }
 
+
+    private boolean recursiveDeletion(String fgName, FunctionalGroup fg, Map<String, ArrayList<FunctionalGroup>> functionalGroups){
+        ArrayList<String> delFunctions = new ArrayList<>();
+        boolean returnValue = false;
+        for (Entry<String, ArrayList<FunctionalGroup>> kv : functionalGroups.entrySet()){
+            ArrayList<Integer> delFg = new ArrayList<>();
+            for (int i = 0; i < kv.getValue().size(); ++i){
+                if (kv.getValue().get(i).getPosition() == fg.getPosition()) delFg.add(i);
+            }
+            if (!delFg.isEmpty()){
+                for (int i = delFg.size() - 1; i >= 0; --i){
+                    kv.getValue().remove(i);
+                    if (kv.getValue().isEmpty()) delFunctions.add(kv.getKey());
+                }
+                if (!functionalGroups.containsKey(fgName)){
+                    functionalGroups.put(fgName, new ArrayList<>());
+                }
+                functionalGroups.get(fgName).add(fg);
+                returnValue = true;
+            }
+            for (FunctionalGroup fgCurr : kv.getValue()){
+                if (returnValue) break;
+                if (recursiveDeletion(fgName, fg, fgCurr.getFunctionalGroupsInternal())) returnValue = true;
+            }
+        }
+        for (String delFgName : delFunctions) functionalGroups.remove(delFgName);
+        return returnValue;
+    }
+    
+    
+    private void cleanMediator(FattyAcid fa){
+        if (!fa.getFunctionalGroups().isEmpty()){
+            for (Entry<String, ArrayList<FunctionalGroup>> kv : fa.getFunctionalGroupsInternal().entrySet()){
+                
+                
+                String fgName = kv.getKey();
+                for (FunctionalGroup fg : kv.getValue()){
+
+                    if (fg.getPosition() >= -1){
+                        // erase prevously added functional group, if findable
+                        if (!recursiveDeletion(fgName, fg, currentFa.getFunctionalGroupsInternal())){
+                            if (!currentFa.getFunctionalGroupsInternal().containsKey(fgName)){
+                                currentFa.getFunctionalGroupsInternal().put(fgName, new ArrayList<>());
+                            }
+                            currentFa.getFunctionalGroupsInternal().get(fgName).add(fg);
+                        }
+                    }
+                    else {
+                        if (!currentFa.getFunctionalGroupsInternal().containsKey(fgName)){
+                            currentFa.getFunctionalGroupsInternal().put(fgName, new ArrayList<>());
+                        }
+                        currentFa.getFunctionalGroupsInternal().get(fgName).add(fg);
+                    }
+                }
+            }
+            fa.getFunctionalGroupsInternal().clear();
+        }
+        removeDeoxy(currentFa.getFunctionalGroupsInternal());
+
+    }
+        
+        
+    private void removeDeoxy(Map<String, ArrayList<FunctionalGroup>> functionalGroups){
+        if (functionalGroups.containsKey("d")){
+            functionalGroups.remove("d");
+        }
+        for (Entry<String, ArrayList<FunctionalGroup>> kv : functionalGroups.entrySet()){
+            for (FunctionalGroup fg : kv.getValue()){
+                removeDeoxy(fg.getFunctionalGroupsInternal());
+            }
+        }
+    }
+    
+
     private void setTrivialMediator(TreeNode node) {
         headGroup = "FA";
         
@@ -501,5 +588,109 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
     private void addHeavyComponent(TreeNode node) {
         adduct.getHeavyElements().put(heavyElement, adduct.getHeavyElements().get(heavyElement) + heavyElementNumber);
     }
-    
+
+        
+    private void setProstaglandinType(TreeNode node){
+        prostaglandinType = node.getText();
+    }
+
+
+
+    private void setProstaglandinNumber(TreeNode node){
+        prostaglandinNumber = node.getText();
+    }
+          
+        
+        
+    private void addProstaglandin(TreeNode node){
+        HashSet<String> pgTypes = new HashSet<>(Arrays.asList("B", "D", "E", "F", "J", "K"));
+        HashSet<String> pgNumbers = new HashSet<>(Arrays.asList("1", "2", "3"));
+        if (!pgTypes.contains(prostaglandinType) || !pgNumbers.contains(prostaglandinNumber)) return;
+
+        DoubleBonds db = null;
+        FattyAcid tmpFa = currentFa;
+        
+        if (prostaglandinNumber == "1") db = new DoubleBonds(new TreeMap<>(Map.of(13, "E")));
+        else if (prostaglandinNumber == "2") db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E")));
+        else if (prostaglandinNumber == "3") db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E", 17, "Z")));
+
+        if (prostaglandinType == "B"){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+            f1.setPosition(15);
+            f2.setPosition(9);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2))));
+            Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(new TreeMap<>(Map.of(8, ""))), fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else if (prostaglandinType == "D"){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
+            f1.setPosition(15);
+            f2.setPosition(9);
+            f3.setPosition(11);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2)), "oxo", new ArrayList<>(Arrays.asList(f3))));
+            Cycle cy = new Cycle(5, 8, 12, null, fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else if (prostaglandinType == "E"){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+            FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+            f1.setPosition(15);
+            f2.setPosition(9);
+            f3.setPosition(11);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f3)), "oxo", new ArrayList<>(Arrays.asList(f3))));
+            Cycle cy = new Cycle(5, 8, 12, null, fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else if (prostaglandinType == "F"){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f3 = knownFunctionalGroups.get("OH");
+            f1.setPosition(15);
+            f2.setPosition(9);
+            f3.setPosition(11);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2, f3))));
+            Cycle cy = new Cycle(5, 8, 12, null, fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else if (prostaglandinType == "J"){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+            f1.setPosition(15);
+            f2.setPosition(11);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2))));
+            Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(new TreeMap<>(Map.of(9, ""))), fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else if (prostaglandinType == "K"){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+            FunctionalGroup f3 = knownFunctionalGroups.get("oxo");
+            f1.setPosition(15);
+            f2.setPosition(9);
+            f3.setPosition(11);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2, f3))));
+            Cycle cy = new Cycle(5, 8, 12, null, fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else {
+            return;
+        }
+
+        cleanMediator(tmpFa);
+        faList.clear();
+        faList.add(currentFa);
+        mediatorSuffix = true;
+        prostaglandinType = "";
+        prostaglandinNumber = "";
+    }
 }

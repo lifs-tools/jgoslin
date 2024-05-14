@@ -242,7 +242,6 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setSterolDefinition(TreeNode node) {
         headGroup += " " + node.getText();
-        faList.remove(0);
 
     }
 
