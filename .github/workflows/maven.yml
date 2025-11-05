@@ -63,7 +63,7 @@ jobs:
     - uses: jfrog/setup-jfrog-cli@v4
       env:
         # JFrog Platform url
-        JF_URL: https://m.lifs-tools.org/artifactory/
+        JF_URL: https://m.lifs-tools.org/
         JF_USER: github-deployer
         JF_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
     # - name: Publish Jar
