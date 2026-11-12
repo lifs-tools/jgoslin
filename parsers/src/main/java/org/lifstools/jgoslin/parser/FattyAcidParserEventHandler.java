@@ -29,6 +29,7 @@ import org.lifstools.jgoslin.domain.FunctionalGroup;
 import org.lifstools.jgoslin.domain.LipidCompleteStructure;
 import org.lifstools.jgoslin.domain.LipidAdduct;
 import org.lifstools.jgoslin.domain.AcylAlkylGroup;
+import org.lifstools.jgoslin.domain.Adduct;
 import org.lifstools.jgoslin.domain.DoubleBonds;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.Cycle;
@@ -60,6 +61,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
     private String headgroup;
     private ArrayDeque<FattyAcid> fattyAcylStack;
     private Dictionary tmp;
+    private Adduct adduct;
 
     private static final Map<String, Integer> LAST_NUMBERS = Map.ofEntries(
             entry("un", 1),
@@ -194,6 +196,7 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                     entry("fatty_acid_recursion_post_event", this::set_fatty_acid),
                     entry("acid_single_type_pre_event", this::set_fatty_acyl_type),
                     entry("ol_ending_pre_event", this::set_fatty_acyl_type),
+                    entry("acid_heavy_single_type_post_event", this::set_heavy_fatty_acyl_type),
                     entry("double_bond_position_pre_event", this::set_double_bond_information),
                     entry("double_bond_position_post_event", this::add_double_bond_information),
                     entry("db_number_post_event", this::set_double_bond_position),
@@ -269,7 +272,10 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
                     // functional group position summary
                     entry("fg_pos_summary_pre_event", this::set_functional_group),
                     entry("fg_pos_summary_post_event", this::add_summary),
-                    entry("func_stereo_pre_event", this::add_func_stereo)
+                    entry("func_stereo_pre_event", this::add_func_stereo),
+                    // deuterated fatty acids, e.g. hexadecanoic acid-d3
+                    entry("nic_pre_event", this::set_nic),
+                    entry("deuterium_number_pre_event", this::add_heavy_adduct)
             );
         } catch (Exception e) {
             throw new ConstraintViolationException("Cannot initialize FattyAcidParserEventHandler.", e);
@@ -293,6 +299,18 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
         fattyAcylStack.add(new FattyAcid("FA", knownFunctionalGroups));
         tmp = new Dictionary();
         tmp.put("fa1", new Dictionary());
+        adduct = null;
+    }
+
+    private void set_nic(TreeNode node) {
+        tmp.put("nic", node.getText());
+    }
+
+    private void add_heavy_adduct(TreeNode node) {
+        if (adduct == null) {
+            adduct = new Adduct("", "");
+        }
+        adduct.getHeavyElements().put(Element.H2, node.getInt());
     }
 
     void build_lipid(TreeNode node) {
@@ -362,12 +380,19 @@ public class FattyAcidParserEventHandler extends BaseParserEventHandler<LipidAdd
             }
         }
         if (lipidSpecies!=null) {
-            content = new LipidAdduct(lipidSpecies, null);
+            content = new LipidAdduct(lipidSpecies, adduct);
         }
     }
 
     void set_fatty_acyl_type(TreeNode node) {
-        String t = node.getText();
+        set_fatty_acyl_type(node.getText());
+    }
+
+    private void set_heavy_fatty_acyl_type(TreeNode node) {
+        set_fatty_acyl_type(tmp.get("nic") + " acid");
+    }
+
+    private void set_fatty_acyl_type(String t) {
 
         if (t.endsWith("ol")) {
             headgroup = "FOH";
