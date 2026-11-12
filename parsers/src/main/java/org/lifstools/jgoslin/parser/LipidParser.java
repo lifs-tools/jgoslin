@@ -60,6 +60,7 @@ public class LipidParser {
                 new LipidMapsParser(knownFunctionalGroups),
                 new SwissLipidsParser(knownFunctionalGroups),
                 new HmdbParser(knownFunctionalGroups),
+                new LDAParser(knownFunctionalGroups),
                 // names that are a lipid class or category only, after all grammars
                 new ClassLevelParser(knownFunctionalGroups)
         );
