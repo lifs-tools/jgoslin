@@ -206,6 +206,53 @@ public class GoslinParserTest {
     }
     
     @Test
+    public void testProstaglandins() {
+        LipidAdduct l = parser.parse("PGA2", handler);
+        assertEquals("FA 20:3(5Z,10Z,13E);[8-12cy5:0;9oxo];15OH", l.getLipidString());
+        assertEquals(LipidLevel.FULL_STRUCTURE, l.getLipidLevel());
+        assertEquals("C20H30O4", l.getSumFormula());
+
+        l = parser.parse("PGB2", handler);
+        assertEquals("FA 20:2(5Z,13E);[8-12cy5:1;9oxo];15OH", l.getLipidString());
+        assertEquals("C20H30O4", l.getSumFormula());
+    }
+
+    @Test
+    public void testMediatorFunctions() {
+        // keto replaces the hydroxy group at the same position
+        LipidAdduct l = parser.parse("15-keto-PGE2", handler);
+        assertEquals("FA 20:2(5Z,13E);[8-12cy5:0;11OH;9oxo];15oxo", l.getLipidString());
+        assertEquals("C20H30O5", l.getSumFormula());
+
+        // deoxy removes the hydroxy group at the same position
+        l = parser.parse("11-deoxy-PGE2", handler);
+        assertEquals("FA 20:2(5Z,13E);[8-12cy5:0;9oxo];15OH", l.getLipidString());
+        assertEquals("C20H32O4", l.getSumFormula());
+
+        l = parser.parse("15d-PGA1", handler);
+        assertEquals("FA 20:2(10Z,13E);[8-12cy5:0;9oxo]", l.getLipidString());
+        assertEquals("C20H32O3", l.getSumFormula());
+
+        // an additional hydroxy group
+        l = parser.parse("20-hydroxy-PGE2", handler);
+        assertEquals("FA 20:2(5Z,13E);[8-12cy5:0;11OH;9oxo];15OH,20OH", l.getLipidString());
+        assertEquals("C20H32O6", l.getSumFormula());
+
+        l = parser.parse("12-oxo-LTB4", handler);
+        assertEquals("FA 20:4(6Z,8E,10E,14Z);5OH;12oxo", l.getLipidString());
+        assertEquals("C20H30O4", l.getSumFormula());
+
+        l = parser.parse("14-keto-DHA", handler);
+        assertEquals("FA 22:6;oxo", l.getLipidString());
+        assertEquals("C22H30O3", l.getSumFormula());
+
+        // the function is added once, also for nested functional group nodes
+        l = parser.parse("(10E,12Z)-9-HODE", handler);
+        assertEquals("FA 18:2;OH", l.getLipidString());
+        assertEquals("C18H32O3", l.getSumFormula());
+    }
+
+    @Test
     public void testLabeledMediators() {
         LipidAdduct lipid = parser.parse("15S-HETE-d8", parser.newEventHandler());
         assertEquals(328.2854d, lipid.getMass(), 1.0e-4);

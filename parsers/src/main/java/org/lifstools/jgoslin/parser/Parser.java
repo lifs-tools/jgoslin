@@ -84,6 +84,17 @@ public abstract class Parser<T> {
     protected boolean usedEof = false;
     protected static final char DEFAULT_QUOTE = '\'';
 
+    /**
+     * Create a parser without a grammar, for parsers that do not use the CYK
+     * algorithm and override
+     * {@link #parse(java.lang.String, org.lifstools.jgoslin.parser.BaseParserEventHandler, boolean)},
+     * e.g. {@link ClassLevelParser}. Subclasses should set
+     * {@link #grammarName}.
+     */
+    protected Parser() {
+        this.quote = DEFAULT_QUOTE;
+    }
+
     public Parser(String grammarContent) {
         this(grammarContent, (char) '\0');
     }

@@ -59,7 +59,10 @@ public class LipidParser {
                 new GoslinParser(knownFunctionalGroups),
                 new LipidMapsParser(knownFunctionalGroups),
                 new SwissLipidsParser(knownFunctionalGroups),
-                new HmdbParser(knownFunctionalGroups)
+                new HmdbParser(knownFunctionalGroups),
+                new LDAParser(knownFunctionalGroups),
+                // names that are a lipid class or category only, after all grammars
+                new ClassLevelParser(knownFunctionalGroups)
         );
     }
 
@@ -76,22 +79,24 @@ public class LipidParser {
      */
     public LipidAdduct parse(String lipidName) {
         lastSuccessfulParser = null;
-        Parser<LipidAdduct> lastParser = null;
         BaseParserEventHandler<LipidAdduct> eventHandler = null;
+        String errorMessage = null;
         for (Parser<LipidAdduct> parser : parserList) {
-            lastParser = parser;
             eventHandler = parser.newEventHandler();
             LipidAdduct lipid = parser.parse(lipidName, eventHandler, false);
             if (lipid != null) {
                 lastSuccessfulParser = parser;
                 return lipid;
             }
+            // report the position of the last grammar based parser that has one
+            if (!(parser instanceof ClassLevelParser) && eventHandler.errorMessage != null && !eventHandler.errorMessage.isEmpty()) {
+                errorMessage = eventHandler.errorMessage;
+            }
         }
         String message = " Parsing failed ";
         if (eventHandler == null) {
             message += " with unknown reason.";
         } else {
-            String errorMessage = eventHandler.errorMessage;
             if (errorMessage == null || errorMessage.isEmpty()) {
                 errorMessage = lipidName;
             }

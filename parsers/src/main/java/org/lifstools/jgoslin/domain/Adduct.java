@@ -48,7 +48,11 @@ public final class Adduct {
             entry("+NH4", ElementTable.of(Map.entry(Element.N, 1), Map.entry(Element.H, 4))),
             entry("+Cl", ElementTable.of(Map.entry(Element.Cl, 1))),
             entry("+HCOO", ElementTable.of(Map.entry(Element.H, 1), Map.entry(Element.C, 1), Map.entry(Element.O, 2))),
-            entry("+CH3COO", ElementTable.of(Map.entry(Element.H, 3), Map.entry(Element.C, 2), Map.entry(Element.O, 2)))
+            entry("+CH3COO", ElementTable.of(Map.entry(Element.H, 3), Map.entry(Element.C, 2), Map.entry(Element.O, 2))),
+            entry("+CH2OCOO", ElementTable.of(Map.entry(Element.H, 2), Map.entry(Element.C, 2), Map.entry(Element.O, 3))),
+            entry("-CH3", ElementTable.of(Map.entry(Element.H, -3), Map.entry(Element.C, -1))),
+            entry("+COO", ElementTable.of(Map.entry(Element.H, 1), Map.entry(Element.C, 1), Map.entry(Element.O, 2))),
+            entry("+CH2COO", ElementTable.of(Map.entry(Element.H, 2), Map.entry(Element.C, 2), Map.entry(Element.O, 2)))
     );
 
     public static final Map<String, Integer> ADDUCT_CHARGES = Map.ofEntries(
@@ -64,7 +68,11 @@ public final class Adduct {
             entry("+NH4", 1),
             entry("+Cl", -1),
             entry("+HCOO", -1),
-            entry("+CH3COO", -1)
+            entry("+CH3COO", -1),
+            entry("-CH3", -1),
+            entry("+COO", -2),
+            entry("+CH2COO", -2),
+            entry("+CH2OCOO", -2)
     );
 
     public Adduct(String _sum_formula, String _adduct_string) {

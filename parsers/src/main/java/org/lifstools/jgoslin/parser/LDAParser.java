@@ -1,0 +1,74 @@
+/*
+ * Copyright 2026 Dominik Kopczynski, Nils Hoffmann.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lifstools.jgoslin.parser;
+
+import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
+import org.lifstools.jgoslin.domain.StringFunctions;
+import org.lifstools.jgoslin.domain.LipidAdduct;
+
+/**
+ * Parser implementation for the sphingolipid names written by
+ * LipidDataAnalyzer (LDA), e.g. 'Cer d18:1/n16:0', 'HexCer t18:0/h24:0',
+ * 'SM d18:0_n24:0' or 'SphBase d18:1'.
+ *
+ * @author Dominik Kopczynski
+ * @author Nils Hoffmann
+ */
+public final class LDAParser extends Parser<LipidAdduct> {
+
+    private static final String DEFAULT_GRAMMAR = "LDA.g4";
+
+    private final KnownFunctionalGroups knownFunctionalGroups;
+
+    /**
+     * Create a new instance of a {@link LDAParser}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     * @param grammarContent the grammar text content
+     * @param quote the quotation character used in the grammar
+     */
+    public LDAParser(KnownFunctionalGroups knownFunctionalGroups, String grammarContent, char quote) {
+        super(grammarContent, quote);
+        this.knownFunctionalGroups = knownFunctionalGroups;
+    }
+
+    /**
+     * Create a new instance of a {@link LDAParser} with default grammar
+     * {@link LDAParser#DEFAULT_GRAMMAR} and default quote
+     * {@link StringFunctions#DEFAULT_QUOTE}.
+     *
+     * @param knownFunctionalGroups the known functional groups
+     */
+    public LDAParser(KnownFunctionalGroups knownFunctionalGroups) {
+        this(knownFunctionalGroups, StringFunctions.getResourceAsString(DEFAULT_GRAMMAR), StringFunctions.DEFAULT_QUOTE);
+    }
+
+    /**
+     * Create a new instance of a {@link LDAParser} with default grammar
+     * {@link LDAParser#DEFAULT_GRAMMAR} and default quote
+     * {@link StringFunctions#DEFAULT_QUOTE} and default
+     * {@link KnownFunctionalGroups}.
+     */
+    public LDAParser() {
+        this(new KnownFunctionalGroups(), StringFunctions.getResourceAsString(DEFAULT_GRAMMAR), StringFunctions.DEFAULT_QUOTE);
+    }
+
+    @Override
+    public LDAParserEventHandler newEventHandler() {
+        return new LDAParserEventHandler(knownFunctionalGroups);
+    }
+
+}

@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    antlr "org.antlr:antlr4:4.9.3"
+    antlr "org.antlr:antlr4:4.13.2"
 }
 // grammars to include for checking
 ext {
@@ -16,6 +16,7 @@ ext {
     "GoslinFragments.g4",
     "Goslin.g4",
     "HMDB.g4",
+    "LDA.g4",
     "LipidMaps.g4",
     "Shorthand2020.g4",
     "SumFormula.g4",
