@@ -99,6 +99,46 @@ public class LipidParserTest {
     }
 
     @Test
+    public void testGoslin224Names() {
+        // bile acid, the class is the bile acid core
+        LipidAdduct l = parser.parse("TCA");
+        assertEquals("TCA", l.getLipidString());
+        assertEquals("BA 24:1", l.getLipidString(LipidLevel.CLASS));
+        assertEquals("C26H45NO7S", l.getSumFormula());
+
+        // sterol ester with a sterol core other than cholesterol
+        l = parser.parse("SE 27:3/14:0");
+        assertEquals("SE 27:3/14:0", l.getLipidString());
+        assertEquals("SE 27:3", l.getLipidString(LipidLevel.CLASS));
+        assertEquals("C41H68O2", l.getSumFormula());
+
+        // saccharolipid
+        l = parser.parse("LA 56:0");
+        assertEquals("LA 56:0", l.getLipidString());
+        assertEquals("C68H128N2O13", l.getSumFormula());
+
+        // deuterated fatty acid
+        l = parser.parse("FA 16:0[M[2]H3]");
+        assertEquals("FA 16:0[M[2]H3]", l.getLipidString());
+        assertEquals("C16H29O2H'3", l.getSumFormula());
+
+        // SwissLipids partially resolved triacylglycerol
+        l = parser.parse("TG 48:1-FA16:0");
+        assertEquals("TG 32:1_16:0", l.getLipidString());
+        assertEquals(LipidLevel.MOLECULAR_SPECIES, l.getLipidLevel());
+        assertEquals("C51H96O6", l.getSumFormula());
+
+        // the long chain base of SPB carries both hydroxy groups
+        l = parser.parse("SPB d18:1");
+        assertEquals("SPB 18:1;O2", l.getLipidString());
+        assertEquals("C18H37NO2", l.getSumFormula());
+
+        l = parser.parse("CAR 16:0");
+        assertEquals("CAR 16:0", l.getLipidString());
+        assertEquals("C23H45NO4", l.getSumFormula());
+    }
+
+    @Test
     public void testLipidParser() {
         LipidParser lp = new LipidParser();
         LipidAdduct la = lp.parse("PE 16:1(6)/16:0;oxo;(OH)2");

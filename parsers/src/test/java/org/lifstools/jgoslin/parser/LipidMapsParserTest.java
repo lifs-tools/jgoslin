@@ -57,6 +57,16 @@ public class LipidMapsParserTest {
     }
 
     @Test
+    public void testMLcbWithHeadGroupAtC1() {
+        // one hydroxy group on a long chain base that carries the head group at C1
+        assertEquals("C47H85N2O5P", parser.parse("SM m42:6", handler).getSumFormula());
+        assertEquals("C35H73N2O5P", parser.parse("SM(m18:0/12:0)", handler).getSumFormula());
+        assertEquals("C20H42NO4P", parser.parse("S1P m20:1", handler).getSumFormula());
+        // ceramides keep the 1-deoxy (3-OH) reading
+        assertEquals("Cer 18:0;3OH/12:0", parser.parse("Cer(m18:0/12:0)", handler).getLipidString());
+    }
+
+    @Test
     public void testLipidMapsParserTest() {        
         LipidAdduct lipid = parser.parse("Cer(d18:1(8Z)/24:0)", handler);
         assertEquals("Cer 18:1(8);(OH)2/24:0", lipid.getLipidString(LipidLevel.STRUCTURE_DEFINED));

@@ -33,7 +33,7 @@ import org.springframework.core.io.ClassPathResource;
 public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup> {
 
     public static final int UNDEFINED_CLASS = 0;
-    private final HashMap<String, ArrayList<Integer>> trivialMediators = new HashMap<>();
+    private final HashMap<String, ArrayList<String>> trivialMediators = new HashMap<>();
 
     private void loadData(List<String> lines, List<String> linesTM, SumFormulaParser sumFormulaParser) {
         int lineCounter = 0;
@@ -46,9 +46,10 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
             ArrayList<String> tokens = StringFunctions.splitString(line, '\t', '"', true);
             if (tokens.size() != 2 || containsKey(tokens.get(0))) continue;
             
-            ArrayList<Integer> positions = new ArrayList<>();
+            // double bond positions, optionally followed by the cis/trans configuration, e.g. '12Z'
+            ArrayList<String> positions = new ArrayList<>();
             for (String pos : StringFunctions.splitString(tokens.get(1), ',', '"', true)){
-                positions.add(Integer.parseInt(pos));
+                positions.add(pos.strip());
             }
             trivialMediators.put(tokens.get(0), positions);
         }
@@ -110,11 +111,18 @@ public final class KnownFunctionalGroups extends HashMap<String, FunctionalGroup
         return super.get(s).copy();
     }
 
-    public HashMap<String, ArrayList<Integer>> getTmDb() {
+    /**
+     * Returns the double bond positions of the known trivial mediators. Each
+     * position may be followed by its cis/trans configuration ('E' or 'Z'),
+     * e.g. '12Z'.
+     *
+     * @return the double bond positions by trivial mediator name
+     */
+    public HashMap<String, ArrayList<String>> getTmDb() {
         return trivialMediators;
     }
 
-    public ArrayList<Integer> db(String s) {
+    public ArrayList<String> db(String s) {
         return trivialMediators.get(s);
     }
 }

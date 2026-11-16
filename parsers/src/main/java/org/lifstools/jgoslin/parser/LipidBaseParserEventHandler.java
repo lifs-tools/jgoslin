@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import static java.util.Map.entry;
 import org.lifstools.jgoslin.domain.Cycle;
 import org.lifstools.jgoslin.domain.DoubleBonds;
 import org.lifstools.jgoslin.domain.FunctionalGroup;
@@ -62,9 +63,72 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     protected Adduct adduct = null;
     protected ArrayList<HeadgroupDecorator> headgroupDecorators = new ArrayList<>();
     protected boolean useHeadGroup = false;
+    protected String importedHeadgroup = null;
     protected KnownFunctionalGroups knownFunctionalGroups;
 
-    protected static HashSet<String> SP_EXCEPTION_CLASSES = new HashSet<>(Arrays.asList("Cer", "Ceramide", "Sphingosine", "So", "Sphinganine", "Sa", "SPH", "Sph", "LCB"));
+    // Cer and SPB with all their synonyms in lipid-list.csv, as in pygoslin
+    protected static HashSet<String> SP_EXCEPTION_CLASSES = spExceptionClasses();
+
+    private static HashSet<String> spExceptionClasses() {
+        HashSet<String> classes = new HashSet<>();
+        for (String hg : Arrays.asList("Cer", "SPB")) {
+            classes.add(hg);
+            classes.addAll(LipidClasses.getInstance().get(Headgroup.getClass(hg)).synonyms);
+        }
+        return classes;
+    }
+
+    /**
+     * Bile acid names and synonyms, mapped to their lipid class names. Bile
+     * acids are represented by the generic head group 'BA 24:1' with the
+     * imported head group of the respective bile acid class.
+     */
+    protected static final Map<String, String> BILE_ACIDS = Map.ofEntries(
+            entry("TCA", "TCA"),
+            entry("Taurocholic acid", "TCA"),
+            entry("Taurocholate", "TCA"),
+            entry("CA", "CA"),
+            entry("Cholic acid", "CA"),
+            entry("CDCA", "CDCA"),
+            entry("Chenodeoxycholic acid", "CDCA"),
+            entry("GCA", "GCA"),
+            entry("Glycocholic acid", "GCA"),
+            entry("Cholylglycine", "GCA"),
+            entry("GCDCA", "GCDCA"),
+            entry("Glycochenodeoxycholic acid", "GCDCA"),
+            entry("TCDCA", "TCDCA"),
+            entry("Taurochenodeoxycholic acid", "TCDCA"),
+            entry("DCA", "DCA"),
+            entry("Deoxycholic acid", "DCA"),
+            entry("LCA", "LCA"),
+            entry("Lithocholic acid", "LCA"),
+            entry("UDCA", "UDCA"),
+            entry("Ursodeoxycholic acid", "UDCA"),
+            entry("GDCA", "GDCA"),
+            entry("Glycodeoxycholic acid", "GDCA"),
+            entry("TDCA", "TDCA"),
+            entry("Taurodeoxycholic acid", "TDCA"),
+            entry("GLCA", "GLCA"),
+            entry("Glycolithocholic acid", "GLCA"),
+            entry("TLCA", "TLCA"),
+            entry("Taurolithocholic acid", "TLCA"),
+            entry("GUDCA", "GUDCA"),
+            entry("Glycoursodeoxycholic acid", "GUDCA"),
+            entry("TUDCA", "TUDCA"),
+            entry("Tauroursodeoxycholic acid", "TUDCA"),
+            entry("HCA", "HCA"),
+            entry("Hyocholic acid", "HCA"),
+            entry("GHCA", "GHCA"),
+            entry("Glycohyocholic acid", "GHCA"),
+            entry("THCA", "THCA"),
+            entry("Trihydroxycholestanoic acid", "THCA"),
+            entry("HDCA", "HDCA"),
+            entry("Hyodeoxycholic acid", "HDCA"),
+            entry("GHDCA", "GHDCA"),
+            entry("Glycohyodeoxycholic acid", "GHDCA"),
+            entry("THDCA", "THDCA"),
+            entry("Taurohyodeoxycholic acid", "THDCA")
+    );
 
     public LipidBaseParserEventHandler(KnownFunctionalGroups knownFunctionalGroups) {
         this.knownFunctionalGroups = knownFunctionalGroups;
@@ -110,7 +174,7 @@ public abstract class LipidBaseParserEventHandler extends BaseParserEventHandler
     }
 
     protected Headgroup prepareHeadgroupAndChecks(boolean allowClassShift) {
-        Headgroup headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup);
+        Headgroup headgroup = new Headgroup(headGroup, headgroupDecorators, useHeadGroup, importedHeadgroup);
         if (useHeadGroup) {
             return headgroup;
         }

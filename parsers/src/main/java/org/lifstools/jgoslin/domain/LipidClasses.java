@@ -146,7 +146,8 @@ public final class LipidClasses extends ArrayList<LipidClassMeta> {
             StringFunctions.splitString(kv.getValue().get(5), ';', '"').forEach(scase -> {
                 special_cases.add(StringFunctions.strip(scase, '"'));
             });
-            ElementTable e = kv.getValue().get(6).length() > 0 ? sfp.parse(kv.getValue().get(6), handler) : new ElementTable();
+            String sumFormula = StringFunctions.strip(kv.getValue().get(6), ' ');
+            ElementTable e = sumFormula.length() > 0 ? sfp.parse(sumFormula, handler) : new ElementTable();
             ArrayList<String> synonyms = new ArrayList<>();
             synonyms.add(kv.getValue().get(0));
             for (int ii = SYNONYM_START_INDEX; ii < kv.getValue().size(); ++ii) {

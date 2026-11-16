@@ -177,6 +177,7 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
         faList.clear();
         currentFa = null;
         useHeadGroup = false;
+        importedHeadgroup = null;
         omitFa = false;
         dbPosition = 0;
         dbNumbers = -1;
@@ -486,6 +487,9 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void addHydroxyl(TreeNode node) {
         int num_h = node.getInt();
+        if (num_h <= 0) {
+            return;
+        }
 
         if (spRegularLcb()) {
             num_h -= 1;
@@ -522,9 +526,13 @@ public class LipidMapsParserEventHandler extends LipidBaseParserEventHandler {
 
         String hydroxyl = node.getText();
         if (hydroxyl.equals("m")) {
-            FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
-            functional_group_p3.setPosition(3);
-            currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
+            // one hydroxy group: on a regular long chain base it is the one at C1
+            // that carries the head group (e.g. SM, S1P), which is implied
+            if (!spRegularLcb()) {
+                FunctionalGroup functional_group_p3 = knownFunctionalGroups.get("OH");
+                functional_group_p3.setPosition(3);
+                currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group_p3);
+            }
 
         } else if (hydroxyl.equals("d")) {
             if (!spRegularLcb()) {

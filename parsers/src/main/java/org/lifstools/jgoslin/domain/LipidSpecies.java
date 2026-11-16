@@ -66,8 +66,26 @@ public class LipidSpecies {
         }
     }
 
+    /**
+     * Returns the lipid level. This is {@link LipidLevel#SPECIES}, unless the
+     * lipid was created for a name that is only a lipid class or a lipid
+     * category, see {@link #isClassOrCategoryLevel()}.
+     *
+     * @return the lipid level.
+     */
     public LipidLevel getLipidLevel() {
-        return LipidLevel.SPECIES;
+        return isClassOrCategoryLevel() ? info.getLevel() : LipidLevel.SPECIES;
+    }
+
+    /**
+     * Returns true, if this lipid only describes a lipid class or a lipid
+     * category, without any fatty acyl information.
+     *
+     * @return true for lipids on class or category level.
+     */
+    @JsonIgnore
+    public boolean isClassOrCategoryLevel() {
+        return info.getLevel() == LipidLevel.CLASS || info.getLevel() == LipidLevel.CATEGORY;
     }
 
     public LipidSpeciesInfo getInfo() {
@@ -97,6 +115,9 @@ public class LipidSpecies {
      * supported.
      */
     public String getLipidString(LipidLevel level) {
+        if (level == LipidLevel.NO_LEVEL && isClassOrCategoryLevel()) {
+            level = info.getLevel();
+        }
         switch (level) {
             case UNDEFINED_LEVEL ->
                 throw new IllegalArgumentException("LipidSpecies does not know how to create a lipid string for level " + level.toString());
