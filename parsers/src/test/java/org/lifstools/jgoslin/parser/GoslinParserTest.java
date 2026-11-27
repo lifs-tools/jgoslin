@@ -24,6 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import org.lifstools.jgoslin.domain.KnownFunctionalGroups;
 import org.lifstools.jgoslin.domain.LipidFaBondType;
 import org.lifstools.jgoslin.domain.StringFunctions;
@@ -237,6 +241,38 @@ public class GoslinParserTest {
         l = parser.parse("PGB2", handler);
         assertEquals("FA 20:2(5Z,13E);[8-12cy5:1;9oxo];15OH", l.getLipidString());
         assertEquals("C20H30O4", l.getSumFormula());
+    }
+
+    /**
+     * The prostaglandins that a 2.2.1 build parsed without double bonds (string comparison with ==)
+     * and, for the E series, with a hydroxy group instead of the 9-oxo group.
+     */
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+        "PGE2      | FA 20:2(5Z,13E);[8-12cy5:0;11OH;9oxo];15OH | C20H32O5",
+        "PGD2      | FA 20:2(5Z,13E);[8-12cy5:0;9OH;11oxo];15OH | C20H32O5",
+        "PGF2alpha | FA 20:2(5Z,13E);[8-12cy5:0;9OH,11OH];15OH | C20H34O5",
+        "PGE1      | FA 20:1(13E);[8-12cy5:0;11OH;9oxo];15OH    | C20H34O5",
+        "PGJ2      | FA 20:2(5Z,13E);[8-12cy5:1;11oxo];15OH     | C20H30O4"
+    })
+    public void testProstaglandinSeries(String name, String lipidString, String sumFormula) {
+        LipidAdduct l = parser.parse(name, handler);
+        assertEquals(lipidString, l.getLipidString());
+        assertEquals(sumFormula, l.getSumFormula());
+    }
+
+    @Test
+    public void testParsingPrintsNothing() {
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out, true, StandardCharsets.UTF_8));
+        try {
+            parser.parse("PGE2", handler);
+            parser.parse("PGF2alpha", handler);
+        } finally {
+            System.setOut(originalOut);
+        }
+        assertEquals("", out.toString(StandardCharsets.UTF_8));
     }
 
     @Test
