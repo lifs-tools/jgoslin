@@ -88,6 +88,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     entry("st_pre_event", this::setHeadGroupName),
                     entry("hg_ste_pre_event", this::setHeadGroupName),
                     entry("hg_stes_pre_event", this::setHeadGroupName),
+                    entry("hg_stet_pre_event", this::setTrivialSterolEster),
                     entry("hg_mgl_pre_event", this::setHeadGroupName),
                     entry("hg_dgl_pre_event", this::setHeadGroupName),
                     entry("hg_sgl_pre_event", this::setHeadGroupName),
@@ -183,6 +184,15 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setHeadGroupName(TreeNode node) {
         headGroup = node.getText();
+    }
+
+    /**
+     * A sterol's trivial name before a fatty acyl ('Sitosterol 18:2'): the ester class of the sterol core the name
+     * stands for (ST 29:1;O to SE 29:1).
+     */
+    private void setTrivialSterolEster(TreeNode node) {
+        String sterol = Headgroup.getClassString(Headgroup.getClass(node.getText()));
+        headGroup = "SE " + sterol.substring("ST ".length(), sterol.indexOf(';'));
     }
 
     protected void setSpeciesLevel(TreeNode node) {
