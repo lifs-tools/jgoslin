@@ -27,6 +27,7 @@ import org.lifstools.jgoslin.domain.LipidFaBondType;
 import org.lifstools.jgoslin.domain.LipidLevel;
 import org.lifstools.jgoslin.domain.LipidParsingException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
 import static java.util.Map.entry;
 
@@ -41,6 +42,8 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
     private int dbPosition;
     private String dbCistrans;
     private int suffixNumber;
+    private boolean faSuffixMolecular;
+    private boolean allowClassShift;
 
     /**
      * Create a new {@code SwissLipidsParserEventHandler}.
@@ -64,9 +67,12 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
                     entry("mediator_pre_event", this::mediatorEvent),
                     entry("gl_mono_hg_pre_event", this::setHeadGroupName),
                     entry("pl_hg_pre_event", this::setHeadGroupName),
+                    entry("carnitine_hg_pre_event", this::setHeadGroupName),
+                    entry("gl_hg_tg_pre_event", this::setHeadGroupName),
                     entry("pl_three_hg_pre_event", this::setHeadGroupName),
                     entry("pl_four_hg_pre_event", this::setHeadGroupName),
                     entry("sl_hg_pre_event", this::setHeadGroupName),
+                    entry("sl_hg_18_0_pre_event", this::setHeadGroupName18_0),
                     entry("st_species_hg_pre_event", this::setHeadGroupName),
                     entry("st_sub1_hg_pre_event", this::setHeadGroupName),
                     entry("st_sub2_hg_pre_event", this::setHeadGroupNameSe),
@@ -76,6 +82,12 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
                     entry("fa2_unsorted_pre_event", this::setMolecularLevel),
                     entry("fa3_unsorted_pre_event", this::setMolecularLevel),
                     entry("fa4_unsorted_pre_event", this::setMolecularLevel),
+                    entry("lcb_18_1_fa_pre_event", this::setLcb18_1),
+                    entry("lcb_18_0_fa_pre_event", this::setLcb18_0),
+                    entry("one_resolved_fa_post_event", this::oneResolvedFa),
+                    entry("only_c_pre_event", this::onlyC),
+                    entry("only_c_post_event", this::appendFa),
+                    entry("gl_half_sub_fa_pre_event", this::glHalfSubFa),
                     entry("db_single_position_pre_event", this::setIsomericLevel),
                     entry("db_single_position_post_event", this::addDbPosition),
                     entry("db_position_number_pre_event", this::addDbPositionNumber),
@@ -113,6 +125,9 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
         dbCistrans = "";
         headgroupDecorators.clear();
         suffixNumber = -1;
+        importedHeadgroup = null;
+        faSuffixMolecular = false;
+        allowClassShift = true;
     }
 
     private void setIsomericLevel(TreeNode node) {
@@ -148,6 +163,54 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
 
     private void setHeadGroupName(TreeNode node) {
         headGroup = node.getText();
+    }
+
+    private void setHeadGroupName18_0(TreeNode node) {
+        String hg = node.getText();
+        headGroup = hg.equals("DCER") ? "Cer" : hg;
+    }
+
+    private void glHalfSubFa(TreeNode node) {
+        faSuffixMolecular = true;
+    }
+
+    private void setLcb18_1(TreeNode node) {
+        setLcb18(node, 1);
+    }
+
+    private void setLcb18_0(TreeNode node) {
+        setLcb18(node, 0);
+    }
+
+    // implicit long chain base 18:1 (or 18:0 for DCER) of a ceramide given with its N-acyl chain only, e.g. Cer(16:0)
+    private void setLcb18(TreeNode node, int doubleBonds) {
+        newLcb(node);
+        currentFa.setNumCarbon(18);
+        currentFa.getDoubleBonds().setNumDoubleBonds(doubleBonds);
+        FunctionalGroup functionalGroup = knownFunctionalGroups.get("OH");
+        Headgroup headgroup = new Headgroup(headGroup);
+        functionalGroup.setCount(1 + (headgroup.isSpException() ? 1 : 0) + (headGroup.equals("DCER") ? 1 : 0));
+        if (!currentFa.getFunctionalGroupsInternal().containsKey("OH")) {
+            currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
+        }
+        currentFa.getFunctionalGroupsInternal().get("OH").add(functionalGroup);
+        cleanLcb(node);
+    }
+
+    // carnitine with the number of carbons only, e.g. CAR C16
+    private void onlyC(TreeNode node) {
+        newFa(node);
+        currentFa.setNumCarbon(node.getInt());
+    }
+
+    // TG 48:1-FA16:0: the total fatty acyl composition with one resolved fatty acyl chain
+    private void oneResolvedFa(TreeNode node) {
+        setLipidLevel(LipidLevel.MOLECULAR_SPECIES);
+        allowClassShift = false;
+        FattyAcid total = faList.get(0);
+        FattyAcid resolved = faList.get(1);
+        total.setNumCarbon(Math.max(2, total.getNumCarbon() - resolved.getNumCarbon()));
+        total.getDoubleBonds().setNumDoubleBonds(Math.max(0, total.getDoubleBonds().getNumDoubleBonds() - resolved.getDoubleBonds().getNumDoubleBonds()));
     }
 
     private void setHeadGroupNameSe(TreeNode node) {
@@ -203,7 +266,11 @@ public class SwissLipidsParserEventHandler extends LipidBaseParserEventHandler {
             faList.add(0, lcb);
         }
 
-        Headgroup headgroup = prepareHeadgroupAndChecks();
+        Headgroup headgroup = prepareHeadgroupAndChecks(allowClassShift);
+        if (faSuffixMolecular) {
+            // TG 52:2FA18:1, only the total fatty acyl composition is kept
+            faList = new LinkedList<>(faList.subList(0, 1));
+        }
         LipidAdduct lipid = new LipidAdduct(assembleLipid(headgroup), adduct);
         content = lipid;
     }

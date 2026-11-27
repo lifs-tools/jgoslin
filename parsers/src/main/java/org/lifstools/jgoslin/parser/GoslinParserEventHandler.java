@@ -132,6 +132,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
                     entry("mediator_db_pre_event", this::setMediatorDB),
                     entry("mediator_mono_functions_pre_event", this::setMediatorFunction),
                     entry("mediator_di_functions_pre_event", this::setMediatorFunction),
+                    entry("mediator_tri_functions_pre_event", this::setMediatorFunction),
                     entry("mediator_position_pre_event", this::setMediatorFunctionPosition),
                     entry("mediator_functional_group_post_event", this::addMediatorFunction),
                     entry("mediator_suffix_pre_event", this::addMediatorSuffix),
@@ -171,6 +172,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         mediatorFunctionPositions.clear();
         mediatorSuffix = false;
         useHeadGroup = false;
+        importedHeadgroup = null;
         headgroupDecorators.clear();
         heavyElement = Element.C;
         heavyElementNumber = 0;
@@ -183,7 +185,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         headGroup = node.getText();
     }
 
-    private void setSpeciesLevel(TreeNode node) {
+    protected void setSpeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.SPECIES);
     }
 
@@ -213,30 +215,30 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         dbCistrans = node.getText();
     }
 
-    private void setMolecularSubspeciesLevel(TreeNode node) {
+    protected void setMolecularSubspeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.MOLECULAR_SPECIES);
     }
 
-    private void newFa(TreeNode node) {
+    protected void newFa(TreeNode node) {
         LipidFaBondType lipid_FA_bond_type = LipidFaBondType.ESTER;
         currentFa = new FattyAcid("FA", 2, null, null, lipid_FA_bond_type, knownFunctionalGroups);
     }
 
-    private void newLcb(TreeNode node) {
+    protected void newLcb(TreeNode node) {
         lcb = new FattyAcid("LCB", knownFunctionalGroups);
         lcb.setType(LipidFaBondType.LCB_REGULAR);
         currentFa = lcb;
         setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
     }
 
-    private void cleanLcb(TreeNode node) {
+    protected void cleanLcb(TreeNode node) {
         if (currentFa.getDoubleBonds().getDoubleBondPositions().isEmpty() && currentFa.getDoubleBonds().getNumDoubleBonds() > 0) {
             setLipidLevel(LipidLevel.SN_POSITION);
         }
         currentFa = null;
     }
 
-    private void appendFa(TreeNode node) {
+    protected void appendFa(TreeNode node) {
         if (currentFa.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED) {
             throw new LipidException("Lipid with unspecified ether bond cannot be treated properly.");
         }
@@ -268,7 +270,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         currentFa = null;
     }
 
-    private void buildLipid(TreeNode node) {
+    protected void buildLipid(TreeNode node) {
         
         if (lcb != null) {
             faList.add(0, lcb);
@@ -283,15 +285,23 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         Headgroup headgroup = prepareHeadgroupAndChecks();
         String lipidName = node.getText();
         if (lipidName.charAt(lipidName.length() - 1) == EOF_SIGN) lipidName = lipidName.substring(0, lipidName.length() - 1);
-        HashMap<String, ArrayList<Integer>> trivialDb = knownFunctionalGroups.getTmDb();
+        HashMap<String, ArrayList<String>> trivialDb = knownFunctionalGroups.getTmDb();
         
         if (trivialMediator && trivialDb.containsKey(lipidName)){
-            ArrayList<Integer> dbPos = trivialDb.get(lipidName);
-            faList.get(0).getDoubleBonds().setNumDoubleBonds(dbPos.size());
             Map<Integer, String> doubleBondPositions = faList.get(0).getDoubleBonds().getDoubleBondPositions();
             doubleBondPositions.clear();
             
-            for (Integer p : dbPos) doubleBondPositions.put(p, "");
+            // positions may carry the cis/trans configuration, e.g. '12Z'
+            for (String p : trivialDb.get(lipidName)) {
+                if (p.isEmpty()) continue;
+                char cistrans = p.charAt(p.length() - 1);
+                if (cistrans == 'E' || cistrans == 'Z') {
+                    doubleBondPositions.put(Integer.valueOf(p.substring(0, p.length() - 1)), String.valueOf(cistrans));
+                } else {
+                    doubleBondPositions.put(Integer.valueOf(p), "");
+                }
+            }
+            faList.get(0).getDoubleBonds().setNumDoubleBonds(doubleBondPositions.size());
             level = LipidLevel.FULL_STRUCTURE;
         }
 
@@ -332,11 +342,11 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         currentFa.getFunctionalGroupsInternal().get("OH").add(functional_group);
     }
 
-    private void addDoubleBonds(TreeNode node) {
+    protected void addDoubleBonds(TreeNode node) {
         currentFa.getDoubleBonds().setNumDoubleBonds(Integer.valueOf(node.getText()));
     }
 
-    private void addCarbon(TreeNode node) {
+    protected void addCarbon(TreeNode node) {
         currentFa.setNumCarbon(Integer.valueOf(node.getText()));
     }
 
@@ -383,7 +393,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         headGroup = "FA";
         currentFa = new FattyAcid("FA", knownFunctionalGroups);
         faList.add(currentFa);
-        setLipidLevel(LipidLevel.STRUCTURE_DEFINED);
+        // the level is derived from the parsed structure in prepareHeadgroupAndChecks, as in pygoslin
     }
 
     private void setUnstructuredMediator(TreeNode node) {
@@ -413,84 +423,95 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         mediatorFunctionPositions.add(node.getInt());
     }
 
+    private void applyMediatorPosition(FunctionalGroup functionalGroup, int index) {
+        if (mediatorFunctionPositions.size() > index) {
+            functionalGroup.setPosition(mediatorFunctionPositions.get(index));
+        }
+    }
+
     private void addMediatorFunction(TreeNode node) {
         FunctionalGroup functionalGroup = null;
         String fg = "";
-        if (mediatorFunction.equals("H")) {
+        String function = mediatorFunction.toLowerCase();
+        if (mediatorFunction.equals("H") || mediatorFunction.equals("hydroxy")) {
             functionalGroup = knownFunctionalGroups.get("OH");
             fg = "OH";
-            if (mediatorFunctionPositions.size() > 0) {
-                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
-            }
-        } else if (mediatorFunction.toLowerCase().equals("oxo")) {
+            applyMediatorPosition(functionalGroup, 0);
+        } else if (function.equals("d") || function.equals("deoxy")) {
+            // removes the functional group at that position from a trivial
+            // mediator or prostaglandin, see cleanMediator
+            functionalGroup = knownFunctionalGroups.get("d");
+            fg = "d";
+            applyMediatorPosition(functionalGroup, 0);
+        } else if (function.equals("oxo") || function.equals("k") || function.equals("keto")) {
             functionalGroup = knownFunctionalGroups.get("oxo");
             fg = "oxo";
-            if (mediatorFunctionPositions.size() > 0) {
-                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
-            }
-        } else if (mediatorFunction.toLowerCase().equals("hp")) {
+            applyMediatorPosition(functionalGroup, 0);
+        } else if (function.equals("hp")) {
             functionalGroup = knownFunctionalGroups.get("OOH");
             fg = "OOH";
-            if (mediatorFunctionPositions.size() > 0) {
-                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
-            }
-        } else if (mediatorFunction.equals("E") || mediatorFunction.toLowerCase().equals("ep")) {
-            functionalGroup = knownFunctionalGroups.get("Ep");
-            fg = "Ep";
-            if (mediatorFunctionPositions.size() > 0) {
-                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
-            }
+            applyMediatorPosition(functionalGroup, 0);
         } else if (mediatorFunction.equals("NO2")) {
             functionalGroup = knownFunctionalGroups.get("NO2");
             fg = "NO2";
-            if (mediatorFunctionPositions.size() > 0) {
-                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
-            }
-        } else if (mediatorFunction.equals("DH") || mediatorFunction.equals("DiH") || mediatorFunction.equals("diH")) {
+            applyMediatorPosition(functionalGroup, 0);
+        } else if (mediatorFunction.equals("E") || mediatorFunction.equals("Ep") || mediatorFunction.equals("EP")) {
+            functionalGroup = knownFunctionalGroups.get("Ep");
+            fg = "Ep";
+            applyMediatorPosition(functionalGroup, 0);
+        } else if (function.equals("dh") || function.equals("dih") || function.equals("dihydro")) {
             functionalGroup = knownFunctionalGroups.get("OH");
             fg = "OH";
-            if (mediatorFunctionPositions.size() > 0) {
-                functionalGroup.setPosition(mediatorFunctionPositions.get(0));
+            if (mediatorFunctionPositions.size() >= 2) {
+                applyMediatorPosition(functionalGroup, 0);
                 FunctionalGroup functionalGroup2 = knownFunctionalGroups.get("OH");
-                functionalGroup2.setPosition(mediatorFunctionPositions.get(1));
-                currentFa.getFunctionalGroupsInternal().put("OH", new ArrayList<>());
-                currentFa.getFunctionalGroupsInternal().get("OH").add(functionalGroup2);
+                applyMediatorPosition(functionalGroup2, 1);
+                currentFa.getFunctionalGroupsInternal().computeIfAbsent("OH", k -> new ArrayList<>()).add(functionalGroup2);
+            } else {
+                functionalGroup.setCount(2);
+            }
+        } else if (function.equals("trih") || function.equals("trihydroxy")) {
+            functionalGroup = knownFunctionalGroups.get("OH");
+            fg = "OH";
+            if (mediatorFunctionPositions.size() >= 3) {
+                applyMediatorPosition(functionalGroup, 0);
+                FunctionalGroup functionalGroup2 = knownFunctionalGroups.get("OH");
+                applyMediatorPosition(functionalGroup2, 1);
+                FunctionalGroup functionalGroup3 = knownFunctionalGroups.get("OH");
+                applyMediatorPosition(functionalGroup3, 2);
+                currentFa.getFunctionalGroupsInternal().computeIfAbsent("OH", k -> new ArrayList<>()).add(functionalGroup2);
+                currentFa.getFunctionalGroupsInternal().get("OH").add(functionalGroup3);
+            } else {
+                functionalGroup.setCount(3);
             }
         }
 
-        if (!currentFa.getFunctionalGroupsInternal().containsKey(fg)) {
-            currentFa.getFunctionalGroupsInternal().put(fg, new ArrayList<>());
+        // e.g. the stereo descriptors alpha / beta do not add a functional group
+        if (functionalGroup != null) {
+            currentFa.getFunctionalGroupsInternal().computeIfAbsent(fg, k -> new ArrayList<>()).add(functionalGroup);
         }
-        currentFa.getFunctionalGroupsInternal().get(fg).add(functionalGroup);
+        // the enclosing mediator_functional_group nodes raise this event again
+        mediatorFunctionPositions.clear();
+        mediatorFunction = "";
     }
 
 
+    // replaces the functional group(s) at the position of fg, if findable
     private boolean recursiveDeletion(String fgName, FunctionalGroup fg, Map<String, ArrayList<FunctionalGroup>> functionalGroups){
-        ArrayList<String> delFunctions = new ArrayList<>();
-        boolean returnValue = false;
+        String deletedFgName = null;
         for (Entry<String, ArrayList<FunctionalGroup>> kv : functionalGroups.entrySet()){
-            ArrayList<Integer> delFg = new ArrayList<>();
-            for (int i = 0; i < kv.getValue().size(); ++i){
-                if (kv.getValue().get(i).getPosition() == fg.getPosition()) delFg.add(i);
-            }
-            if (!delFg.isEmpty()){
-                for (int i = delFg.size() - 1; i >= 0; --i){
-                    kv.getValue().remove(i);
-                    if (kv.getValue().isEmpty()) delFunctions.add(kv.getKey());
-                }
-                if (!functionalGroups.containsKey(fgName)){
-                    functionalGroups.put(fgName, new ArrayList<>());
-                }
-                functionalGroups.get(fgName).add(fg);
-                returnValue = true;
+            if (kv.getValue().removeIf(fgCurr -> fgCurr.getPosition() == fg.getPosition())){
+                deletedFgName = kv.getKey();
+                break;
             }
             for (FunctionalGroup fgCurr : kv.getValue()){
-                if (returnValue) break;
-                if (recursiveDeletion(fgName, fg, fgCurr.getFunctionalGroupsInternal())) returnValue = true;
+                if (recursiveDeletion(fgName, fg, fgCurr.getFunctionalGroupsInternal())) return true;
             }
         }
-        for (String delFgName : delFunctions) functionalGroups.remove(delFgName);
-        return returnValue;
+        if (deletedFgName == null) return false;
+        if (functionalGroups.get(deletedFgName).isEmpty()) functionalGroups.remove(deletedFgName);
+        functionalGroups.computeIfAbsent(fgName, k -> new ArrayList<>()).add(fg);
+        return true;
     }
     
     
@@ -544,13 +565,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         FattyAcid tmpFa = currentFa;
         currentFa = resolveFaSynonym(node.getText());
         if (tmpFa != null){
-            for (Entry<String, ArrayList<FunctionalGroup>> kv : tmpFa.getFunctionalGroupsInternal().entrySet()){
-                if (!currentFa.getFunctionalGroupsInternal().containsKey(kv.getKey())){
-                    currentFa.getFunctionalGroupsInternal().put(kv.getKey(), new ArrayList<>());
-                }
-                for (FunctionalGroup fg : kv.getValue()) currentFa.getFunctionalGroupsInternal().get(kv.getKey()).add(fg);
-            }
-            tmpFa.getFunctionalGroupsInternal().clear();
+            cleanMediator(tmpFa);
         }
 
         faList.clear();
@@ -603,26 +618,36 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
         
         
     private void addProstaglandin(TreeNode node){
-        HashSet<String> pgTypes = new HashSet<>(Arrays.asList("B", "D", "E", "F", "J", "K"));
+        HashSet<String> pgTypes = new HashSet<>(Arrays.asList("A", "B", "D", "E", "F", "H", "J", "K"));
         HashSet<String> pgNumbers = new HashSet<>(Arrays.asList("1", "2", "3"));
         if (!pgTypes.contains(prostaglandinType) || !pgNumbers.contains(prostaglandinNumber)) return;
 
         DoubleBonds db = null;
         FattyAcid tmpFa = currentFa;
         
-        if (prostaglandinNumber == "1") db = new DoubleBonds(new TreeMap<>(Map.of(13, "E")));
-        else if (prostaglandinNumber == "2") db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E")));
-        else if (prostaglandinNumber == "3") db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E", 17, "Z")));
+        if (prostaglandinNumber.equals("1")) db = new DoubleBonds(new TreeMap<>(Map.of(13, "E")));
+        else if (prostaglandinNumber.equals("2")) db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E")));
+        else if (prostaglandinNumber.equals("3")) db = new DoubleBonds(new TreeMap<>(Map.of(5, "Z", 13, "E", 17, "Z")));
 
-        System.out.println(prostaglandinNumber + " " + prostaglandinType);
-        
-        if (prostaglandinType.equals("B")){
+        if (prostaglandinType.equals("A")){
             FunctionalGroup f1 = knownFunctionalGroups.get("OH");
-            FunctionalGroup f2 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
             f1.setPosition(15);
             f2.setPosition(9);
-            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f2))));
-            Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(new TreeMap<>(Map.of(8, ""))), fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2))));
+            Cycle cy = new Cycle(5, 8, 12, null, fgCy, knownFunctionalGroups);
+            HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
+            db.getDoubleBondPositions().put(10, "Z");
+            db.setNumDoubleBonds(db.getDoubleBondPositions().size());
+            currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
+        }
+        else if (prostaglandinType.equals("B")){
+            FunctionalGroup f1 = knownFunctionalGroups.get("OH");
+            FunctionalGroup f2 = knownFunctionalGroups.get("oxo");
+            f1.setPosition(15);
+            f2.setPosition(9);
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2))));
+            Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgCy, knownFunctionalGroups);
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }
@@ -645,7 +670,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             f1.setPosition(15);
             f2.setPosition(9);
             f3.setPosition(11);
-            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f3)), "oxo", new ArrayList<>(Arrays.asList(f3))));
+            HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f3)), "oxo", new ArrayList<>(Arrays.asList(f2))));
             Cycle cy = new Cycle(5, 8, 12, null, fgCy, knownFunctionalGroups);
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
@@ -668,7 +693,7 @@ public class GoslinParserEventHandler extends LipidBaseParserEventHandler {
             f1.setPosition(15);
             f2.setPosition(11);
             HashMap<String, ArrayList<FunctionalGroup>> fgCy = new HashMap<>(Map.of("oxo", new ArrayList<>(Arrays.asList(f2))));
-            Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(new TreeMap<>(Map.of(9, ""))), fgCy, knownFunctionalGroups);
+            Cycle cy = new Cycle(5, 8, 12, new DoubleBonds(1), fgCy, knownFunctionalGroups);
             HashMap<String, ArrayList<FunctionalGroup>> fg = new HashMap<>(Map.of("OH", new ArrayList<>(Arrays.asList(f1)), "cy", new ArrayList<>(Arrays.asList(cy))));
             currentFa = new FattyAcid("FA", 20, db, fg, knownFunctionalGroups);
         }

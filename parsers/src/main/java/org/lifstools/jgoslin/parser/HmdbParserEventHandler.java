@@ -126,6 +126,7 @@ public class HmdbParserEventHandler extends LipidBaseParserEventHandler {
         faList.clear();
         currentFa = null;
         useHeadGroup = false;
+        importedHeadgroup = null;
         dbPositions = 0;
         dbCistrans = "";
         furan = new Dictionary();

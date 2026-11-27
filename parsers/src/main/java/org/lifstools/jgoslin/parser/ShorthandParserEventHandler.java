@@ -83,6 +83,7 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("pl_species_pre_event", this::setSpeciesLevel),
                     entry("pl_molecular_species_pre_event", this::setMolecularLevel),
                     entry("sl_species_pre_event", this::setSpeciesLevel),
+                    entry("la_species_pre_event", this::setSpeciesLevel),
                     entry("pl_single_pre_event", this::setMolecularLevel),
                     entry("unsorted_fa_separator_pre_event", this::setMolecularLevel),
                     entry("ether_num_pre_event", this::setEtherNum),
@@ -110,6 +111,10 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("hg_pip_pure_d_pre_event", this::setHeadgroupName),
                     entry("hg_pip_pure_t_pre_event", this::setHeadgroupName),
                     entry("hg_PE_PS_pre_event", this::setHeadgroupName),
+                    entry("la2_hg_pre_event", this::setHeadgroupName),
+                    entry("la3_hg_pre_event", this::setHeadgroupName),
+                    entry("la4_hg_pre_event", this::setHeadgroupName),
+                    entry("bile_acids_pre_event", this::setHeadgroupName),
                     // set head group headgroupDecorators
                     entry("carbohydrate_sn_pre_event", this::setCarbohydrate),
                     entry("carbohydrate_iso_pre_event", this::setCarbohydrate),
@@ -177,7 +182,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
                     entry("sterol_ester_definition_post_event", this::setSterolDefinition),
                     entry("adduct_heavy_element_pre_event", this::setHeavyElement),
                     entry("adduct_heavy_number_pre_event", this::setHeavyNumber),
-                    entry("adduct_heavy_component_post_event", this::addHeavyComponent)
+                    entry("adduct_heavy_component_post_event", this::addHeavyComponent),
+                    entry("deuter_number_pre_event", this::addDeuterated)
             );
 
         } catch (Exception e) {
@@ -191,6 +197,8 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         level = LipidLevel.COMPLETE_STRUCTURE;
         adduct = null;
         headGroup = "";
+        useHeadGroup = false;
+        importedHeadgroup = null;
         faList.clear();
         currentFas.clear();
         headgroupDecorators.clear();
@@ -293,6 +301,10 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
         adduct.getHeavyElements().put(heavyElement, heavyElementNumber);
     }
 
+    private void addDeuterated(TreeNode node) {
+        adduct.getHeavyElements().put(Element.H2, node.getInt());
+    }
+
     private void setSpeciesLevel(TreeNode node) {
         setLipidLevel(LipidLevel.SPECIES);
     }
@@ -321,8 +333,14 @@ public class ShorthandParserEventHandler extends LipidBaseParserEventHandler {
     }
 
     private void setHeadgroupName(TreeNode node) {
-        if (headGroup.length() == 0) {
-            headGroup = node.getText();
+        if (headGroup.length() > 0) {
+            return;
+        }
+        headGroup = node.getText();
+        if (BILE_ACIDS.containsKey(headGroup)) {
+            importedHeadgroup = BILE_ACIDS.get(headGroup);
+            headGroup = "BA 24:1";
+            useHeadGroup = true;
         }
     }
 

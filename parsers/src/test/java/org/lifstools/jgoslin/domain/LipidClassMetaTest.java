@@ -36,6 +36,6 @@ public class LipidClassMetaTest {
         assertEquals(0, lcm.getSpecialCases().size());
         assertEquals(1, lcm.getSynonyms().size());
         assertEquals("NeuAc(alpha2-6)-MSGG", lcm.getSynonyms().get(0));
-        assertEquals(19, lcm.getElements().size());
+        assertEquals(Elements.ELEMENT_MASSES.size(), lcm.getElements().size());
     }
 }

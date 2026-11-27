@@ -46,6 +46,7 @@ public final class Headgroup {
     private boolean useHeadgroup;
     private ArrayList<HeadgroupDecorator> decorators = new ArrayList<>();
     private boolean spException;
+    private String importedHeadgroup;
 
     public static final Map<LipidCategory, String> CategoryString = Map.ofEntries(
             entry(LipidCategory.NO_CATEGORY, "NO_CATEGORY"),
@@ -55,6 +56,7 @@ public final class Headgroup {
             entry(LipidCategory.SP, "SP"),
             entry(LipidCategory.ST, "ST"),
             entry(LipidCategory.FA, "FA"),
+            entry(LipidCategory.PK, "PK"),
             entry(LipidCategory.SL, "SL")
     );
     
@@ -90,6 +92,25 @@ public final class Headgroup {
     }
 
     public Headgroup(String _headgroup, ArrayList<HeadgroupDecorator> _decorators, boolean _use_headgroup) {
+        this(_headgroup, _decorators, _use_headgroup, null);
+    }
+
+    /**
+     * Create a new head group with an imported head group. The lipid category
+     * is derived from {@code _headgroup}, while the lipid string (except on
+     * class level) and the element table are derived from the lipid class of
+     * {@code _importedHeadgroup}, e.g. the bile acid 'TCA' with the generic
+     * head group 'BA 24:1'.
+     *
+     * @param _headgroup the head group name
+     * @param _decorators the head group decorators, may be null
+     * @param _use_headgroup if true, use the head group name as is for the
+     * lipid string
+     * @param _importedHeadgroup the name of the lipid class that defines the
+     * head group, may be null
+     */
+    public Headgroup(String _headgroup, ArrayList<HeadgroupDecorator> _decorators, boolean _use_headgroup, String _importedHeadgroup) {
+        importedHeadgroup = _importedHeadgroup;
         String hg = _headgroup.toLowerCase();
         if (GLYCO_TABLE.containsKey(hg) && !_use_headgroup){
             for (String carbohydrate : GLYCO_TABLE.get(hg)){
@@ -110,6 +131,9 @@ public final class Headgroup {
         headgroup = _headgroup;
         lipidCategory = getCategory(_headgroup);
         lipidClass = getClass(headgroup);
+        if (importedHeadgroup != null) {
+            lipidClass = getClass(importedHeadgroup);
+        }
         useHeadgroup = _use_headgroup;
         if (_decorators != null){
             for (HeadgroupDecorator hgd : _decorators) decorators.add(hgd);
@@ -171,7 +195,14 @@ public final class Headgroup {
             return getCategoryString(lipidCategory);
         }
 
-        String hgs = useHeadgroup ? headgroup : getClassString(lipidClass);
+        String hgs;
+        if (!useHeadgroup) {
+            hgs = getClassString(lipidClass);
+        } else if (level == LipidLevel.CLASS || importedHeadgroup == null) {
+            hgs = headgroup;
+        } else {
+            hgs = importedHeadgroup;
+        }
 
         /*
         if (level == LipidLevel.CLASS) {
@@ -232,7 +263,7 @@ public final class Headgroup {
     @JsonIgnore
     public ElementTable getElements() {
 
-        if (useHeadgroup || LipidClasses.getInstance().size() <= lipidClass) {
+        if ((useHeadgroup && importedHeadgroup == null) || LipidClasses.getInstance().size() <= lipidClass) {
             throw new ConstraintViolationException("Element table cannot be computed for lipid '" + headgroup + "'");
         }
 
@@ -277,6 +308,21 @@ public final class Headgroup {
 
     public void setUseHeadgroup(boolean useHeadgroup) {
         this.useHeadgroup = useHeadgroup;
+    }
+
+    /**
+     * Returns the name of the imported head group, e.g. the bile acid 'TCA',
+     * or null, if no head group was imported.
+     *
+     * @return the imported head group name or null
+     */
+    @JsonIgnore
+    public String getImportedHeadgroup() {
+        return importedHeadgroup;
+    }
+
+    public void setImportedHeadgroup(String importedHeadgroup) {
+        this.importedHeadgroup = importedHeadgroup;
     }
 
     @JsonIgnore

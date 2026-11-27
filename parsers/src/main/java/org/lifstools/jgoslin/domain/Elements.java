@@ -44,6 +44,7 @@ public final class Elements {
             entry("Br", Element.Br),
             entry("I", Element.I),
             entry("As", Element.As),
+            entry("B", Element.B),
             entry("S'", Element.S34),
             entry("S''", Element.S33),
             entry("H'", Element.H2),
@@ -88,7 +89,8 @@ public final class Elements {
             entry(Element.Cl, 34.968853),
             entry(Element.Br, 78.918327),
             entry(Element.I, 126.904473),
-            entry(Element.As, 74.921595)
+            entry(Element.As, 74.921595),
+            entry(Element.B, 10.012936862)
     );
 
     public static final Map<Element, String> ELEMENT_SHORTCUT = Map.ofEntries(
@@ -104,6 +106,7 @@ public final class Elements {
             entry(Element.Br, "Br"),
             entry(Element.I, "I"),
             entry(Element.As, "As"),
+            entry(Element.B, "B"),
             entry(Element.H2, "H'"),
             entry(Element.C13, "C'"),
             entry(Element.N15, "N'"),
@@ -127,6 +130,7 @@ public final class Elements {
             entry(Element.Br, "Br"),
             entry(Element.I, "I"),
             entry(Element.As, "As"),
+            entry(Element.B, "B"),
             entry(Element.H2, "[2]H"),
             entry(Element.C13, "[13]C"),
             entry(Element.N15, "[15]N"),
@@ -164,5 +168,5 @@ public final class Elements {
     );
     
 
-    public static final ArrayList<Element> ELEMENT_ORDER = new ArrayList<Element>(List.of(Element.C, Element.H, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));
+    public static final ArrayList<Element> ELEMENT_ORDER = new ArrayList<Element>(List.of(Element.C, Element.H, Element.B, Element.As, Element.Br, Element.Cl, Element.F, Element.I, Element.N, Element.O, Element.P, Element.S, Element.H2, Element.C13, Element.N15, Element.O17, Element.O18, Element.P32, Element.S33, Element.S34));
 }
